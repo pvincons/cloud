@@ -1,9 +1,20 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="vi" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PV Incons - Giải Pháp Thiết Kế & Thi Công Công Nghiệp</title>
+    <title>PV INCONS | Real Quality - Real Value</title>
+    <meta name="description" content="PV INCONS - Chuyên tư vấn thiết kế kiến trúc, thi công nhà xưởng công nghiệp, bảo dưỡng kỹ thuật và tư vấn pháp lý xây dựng.">
+    
+    <!-- Favicon / Logo Tab Trình Duyệt -->
+    <link rel="icon" type="image/png" href="logo.png">
+
+    <!-- Open Graph for Social Sharing -->
+    <meta property="og:title" content="PV INCONS - Real Quality - Real Value">
+    <meta property="og:description" content="Giải pháp toàn diện từ thiết kế, dự toán chi tiết đến thi công hoàn thiện công trình.">
+    <meta property="og:image" content="logo.png">
+    <meta property="og:type" content="website">
+
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -12,81 +23,125 @@
                 extend: {
                     colors: {
                         brand: {
-                            blue: '#004A99',
-                            darkblue: '#003366',
-                            yellow: '#FFB800',
-                            gray: '#F4F6F9'
+                            blue: '#1e68a8',
+                            darkblue: '#0d3d6b',
+                            orange: '#e87e23',
+                            gray: '#f4f6f9'
                         }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
                     }
                 }
             }
         }
     </script>
-    <!-- Font Inter & FontAwesome Icons -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        body { font-family: 'Inter', sans-serif; }
-    </style>
 </head>
-<body class="bg-slate-50 text-slate-800 antialiased">
+<body class="bg-slate-50 text-slate-800 font-sans antialiased selection:bg-brand-blue selection:text-white">
+
+    <!-- Top Info Bar -->
+    <div class="bg-slate-900 text-slate-300 text-xs py-2 border-b border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
+            <div class="flex items-center space-x-6">
+                <span><i class="fa-solid fa-envelope text-brand-orange mr-1.5"></i> contact@pvincons.vn</span>
+                <span class="hidden sm:inline"><i class="fa-solid fa-phone text-brand-orange mr-1.5"></i> Hotline: 090x xxx xxx</span>
+                <span class="hidden md:inline"><i class="fa-solid fa-location-dot text-brand-orange mr-1.5"></i> Ninh Kiều, Cần Thơ</span>
+            </div>
+            <div class="flex space-x-4">
+                <a href="#" class="hover:text-white transition"><i class="fa-brands fa-facebook"></i></a>
+                <a href="#" class="hover:text-white transition"><i class="fa-brands fa-linkedin"></i></a>
+                <a href="#" class="hover:text-white transition"><i class="fa-brands fa-youtube"></i></a>
+            </div>
+        </div>
+    </div>
 
     <!-- Header Navigation -->
-    <header class="sticky top-0 z-50 bg-white shadow-sm border-b border-slate-100">
+    <header class="sticky top-0 z-50 bg-white/95 backdrop-blur-md shadow-sm border-b border-slate-100">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-            <a href="#" class="flex items-center space-x-3">
-                <div class="bg-brand-blue text-white font-black text-2xl px-3 py-1.5 rounded tracking-wider">PV</div>
-                <div>
-                    <span class="block font-bold text-xl text-brand-darkblue leading-none">INCONS</span>
-                    <span class="text-[10px] text-slate-500 tracking-wider font-semibold uppercase">Construction & Engineering</span>
-                </div>
+            <!-- Official Logo -->
+            <a href="#" class="flex items-center space-x-3 group py-2">
+                <img src="logo.png" alt="PV INCONS Logo" class="h-12 sm:h-14 w-auto object-contain transition-transform group-hover:scale-105">
             </a>
 
-            <nav class="hidden md:flex space-x-8 font-medium text-slate-700">
+            <!-- Desktop Nav -->
+            <nav class="hidden lg:flex space-x-8 font-semibold text-sm text-slate-700">
                 <a href="#about" class="hover:text-brand-blue transition">Giới Thiệu</a>
-                <a href="#pricing" class="hover:text-brand-blue transition">Báo Giá Dịch Vụ</a>
-                <a href="#calculator" class="hover:text-brand-blue transition">Dự Toán Chi Phí</a>
-                <a href="#projects" class="hover:text-brand-blue transition">Dự Án</a>
-                <a href="#contact" class="hover:text-brand-blue transition">Liên Hệ</a>
+                <a href="#services" class="hover:text-brand-blue transition">Dịch Vụ</a>
+                <a href="#pricing" class="hover:text-brand-blue transition">Bảng Báo Giá</a>
+                <a href="#calculator" class="hover:text-brand-blue transition">Tính Dự Toán</a>
+                <a href="#process" class="hover:text-brand-blue transition">Quy Trình</a>
             </nav>
 
-            <a href="#contact" class="hidden sm:inline-flex items-center bg-brand-yellow hover:bg-yellow-500 text-slate-900 font-semibold px-5 py-2.5 rounded-lg transition shadow-sm">
-                <i class="fa-solid fa-paper-plane mr-2"></i> Yêu Cầu Báo Giá
-            </a>
+            <!-- CTA Button -->
+            <div class="hidden sm:flex items-center space-x-4">
+                <a href="#contact" class="bg-brand-blue hover:bg-brand-darkblue text-white font-semibold text-sm px-5 py-2.5 rounded-lg transition shadow-md shadow-brand-blue/20">
+                    <i class="fa-solid fa-paper-plane mr-2"></i> Yêu Cầu Báo Giá
+                </a>
+            </div>
+
+            <!-- Mobile Menu Toggle -->
+            <button id="mobileMenuBtn" class="lg:hidden text-slate-700 text-2xl focus:outline-none">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+        </div>
+
+        <!-- Mobile Menu Drawer -->
+        <div id="mobileMenu" class="hidden lg:hidden bg-white border-b border-slate-200 px-4 pt-2 pb-6 space-y-3">
+            <a href="#about" class="block py-2 font-medium text-slate-700 hover:text-brand-blue">Giới Thiệu</a>
+            <a href="#services" class="block py-2 font-medium text-slate-700 hover:text-brand-blue">Dịch Vụ</a>
+            <a href="#pricing" class="block py-2 font-medium text-slate-700 hover:text-brand-blue">Bảng Báo Giá</a>
+            <a href="#calculator" class="block py-2 font-medium text-slate-700 hover:text-brand-blue">Tính Dự Toán</a>
+            <a href="#contact" class="block text-center bg-brand-blue text-white font-semibold py-2.5 rounded-lg mt-4">Yêu Cầu Báo Giá</a>
         </div>
     </header>
 
     <!-- Hero Section -->
-    <section class="relative bg-brand-darkblue text-white py-20 lg:py-28 overflow-hidden">
-        <div class="absolute inset-0 opacity-10 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:16px_16px]"></div>
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 grid md:grid-cols-2 gap-12 items-center">
-            <div>
-                <span class="bg-blue-900/80 text-blue-300 text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider">Đơn vị thi công uy tín</span>
-                <h1 class="text-4xl sm:text-5xl font-extrabold mt-4 leading-tight">Giải Pháp Xây Dựng & Kỹ Thuật Công Nghiệp Comprehensive</h1>
-                <p class="mt-4 text-slate-300 text-lg">PV Incons chuyên tư vấn thiết kế, thi công xây lắp công nghiệp, bảo dưỡng công trình dầu khí và cung cấp vật tư kỹ thuật chất lượng cao.</p>
-                <div class="mt-8 flex flex-wrap gap-4">
-                    <a href="#pricing" class="bg-brand-blue hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-lg shadow-lg transition">Xem Bảng Giá Dịch Vụ</a>
-                    <a href="#calculator" class="bg-slate-800 hover:bg-slate-700 border border-slate-600 text-white font-semibold px-6 py-3 rounded-lg transition">Công Cụ Dự Toán</a>
+    <section class="relative bg-slate-900 text-white py-24 lg:py-32 overflow-hidden">
+        <div class="absolute inset-0 opacity-20 bg-[radial-gradient(#1e68a8_1px,transparent_1px)] [background-size:24px_24px]"></div>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 grid lg:grid-cols-12 gap-12 items-center">
+            <div class="lg:col-span-7">
+                <div class="inline-flex items-center space-x-2 bg-brand-blue/20 border border-brand-blue/40 text-blue-200 text-xs font-semibold px-3.5 py-1.5 rounded-full mb-6 backdrop-blur-sm">
+                    <span class="w-2 h-2 rounded-full bg-brand-orange animate-pulse"></span>
+                    <span>Real Quality - Real Value</span>
+                </div>
+                <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-tight">
+                    Giải Pháp Xây Dựng & <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-brand-orange">Kỹ Thuật Toàn Diện</span>
+                </h1>
+                <p class="mt-6 text-slate-300 text-lg leading-relaxed max-w-2xl">
+                    PV INCONS đồng hành cùng khách hàng và nhà đầu tư với giải pháp toàn diện: từ thiết kế kiến trúc, mô phỏng BIM/3D, thi công công nghiệp – dân dụng đến hoàn thiện thủ tục pháp lý xây dựng.
+                </p>
+                <div class="mt-10 flex flex-wrap gap-4">
+                    <a href="#pricing" class="bg-brand-blue hover:bg-brand-darkblue text-white font-bold px-7 py-3.5 rounded-xl shadow-lg shadow-brand-blue/30 transition">
+                        Xem Báo Giá Dịch Vụ
+                    </a>
+                    <a href="#calculator" class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-bold px-7 py-3.5 rounded-xl transition">
+                        <i class="fa-solid fa-calculator mr-2 text-brand-orange"></i> Tính Chi Phí Sơ Bộ
+                    </a>
                 </div>
             </div>
-            <div class="relative">
-                <div class="bg-white/5 p-6 rounded-2xl border border-white/10 backdrop-blur-sm">
-                    <div class="grid grid-cols-2 gap-4">
-                        <div class="bg-white/10 p-4 rounded-xl text-center">
-                            <span class="block text-3xl font-bold text-brand-yellow">10+</span>
-                            <span class="text-xs text-slate-300">Năm Kinh Nghiệm</span>
-                        </div>
-                        <div class="bg-white/10 p-4 rounded-xl text-center">
-                            <span class="block text-3xl font-bold text-brand-yellow">250+</span>
-                            <span class="text-xs text-slate-300">Dự Án Hoàn Thành</span>
-                        </div>
-                        <div class="bg-white/10 p-4 rounded-xl text-center">
-                            <span class="block text-3xl font-bold text-brand-yellow">100%</span>
-                            <span class="text-xs text-slate-300">Đạt Tiêu Chuẩn An Toàn</span>
-                        </div>
-                        <div class="bg-white/10 p-4 rounded-xl text-center">
-                            <span class="block text-3xl font-bold text-brand-yellow">24/7</span>
-                            <span class="text-xs text-slate-300">Hỗ Trợ Kỹ Thuật</span>
+
+            <!-- Hero Feature Cards -->
+            <div class="lg:col-span-5 grid grid-cols-2 gap-4">
+                <div class="bg-slate-800/80 p-6 rounded-2xl border border-slate-700/60 backdrop-blur-md">
+                    <div class="text-brand-orange text-3xl font-extrabold mb-1">BIM 3D</div>
+                    <div class="text-sm font-semibold text-slate-200">Chuẩn Hóa Thiết Kế</div>
+                    <p class="text-xs text-slate-400 mt-2">Mô hình hóa trực quan, tối ưu hóa vật liệu và bóc tách khối lượng chính xác.</p>
+                </div>
+                <div class="bg-slate-800/80 p-6 rounded-2xl border border-slate-700/60 backdrop-blur-md">
+                    <div class="text-brand-orange text-3xl font-extrabold mb-1">100%</div>
+                    <div class="text-sm font-semibold text-slate-200">Đạt Tiêu Chuẩn TCVN</div>
+                    <p class="text-xs text-slate-400 mt-2">Đảm bảo an toàn kết cấu, quy chuẩn PCCC và tiêu chuẩn xây dựng hiện hành.</p>
+                </div>
+                <div class="bg-slate-800/80 p-6 rounded-2xl border border-slate-700/60 backdrop-blur-md col-span-2">
+                    <div class="flex items-center space-x-4">
+                        <div class="p-3 bg-brand-blue/20 text-brand-orange rounded-xl"><i class="fa-solid fa-shield-halved text-2xl"></i></div>
+                        <div>
+                            <h4 class="font-bold text-white text-base">Cam Kết Chất Lượng & Pháp Lý</h4>
+                            <p class="text-xs text-slate-300 mt-0.5">Hỗ trợ trọn gói từ bản vẽ xin phép, thi công đến nghiệm thu hoàn công.</p>
                         </div>
                     </div>
                 </div>
@@ -94,247 +149,294 @@
         </div>
     </section>
 
-    <!-- Detailed Pricing Section -->
+    <!-- Detailed Services Grid -->
+    <section id="services" class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-16">
+                <span class="text-brand-blue font-bold text-sm tracking-widest uppercase">Năng Lực Cốt Lõi</span>
+                <h2 class="text-3xl sm:text-4xl font-bold text-slate-900 mt-2">Dịch Vụ Kỹ Thuật & Xây Dựng</h2>
+                <p class="text-slate-600 mt-3">Cung cấp giải pháp kỹ thuật đa dạng với quy trình làm việc chuẩn mực và minh bạch.</p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- Service 1 -->
+                <div class="p-8 bg-slate-50 rounded-2xl border border-slate-200/80 hover:border-brand-blue hover:shadow-xl transition group">
+                    <div class="w-14 h-14 bg-blue-50 text-brand-blue rounded-xl flex items-center justify-center text-2xl mb-6 group-hover:bg-brand-blue group-hover:text-white transition">
+                        <i class="fa-solid fa-drafting-compass"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-900 mb-3">Tư Vấn & Thiết Kế Kiến Trúc</h3>
+                    <p class="text-slate-600 text-sm leading-relaxed mb-4">
+                        Lập hồ sơ thiết kế cơ sở, bản vẽ thi công, mô phỏng render 3D chất lượng cao cho công trình nhà phố, biệt thự và nhà xưởng.
+                    </p>
+                    <ul class="text-xs text-slate-500 space-y-2">
+                        <li><i class="fa-solid fa-check text-brand-blue mr-2"></i>Ứng dụng BIM & Revit tối ưu</li>
+                        <li><i class="fa-solid fa-check text-brand-blue mr-2"></i>Bóc tách dự toán chi tiết</li>
+                    </ul>
+                </div>
+
+                <!-- Service 2 -->
+                <div class="p-8 bg-slate-50 rounded-2xl border border-slate-200/80 hover:border-brand-blue hover:shadow-xl transition group">
+                    <div class="w-14 h-14 bg-blue-50 text-brand-blue rounded-xl flex items-center justify-center text-2xl mb-6 group-hover:bg-brand-blue group-hover:text-white transition">
+                        <i class="fa-solid fa-warehouse"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-900 mb-3">Thi Công Nhà Xưởng & Khung Thép</h3>
+                    <p class="text-slate-600 text-sm leading-relaxed mb-4">
+                        Thi công trọn gói kết cấu thép tiền chế, nhà kho, sàn bê tông công nghiệp đánh bóng xoa nền tăng cứng.
+                    </p>
+                    <ul class="text-xs text-slate-500 space-y-2">
+                        <li><i class="fa-solid fa-check text-brand-blue mr-2"></i>Đạt tiêu chuẩn an toàn lao động</li>
+                        <li><i class="fa-solid fa-check text-brand-blue mr-2"></i>Tiến độ thi công nhanh chóng</li>
+                    </ul>
+                </div>
+
+                <!-- Service 3 -->
+                <div class="p-8 bg-slate-50 rounded-2xl border border-slate-200/80 hover:border-brand-blue hover:shadow-xl transition group">
+                    <div class="w-14 h-14 bg-blue-50 text-brand-blue rounded-xl flex items-center justify-center text-2xl mb-6 group-hover:bg-brand-blue group-hover:text-white transition">
+                        <i class="fa-solid fa-file-contract"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-900 mb-3">Pháp Lý & Đo Đạc Hoàn Công</h3>
+                    <p class="text-slate-600 text-sm leading-relaxed mb-4">
+                        Tư vấn lập bản vẽ trích đo hiện trạng đất đai (hệ tọa độ VN-2000), xin cấp phép xây dựng và thủ tục hoàn công tài sản.
+                    </p>
+                    <ul class="text-xs text-slate-500 space-y-2">
+                        <li><i class="fa-solid fa-check text-brand-blue mr-2"></i>Xử lý sai lệch ranh đất</li>
+                        <li><i class="fa-solid fa-check text-brand-blue mr-2"></i>Đúng quy định chính quyền địa phương</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
     <section id="pricing" class="py-20 bg-slate-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center max-w-3xl mx-auto mb-16">
-                <h2 class="text-3xl font-bold text-slate-900">Bảng Báo Giá Dịch Vụ Niêm Yết</h2>
-                <p class="mt-3 text-slate-600">Minh bạch chi phí, tối ưu ngân sách cho từng quy mô dự án xây dựng và kỹ thuật công nghiệp.</p>
+                <span class="text-brand-blue font-bold text-sm tracking-widest uppercase">Minh Bạch Chi Phí</span>
+                <h2 class="text-3xl sm:text-4xl font-bold text-slate-900 mt-2">Bảng Báo Giá Niêm Yết</h2>
+                <p class="text-slate-600 mt-3">Đơn giá tham khảo minh bạch giúp bạn chủ động chuẩn bị ngân sách đầu tư.</p>
             </div>
 
-            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div class="grid md:grid-cols-3 gap-8">
                 <!-- Package 1 -->
-                <div class="bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition p-8 flex flex-col justify-between">
+                <div class="bg-white rounded-2xl border border-slate-200 p-8 shadow-sm hover:shadow-lg transition flex flex-col justify-between">
                     <div>
-                        <div class="flex items-center justify-between mb-4">
-                            <span class="p-3 bg-blue-50 text-brand-blue rounded-xl"><i class="fa-solid fa-industry text-2xl"></i></span>
-                            <span class="text-xs font-semibold text-slate-500 uppercase bg-slate-100 px-2.5 py-1 rounded">Xây Dựng</span>
-                        </div>
-                        <h3 class="text-xl font-bold text-slate-900">Thi Công Nhà Xưởng & Kho Bãi</h3>
-                        <p class="text-sm text-slate-500 mt-1">Thi công khung thép tiền chế, sàn bê tông công nghiệp.</p>
+                        <span class="text-xs font-bold text-brand-blue bg-blue-50 px-3 py-1 rounded-full uppercase">Thiết Kế</span>
+                        <h3 class="text-xl font-bold text-slate-900 mt-4">Hồ Sơ Thiết Kế Kiến Trúc</h3>
+                        <p class="text-xs text-slate-500 mt-1">Dành cho Nhà phố / Biệt thự / Văn phòng</p>
                         <div class="my-6">
-                            <span class="text-3xl font-bold text-brand-blue">1.800.000đ</span>
+                            <span class="text-3xl font-extrabold text-slate-900">150.000đ</span>
                             <span class="text-slate-500 text-sm">/ m²</span>
                         </div>
-                        <ul class="space-y-3 text-sm text-slate-600">
-                            <li class="flex items-center"><i class="fa-solid fa-check text-green-500 mr-2.5"></i> Thiết kế bản vẽ thi công basic</li>
-                            <li class="flex items-center"><i class="fa-solid fa-check text-green-500 mr-2.5"></i> Kết cấu thép đạt chuẩn ISO</li>
-                            <li class="flex items-center"><i class="fa-solid fa-check text-green-500 mr-2.5"></i> Đổ bê tông nền xưởng xoa nền tăng cứng</li>
+                        <ul class="space-y-3 text-sm text-slate-600 border-t border-slate-100 pt-6">
+                            <li class="flex items-center"><i class="fa-solid fa-check text-green-500 mr-2.5"></i> Bản vẽ kiến trúc 2D & Kết cấu</li>
+                            <li class="flex items-center"><i class="fa-solid fa-check text-green-500 mr-2.5"></i> Bản vẽ điện nước (MEP)</li>
+                            <li class="flex items-center"><i class="fa-solid fa-check text-green-500 mr-2.5"></i> Phối cảnh 3D ngoại thất</li>
+                            <li class="flex items-center"><i class="fa-solid fa-check text-green-500 mr-2.5"></i> Hỗ trợ chỉnh sửa bản vẽ 3 lần</li>
+                        </ul>
+                    </div>
+                    <a href="#contact" class="mt-8 block text-center bg-slate-100 hover:bg-brand-blue hover:text-white text-slate-800 font-bold py-3 rounded-xl transition">Đăng Ký Tư Vấn</a>
+                </div>
+
+                <!-- Package 2 Featured -->
+                <div class="bg-white rounded-2xl border-2 border-brand-blue p-8 shadow-xl transition flex flex-col justify-between relative scale-105 z-10">
+                    <span class="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-brand-blue text-white text-xs font-bold px-4 py-1 rounded-full uppercase tracking-wider">Được Chọn Nhiều Nhất</span>
+                    <div>
+                        <span class="text-xs font-bold text-brand-blue bg-blue-50 px-3 py-1 rounded-full uppercase">Thi Công</span>
+                        <h3 class="text-xl font-bold text-slate-900 mt-4">Xây Lắp Nhà Xưởng Khung Thép</h3>
+                        <p class="text-xs text-slate-500 mt-1">Trọn gói kết cấu & Nền bê tông công nghiệp</p>
+                        <div class="my-6">
+                            <span class="text-3xl font-extrabold text-brand-blue">1.800.000đ</span>
+                            <span class="text-slate-500 text-sm">/ m²</span>
+                        </div>
+                        <ul class="space-y-3 text-sm text-slate-600 border-t border-slate-100 pt-6">
+                            <li class="flex items-center"><i class="fa-solid fa-check text-green-500 mr-2.5"></i> Khung thép tổ hợp đạt chuẩn</li>
+                            <li class="flex items-center"><i class="fa-solid fa-check text-green-500 mr-2.5"></i> Mái tôn chống nóng & Lấy sáng</li>
+                            <li class="flex items-center"><i class="fa-solid fa-check text-green-500 mr-2.5"></i> Sàn bê tông cốt thép xoa nền</li>
                             <li class="flex items-center"><i class="fa-solid fa-check text-green-500 mr-2.5"></i> Bảo hành kết cấu 5 năm</li>
                         </ul>
                     </div>
-                    <a href="#contact" class="mt-8 w-full block text-center bg-slate-100 hover:bg-brand-blue hover:text-white text-slate-800 font-semibold py-3 rounded-xl transition">Đăng Ký Tư Vấn</a>
-                </div>
-
-                <!-- Package 2 (Featured) -->
-                <div class="bg-white rounded-2xl border-2 border-brand-blue shadow-lg transition p-8 flex flex-col justify-between relative">
-                    <span class="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-brand-blue text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Phổ Biến Nhất</span>
-                    <div>
-                        <div class="flex items-center justify-between mb-4">
-                            <span class="p-3 bg-blue-50 text-brand-blue rounded-xl"><i class="fa-solid fa-wrench text-2xl"></i></span>
-                            <span class="text-xs font-semibold text-slate-500 uppercase bg-slate-100 px-2.5 py-1 rounded">Bảo Dưỡng</span>
-                        </div>
-                        <h3 class="text-xl font-bold text-slate-900">Bảo Dưỡng Hệ Thống Công Nghiệp</h3>
-                        <p class="text-sm text-slate-500 mt-1">Bảo trì định kỳ đường ống, bồn bể, đường ống công nghiệp.</p>
-                        <div class="my-6">
-                            <span class="text-3xl font-bold text-brand-blue">15.000.000đ</span>
-                            <span class="text-slate-500 text-sm">/ tháng</span>
-                        </div>
-                        <ul class="space-y-3 text-sm text-slate-600">
-                            <li class="flex items-center"><i class="fa-solid fa-check text-green-500 mr-2.5"></i> Kiểm tra hệ thống định kỳ 2 lần/tháng</li>
-                            <li class="flex items-center"><i class="fa-solid fa-check text-green-500 mr-2.5"></i> Đo độ dày đường ống & siêu âm mối hàn</li>
-                            <li class="flex items-center"><i class="fa-solid fa-check text-green-500 mr-2.5"></i> Xử lý sự cố khẩn cấp trong 4h</li>
-                            <li class="flex items-center"><i class="fa-solid fa-check text-green-500 mr-2.5"></i> Báo cáo đánh giá rủi ro kỹ thuật</li>
-                        </ul>
-                    </div>
-                    <a href="#contact" class="mt-8 w-full block text-center bg-brand-blue hover:bg-blue-700 text-white font-semibold py-3 rounded-xl transition">Nhận Báo Giá Chi Tiết</a>
+                    <a href="#contact" class="mt-8 block text-center bg-brand-blue hover:bg-brand-darkblue text-white font-bold py-3 rounded-xl transition shadow-md">Nhận Báo Giá Chi Tiết</a>
                 </div>
 
                 <!-- Package 3 -->
-                <div class="bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition p-8 flex flex-col justify-between">
+                <div class="bg-white rounded-2xl border border-slate-200 p-8 shadow-sm hover:shadow-lg transition flex flex-col justify-between">
                     <div>
-                        <div class="flex items-center justify-between mb-4">
-                            <span class="p-3 bg-blue-50 text-brand-blue rounded-xl"><i class="fa-solid fa-helmet-safety text-2xl"></i></span>
-                            <span class="text-xs font-semibold text-slate-500 uppercase bg-slate-100 px-2.5 py-1 rounded">Tư Vấn</span>
-                        </div>
-                        <h3 class="text-xl font-bold text-slate-900">Giám Sát & Quản Lý Dự Án</h3>
-                        <p class="text-sm text-slate-500 mt-1">Tư vấn quản lý chất lượng & an toàn công trình.</p>
+                        <span class="text-xs font-bold text-brand-blue bg-blue-50 px-3 py-1 rounded-full uppercase">Xây Dựng Dân Dụng</span>
+                        <h3 class="text-xl font-bold text-slate-900 mt-4">Thi Công Nhà Phố Trọn Gói</h3>
+                        <p class="text-xs text-slate-500 mt-1">Chìa khóa trao tay - Đầy đủ vật tư</p>
                         <div class="my-6">
-                            <span class="text-3xl font-bold text-brand-blue">2.0%</span>
-                            <span class="text-slate-500 text-sm">/ tổng giá trị dự án</span>
+                            <span class="text-3xl font-extrabold text-slate-900">5.500.000đ</span>
+                            <span class="text-slate-500 text-sm">/ m²</span>
                         </div>
-                        <ul class="space-y-3 text-sm text-slate-600">
-                            <li class="flex items-center"><i class="fa-solid fa-check text-green-500 mr-2.5"></i> Kỹ sư giám sát thường trực tại hiện trường</li>
-                            <li class="flex items-center"><i class="fa-solid fa-check text-green-500 mr-2.5"></i> Kiểm soát tiến độ & chất lượng vật tư</li>
-                            <li class="flex items-center"><i class="fa-solid fa-check text-green-500 mr-2.5"></i> Nghiệm thu từng hạng mục theo chuẩn</li>
-                            <li class="flex items-center"><i class="fa-solid fa-check text-green-500 mr-2.5"></i> Tối ưu hóa chi phí phát sinh</li>
+                        <ul class="space-y-3 text-sm text-slate-600 border-t border-slate-100 pt-6">
+                            <li class="flex items-center"><i class="fa-solid fa-check text-green-500 mr-2.5"></i> Miễn phí 100% hồ sơ thiết kế</li>
+                            <li class="flex items-center"><i class="fa-solid fa-check text-green-500 mr-2.5"></i> Bao gồm vật tư thô + Hoàn thiện</li>
+                            <li class="flex items-center"><i class="fa-solid fa-check text-green-500 mr-2.5"></i> Giám sát kỹ thuật thường trực</li>
+                            <li class="flex items-center"><i class="fa-solid fa-check text-green-500 mr-2.5"></i> Hỗ trợ thủ tục xin phép & hoàn công</li>
                         </ul>
                     </div>
-                    <a href="#contact" class="mt-8 w-full block text-center bg-slate-100 hover:bg-brand-blue hover:text-white text-slate-800 font-semibold py-3 rounded-xl transition">Liên Hệ Tư Vấn</a>
-                </div>
-            </div>
-
-            <!-- Price Table for Fabrication Services -->
-            <div class="mt-16 bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
-                <div class="px-6 py-4 bg-slate-100 border-b border-slate-200">
-                    <h3 class="font-bold text-slate-800 text-lg">Đơn Giá Gia Công Cơ Khí & Lắp Máy (Tham Khảo)</h3>
-                </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-sm text-slate-600">
-                        <thead class="bg-slate-50 text-slate-700 uppercase font-semibold border-b border-slate-200">
-                            <tr>
-                                <th class="px-6 py-3">Hạng Mục Dịch Vụ</th>
-                                <th class="px-6 py-3">Đơn Vị Tính</th>
-                                <th class="px-6 py-3">Đơn Giá Dự Kiến (VNĐ)</th>
-                                <th class="px-6 py-3">Ghi Chú</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-slate-100">
-                            <tr class="hover:bg-slate-50">
-                                <td class="px-6 py-4 font-medium text-slate-800">Gia công kết cấu thép nhà xưởng</td>
-                                <td class="px-6 py-4">Kg</td>
-                                <td class="px-6 py-4 text-brand-blue font-semibold">28.000 - 35.000</td>
-                                <td class="px-6 py-4">Tùy thuộc chủng loại thép và sơn hoàn thiện</td>
-                            </tr>
-                            <tr class="hover:bg-slate-50">
-                                <td class="px-6 py-4 font-medium text-slate-800">Lắp đặt đường ống áp lực (Carbon Steel)</td>
-                                <td class="px-6 py-4">Inch-dia</td>
-                                <td class="px-6 py-4 text-brand-blue font-semibold">180.000 - 250.000</td>
-                                <td class="px-6 py-4">Đã bao gồm hàn NDT và thử áp</td>
-                            </tr>
-                            <tr class="hover:bg-slate-50">
-                                <td class="px-6 py-4 font-medium text-slate-800">Bọc lót cách nhiệt đường ống/bồn bể</td>
-                                <td class="px-6 py-4">m²</td>
-                                <td class="px-6 py-4 text-brand-blue font-semibold">350.000 - 500.000</td>
-                                <td class="px-6 py-4">Vật liệu bông thủy tinh / nhôm định hình</td>
-                            </tr>
-                            <tr class="hover:bg-slate-50">
-                                <td class="px-6 py-4 font-medium text-slate-800">Thi công sơn chống cháy kết cấu thép</td>
-                                <td class="px-6 py-4">m²</td>
-                                <td class="px-6 py-4 text-brand-blue font-semibold">450.000 - 750.000</td>
-                                <td class="px-6 py-4">Theo định mức thời gian chịu lửa (60m - 120m)</td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    <a href="#contact" class="mt-8 block text-center bg-slate-100 hover:bg-brand-blue hover:text-white text-slate-800 font-bold py-3 rounded-xl transition">Đăng Ký Tư Vấn</a>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Interactive Cost Calculator -->
-    <section id="calculator" class="py-16 bg-brand-darkblue text-white">
+    <!-- Calculator Section -->
+    <section id="calculator" class="py-20 bg-slate-900 text-white">
         <div class="max-w-4xl mx-auto px-4 sm:px-6">
-            <div class="text-center mb-10">
-                <h2 class="text-3xl font-bold">Tính Toán Dự Toán Chi Phí Nhanh</h2>
-                <p class="text-slate-300 mt-2">Nhập thông số dự án của bạn để nhận ước tính ngân sách tức thì</p>
+            <div class="text-center mb-12">
+                <span class="text-brand-orange font-bold text-sm tracking-widest uppercase">Công Cụ Tương Tác</span>
+                <h2 class="text-3xl font-bold mt-2">Dự Toán Chi Phí Sơ Bộ</h2>
+                <p class="text-slate-400 mt-2">Nhập thông số diện tích/khối lượng để tính toán ngân sách tức thì</p>
             </div>
 
-            <div class="bg-white text-slate-800 p-8 rounded-2xl shadow-xl">
+            <div class="bg-white text-slate-800 p-8 rounded-2xl shadow-2xl">
                 <form id="calcForm" class="space-y-6">
                     <div>
-                        <label class="block font-semibold mb-2 text-slate-700">Loại Hình Dịch Vụ</label>
-                        <select id="calcService" class="w-full border border-slate-300 rounded-lg p-3 bg-white focus:ring-2 focus:ring-brand-blue outline-none">
-                            <option value="1800000">Thi công Nhà xưởng Khung thép (1.800.000đ/m²)</option>
-                            <option value="3500000">Thi công Văn phòng - Nhà máy (3.500.000đ/m²)</option>
-                            <option value="30000">Gia công Kết cấu thép (30.000đ/kg)</option>
-                            <option value="400000">Thi công Sơn chống cháy (400.000đ/m²)</option>
+                        <label class="block font-bold text-sm text-slate-700 mb-2">Hạng Mục Công Trình</label>
+                        <select id="calcService" class="w-full border border-slate-300 rounded-lg p-3.5 bg-slate-50 focus:ring-2 focus:ring-brand-blue outline-none font-medium">
+                            <option value="1800000">Thi công Nhà xưởng khung thép (1.800.000đ / m²)</option>
+                            <option value="5500000">Thi công Nhà phố trọn gói (5.500.000đ / m²)</option>
+                            <option value="150000">Thiết kế hồ sơ kiến trúc (150.000đ / m²)</option>
+                            <option value="32000">Gia công kết cấu thép (32.000đ / kg)</option>
                         </select>
                     </div>
 
                     <div class="grid md:grid-cols-2 gap-6">
                         <div>
-                            <label class="block font-semibold mb-2 text-slate-700">Khối Lượng / Diện Tích</label>
-                            <input type="number" id="calcQuantity" value="500" min="1" class="w-full border border-slate-300 rounded-lg p-3 focus:ring-2 focus:ring-brand-blue outline-none" placeholder="Nhập diện tích (m2) hoặc khối lượng (kg)">
+                            <label class="block font-bold text-sm text-slate-700 mb-2">Diện Tích / Khối Lượng</label>
+                            <div class="relative">
+                                <input type="number" id="calcQuantity" value="300" min="1" class="w-full border border-slate-300 rounded-lg p-3.5 bg-slate-50 focus:ring-2 focus:ring-brand-blue outline-none font-bold text-lg">
+                                <span class="absolute right-4 top-3.5 text-slate-400 font-semibold text-sm">m² / kg</span>
+                            </div>
                         </div>
                         <div>
-                            <label class="block font-semibold mb-2 text-slate-700">Yêu Cầu Tiến Độ</label>
-                            <select id="calcSpeed" class="w-full border border-slate-300 rounded-lg p-3 bg-white focus:ring-2 focus:ring-brand-blue outline-none">
-                                <option value="1">Tiêu chuẩn (Theo tiến độ bình thường)</option>
-                                <option value="1.1">Gấp (Rút ngắn 20% thời gian - +10%)</option>
+                            <label class="block font-bold text-sm text-slate-700 mb-2">Yêu Cầu Tiến Độ / Vị Trí</label>
+                            <select id="calcFactor" class="w-full border border-slate-300 rounded-lg p-3.5 bg-slate-50 focus:ring-2 focus:ring-brand-blue outline-none font-medium">
+                                <option value="1">Tiêu chuẩn (100% chi phí)</option>
+                                <option value="1.08">Công trình yêu cầu tiến độ gấp (+8%)</option>
+                                <option value="1.15">Vị trí thi công hẻm nhỏ / địa hình khó (+15%)</option>
                             </select>
                         </div>
                     </div>
 
-                    <div class="bg-slate-100 p-6 rounded-xl flex flex-col sm:flex-row items-center justify-between border border-slate-200">
+                    <div class="bg-blue-50 p-6 rounded-xl flex flex-col sm:flex-row items-center justify-between border border-blue-100 gap-4">
                         <div>
-                            <span class="block text-slate-500 text-sm font-medium">Chi Phí Ước Tính:</span>
-                            <span id="calcTotal" class="text-3xl font-extrabold text-brand-blue">900.000.000 VNĐ</span>
+                            <span class="block text-slate-500 text-xs font-bold uppercase tracking-wider">Tổng Chi Phí Ước Tính</span>
+                            <span id="calcTotal" class="text-3xl font-black text-brand-blue">540.000.000 VNĐ</span>
                         </div>
-                        <button type="button" onclick="scrollToContact()" class="mt-4 sm:mt-0 bg-brand-yellow hover:bg-yellow-500 text-slate-900 font-bold px-6 py-3 rounded-lg transition">
-                            Nhận Báo Giá Chính Thức
-                        </button>
+                        <a href="#contact" class="w-full sm:w-auto text-center bg-brand-blue hover:bg-brand-darkblue text-white font-bold px-6 py-3.5 rounded-xl transition shadow-md">
+                            Gửi Dự Toán Cho PV INCONS
+                        </a>
                     </div>
                 </form>
             </div>
         </div>
     </section>
 
-    <!-- Contact & Request Quote Section -->
-    <section id="contact" class="py-20 bg-white">
+    <!-- Work Process Section -->
+    <section id="process" class="py-20 bg-white">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="grid md:grid-cols-2 gap-12">
-                <div>
-                    <h2 class="text-3xl font-bold text-slate-900">Liên Hệ & Yêu Cầu Báo Giá</h2>
-                    <p class="mt-4 text-slate-600">Gửi thông tin dự án của bạn cho PV Incons. Đội ngũ kỹ sư của chúng tôi sẽ liên hệ tư vấn và gửi bản báo giá bóc tách chi tiết trong vòng 24 giờ.</p>
+            <div class="text-center max-w-3xl mx-auto mb-16">
+                <span class="text-brand-blue font-bold text-sm tracking-widest uppercase">Quy Trình Chuẩn Hóa</span>
+                <h2 class="text-3xl font-bold text-slate-900 mt-2">4 Bước Triển Khai Dự Án</h2>
+            </div>
+
+            <div class="grid md:grid-cols-4 gap-8">
+                <div class="text-center relative">
+                    <div class="w-16 h-16 bg-brand-blue text-white font-extrabold text-2xl rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-brand-blue/30">01</div>
+                    <h3 class="font-bold text-slate-900 text-lg">Khảo Sát & Tư Vấn</h3>
+                    <p class="text-slate-500 text-xs mt-2">Tiếp nhận yêu cầu, đo đạc hiện trạng ranh đất và tư vấn giải pháp tối ưu.</p>
+                </div>
+                <div class="text-center relative">
+                    <div class="w-16 h-16 bg-brand-blue text-white font-extrabold text-2xl rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-brand-blue/30">02</div>
+                    <h3 class="font-bold text-slate-900 text-lg">Thiết Kế & Báo Giá</h3>
+                    <p class="text-slate-500 text-xs mt-2">Lập bản vẽ 3D/BIM, bóc tách khối lượng vật tư và chốt hợp đồng thi công.</p>
+                </div>
+                <div class="text-center relative">
+                    <div class="w-16 h-16 bg-brand-blue text-white font-extrabold text-2xl rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-brand-blue/30">03</div>
+                    <h3 class="font-bold text-slate-900 text-lg">Thi Công Xây Lắp</h3>
+                    <p class="text-slate-500 text-xs mt-2">Triển khai lực lượng kỹ sư giám sát, thi công theo đúng tiêu chuẩn kỹ thuật.</p>
+                </div>
+                <div class="text-center relative">
+                    <div class="w-16 h-16 bg-brand-orange text-white font-extrabold text-2xl rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-brand-orange/30">04</div>
+                    <h3 class="font-bold text-slate-900 text-lg">Nghiệm Thu & Hoàn Công</h3>
+                    <p class="text-slate-500 text-xs mt-2">Bàn giao công trình, bảo hành dài hạn và hỗ trợ hoàn thiện hồ sơ hoàn công.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact & Form Section -->
+    <section id="contact" class="py-20 bg-slate-50 border-t border-slate-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid lg:grid-cols-12 gap-12">
+                <div class="lg:col-span-5">
+                    <span class="text-brand-blue font-bold text-sm tracking-widest uppercase">Kết Nối Với Chúng Tôi</span>
+                    <h2 class="text-3xl font-bold text-slate-900 mt-2">Liên Hệ Báo Giá & Tư Vấn</h2>
+                    <p class="mt-4 text-slate-600 text-sm leading-relaxed">
+                        Đội ngũ kỹ sư và kiến trúc sư của PV INCONS sẵn sàng hỗ trợ giải đáp thắc mắc và tư vấn phương án thi công tối ưu cho dự án của bạn.
+                    </p>
 
                     <div class="mt-8 space-y-6">
                         <div class="flex items-start space-x-4">
-                            <div class="p-3 bg-blue-50 text-brand-blue rounded-lg"><i class="fa-solid fa-location-dot text-xl"></i></div>
+                            <div class="p-3.5 bg-white border border-slate-200 text-brand-blue rounded-xl shadow-sm"><i class="fa-solid fa-location-dot text-xl"></i></div>
                             <div>
-                                <h4 class="font-bold text-slate-800">Trụ sở chính</h4>
-                                <p class="text-slate-600 text-sm">Tòa nhà PV Incons, Khu Công Nghiệp Xây Lắp, Việt Nam</p>
+                                <h4 class="font-bold text-slate-900 text-sm">Văn Phòng Làm Việc</h4>
+                                <p class="text-slate-600 text-xs mt-1">Quận Ninh Kiều, Thành phố Cần Thơ</p>
                             </div>
                         </div>
 
                         <div class="flex items-start space-x-4">
-                            <div class="p-3 bg-blue-50 text-brand-blue rounded-lg"><i class="fa-solid fa-phone text-xl"></i></div>
+                            <div class="p-3.5 bg-white border border-slate-200 text-brand-blue rounded-xl shadow-sm"><i class="fa-solid fa-phone text-xl"></i></div>
                             <div>
-                                <h4 class="font-bold text-slate-800">Hotline Báo Giá</h4>
-                                <p class="text-slate-600 text-sm">(+84) 028 3822 xxxx - 090x xxx xxx</p>
+                                <h4 class="font-bold text-slate-900 text-sm">Điện Thoại / Zalo</h4>
+                                <p class="text-slate-600 text-xs mt-1">090x xxx xxx (Tư vấn kỹ thuật & Pháp lý)</p>
                             </div>
                         </div>
 
                         <div class="flex items-start space-x-4">
-                            <div class="p-3 bg-blue-50 text-brand-blue rounded-lg"><i class="fa-solid fa-envelope text-xl"></i></div>
+                            <div class="p-3.5 bg-white border border-slate-200 text-brand-blue rounded-xl shadow-sm"><i class="fa-solid fa-envelope text-xl"></i></div>
                             <div>
-                                <h4 class="font-bold text-slate-800">Email Dự Án</h4>
-                                <p class="text-slate-600 text-sm">contact@pvincons.com.vn</p>
+                                <h4 class="font-bold text-slate-900 text-sm">Email Dự Án</h4>
+                                <p class="text-slate-600 text-xs mt-1">contact@pvincons.vn</p>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="bg-slate-50 p-8 rounded-2xl border border-slate-200">
-                    <form onsubmit="alert('Cảm ơn bạn đã gửi yêu cầu. PV Incons sẽ liên hệ lại trong thời gian sớm nhất!'); return false;" class="space-y-4">
+                <div class="lg:col-span-7 bg-white p-8 sm:p-10 rounded-2xl border border-slate-200 shadow-md">
+                    <h3 class="text-xl font-bold text-slate-900 mb-6">Gửi Yêu Cầu Tư Vấn Tới PV INCONS</h3>
+                    <form action="https://formspree.io/f/maylqvrr" method="POST" class="space-y-4">
                         <div>
-                            <label class="block text-sm font-medium text-slate-700 mb-1">Họ và Tên *</label>
-                            <input type="text" required class="w-full border border-slate-300 rounded-lg p-3 bg-white outline-none focus:ring-2 focus:ring-brand-blue" placeholder="Nguyễn Văn A">
+                            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Họ và Tên *</label>
+                            <input type="text" name="name" required class="w-full border border-slate-300 rounded-lg p-3 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-brand-blue outline-none transition text-sm" placeholder="Nguyễn Văn A">
                         </div>
-                        <div class="grid grid-cols-2 gap-4">
+                        <div class="grid sm:grid-cols-2 gap-4">
                             <div>
-                                <label class="block text-sm font-medium text-slate-700 mb-1">Số Điện Thoại *</label>
-                                <input type="tel" required class="w-full border border-slate-300 rounded-lg p-3 bg-white outline-none focus:ring-2 focus:ring-brand-blue" placeholder="0901234567">
+                                <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Số Điện Thoại *</label>
+                                <input type="tel" name="phone" required class="w-full border border-slate-300 rounded-lg p-3 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-brand-blue outline-none transition text-sm" placeholder="0901234567">
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-slate-700 mb-1">Tên Công Ty</label>
-                                <input type="text" class="w-full border border-slate-300 rounded-lg p-3 bg-white outline-none focus:ring-2 focus:ring-brand-blue" placeholder="Công ty XYZ">
+                                <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Địa Điểm Công Trình</label>
+                                <input type="text" name="location" class="w-full border border-slate-300 rounded-lg p-3 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-brand-blue outline-none transition text-sm" placeholder="Cần Thơ / Hậu Giang...">
                             </div>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-slate-700 mb-1">Dịch Vụ Cần Báo Giá</label>
-                            <select class="w-full border border-slate-300 rounded-lg p-3 bg-white outline-none focus:ring-2 focus:ring-brand-blue">
-                                <option>Thi công Nhà xưởng / Kho bãi</option>
-                                <option>Bảo dưỡng công trình công nghiệp</option>
-                                <option>Gia công cơ khí / Lắp máy</option>
-                                <option>Tư vấn giám sát & quản lý dự án</option>
+                            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Nhu Cầu Dịch Vụ</label>
+                            <select name="service" class="w-full border border-slate-300 rounded-lg p-3 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-brand-blue outline-none transition text-sm">
+                                <option>Thiết kế kiến trúc & Lập hồ sơ 3D/BIM</option>
+                                <option>Thi công nhà xưởng / Khung thép tiền chế</option>
+                                <option>Thi công nhà phố trọn gói</option>
+                                <option>Tư vấn đo đạc & Thủ tục pháp lý hoàn công</option>
                             </select>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-slate-700 mb-1">Mô Tả Yêu Cầu Dự Án</label>
-                            <textarea rows="4" class="w-full border border-slate-300 rounded-lg p-3 bg-white outline-none focus:ring-2 focus:ring-brand-blue" placeholder="Mô tả quy mô, địa điểm, tiến độ mong muốn..."></textarea>
+                            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Mô Tả Yêu Cầu Dự Án</label>
+                            <textarea name="message" rows="4" class="w-full border border-slate-300 rounded-lg p-3 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-brand-blue outline-none transition text-sm" placeholder="Ghi chú thêm về diện tích, tiến độ mong muốn..."></textarea>
                         </div>
-                        <button type="submit" class="w-full bg-brand-blue hover:bg-blue-700 text-white font-bold py-3.5 rounded-lg shadow-md transition">
-                            Gửi Yêu Cầu Báo Giá
+                        <button type="submit" class="w-full bg-brand-blue hover:bg-brand-darkblue text-white font-bold py-3.5 rounded-lg shadow-lg transition">
+                            Gửi Thông Tin Ngay
                         </button>
                     </form>
                 </div>
@@ -343,42 +445,48 @@
     </section>
 
     <!-- Footer -->
-    <footer class="bg-slate-900 text-slate-400 py-12 border-t border-slate-800">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row justify-between items-center gap-4">
-            <div>
-                <p class="text-sm">&copy; 2026 PV Incons. Tất cả quyền được bảo lưu.</p>
+    <footer class="bg-slate-900 text-slate-400 py-12 border-t border-slate-800 text-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row justify-between items-center gap-6">
+            <div class="flex items-center space-x-4">
+                <img src="logo.png" alt="PV INCONS Logo Footer" class="h-10 w-auto object-contain bg-white/10 p-1 rounded">
+                <p>&copy; 2026 <span class="text-white font-bold">PV INCONS</span>. All rights reserved.</p>
             </div>
-            <div class="flex space-x-6 text-sm">
-                <a href="#" class="hover:text-white transition">Chính sách bảo mật</a>
-                <a href="#" class="hover:text-white transition">Điều khoản dịch vụ</a>
-                <a href="#" class="hover:text-white transition">Hồ sơ năng lực</a>
+            <div class="flex space-x-6 text-xs">
+                <a href="#" class="hover:text-white transition">Hồ Sơ Năng Lực</a>
+                <a href="#" class="hover:text-white transition">Chính Sách Bảo Hành</a>
+                <a href="#" class="hover:text-white transition">Quy Chuẩn Kỹ Thuật</a>
             </div>
         </div>
     </footer>
 
-    <!-- Interactive Calculator Script -->
+    <!-- JavaScript Logic -->
     <script>
+        // Mobile Menu Drawer Toggle
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const mobileMenu = document.getElementById('mobileMenu');
+
+        mobileMenuBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        // Interactive Cost Calculator Logic
         const calcService = document.getElementById('calcService');
         const calcQuantity = document.getElementById('calcQuantity');
-        const calcSpeed = document.getElementById('calcSpeed');
+        const calcFactor = document.getElementById('calcFactor');
         const calcTotal = document.getElementById('calcTotal');
 
-        function updatePrice() {
+        function updateCost() {
             const price = parseFloat(calcService.value) || 0;
             const qty = parseFloat(calcQuantity.value) || 0;
-            const speed = parseFloat(calcSpeed.value) || 1;
+            const factor = parseFloat(calcFactor.value) || 1;
 
-            const total = price * qty * speed;
-            calcTotal.innerText = new Intl.NumberFormat('vi-VN').format(total) + ' VNĐ';
+            const total = price * qty * factor;
+            calcTotal.innerText = new Intl.NumberFormat('vi-VN').format(Math.round(total)) + ' VNĐ';
         }
 
-        calcService.addEventListener('change', updatePrice);
-        calcQuantity.addEventListener('input', updatePrice);
-        calcSpeed.addEventListener('change', updatePrice);
-
-        function scrollToContact() {
-            document.getElementById('contact').scrollIntoView({ behavior: 'smooth' });
-        }
+        calcService.addEventListener('change', updateCost);
+        calcQuantity.addEventListener('input', updateCost);
+        calcFactor.addEventListener('change', updateCost);
     </script>
 </body>
 </html>
