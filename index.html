@@ -129,51 +129,23 @@
 
     <!-- ==================== TAB CONTENT CONTAINERS ==================== -->
 
-    <!-- TAB 1: TRANG CHỦ (CÓ SLIDER & CAROUSEL TỰ ĐỘNG THEO MẪU) -->
-    <main id="tab-home" class="tab-content">
-        <!-- Main Hero Banner Auto Slider -->
-        <section class="relative w-full h-[380px] sm:h-[480px] lg:h-[580px] overflow-hidden bg-slate-900 group">
-            <div id="heroSlider" class="relative w-full h-full">
-                <!-- Slide 1 -->
-                <div class="hero-slide absolute inset-0 opacity-0 transition-opacity duration-1000 ease-in-out bg-cover bg-center flex items-end p-6 sm:p-12" style="background-image: url('https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=1600&auto=format&fit=crop');">
-                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
-                    <div class="relative z-10 max-w-7xl mx-auto w-full mb-6">
-                        <span class="inline-block bg-amber-800/80 hover:bg-amber-700 text-amber-200 border border-amber-600/50 font-bold px-4 py-2 text-sm sm:text-base tracking-wider uppercase shadow-md transition backdrop-blur-sm cursor-pointer">
-                            MOONLIGHT AVENUE
-                        </span>
-                    </div>
-                </div>
-                
-                <!-- Slide 2 -->
-                <div class="hero-slide absolute inset-0 opacity-0 transition-opacity duration-1000 ease-in-out bg-cover bg-center flex items-end p-6 sm:p-12" style="background-image: url('https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=1600&auto=format&fit=crop');">
-                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
-                    <div class="relative z-10 max-w-7xl mx-auto w-full mb-6">
-                        <span class="inline-block bg-amber-800/80 hover:bg-amber-700 text-amber-200 border border-amber-600/50 font-bold px-4 py-2 text-sm sm:text-base tracking-wider uppercase shadow-md transition backdrop-blur-sm cursor-pointer">
-                            MOONLIGHT AVENUE
-                        </span>
-                    </div>
-                </div>
-
-              <!-- Slide 3 -->
-                <div class="hero-slide absolute inset-0 opacity-0 transition-opacity duration-1000 ease-in-out bg-cover bg-center flex items-end p-6 sm:p-12" style="background-image: url('https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=1600&auto=format&fit=crop');">
-                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
-                    <div class="relative z-10 max-w-7xl mx-auto w-full mb-6">
-                        <span class="inline-block bg-amber-800/80 hover:bg-amber-700 text-amber-200 border border-amber-600/50 font-bold px-4 py-2 text-sm sm:text-base tracking-wider uppercase shadow-md transition backdrop-blur-sm cursor-pointer">
-                            MOONLIGHT AVENUE
-                        </span>
-                    </div>
-                </div>
+    <!-- TAB 1: TRANG CHỦ -->
+<main id="tab-home" class="tab-content">
+    <!-- Main Hero Banner Static -->
+    <section class="relative w-full h-[380px] sm:h-[480px] lg:h-[580px] overflow-hidden bg-slate-900">
+        <div class="relative w-full h-full bg-cover bg-center flex items-end p-6 sm:p-12" style="background-image: url('https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=1600&auto=format&fit=crop');">
+            <!-- Overlay gradient -->
+            <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+            
+            <!-- Content -->
+            <div class="relative z-10 max-w-7xl mx-auto w-full mb-6">
+                <span class="inline-block bg-amber-800/80 hover:bg-amber-700 text-amber-200 border border-amber-600/50 font-bold px-4 py-2 text-sm sm:text-base tracking-wider uppercase shadow-md transition backdrop-blur-sm cursor-pointer">
+                    MOONLIGHT AVENUE
+                </span>
             </div>
-
-            <!-- Hero Left/Right Arrows (Mô phỏng mẫu) -->
-            <button onclick="prevHero()" class="absolute left-3 top-6 sm:top-8 bg-amber-900/70 hover:bg-amber-600 text-amber-100 w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center border border-amber-500/40 transition z-20 shadow-lg">
-                <i class="fa-solid fa-chevron-left text-sm sm:text-base"></i>
-            </button>
-            <button onclick="nextHero()" class="absolute right-3 top-6 sm:top-8 bg-amber-900/70 hover:bg-amber-600 text-amber-100 w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center border border-amber-500/40 transition z-20 shadow-lg">
-                <i class="fa-solid fa-chevron-right text-sm sm:text-base"></i>
-            </button>
-        </section>
-
+        </div>
+    </section>
+</main>
         <!-- Project Carousel Section ("CÔNG TRÌNH" - Chuẩn theo Form đính kèm) -->
         <section class="py-12 bg-stone-100 border-b border-stone-200">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
