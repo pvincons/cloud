@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="vi" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PV INCONS - GIỚI THIỆU</title>
+    <link rel="icon" type="image/png" href="LOGO_PVI.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: { brand: { blue: '#1e68a8', darkblue: '#0d3d6b', orange: '#e87e23', brown: '#a67c52', gray: '#f4f6f9' } },
+                    fontFamily: { sans: ['Inter', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased selection:bg-brand-blue selection:text-white">
+
+    <div id="header-placeholder"></div>
+
+    <main>
+        <section class="relative bg-slate-900 text-white py-20 lg:py-24 overflow-hidden">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+                <span class="text-brand-orange font-bold text-xs tracking-widest uppercase">Real Quality - Real Value</span>
+                <h1 class="text-3xl sm:text-5xl font-extrabold tracking-tight leading-tight mt-2">
+                    Giải Pháp Xây Dựng & Kỹ Thuật Toàn Diện
+                </h1>
+                <p class="mt-4 text-slate-300 text-base leading-relaxed max-w-3xl">
+                    PV INCONS đồng hành cùng khách hàng với giải pháp từ thiết kế kiến trúc, mô phỏng BIM/3D đến thi công hoàn thiện và pháp lý xây dựng.
+                </p>
+            </div>
+        </section>
+
+        <section class="py-16 bg-white">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid lg:grid-cols-2 gap-12 items-center">
+                <div>
+                    <span class="text-brand-blue font-bold text-sm tracking-widest uppercase">Về Chúng Tôi</span>
+                    <h2 class="text-3xl font-bold text-slate-900 mt-2 mb-6">Đơn Vị Thi Công Uy Tín Tại Cần Thơ</h2>
+                    <p class="text-slate-600 text-sm leading-relaxed mb-4">
+                        CÔNG TY TNHH XÂY DỰNG VÀ THƯƠNG MẠI PV INCONS chuyên cung cấp các giải pháp xây dựng chất lượng cao. Sở hữu đội ngũ kỹ sư, kiến trúc sư giàu kinh nghiệm, làm chủ các công cụ hiện đại như Revit, Dynamo và công nghệ render 3D.
+                    </p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div id="footer-placeholder"></div>
+
+    <script src="layout.js"></script>
+    <script>loadLayout('about');</script>
+</body>
+</html>

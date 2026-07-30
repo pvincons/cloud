@@ -1,0 +1,11 @@
+/
+├── index.html         (Trang chủ)
+├── about.html         (Giới thiệu)
+├── projects.html      (Dự án)
+├── news.html          (Tin tức)
+├── services.html      (Dịch vụ)
+├── investment.html    (Quan hệ đầu tư)
+├── hr.html            (Chính sách nhân sự)
+├── header.html        (Thanh Header & Navigation dùng chung)
+├── footer.html        (Khối Liên hệ & Footer dùng chung)
+└── layout.js          (File JavaScript hỗ trợ nhúng & đồng bộ menu active)

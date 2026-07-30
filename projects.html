@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="vi" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PV INCONS - DỰ ÁN</title>
+    <link rel="icon" type="image/png" href="LOGO_PVI.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: { brand: { blue: '#1e68a8', darkblue: '#0d3d6b', orange: '#e87e23', brown: '#a67c52', gray: '#f4f6f9' } },
+                    fontFamily: { sans: ['Inter', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased selection:bg-brand-blue selection:text-white">
+
+    <div id="header-placeholder"></div>
+
+    <main>
+        <section class="py-16 bg-white">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center max-w-3xl mx-auto mb-12">
+                    <span class="text-brand-blue font-bold text-sm tracking-widest uppercase">Dự Án Tiêu Biểu</span>
+                    <h2 class="text-3xl font-bold text-slate-900 mt-2">Công Trình Đã & Đang Triển Khai</h2>
+                </div>
+                <div class="grid md:grid-cols-3 gap-8">
+                    <div class="bg-slate-50 rounded-2xl border p-6">
+                        <h3 class="font-bold text-lg text-slate-900">Nhà Phố Hiện Đại (44.5 m²)</h3>
+                        <p class="text-slate-600 text-xs mt-2">Thiết kế kiến trúc tối ưu không gian, phối cảnh 3D kết hợp kỹ thuật BIM/Revit.</p>
+                    </div>
+                    <div class="bg-slate-50 rounded-2xl border p-6">
+                        <h3 class="font-bold text-lg text-slate-900">Thi Công Nhà Xưởng Tiền Chế</h3>
+                        <p class="text-slate-600 text-xs mt-2">Xây dựng kết cấu thép tổ hợp, thi công sàn bê tông xoa nền tăng cứng.</p>
+                    </div>
+                    <div class="bg-slate-50 rounded-2xl border p-6">
+                        <h3 class="font-bold text-lg text-slate-900">Lập Bản Vẽ Đo Đạc Hoàn Công</h3>
+                        <p class="text-slate-600 text-xs mt-2">Xác định ranh giới đất theo hệ tọa độ VN-2000, hỗ trợ thủ tục pháp lý.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div id="footer-placeholder"></div>
+
+    <script src="layout.js"></script>
+    <script>loadLayout('projects');</script>
+</body>
+</html>

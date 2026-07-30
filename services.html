@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="vi" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PV INCONS - DỊCH VỤ</title>
+    <link rel="icon" type="image/png" href="LOGO_PVI.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: { brand: { blue: '#1e68a8', darkblue: '#0d3d6b', orange: '#e87e23', brown: '#a67c52', gray: '#f4f6f9' } },
+                    fontFamily: { sans: ['Inter', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased selection:bg-brand-blue selection:text-white">
+
+    <div id="header-placeholder"></div>
+
+    <main>
+        <section class="py-16 bg-white">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center max-w-3xl mx-auto mb-12">
+                    <span class="text-brand-blue font-bold text-sm tracking-widest uppercase">Năng Lực Cốt Lõi</span>
+                    <h2 class="text-3xl font-bold text-slate-900 mt-2">Dịch Vụ Kỹ Thuật & Xây Dựng</h2>
+                </div>
+                <div class="grid md:grid-cols-3 gap-8">
+                    <div class="p-8 bg-slate-50 rounded-2xl border border-slate-200">
+                        <h3 class="text-xl font-bold text-slate-900 mb-3">Tư Vấn & Thiết Kế Kiến Trúc</h3>
+                        <p class="text-slate-600 text-sm">Lập hồ sơ thiết kế cơ sở, bản vẽ thi công, mô phỏng render 3D cho nhà phố, biệt thự.</p>
+                    </div>
+                    <div class="p-8 bg-slate-50 rounded-2xl border border-slate-200">
+                        <h3 class="text-xl font-bold text-slate-900 mb-3">Thi Công Nhà Xưởng Khung Thép</h3>
+                        <p class="text-slate-600 text-sm">Thi công trọn gói kết cấu thép tiền chế, nhà kho, sàn bê tông công nghiệp.</p>
+                    </div>
+                    <div class="p-8 bg-slate-50 rounded-2xl border border-slate-200">
+                        <h3 class="text-xl font-bold text-slate-900 mb-3">Pháp Lý & Đo Đạc Hoàn Công</h3>
+                        <p class="text-slate-600 text-sm">Tư vấn lập bản vẽ trích đo hiện trạng đất đai (VN-2000), Dịch vụ cấp phép xây dựng & hoàn công.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div id="footer-placeholder"></div>
+
+    <script src="layout.js"></script>
+    <script>loadLayout('services');</script>
+</body>
+</html>

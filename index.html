@@ -3,133 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PV INCONS CONSTRUCTION AND TRADING CO.,LTD</title>
-    <meta name="description" content="Đầu tư - Xây dựng - Pháp lý">
-    
-    <!-- Favicon / Logo Tab Trình Duyệt -->
+    <title>PV INCONS - TRANG CHỦ</title>
     <link rel="icon" type="image/png" href="LOGO_PVI.png">
-    
-    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
-                        brand: {
-                            blue: '#1e68a8',
-                            darkblue: '#0d3d6b',
-                            orange: '#e87e23',
-                            brown: '#a67c52',
-                            gray: '#f4f6f9'
-                        }
+                        brand: { blue: '#1e68a8', darkblue: '#0d3d6b', orange: '#e87e23', brown: '#a67c52', gray: '#f4f6f9' }
                     },
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                    }
+                    fontFamily: { sans: ['Inter', 'sans-serif'] }
                 }
             }
         }
     </script>
-    
-    <!-- Fonts & Icons -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-    <style>
-        /* CSS ẩn thanh cuộn */
-        .no-scrollbar::-webkit-scrollbar {
-            display: none;
-        }
-        .no-scrollbar {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-        }
-    </style>
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans antialiased selection:bg-brand-blue selection:text-white">
 
-    <!-- Top Info Bar -->
-    <div class="bg-slate-900 text-slate-300 text-xs py-2 border-b border-slate-800">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
-            <div class="flex items-center space-x-6">
-                <span><i class="fa-solid fa-envelope text-brand-orange mr-1.5"></i> pvincons@gmail.com</span>
-                <span class="hidden sm:inline"><i class="fa-solid fa-phone text-brand-orange mr-1.5"></i> Hotline: 0909 751 194</span>
-                <span class="hidden md:inline"><i class="fa-solid fa-location-dot text-brand-orange mr-1.5"></i> Phường Hưng Phú, Cần Thơ</span>
-            </div>
-            <div class="flex space-x-4">
-                <a href="#" class="hover:text-white transition"><i class="fa-brands fa-facebook"></i></a>
-                <a href="#" class="hover:text-white transition"><i class="fa-brands fa-linkedin"></i></a>
-                <a href="#" class="hover:text-white transition"><i class="fa-brands fa-youtube"></i></a>
-            </div>
-        </div>
-    </div>
+    <div id="header-placeholder"></div>
 
-    <!-- Header Navigation -->
-    <header class="sticky top-0 z-50 bg-white/95 backdrop-blur-md shadow-sm border-b border-slate-200">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-            <!-- Official Logo -->
-            <a href="javascript:void(0)" onclick="switchTab('home')" class="flex items-center space-x-3 group py-2">
-                <img src="logo.png" alt="PV INCONS Logo" class="h-12 sm:h-14 w-auto object-contain transition-transform group-hover:scale-105">
-            </a>
-
-            <!-- Desktop Nav Tabs (7 Tabs IN HOA) -->
-            <nav class="hidden xl:flex space-x-1 h-full items-center font-bold text-xs xl:text-xs 2xl:text-sm uppercase tracking-wide">
-                <button data-tab="home" onclick="switchTab('home')" class="nav-tab-btn px-2.5 py-2 border-b-2 border-brand-blue text-brand-blue transition-all">
-                    TRANG CHỦ
-                </button>
-                <button data-tab="about" onclick="switchTab('about')" class="nav-tab-btn px-2.5 py-2 border-b-2 border-transparent text-slate-600 hover:text-brand-blue transition-all">
-                    GIỚI THIỆU
-                </button>
-                <button data-tab="projects" onclick="switchTab('projects')" class="nav-tab-btn px-2.5 py-2 border-b-2 border-transparent text-slate-600 hover:text-brand-blue transition-all">
-                    DỰ ÁN
-                </button>
-                <button data-tab="news" onclick="switchTab('news')" class="nav-tab-btn px-2.5 py-2 border-b-2 border-transparent text-slate-600 hover:text-brand-blue transition-all">
-                    TIN TỨC
-                </button>
-                <button data-tab="services" onclick="switchTab('services')" class="nav-tab-btn px-2.5 py-2 border-b-2 border-transparent text-slate-600 hover:text-brand-blue transition-all">
-                    DỊCH VỤ
-                </button>
-                <button data-tab="investment" onclick="switchTab('investment')" class="nav-tab-btn px-2.5 py-2 border-b-2 border-transparent text-slate-600 hover:text-brand-blue transition-all">
-                    QUAN HỆ ĐẦU TƯ
-                </button>
-                <button data-tab="hr" onclick="switchTab('hr')" class="nav-tab-btn px-2.5 py-2 border-b-2 border-transparent text-slate-600 hover:text-brand-blue transition-all">
-                    CHÍNH SÁCH NHÂN SỰ
-                </button>
-            </nav>
-
-            <!-- CTA Button -->
-            <div class="hidden sm:flex items-center space-x-4">
-                <a href="#contact" class="bg-brand-blue hover:bg-brand-darkblue text-white font-semibold text-sm px-4 py-2.5 rounded-lg transition shadow-md shadow-brand-blue/20">
-                    <i class="fa-solid fa-paper-plane mr-1.5"></i> Liên Hệ
-                </a>
-            </div>
-
-            <!-- Mobile Menu Toggle -->
-            <button id="mobileMenuBtn" class="xl:hidden text-slate-700 text-2xl focus:outline-none p-2">
-                <i class="fa-solid fa-bars"></i>
-            </button>
-        </div>
-
-        <!-- Mobile Menu Drawer (7 Tabs IN HOA) -->
-        <div id="mobileMenu" class="hidden xl:hidden bg-white border-b border-slate-200 px-4 pt-2 pb-6 space-y-1 uppercase text-xs font-bold">
-            <button data-tab="home" onclick="switchTab('home')" class="mobile-tab-btn block w-full text-left py-2 px-3 rounded-lg text-brand-blue bg-blue-50">TRANG CHỦ</button>
-            <button data-tab="about" onclick="switchTab('about')" class="mobile-tab-btn block w-full text-left py-2 px-3 rounded-lg text-slate-700 hover:bg-slate-100">GIỚI THIỆU</button>
-            <button data-tab="projects" onclick="switchTab('projects')" class="mobile-tab-btn block w-full text-left py-2 px-3 rounded-lg text-slate-700 hover:bg-slate-100">DỰ ÁN</button>
-            <button data-tab="news" onclick="switchTab('news')" class="mobile-tab-btn block w-full text-left py-2 px-3 rounded-lg text-slate-700 hover:bg-slate-100">TIN TỨC</button>
-            <button data-tab="services" onclick="switchTab('services')" class="mobile-tab-btn block w-full text-left py-2 px-3 rounded-lg text-slate-700 hover:bg-slate-100">DỊCH VỤ</button>
-            <button data-tab="investment" onclick="switchTab('investment')" class="mobile-tab-btn block w-full text-left py-2 px-3 rounded-lg text-slate-700 hover:bg-slate-100">QUAN HỆ ĐẦU TƯ</button>
-            <button data-tab="hr" onclick="switchTab('hr')" class="mobile-tab-btn block w-full text-left py-2 px-3 rounded-lg text-slate-700 hover:bg-slate-100">CHÍNH SÁCH NHÂN SỰ</button>
-            <a href="#contact" onclick="closeMobileMenu()" class="block text-center bg-brand-blue text-white font-semibold py-2.5 rounded-lg mt-4 normal-case text-sm">Liên Hệ Báo Giá</a>
-        </div>
-    </header>
-
-    <!-- ==================== TAB CONTENT CONTAINERS ==================== -->
-
-    <!-- TAB 1: TRANG CHỦ -->
-    <main id="tab-home" class="tab-content">
-        
-        <!-- BANNER CHÍNH -->
+    <main>
+        <!-- Banner chính -->
         <section class="relative w-full h-[25vh] sm:h-[45vh] lg:h-[75vh] min-h-[200px] overflow-hidden bg-slate-900 flex items-center">
             <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=1200&auto=format&fit=crop');">
                 <div class="absolute inset-0 bg-black/40"></div>
@@ -144,11 +41,9 @@
             </div>
         </section>
 
-        <!-- SECTION: DỰ ÁN MỚI NHẤT (SLIDE TRƯỢT - 6 SLIDE) -->
+        <!-- Slide Dự án điển hình (6 Slide) -->
         <section class="py-12 bg-slate-50">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                
-                <!-- Title -->
                 <div class="flex items-center justify-center mb-8">
                     <div class="h-[1px] bg-slate-300 w-16 sm:w-36"></div>
                     <h2 class="text-xl sm:text-2xl font-bold text-[#8c6239] uppercase px-4 text-center tracking-widest">
@@ -157,10 +52,7 @@
                     <div class="h-[1px] bg-slate-300 w-16 sm:w-36"></div>
                 </div>
 
-                <!-- Featured Project Slider Container -->
                 <div class="relative max-w-4xl mx-auto group">
-                    
-                    <!-- Arrow Controls (Left / Right) -->
                     <button onclick="prevLatestProject()" class="absolute left-2 sm:-left-6 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-slate-800 hover:text-brand-blue w-10 h-10 sm:w-12 sm:h-12 rounded-full shadow-lg flex items-center justify-center transition-all z-20 border border-slate-200">
                         <i class="fa-solid fa-chevron-left text-sm sm:text-base"></i>
                     </button>
@@ -168,86 +60,59 @@
                         <i class="fa-solid fa-chevron-right text-sm sm:text-base"></i>
                     </button>
 
-                    <!-- Viewport Slider Track -->
                     <div class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
                         <div id="latestProjectsTrack" class="flex transition-transform duration-700 ease-in-out">
-                            
-                            <!-- Slide Item 1 -->
-                            <div class="w-full flex-shrink-0 cursor-pointer" onclick="switchTab('projects')">
+                            <a href="projects.html" class="w-full flex-shrink-0 block">
                                 <div class="relative w-full aspect-[1.4/1] overflow-hidden">
                                     <img src="PC_01.png" class="w-full h-full object-cover hover:scale-105 transition duration-700" alt="MODERN HOUSE">
                                 </div>
                                 <div class="p-4 sm:p-5 text-center bg-stone-50 border-t border-stone-100">
-                                    <h3 class="text-base sm:text-xl font-bold text-slate-800 tracking-wider uppercase hover:text-[#8c6239] transition">
-                                        MODERN HOUSE
-                                    </h3>
+                                    <h3 class="text-base sm:text-xl font-bold text-slate-800 tracking-wider uppercase hover:text-[#8c6239] transition">MODERN HOUSE</h3>
                                 </div>
-                            </div>
-
-                            <!-- Slide Item 2 -->
-                            <div class="w-full flex-shrink-0 cursor-pointer" onclick="switchTab('projects')">
+                            </a>
+                            <a href="projects.html" class="w-full flex-shrink-0 block">
                                 <div class="relative w-full aspect-[1.4/1] overflow-hidden">
                                     <img src="PC_02.png" class="w-full h-full object-cover hover:scale-105 transition duration-700" alt="BIỆT THỰ TUYẾT SƯƠNG">
                                 </div>
                                 <div class="p-4 sm:p-5 text-center bg-stone-50 border-t border-stone-100">
-                                    <h3 class="text-base sm:text-xl font-bold text-slate-800 tracking-wider uppercase hover:text-[#8c6239] transition">
-                                        BIỆT THỰ TUYẾT SƯƠNG
-                                    </h3>
+                                    <h3 class="text-base sm:text-xl font-bold text-slate-800 tracking-wider uppercase hover:text-[#8c6239] transition">BIỆT THỰ TUYẾT SƯƠNG</h3>
                                 </div>
-                            </div>
-
-                            <!-- Slide Item 3 -->
-                            <div class="w-full flex-shrink-0 cursor-pointer" onclick="switchTab('projects')">
+                            </a>
+                            <a href="projects.html" class="w-full flex-shrink-0 block">
                                 <div class="relative w-full aspect-[1.4/1] overflow-hidden">
                                     <img src="PC_03.png" class="w-full h-full object-cover hover:scale-105 transition duration-700" alt="VILA CLASSICAL CHOPIN">
                                 </div>
                                 <div class="p-4 sm:p-5 text-center bg-stone-50 border-t border-stone-100">
-                                    <h3 class="text-base sm:text-xl font-bold text-slate-800 tracking-wider uppercase hover:text-[#8c6239] transition">
-                                        VILA CLASSICAL CHOPIN
-                                    </h3>
+                                    <h3 class="text-base sm:text-xl font-bold text-slate-800 tracking-wider uppercase hover:text-[#8c6239] transition">VILA CLASSICAL CHOPIN</h3>
                                 </div>
-                            </div>
-
-                            <!-- Slide Item 4 -->
-                            <div class="w-full flex-shrink-0 cursor-pointer" onclick="switchTab('projects')">
+                            </a>
+                            <a href="projects.html" class="w-full flex-shrink-0 block">
                                 <div class="relative w-full aspect-[1.4/1] overflow-hidden">
                                     <img src="PC_04.png" class="w-full h-full object-cover hover:scale-105 transition duration-700" alt="HOUSE TROPICAL">
                                 </div>
                                 <div class="p-4 sm:p-5 text-center bg-stone-50 border-t border-stone-100">
-                                    <h3 class="text-base sm:text-xl font-bold text-slate-800 tracking-wider uppercase hover:text-[#8c6239] transition">
-                                        HOUSE TROPICAL
-                                    </h3>
+                                    <h3 class="text-base sm:text-xl font-bold text-slate-800 tracking-wider uppercase hover:text-[#8c6239] transition">HOUSE TROPICAL</h3>
                                 </div>
-                            </div>
-
-                            <!-- Slide Item 5 -->
-                            <div class="w-full flex-shrink-0 cursor-pointer" onclick="switchTab('projects')">
+                            </a>
+                            <a href="projects.html" class="w-full flex-shrink-0 block">
                                 <div class="relative w-full aspect-[1.4/1] overflow-hidden">
                                     <img src="PC_05.png" class="w-full h-full object-cover hover:scale-105 transition duration-700" alt="VILA TROPICAL">
                                 </div>
                                 <div class="p-4 sm:p-5 text-center bg-stone-50 border-t border-stone-100">
-                                    <h3 class="text-base sm:text-xl font-bold text-slate-800 tracking-wider uppercase hover:text-[#8c6239] transition">
-                                        VILA TROPICAL
-                                    </h3>
+                                    <h3 class="text-base sm:text-xl font-bold text-slate-800 tracking-wider uppercase hover:text-[#8c6239] transition">VILA TROPICAL</h3>
                                 </div>
-                            </div>
-
-                            <!-- Slide Item 6 -->
-                            <div class="w-full flex-shrink-0 cursor-pointer" onclick="switchTab('projects')">
+                            </a>
+                            <a href="projects.html" class="w-full flex-shrink-0 block">
                                 <div class="relative h-64 sm:h-96 md:h-[450px] overflow-hidden">
                                     <img src="PC_06.png" class="w-full h-full object-cover hover:scale-105 transition duration-700" alt="BLUE SEA RESORT">
                                 </div>
                                 <div class="p-4 sm:p-5 text-center bg-stone-50 border-t border-stone-100">
-                                    <h3 class="text-base sm:text-xl font-bold text-slate-800 tracking-wider uppercase hover:text-[#8c6239] transition">
-                                        BLUE SEA RESORT
-                                    </h3>
+                                    <h3 class="text-base sm:text-xl font-bold text-slate-800 tracking-wider uppercase hover:text-[#8c6239] transition">BLUE SEA RESORT</h3>
                                 </div>
-                            </div>
-
+                            </a>
                         </div>
                     </div>
 
-                    <!-- Slide Dots Indicator (6 Nút Chấm) -->
                     <div class="flex justify-center space-x-2 mt-4">
                         <button onclick="setLatestProject(0)" class="latest-dot w-6 h-2.5 rounded-full bg-[#8c6239] transition-all"></button>
                         <button onclick="setLatestProject(1)" class="latest-dot w-2.5 h-2.5 rounded-full bg-slate-300 transition-all"></button>
@@ -257,11 +122,10 @@
                         <button onclick="setLatestProject(5)" class="latest-dot w-2.5 h-2.5 rounded-full bg-slate-300 transition-all"></button>
                     </div>
                 </div>
-
             </div>
         </section>
 
-        <!-- Quick Summary Section -->
+        <!-- Quick Summary -->
         <section class="py-16 bg-white border-t border-slate-200">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
                 <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-4 uppercase">CHÀO MỪNG BẠN ĐẾN VỚI PV INCONS</h2>
@@ -269,319 +133,24 @@
                     Đối tác tin cậy trong lĩnh vực Tư vấn thiết kế, Thi công xây dựng công nghiệp - dân dụng và Giải pháp Pháp lý Bất động sản.
                 </p>
                 <div class="mt-8 flex justify-center gap-4">
-                    <button onclick="switchTab('about')" class="bg-brand-blue hover:bg-brand-darkblue text-white font-bold px-6 py-3 rounded-lg text-sm transition">Tìm Hiểu Thêm</button>
-                    <button onclick="switchTab('services')" class="bg-white hover:bg-slate-100 text-slate-700 border font-bold px-6 py-3 rounded-lg text-sm transition">Xem Dịch Vụ</button>
+                    <a href="about.html" class="bg-brand-blue hover:bg-brand-darkblue text-white font-bold px-6 py-3 rounded-lg text-sm transition">Tìm Hiểu Thêm</a>
+                    <a href="services.html" class="bg-white hover:bg-slate-100 text-slate-700 border font-bold px-6 py-3 rounded-lg text-sm transition">Xem Dịch Vụ</a>
                 </div>
             </div>
         </section>
     </main>
 
-    <!-- TAB 2: GIỚI THIỆU -->
-    <main id="tab-about" class="tab-content hidden">
-        <section class="relative bg-slate-900 text-white py-20 lg:py-24 overflow-hidden">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-                <span class="text-brand-orange font-bold text-xs tracking-widest uppercase">Real Quality - Real Value</span>
-                <h1 class="text-3xl sm:text-5xl font-extrabold tracking-tight leading-tight mt-2">
-                    Giải Pháp Xây Dựng & Kỹ Thuật Toàn Diện
-                </h1>
-                <p class="mt-4 text-slate-300 text-base leading-relaxed max-w-3xl">
-                    PV INCONS đồng hành cùng khách hàng với giải pháp từ thiết kế kiến trúc, mô phỏng BIM/3D đến thi công hoàn thiện và pháp lý xây dựng.
-                </p>
-            </div>
-        </section>
+    <div id="footer-placeholder"></div>
 
-        <section class="py-16 bg-white">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid lg:grid-cols-2 gap-12 items-center">
-                <div>
-                    <span class="text-brand-blue font-bold text-sm tracking-widest uppercase">Về Chúng Tôi</span>
-                    <h2 class="text-3xl font-bold text-slate-900 mt-2 mb-6">Đơn Vị Thi Công Uy Tín Tại Cần Thơ</h2>
-                    <p class="text-slate-600 text-sm leading-relaxed mb-4">
-                        CÔNG TY TNHH XÂY DỰNG VÀ THƯƠNG MẠI PV INCONS chuyên cung cấp các giải pháp xây dựng chất lượng cao. Sở hữu đội ngũ kỹ sư, kiến trúc sư giàu kinh nghiệm, làm chủ các công cụ hiện đại như Revit, Dynamo và công nghệ render 3D.
-                    </p>
-                </div>
-            </div>
-        </section>
-    </main>
-
-    <!-- TAB 3: DỰ ÁN -->
-    <main id="tab-projects" class="tab-content hidden">
-        <section class="py-16 bg-white">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="text-center max-w-3xl mx-auto mb-12">
-                    <span class="text-brand-blue font-bold text-sm tracking-widest uppercase">Dự Án Tiêu Biểu</span>
-                    <h2 class="text-3xl font-bold text-slate-900 mt-2">Công Trình Đã & Đang Triển Khai</h2>
-                </div>
-                <div class="grid md:grid-cols-3 gap-8">
-                    <div class="bg-slate-50 rounded-2xl border p-6">
-                        <h3 class="font-bold text-lg text-slate-900">Nhà Phố Hiện Đại (44.5 m²)</h3>
-                        <p class="text-slate-600 text-xs mt-2">Thiết kế kiến trúc tối ưu không gian, phối cảnh 3D kết hợp kỹ thuật BIM/Revit.</p>
-                    </div>
-                    <div class="bg-slate-50 rounded-2xl border p-6">
-                        <h3 class="font-bold text-lg text-slate-900">Thi Công Nhà Xưởng Tiền Chế</h3>
-                        <p class="text-slate-600 text-xs mt-2">Xây dựng kết cấu thép tổ hợp, thi công sàn bê tông xoa nền tăng cứng.</p>
-                    </div>
-                    <div class="bg-slate-50 rounded-2xl border p-6">
-                        <h3 class="font-bold text-lg text-slate-900">Lập Bản Vẽ Đo Đạc Hoàn Công</h3>
-                        <p class="text-slate-600 text-xs mt-2">Xác định ranh giới đất theo hệ tọa độ VN-2000, hỗ trợ thủ tục pháp lý.</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-    </main>
-
-    <!-- TAB 4: TIN TỨC -->
-    <main id="tab-news" class="tab-content hidden">
-        <section class="py-16 bg-white">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="text-center max-w-3xl mx-auto mb-12">
-                    <span class="text-brand-blue font-bold text-sm tracking-widest uppercase">Cập Nhật Tin Tức</span>
-                    <h2 class="text-3xl font-bold text-slate-900 mt-2">Tin Tức & Hoạt Động Doanh Nghiệp</h2>
-                </div>
-                <div class="grid md:grid-cols-3 gap-8">
-                    <article class="bg-slate-50 rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
-                        <div class="h-48 overflow-hidden">
-                            <img src="https://images.unsplash.com/photo-1541888946425-d0fbb186a5b3?q=80&w=800&auto=format&fit=crop" class="w-full h-full object-cover hover:scale-105 transition duration-500" alt="Tin tức xây dựng">
-                        </div>
-                        <div class="p-6">
-                            <span class="text-xs text-brand-blue font-semibold">2026-04-10</span>
-                            <h3 class="font-bold text-base text-slate-900 mt-1 mb-2">Ứng dụng thành công công nghệ BIM trong quản lý dự án nhà phố</h3>
-                            <p class="text-slate-600 text-xs leading-relaxed">PV INCONS chuẩn hóa quy trình thiết kế và thi công chính xác đến từng chi tiết nhờ bộ công cụ tự động hóa Revit & Dynamo.</p>
-                        </div>
-                    </article>
-
-                    <article class="bg-slate-50 rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
-                        <div class="h-48 overflow-hidden">
-                            <img src="https://images.unsplash.com/photo-1504307651254-35680f356dfd?q=80&w=800&auto=format&fit=crop" class="w-full h-full object-cover hover:scale-105 transition duration-500" alt="Tin tức pháp lý">
-                        </div>
-                        <div class="p-6">
-                            <span class="text-xs text-brand-blue font-semibold">2026-03-25</span>
-                            <h3 class="font-bold text-base text-slate-900 mt-1 mb-2">Giải pháp xử lý lệch ranh đất & hoàn công công trình tại Cần Thơ</h3>
-                            <p class="text-slate-600 text-xs leading-relaxed">Tư vấn quy trình Trích đo hiện trạng VN-2000 giúp chủ đầu tư yên tâm về mặt pháp lý tài sản bđs.</p>
-                        </div>
-                    </article>
-
-                    <article class="bg-slate-50 rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
-                        <div class="h-48 overflow-hidden">
-                            <img src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=800&auto=format&fit=crop" class="w-full h-full object-cover hover:scale-105 transition duration-500" alt="Sự kiện doanh nghiệp">
-                        </div>
-                        <div class="p-6">
-                            <span class="text-xs text-brand-blue font-semibold">2026-03-01</span>
-                            <h3 class="font-bold text-base text-slate-900 mt-1 mb-2">PV INCONS mở rộng hợp tác thi công nhà xưởng tiền chế năm 2026</h3>
-                            <p class="text-slate-600 text-xs leading-relaxed">Tăng cường năng lực cung ứng kết cấu thép và giải pháp xây dựng công nghiệp trọn gói cho doanh nghiệp.</p>
-                        </div>
-                    </article>
-                </div>
-            </div>
-        </section>
-    </main>
-
-    <!-- TAB 5: DỊCH VỤ -->
-    <main id="tab-services" class="tab-content hidden">
-        <section class="py-16 bg-white">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="text-center max-w-3xl mx-auto mb-12">
-                    <span class="text-brand-blue font-bold text-sm tracking-widest uppercase">Năng Lực Cốt Lõi</span>
-                    <h2 class="text-3xl font-bold text-slate-900 mt-2">Dịch Vụ Kỹ Thuật & Xây Dựng</h2>
-                </div>
-                <div class="grid md:grid-cols-3 gap-8">
-                    <div class="p-8 bg-slate-50 rounded-2xl border border-slate-200">
-                        <h3 class="text-xl font-bold text-slate-900 mb-3">Tư Vấn & Thiết Kế Kiến Trúc</h3>
-                        <p class="text-slate-600 text-sm">Lập hồ sơ thiết kế cơ sở, bản vẽ thi công, mô phỏng render 3D cho nhà phố, biệt thự.</p>
-                    </div>
-                    <div class="p-8 bg-slate-50 rounded-2xl border border-slate-200">
-                        <h3 class="text-xl font-bold text-slate-900 mb-3">Thi Công Nhà Xưởng Khung Thép</h3>
-                        <p class="text-slate-600 text-sm">Thi công trọn gói kết cấu thép tiền chế, nhà kho, sàn bê tông công nghiệp.</p>
-                    </div>
-                    <div class="p-8 bg-slate-50 rounded-2xl border border-slate-200">
-                        <h3 class="text-xl font-bold text-slate-900 mb-3">Pháp Lý & Đo Đạc Hoàn Công</h3>
-                        <p class="text-slate-600 text-sm">Tư vấn lập bản vẽ trích đo hiện trạng đất đai (VN-2000), Dịch vụ cấp phép xây dựng & hoàn công.</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-    </main>
-
-    <!-- TAB 6: QUAN HỆ ĐẦU TƯ -->
-    <main id="tab-investment" class="tab-content hidden">
-        <section class="py-16 bg-white">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="text-center max-w-3xl mx-auto mb-12">
-                    <span class="text-brand-blue font-bold text-sm tracking-widest uppercase">Hợp Tác Phát Triển</span>
-                    <h2 class="text-3xl font-bold text-slate-900 mt-2">Cơ Hội Đầu Tư & Quan Hệ Cổ Đông</h2>
-                    <p class="text-slate-600 text-sm mt-3">PV INCONS liên tục tìm kiếm các đối tác chiến lược để cùng phát triển dự án nhà ở, khu dân cư và hạ tầng kỹ thuật.</p>
-                </div>
-                <div class="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto mb-12">
-                    <div class="p-8 bg-slate-50 rounded-2xl border border-slate-200">
-                        <h3 class="text-xl font-bold text-slate-900 mb-3"><i class="fa-solid fa-handshake text-brand-blue mr-2"></i>Hợp Tác Đầu Tư Dự Án</h3>
-                        <p class="text-slate-600 text-sm leading-relaxed">Hợp tác góp vốn, phát triển quỹ đất đô thị và thương mại tại khu vực Cần Thơ và Đồng bằng Sông Cửu Long.</p>
-                    </div>
-                    <div class="p-8 bg-slate-50 rounded-2xl border border-slate-200">
-                        <h3 class="text-xl font-bold text-slate-900 mb-3"><i class="fa-solid fa-chart-line text-brand-blue mr-2"></i>Tư Vấn Tối Ưu Hóa Đầu Tư</h3>
-                        <p class="text-slate-600 text-sm leading-relaxed">Phân tích hiệu quả tài chính, lập quy hoạch chi tiết và đảm bảo tính pháp lý tối đa cho nhà đầu tư.</p>
-                    </div>
-                </div>
-
-                <!-- Tài liệu cổ đông -->
-                <div class="space-y-4 max-w-4xl mx-auto">
-                    <h3 class="font-bold text-lg text-slate-900 border-b pb-2">Báo Cáo & Công Khai Thông Tin</h3>
-                    <div class="p-5 bg-slate-50 rounded-xl border border-slate-200 flex justify-between items-center">
-                        <div>
-                            <h4 class="font-bold text-slate-900 text-sm sm:text-base">Báo cáo tài chính kiểm toán năm 2025</h4>
-                            <p class="text-xs text-slate-500 mt-1">Đăng tải ngày: 2026-03-28</p>
-                        </div>
-                        <a href="#" class="text-brand-blue text-xs sm:text-sm font-bold hover:underline"><i class="fa-solid fa-download mr-1"></i> Tải về</a>
-                    </div>
-                    <div class="p-5 bg-slate-50 rounded-xl border border-slate-200 flex justify-between items-center">
-                        <div>
-                            <h4 class="font-bold text-slate-900 text-sm sm:text-base">Nghị quyết Đại hội đồng cổ đông thường niên 2026</h4>
-                            <p class="text-xs text-slate-500 mt-1">Đăng tải ngày: 2026-04-15</p>
-                        </div>
-                        <a href="#" class="text-brand-blue text-xs sm:text-sm font-bold hover:underline"><i class="fa-solid fa-download mr-1"></i> Tải về</a>
-                    </div>
-                </div>
-            </div>
-        </section>
-    </main>
-
-    <!-- TAB 7: CHÍNH SÁCH NHÂN SỰ -->
-    <main id="tab-hr" class="tab-content hidden">
-        <section class="py-16 bg-white">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="text-center max-w-3xl mx-auto mb-12">
-                    <span class="text-brand-blue font-bold text-sm tracking-widest uppercase">Môi Trường Làm Việc</span>
-                    <h2 class="text-3xl font-bold text-slate-900 mt-2">Chính Sách Nhân Sự & Tuyển Dụng</h2>
-                    <p class="text-slate-600 text-sm mt-3">PV INCONS cam kết xây dựng môi trường làm việc chuyên nghiệp, đãi ngộ cạnh tranh và lộ trình phát triển rõ ràng.</p>
-                </div>
-                <div class="grid md:grid-cols-3 gap-8">
-                    <div class="bg-slate-50 p-6 rounded-2xl border border-slate-200">
-                        <h3 class="font-bold text-lg text-slate-900 mb-2"><i class="fa-solid fa-award text-brand-orange mr-2"></i>Đãi Ngộ Hấp Dẫn</h3>
-                        <p class="text-slate-600 text-xs leading-relaxed">Lương thưởng cạnh tranh, thưởng dự án, BHXH đầy đủ cùng chính sách chăm sóc sức khỏe toàn diện.</p>
-                    </div>
-                    <div class="bg-slate-50 p-6 rounded-2xl border border-slate-200">
-                        <h3 class="font-bold text-lg text-slate-900 mb-2"><i class="fa-solid fa-graduation-cap text-brand-orange mr-2"></i>Đào Tạo Liên Tục</h3>
-                        <p class="text-slate-600 text-xs leading-relaxed">Hỗ trợ nâng cao tay nghề, cập nhật công nghệ mới (BIM, Revit, Dynamo) và kỹ năng quản lý.</p>
-                    </div>
-                    <div class="bg-slate-50 p-6 rounded-2xl border border-slate-200">
-                        <h3 class="font-bold text-lg text-slate-900 mb-2"><i class="fa-solid fa-users text-brand-orange mr-2"></i>Văn Hóa Đồng Đội</h3>
-                        <p class="text-slate-600 text-xs leading-relaxed">Môi trường làm việc tôn trọng, minh bạch, đề cao tinh thần trách nhiệm và sự sáng tạo.</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-    </main>
-
-    <!-- ==================== COMMON CONTACT & FOOTER ==================== -->
-
-    <!-- Contact & Form Section -->
-    <section id="contact" class="py-16 bg-slate-50 border-t border-slate-200">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="grid lg:grid-cols-12 gap-12">
-                <div class="lg:col-span-5">
-                    <span class="text-brand-blue font-bold text-sm tracking-widest uppercase">Kết Nối Với Chúng Tôi</span>
-                    <h2 class="text-3xl font-bold text-slate-900 mt-2">Liên Hệ Báo Giá & Tư Vấn</h2>
-                    <p class="mt-4 text-slate-600 text-sm leading-relaxed">
-                        Đội ngũ kỹ sư và kiến trúc sư của PV INCONS sẵn sàng hỗ trợ giải đáp thắc mắc cho dự án của bạn.
-                    </p>
-                    <div class="mt-6 space-y-4 text-sm">
-                        <p><i class="fa-solid fa-location-dot text-brand-blue mr-2"></i> Phường Hưng Phú, Thành phố Cần Thơ</p>
-                        <p><i class="fa-solid fa-phone text-brand-blue mr-2"></i> Phone: 0772 194 789 - Hotline: 0909 751 194</p>
-                        <p><i class="fa-solid fa-envelope text-brand-blue mr-2"></i> pvincons@gmail.com</p>
-                    </div>
-                </div>
-
-                <div class="lg:col-span-7 bg-white p-8 rounded-2xl border border-slate-200 shadow-md">
-                    <h3 class="text-xl font-bold text-slate-900 mb-6">Gửi Yêu Cầu Tới PV INCONS</h3>
-                    <form action="https://formspree.io/f/maylqvrr" method="POST" class="space-y-4">
-                        <div>
-                            <input type="text" name="name" required class="w-full border border-slate-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-brand-blue outline-none" placeholder="Họ và Tên *">
-                        </div>
-                        <div class="grid sm:grid-cols-2 gap-4">
-                            <input type="tel" name="phone" required class="w-full border border-slate-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-brand-blue outline-none" placeholder="Số Điện Thoại *">
-                            <input type="text" name="location" class="w-full border border-slate-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-brand-blue outline-none" placeholder="Địa Điểm Công Trình">
-                        </div>
-                        <textarea name="message" rows="3" class="w-full border border-slate-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-brand-blue outline-none" placeholder="Nội dung yêu cầu..."></textarea>
-                        <button type="submit" class="w-full bg-brand-blue hover:bg-brand-darkblue text-white font-bold py-3 rounded-lg transition">Gửi Thông Tin</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Footer -->
-    <footer class="bg-slate-900 text-slate-400 py-10 border-t border-slate-800 text-sm">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row justify-between items-center gap-4">
-            <p>&copy; 2026 <span class="text-white font-bold">PV INCONS</span>. All rights reserved.</p>
-            <div class="flex space-x-4 text-xs flex-wrap justify-center gap-y-2 uppercase font-semibold">
-                <a href="javascript:void(0)" onclick="switchTab('home')" class="hover:text-white transition">TRANG CHỦ</a>
-                <a href="javascript:void(0)" onclick="switchTab('about')" class="hover:text-white transition">GIỚI THIỆU</a>
-                <a href="javascript:void(0)" onclick="switchTab('projects')" class="hover:text-white transition">DỰ ÁN</a>
-                <a href="javascript:void(0)" onclick="switchTab('news')" class="hover:text-white transition">TIN TỨC</a>
-                <a href="javascript:void(0)" onclick="switchTab('investment')" class="hover:text-white transition">QUAN HỆ ĐẦU TƯ</a>
-            </div>
-        </div>
-    </footer>
-
-    <!-- JAVASCRIPT LOGIC -->
+    <script src="layout.js"></script>
     <script>
-        // Tab Switching Functionality (7 Tabs)
-        function switchTab(tabId) {
-            const contents = document.querySelectorAll('.tab-content');
-            contents.forEach(content => content.classList.add('hidden'));
+        loadLayout('home');
 
-            const targetContent = document.getElementById('tab-' + tabId);
-            if (targetContent) {
-                targetContent.classList.remove('hidden');
-            }
-
-            // Update Desktop Nav Button Styles
-            const navBtns = document.querySelectorAll('.nav-tab-btn');
-            navBtns.forEach(btn => {
-                if (btn.getAttribute('data-tab') === tabId) {
-                    btn.classList.add('border-brand-blue', 'text-brand-blue');
-                    btn.classList.remove('border-transparent', 'text-slate-600');
-                } else {
-                    btn.classList.remove('border-brand-blue', 'text-brand-blue');
-                    btn.classList.add('border-transparent', 'text-slate-600');
-                }
-            });
-
-            // Update Mobile Nav Button Styles
-            const mobileBtns = document.querySelectorAll('.mobile-tab-btn');
-            mobileBtns.forEach(btn => {
-                if (btn.getAttribute('data-tab') === tabId) {
-                    btn.classList.add('text-brand-blue', 'bg-blue-50');
-                    btn.classList.remove('text-slate-700');
-                } else {
-                    btn.classList.remove('text-brand-blue', 'bg-blue-50');
-                    btn.classList.add('text-slate-700');
-                }
-            });
-
-            closeMobileMenu();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        // Mobile Menu Drawer Control
-        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-        const mobileMenu = document.getElementById('mobileMenu');
-
-        if (mobileMenuBtn) {
-            mobileMenuBtn.addEventListener('click', () => {
-                mobileMenu.classList.toggle('hidden');
-            });
-        }
-
-        function closeMobileMenu() {
-            if (mobileMenu && !mobileMenu.classList.contains('hidden')) {
-                mobileMenu.classList.add('hidden');
-            }
-        }
-
-        // SLIDER DỰ ÁN MỚI NHẤT (SMOOTH CAROUSEL LOGIC - 6 SLIDES)
+        // Logic Slider cho trang chủ
         let latestProjectIndex = 0;
         const latestTrack = document.getElementById('latestProjectsTrack');
         const latestDots = document.querySelectorAll('.latest-dot');
-        const totalLatestProjects = 6; // Đã cập nhật lên 6 Slide
+        const totalLatestProjects = 6;
 
         function setLatestProject(index) {
             latestProjectIndex = index;
@@ -609,7 +178,6 @@
             setLatestProject(latestProjectIndex);
         }
 
-        // Tự động cuộn mượt mỗi 4 giây
         setInterval(nextLatestProject, 4000);
     </script>
 </body>
