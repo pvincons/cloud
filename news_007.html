@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phân Tích Chiến Lược: PV Incons Mở Rộng Hợp Tác Thi Công Nhà Xưởng Tiền Chế 2026</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0F172A;
+            --primary-light: #1E293B;
+            --accent: #EA580C; /* Industrial Steel Amber/Orange */
+            --accent-hover: #C2410C;
+            --accent-light: #FFEDD5;
+            --secondary: #0284C7; /* Tech Steel Blue */
+            --secondary-light: #E0F2FE;
+            --text-dark: #0F172A;
+            --text-muted: #475569;
+            --text-light: #94A3B8;
+            --bg-body: #F8FAFC;
+            --bg-card: #FFFFFF;
+            --border-color: #E2E8F0;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --radius-sm: 6px;
+            --radius-md: 12px;
+            --radius-lg: 20px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-dark);
+            line-height: 1.75;
+            font-size: 16px;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Top Navigation Bar */
+        .navbar {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.94);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 0;
+        }
+
+        .navbar-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .brand-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: var(--primary);
+            font-weight: 800;
+            font-size: 1.25rem;
+            letter-spacing: -0.02em;
+        }
+
+        .brand-badge {
+            background: linear-gradient(135deg, #EA580C, #0284C7);
+            color: white;
+            padding: 4px 10px;
+            border-radius: var(--radius-sm);
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover {
+            color: var(--accent);
+        }
+
+        /* Hero Header Section */
+        .hero {
+            background: linear-gradient(180deg, #0F172A 0%, #1E293B 100%);
+            color: white;
+            padding: 60px 0 80px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 80% 20%, rgba(234, 88, 12, 0.2) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .hero-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 24px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .article-category {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(234, 88, 12, 0.2);
+            border: 1px solid rgba(251, 146, 60, 0.4);
+            color: #FB923C;
+            padding: 6px 14px;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 24px;
+        }
+
+        .hero-title {
+            font-size: 2.6rem;
+            line-height: 1.25;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #FFFFFF 0%, #E2E8F0 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-subtitle {
+            font-size: 1.15rem;
+            color: #94A3B8;
+            line-height: 1.6;
+            margin-bottom: 32px;
+            font-weight: 400;
+        }
+
+        .meta-info {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 24px;
+            padding-top: 24px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.875rem;
+            color: #CBD5E1;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Main Container Layout */
+        .layout-container {
+            max-width: 1200px;
+            margin: -40px auto 60px;
+            padding: 0 24px;
+            position: relative;
+            z-index: 10;
+            display: grid;
+            grid-template-columns: 1fr 320px;
+            gap: 40px;
+        }
+
+        @media (max-width: 992px) {
+            .layout-container {
+                grid-template-columns: 1fr;
+            }
+            .hero-title {
+                font-size: 2rem;
+            }
+        }
+
+        /* Main Article Content */
+        .main-content {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            padding: 48px;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border-color);
+        }
+
+        @media (max-width: 640px) {
+            .main-content {
+                padding: 24px;
+            }
+        }
+
+        /* Key Takeaways Card */
+        .key-takeaways {
+            background: linear-gradient(135deg, var(--accent-light) 0%, #FFF7ED 100%);
+            border: 1px solid #FFEDD5;
+            border-radius: var(--radius-md);
+            padding: 28px;
+            margin-bottom: 40px;
+        }
+
+        .key-takeaways-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #C2410C;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .key-takeaways-list {
+            list-style: none;
+            display: grid;
+            gap: 12px;
+        }
+
+        .key-takeaways-list li {
+            position: relative;
+            padding-left: 28px;
+            font-size: 0.975rem;
+            color: #1E293B;
+            font-weight: 500;
+        }
+
+        .key-takeaways-list li::before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            top: 0;
+            color: var(--accent);
+            font-weight: 800;
+            font-size: 1.1rem;
+        }
+
+        /* Typography inside Article */
+        h2 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin: 48px 0 20px;
+            letter-spacing: -0.02em;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-left: 4px solid var(--accent);
+            padding-left: 16px;
+        }
+
+        h2:first-of-type {
+            margin-top: 0;
+        }
+
+        h3 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--primary-light);
+            margin: 32px 0 16px;
+            letter-spacing: -0.01em;
+        }
+
+        p {
+            margin-bottom: 20px;
+            color: var(--text-muted);
+            font-size: 1.05rem;
+            text-align: justify;
+        }
+
+        strong {
+            color: var(--text-dark);
+            font-weight: 600;
+        }
+
+        ul, ol {
+            margin-bottom: 24px;
+            padding-left: 24px;
+            color: var(--text-muted);
+        }
+
+        li {
+            margin-bottom: 10px;
+            font-size: 1.025rem;
+        }
+
+        blockquote {
+            background: #F1F5F9;
+            border-left: 4px solid var(--secondary);
+            padding: 20px 24px;
+            border-radius: 0 var(--radius-md) var(--radius-md) 0;
+            margin: 32px 0;
+            font-style: italic;
+            color: var(--text-dark);
+            font-size: 1.05rem;
+        }
+
+        blockquote p {
+            margin-bottom: 0;
+            font-style: italic;
+        }
+
+        /* Embedded Illustration Image Cards */
+        .illustration-card {
+            margin: 36px 0;
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            background: #F8FAFC;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .illustration-img-wrapper {
+            width: 100%;
+            background: #0F172A;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 24px;
+        }
+
+        .illustration-img-wrapper svg {
+            max-width: 100%;
+            height: auto;
+        }
+
+        .illustration-caption {
+            padding: 14px 20px;
+            background: #FFFFFF;
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            text-align: center;
+            border-top: 1px solid var(--border-color);
+            font-weight: 500;
+        }
+
+        /* Metric Highlights Grid */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 36px 0;
+        }
+
+        .metric-card {
+            background: #FFFFFF;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 24px;
+            text-align: center;
+            box-shadow: var(--shadow-sm);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
+            border-color: var(--accent);
+        }
+
+        .metric-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--accent);
+            line-height: 1;
+            margin-bottom: 8px;
+            letter-spacing: -0.03em;
+        }
+
+        .metric-label {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* Custom Comparison Table */
+        .data-table-container {
+            overflow-x: auto;
+            margin: 32px 0;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-color);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.95rem;
+            text-align: left;
+        }
+
+        th {
+            background: var(--primary);
+            color: white;
+            padding: 16px 20px;
+            font-weight: 600;
+        }
+
+        td {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-muted);
+        }
+
+        tr:nth-child(even) {
+            background-color: #F8FAFC;
+        }
+
+        tr:hover {
+            background-color: #F1F5F9;
+        }
+
+        .badge-success {
+            background: #DCFCE7;
+            color: #15803D;
+            padding: 4px 10px;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+
+        /* Sidebar Styling */
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 28px;
+        }
+
+        .sidebar-widget {
+            background: var(--bg-card);
+            border-radius: var(--radius-md);
+            padding: 24px;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .widget-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 16px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--accent-light);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .toc-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .toc-list a {
+            text-decoration: none;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: color 0.2s;
+        }
+
+        .toc-list a:hover {
+            color: var(--accent);
+        }
+
+        .company-profile-card {
+            background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
+            color: white;
+            border-radius: var(--radius-md);
+            padding: 24px;
+        }
+
+        .company-profile-card h4 {
+            color: #FB923C;
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+        }
+
+        .company-profile-card p {
+            color: #94A3B8;
+            font-size: 0.875rem;
+            margin-bottom: 16px;
+            text-align: left;
+        }
+
+        .tag-cloud {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .tag {
+            background: #F1F5F9;
+            color: var(--text-muted);
+            padding: 6px 12px;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .tag:hover {
+            background: var(--accent-light);
+            color: var(--accent);
+        }
+
+        /* Footer */
+        footer {
+            background: var(--primary);
+            color: var(--text-light);
+            padding: 40px 0;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            text-align: center;
+            font-size: 0.875rem;
+        }
+
+        footer p {
+            text-align: center;
+            color: var(--text-light);
+            margin-bottom: 0;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header Navigation -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="#" class="brand-logo">
+                <span style="color: var(--accent);">PV</span> INCONS
+                <span class="brand-badge">BÁO CÁO CHIẾN LƯỢC</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="#overview">Tổng quan</a></li>
+                <li><a href="#solution">Giải pháp Turnkey</a></li>
+                <li><a href="#tech">Kỹ thuật PEB</a></li>
+                <li><a href="#results">Hiệu quả thực tế</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="hero">
+        <div class="hero-container">
+            <div class="article-category">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19 2 19M6 19V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v14M12 3v16M9 9h6M9 13h6"/></svg>
+                XÂY DỰNG CÔNG NGHIỆP & KẾT CẤU THÉP
+            </div>
+            <h1 class="hero-title">PV Incons Mở Rộng Hợp Tác Thi Công Nhà Xưởng Tiền Chế Năm 2026</h1>
+            <p class="hero-subtitle">Tăng cường năng lực cung ứng kết cấu thép, tối ưu hóa chuỗi sản xuất và mang đến giải pháp xây dựng công nghiệp trọn gói (EPC/Turnkey) cho các doanh nghiệp trong và ngoài nước.</p>
+            
+            <div class="meta-info">
+                <div class="meta-item">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                    <span>Cập nhật: <strong>01/03/2026</strong></span>
+                </div>
+                <div class="meta-item">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    <span>Tác giả: <strong>Ban Khai Thác Dự Án & Phát Triển Công Nghiệp - PV INCONS</strong></span>
+                </div>
+                <div class="meta-item">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    <span>Thời gian đọc: <strong>9 phút</strong></span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Content Layout -->
+    <div class="layout-container">
+        
+        <!-- Main Body -->
+        <main class="main-content">
+
+            <!-- Executive Summary -->
+            <div class="key-takeaways">
+                <div class="key-takeaways-title">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+                    Tóm Tắt Điểm Nổi Bật Của Chiến Lược 2026
+                </div>
+                <ul class="key-takeaways-list">
+                    <li><strong>Bứt phá công suất kết cấu thép:</strong> PV Incons liên kết mở rộng hệ thống nhà máy gia công kết cấu thép với tổng công suất đạt hơn 35.000 tấn thép/năm, đáp ứng tiêu chuẩn quốc tế ISO 9001:2015 & EN 1090.</li>
+                    <li><strong>Mô hình Tổng thầu EPC Trọn gói:</strong> Khách hàng được cung cấp trọn gói từ tư vấn pháp lý, thiết kế tối ưu, gia công chế tạo đến lắp dựng hoàn thiện nhà xưởng công nghiệp.</li>
+                    <li><strong>Tiến độ thi công siêu tốc:</strong> Đẩy nhanh tốc độ bàn giao nhà xưởng từ 30% - 40% so với giải pháp truyền thống, giúp doanh nghiệp sớm đi vào vận hành sản xuất thương mại.</li>
+                    <li><strong>Định hướng Xanh & Bền vững:</strong> Thiết kế tích hợp hệ thống năng lượng mặt trời mái nhà (Rooftop Solar), thông gió tự nhiên tối ưu và sử dụng vật liệu thép tái chế thân thiện với môi trường.</li>
+                </ul>
+            </div>
+
+            <section id="overview">
+                <h2>1. Bối Cảnh Thị Trường Xây Dựng Công Nghiệp Năm 2026</h2>
+                <p>Bước sang năm 2026, Việt Nam tiếp tục khẳng định vị thế là trung tâm sản xuất và hậu cần (Logistics) quan trọng hàng đầu khu vực Đông Nam Á. Sự dịch chuyển làn sóng FDI chất lượng cao từ các tập đoàn đa quốc gia kéo theo nhu cầu bùng nổ về mặt bằng nhà xưởng quy mô lớn, đòi hỏi tiêu chuẩn kỹ thuật nghiêm ngặt, tiến độ hoàn thành ngắn và khả năng tối ưu hóa chi phí đầu tư ban đầu (CAPEX).</p>
+                <p>Trước thực tế đó, mô hình <strong>Nhà xưởng khung thép tiền chế (Pre-Engineered Buildings - PEB)</strong> trở thành lựa chọn ưu việt hàng đầu. Nắm bắt xu hướng này, <strong>PV Incons</strong> đã chính thức công bố chiến lược hợp tác toàn diện năm 2026, liên kết với các đối tác cung ứng vật tư hàng đầu và các chủ đầu tư khu công nghiệp nhằm nâng cao năng lực thi công và cung cấp giải pháp xây dựng công nghiệp trọn gói.</p>
+            </section>
+
+            <!-- Illustration 1: PEB Structure Frame Anatomy -->
+            <div class="illustration-card">
+                <div class="illustration-img-wrapper">
+                    <svg width="740" height="340" viewBox="0 0 800 360" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <pattern id="grid-pattern" width="30" height="30" patternUnits="userSpaceOnUse">
+                                <path d="M 30 0 L 0 0 0 30" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+                            </pattern>
+                            <linearGradient id="steel-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stop-color="#EA580C"/>
+                                <stop offset="100%" stop-color="#9A3412"/>
+                            </linearGradient>
+                            <linearGradient id="beam-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" stop-color="#38BDF8"/>
+                                <stop offset="100%" stop-color="#0284C7"/>
+                            </linearGradient>
+                        </defs>
+                        <!-- Background -->
+                        <rect width="100%" height="100%" fill="#0B132B"/>
+                        <rect width="100%" height="100%" fill="url(#grid-pattern)"/>
+
+                        <!-- Structural Ground Base -->
+                        <rect x="50" y="290" width="700" height="20" fill="#334155" rx="4"/>
+                        <path d="M 50 310 L 750 310" stroke="#475569" stroke-width="4"/>
+
+                        <!-- Concrete Foundations -->
+                        <rect x="100" y="260" width="60" height="30" fill="#64748B" rx="2"/>
+                        <rect x="370" y="260" width="60" height="30" fill="#64748B" rx="2"/>
+                        <rect x="640" y="260" width="60" height="30" fill="#64748B" rx="2"/>
+
+                        <!-- Primary Steel Columns -->
+                        <path d="M 120 260 L 120 110 L 140 110 L 140 260 Z" fill="url(#steel-grad)" stroke="#FB923C" stroke-width="1.5"/>
+                        <path d="M 390 260 L 390 80 L 410 80 L 410 260 Z" fill="url(#steel-grad)" stroke="#FB923C" stroke-width="1.5"/>
+                        <path d="M 660 260 L 660 110 L 680 110 L 680 260 Z" fill="url(#steel-grad)" stroke="#FB923C" stroke-width="1.5"/>
+
+                        <!-- Steel Rafters / Roof Trusses -->
+                        <path d="M 120 110 L 390 80 L 410 80 L 140 120 Z" fill="url(#beam-grad)" stroke="#38BDF8" stroke-width="1.5"/>
+                        <path d="M 680 110 L 410 80 L 390 80 L 660 120 Z" fill="url(#beam-grad)" stroke="#38BDF8" stroke-width="1.5"/>
+
+                        <!-- Purlins (Xà gồ mái & vách) -->
+                        <g stroke="#94A3B8" stroke-width="2" opacity="0.8">
+                            <!-- Roof purlins left -->
+                            <circle cx="180" cy="103" r="3" fill="#F8FAFC"/>
+                            <circle cx="230" cy="97" r="3" fill="#F8FAFC"/>
+                            <circle cx="280" cy="92" r="3" fill="#F8FAFC"/>
+                            <circle cx="330" cy="86" r="3" fill="#F8FAFC"/>
+                            <!-- Roof purlins right -->
+                            <circle cx="470" cy="86" r="3" fill="#F8FAFC"/>
+                            <circle cx="520" cy="92" r="3" fill="#F8FAFC"/>
+                            <circle cx="570" cy="97" r="3" fill="#F8FAFC"/>
+                            <circle cx="620" cy="103" r="3" fill="#F8FAFC"/>
+                        </g>
+
+                        <!-- Roof Sheeting Line -->
+                        <path d="M 100 108 L 400 74 L 700 108" fill="none" stroke="#F97316" stroke-width="3" stroke-dasharray="6 3"/>
+
+                        <!-- Bracing (Giằng cáp / giằng thép) -->
+                        <line x1="140" y1="130" x2="390" y2="250" stroke="#F1F5F9" stroke-width="1" stroke-dasharray="4 4" opacity="0.6"/>
+                        <line x1="390" y1="130" x2="140" y2="250" stroke="#F1F5F9" stroke-width="1" stroke-dasharray="4 4" opacity="0.6"/>
+                        <line x1="410" y1="130" x2="660" y2="250" stroke="#F1F5F9" stroke-width="1" stroke-dasharray="4 4" opacity="0.6"/>
+                        <line x1="660" y1="130" x2="410" y2="250" stroke="#F1F5F9" stroke-width="1" stroke-dasharray="4 4" opacity="0.6"/>
+
+                        <!-- Labels and Callouts -->
+                        <!-- Callout 1: Cột thép chính -->
+                        <rect x="20" y="160" width="90" height="28" rx="6" fill="#1E293B" stroke="#EA580C" stroke-width="1.5"/>
+                        <text x="65" y="178" fill="#FB923C" font-size="11" font-weight="bold" text-anchor="middle">Cột Thép Chính</text>
+                        <line x1="110" y1="174" x2="130" y2="180" stroke="#EA580C" stroke-width="1.5"/>
+
+                        <!-- Callout 2: Kèo mái vượt nhịp -->
+                        <rect x="230" y="25" width="130" height="28" rx="6" fill="#1E293B" stroke="#0284C7" stroke-width="1.5"/>
+                        <text x="295" y="43" fill="#38BDF8" font-size="11" font-weight="bold" text-anchor="middle">Kèo Thép Vượt Nhịp</text>
+                        <line x1="295" y1="53" x2="280" y2="88" stroke="#0284C7" stroke-width="1.5"/>
+
+                        <!-- Callout 3: Tôn mái & Xà gồ C/Z -->
+                        <rect x="480" y="25" width="130" height="28" rx="6" fill="#1E293B" stroke="#F97316" stroke-width="1.5"/>
+                        <text x="545" y="43" fill="#F97316" font-size="11" font-weight="bold" text-anchor="middle">Tôn Mái & Xà Gồ C/Z</text>
+                        <line x1="545" y1="53" x2="520" y2="88" stroke="#F97316" stroke-width="1.5"/>
+
+                        <!-- Callout 4: Móng Bê Tông Cốt Thép -->
+                        <rect x="330" y="315" width="140" height="28" rx="6" fill="#1E293B" stroke="#64748B" stroke-width="1.5"/>
+                        <text x="400" y="333" fill="#94A3B8" font-size="11" font-weight="bold" text-anchor="middle">Móng BTCT Chịu Tải</text>
+                    </svg>
+                </div>
+                <div class="illustration-caption">Hình 1: Mô hình giải phẫu khung kết cấu thép tiền chế (PEB) tiêu chuẩn do PV Incons thiết kế và thi công</div>
+            </div>
+
+            <section id="solution">
+                <h2>2. Giải Pháp Xây Dựng Công Nghiệp Trọn Gói (EPC/Turnkey)</h2>
+                <p>Khác với các nhà thầu thi công đơn lẻ, PV Incons mang đến mô hình <strong>EPC (Engineering - Procurement - Construction)</strong> toàn diện. Mô hình này giúp loại bỏ tối đa các mắt xích trung gian, nâng cao tính đồng bộ và chịu trách nhiệm duy nhất cho toàn bộ chu kỳ sống của dự án.</p>
+
+                <!-- Illustration 2: EPC Process Flowchart -->
+                <div class="illustration-card">
+                    <div class="illustration-img-wrapper">
+                        <svg width="740" height="260" viewBox="0 0 800 280" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect width="100%" height="100%" fill="#0F172A"/>
+
+                            <!-- Step 1 -->
+                            <g transform="translate(30, 70)">
+                                <rect x="0" y="0" width="160" height="130" rx="12" fill="#1E293B" stroke="#EA580C" stroke-width="2"/>
+                                <circle cx="80" cy="35" r="20" fill="#EA580C"/>
+                                <text x="80" y="41" fill="#FFFFFF" font-size="14" font-weight="bold" text-anchor="middle">01</text>
+                                <text x="80" y="80" fill="#FB923C" font-size="13" font-weight="bold" text-anchor="middle">TƯ VẤN & PHÁP LÝ</text>
+                                <text x="80" y="102" fill="#94A3B8" font-size="11" text-anchor="middle">Khảo sát, cấp phép</text>
+                                <text x="80" y="118" fill="#94A3B8" font-size="11" text-anchor="middle">& Quy hoạch 1/500</text>
+                            </g>
+
+                            <!-- Arrow 1-2 -->
+                            <path d="M 200 135 L 220 135" stroke="#EA580C" stroke-width="3" marker-end="url(#arrow-head)"/>
+
+                            <!-- Step 2 -->
+                            <g transform="translate(225, 70)">
+                                <rect x="0" y="0" width="160" height="130" rx="12" fill="#1E293B" stroke="#0284C7" stroke-width="2"/>
+                                <circle cx="80" cy="35" r="20" fill="#0284C7"/>
+                                <text x="80" y="41" fill="#FFFFFF" font-size="14" font-weight="bold" text-anchor="middle">02</text>
+                                <text x="80" y="80" fill="#38BDF8" font-size="13" font-weight="bold" text-anchor="middle">THIẾT KẾ BIM 3D</text>
+                                <text x="80" y="102" fill="#94A3B8" font-size="11" text-anchor="middle">Tối ưu hóa Tekla/Revit</text>
+                                <text x="80" y="118" fill="#94A3B8" font-size="11" text-anchor="middle">& Bóc tách Tekla/Etabs</text>
+                            </g>
+
+                            <!-- Arrow 2-3 -->
+                            <path d="M 395 135 L 415 135" stroke="#0284C7" stroke-width="3"/>
+
+                            <!-- Step 3 -->
+                            <g transform="translate(420, 70)">
+                                <rect x="0" y="0" width="160" height="130" rx="12" fill="#1E293B" stroke="#0D9488" stroke-width="2"/>
+                                <circle cx="80" cy="35" r="20" fill="#0D9488"/>
+                                <text x="80" y="41" fill="#FFFFFF" font-size="14" font-weight="bold" text-anchor="middle">03</text>
+                                <text x="80" y="80" fill="#2DD4BF" font-size="13" font-weight="bold" text-anchor="middle">GIA CÔNG NHÀ MÁY</text>
+                                <text x="80" y="102" fill="#94A3B8" font-size="11" text-anchor="middle">Cắt CNC, hàn tự động</text>
+                                <text x="80" y="118" fill="#94A3B8" font-size="11" text-anchor="middle">& Phun sơn chống cháy</text>
+                            </g>
+
+                            <!-- Arrow 3-4 -->
+                            <path d="M 590 135 L 610 135" stroke="#0D9488" stroke-width="3"/>
+
+                            <!-- Step 4 -->
+                            <g transform="translate(615, 70)">
+                                <rect x="0" y="0" width="155" height="130" rx="12" fill="#1E293B" stroke="#818CF8" stroke-width="2"/>
+                                <circle cx="77" cy="35" r="20" fill="#818CF8"/>
+                                <text x="77" y="41" fill="#FFFFFF" font-size="14" font-weight="bold" text-anchor="middle">04</text>
+                                <text x="77" y="80" fill="#A5B4FC" font-size="13" font-weight="bold" text-anchor="middle">LẮP DỰNG & BÀN GIAO</text>
+                                <text x="77" y="102" fill="#94A3B8" font-size="11" text-anchor="middle">Lắp dựng an toàn</text>
+                                <text x="77" y="118" fill="#94A3B8" font-size="11" text-anchor="middle">& Nghiệm thu PCCC</text>
+                            </g>
+
+                            <defs>
+                                <marker id="arrow-head" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                                    <path d="M 0 0 L 10 5 L 0 10 z" fill="#EA580C"/>
+                                </marker>
+                            </defs>
+                        </svg>
+                    </div>
+                    <div class="illustration-caption">Hình 2: Quy trình 4 bước triển khai dự án nhà xưởng công nghiệp trọn gói (EPC) tại PV Incons</div>
+                </div>
+
+                <h3>4 Lợi Ích Cốt Lõi Khi Hợp Tác Cùng PV Incons:</h3>
+                <ol>
+                    <li><strong>Kiểm soát ngân sách chính xác:</strong> Cam kết không phát sinh chi phí nhờ khâu lập dự toán chính xác bằng phần mềm mô phỏng 3D hiện đại.</li>
+                    <li><strong>Gia công chuẩn xác tuyệt đối:</strong> Hệ thống nhà máy đối tác trang bị dây chuyền cắt Laser CNC, máy hàn cổng tự động và hệ thống phun bi làm sạch bề mặt đạt tiêu chuẩn Sa 2.5.</li>
+                    <li><strong>Đảm bảo an toàn PCCC & Pháp lý:</strong> Hỗ trợ hoàn thiện đầy đủ hồ sơ thẩm duyệt PCCC, cấp phép xây dựng và hoàn công công trình nhanh chóng.</li>
+                    <li><strong>Bảo hành kết cấu dài hạn:</strong> Cam kết bảo hành kết cấu thép lên đến 10 - 15 năm, đồng hành bảo trì định kỳ cùng chủ đầu tư.</li>
+                </ol>
+            </section>
+
+            <section id="tech">
+                <h2>3. Ưu Thế Kỹ Thuật & Công Nghệ Kết Cấu Thép Tiền Chế (PEB)</h2>
+                <p>So với phương pháp xây dựng nhà xưởng bê tông cốt thép truyền thống, giải pháp nhà xưởng tiền chế của PV Incons mang lại nhiều bước tiến vượt bậc về mặt kỹ thuật:</p>
+                <ul>
+                    <li><strong>Khả năng vượt nhịp lớn (Clear Span):</strong> Khung thép tiền chế có thể vượt nhịp từ 30m đến hơn 90m mà không cần cột chống giữa, giúp tối ưu hóa 100% diện tích không gian bố trí dây chuyền máy móc và kho bãi.</li>
+                    <li><strong>Tải trọng nhẹ, giảm chi phí móng:</strong> Trọng lượng khung thép nhẹ hơn đáng kể so với bê tông, giúp giảm từ 20% - 30% chi phí xử lý nền móng (ép cọc, móng băng).</li>
+                    <li><strong>Linh hoạt mở rộng trong tương lai:</strong> Cấu trúc mô-đun tháo lắp bằng bu-lông cường độ cao cho phép doanh nghiệp dễ dàng nới rộng quy mô xưởng hoặc di dời khi có nhu cầu tái cấu trúc.</li>
+                </ul>
+            </section>
+
+            <section id="results">
+                <h2>4. Đánh Giá Hiệu Quả & Dữ Liệu Thực Tế</h2>
+                <p>Thông qua việc chuẩn hóa quy trình và mở rộng chuỗi cung ứng kết cấu thép trong năm 2026, PV Incons ghi nhận những chỉ số tăng trưởng và hiệu quả vượt trội trên các dự án đã triển khai:</p>
+
+                <!-- Metric Cards -->
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-value">35.000+</div>
+                        <div class="metric-label">Tấn thép/năm công suất cung ứng</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">-35%</div>
+                        <div class="metric-label">Rút ngắn thời gian thi công</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">99.8%</div>
+                        <div class="metric-label">Độ chính xác chế tạo gia công</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">100%</div>
+                        <div class="metric-label">Đạt tiêu chuẩn an toàn PCCC</div>
+                    </div>
+                </div>
+
+                <h3>Bảng So Sánh Giải Pháp Nhà Xưởng Tiền Chế PV Incons vs Nhà Xưởng Bê Tông Truyền Thống</h3>
+
+                <div class="data-table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Tiêu Chí So Sánh</th>
+                                <th>Nhà Xưởng BTCT Truyền Thống</th>
+                                <th>Nhà Xưởng Khung Thép PV Incons</th>
+                                <th>Ưu Thế Đạt Được</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Thời gian thi công</strong></td>
+                                <td>6 - 9 tháng (Phụ thuộc thời gian ninh kết bê tông)</td>
+                                <td>3 - 4 tháng (Gia công song song tại nhà máy)</td>
+                                <td><span class="badge-success">Nhanh hơn 40%</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Chi phí nền móng</strong></td>
+                                <td>Cao (Do tải trọng công trình rất nặng)</td>
+                                <td>Tiết kiệm 20% - 30% (Tải trọng thép nhẹ hơn)</td>
+                                <td><span class="badge-success">Tối ưu chi phí</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Khả năng vượt nhịp</strong></td>
+                                <td>Hạn chế (Cần nhiều cột giữa)</td>
+                                <td>Vượt nhịp rộng đến 60m - 90m không cột giữa</td>
+                                <td><span class="badge-success">Diện tích tối đa</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Khả năng tái sử dụng / Mở rộng</strong></td>
+                                <td>Rất khó, phải đập phá gây lãng phí</td>
+                                <td>Tháo dỡ, nâng cấp mô-đun bu-lông dễ dàng</td>
+                                <td><span class="badge-success">Linh hoạt 100%</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <blockquote>
+                    <p>"Chất lượng kết cấu thép và tiến độ thi công là hai yếu tố sống còn đối với các nhà đầu tư công nghiệp. Việc mở rộng hợp tác thi công nhà xưởng tiền chế năm 2026 giúp PV Incons chủ động hoàn toàn về nguồn cung vật tư, kiểm soát tiến độ từng ngày và mang đến công trình đạt chuẩn quốc tế cho khách hàng."</p>
+                </blockquote>
+            </section>
+
+            <section id="conclusion">
+                <h2>5. Bài Học Kinh Nghiệm & Hướng Đi Bền Vững</h2>
+                <p>Chiến lược mở rộng hợp tác thi công nhà xưởng tiền chế năm 2026 của PV Incons khẳng định tầm nhìn dài hạn trong việc đón đầu làn sóng đầu tư công nghiệp tại Việt Nam. Không chỉ dừng lại ở khía cạnh quy mô và tốc độ, PV Incons cam kết tích hợp các tiêu chuẩn <strong>Xây dựng Xanh (Green Building)</strong>, sẵn sàng mặt bằng lắp đặt điện mặt trời mái nhà và sử dụng vật liệu thân thiện môi trường nhằm giảm phát thải carbon.</p>
+                <p>Với năng lực thi công vượt trội cùng tinh thần hợp tác phát triển, PV Incons tiếp tục là đối tác tin cậy hàng đầu của các doanh nghiệp trong hành trình xây dựng nhà xưởng công nghiệp hiện đại, bền vững.</p>
+            </section>
+
+        </main>
+
+        <!-- Right Sidebar -->
+        <aside class="sidebar">
+            
+            <!-- Table of Contents Widget -->
+            <div class="sidebar-widget">
+                <div class="widget-title">Mục Lục Bài Viết</div>
+                <ul class="toc-list">
+                    <li><a href="#overview"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg> 1. Bối cảnh thị trường 2026</a></li>
+                    <li><a href="#solution"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg> 2. Giải pháp EPC trọn gói</a></li>
+                    <li><a href="#tech"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg> 3. Kỹ thuật nhà xưởng PEB</a></li>
+                    <li><a href="#results"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg> 4. Hiệu quả & Số liệu</a></li>
+                    <li><a href="#conclusion"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg> 5. Định hướng bền vững</a></li>
+                </ul>
+            </div>
+
+            <!-- Profile Info Widget -->
+            <div class="company-profile-card">
+                <h4>PV INCONS</h4>
+                <p>Đơn vị hàng đầu trong tư vấn thiết kế, sản xuất kết cấu thép và tổng thầu EPC thi công nhà xưởng công nghiệp tại Việt Nam.</p>
+                <div style="font-size: 0.8rem; color: #FB923C; font-weight: 600;">
+                    ✓ ISO 9001:2015 & EN 1090 Certified
+                </div>
+            </div>
+
+            <!-- Tags Widget -->
+            <div class="sidebar-widget">
+                <div class="widget-title">Chủ Đề Liên Quan</div>
+                <div class="tag-cloud">
+                    <a href="#" class="tag">Nhà Xưởng Tiền Chế</a>
+                    <a href="#" class="tag">Kết Cấu Thép</a>
+                    <a href="#" class="tag">Xây Dựng Công Nghiệp</a>
+                    <a href="#" class="tag">Tổng Thầu EPC</a>
+                    <a href="#" class="tag">PV Incons 2026</a>
+                    <a href="#" class="tag">Xưởng Vượt Nhịp</a>
+                    <a href="#" class="tag">Tiêu Chuẩn PCCC</a>
+                </div>
+            </div>
+
+        </aside>
+
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <p>© 2026 PV INCONS. Tất cả các quyền được bảo lưu. Báo cáo phân tích chiến lược phát triển công nghiệp.</p>
+    </footer>
+
+</body>
+</html>
