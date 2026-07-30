@@ -43,3 +43,28 @@ function closeMobileMenu() {
         mobileMenu.classList.add('hidden');
     }
 }
+
+// Hàm tự động lấy tin tức từ news.html sang index.html
+async function loadHomeNews() {
+    const placeholder = document.getElementById('latest-news-placeholder');
+    if (!placeholder) return;
+
+    try {
+        const response = await fetch('news.html');
+        const htmlText = await response.text();
+
+        // Đọc dữ liệu HTML từ trang news.html
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(htmlText, 'text/html');
+        const newsContent = doc.querySelector('#news-container');
+
+        if (newsContent) {
+            placeholder.innerHTML = newsContent.innerHTML;
+        }
+    } catch (error) {
+        console.error('Lỗi đồng bộ tin tức:', error);
+    }
+}
+
+// Chạy hàm khi trang web tải xong
+document.addEventListener('DOMContentLoaded', loadHomeNews);
