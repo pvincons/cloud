@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PV INCONS - GIỚI THIỆU</title>
     <link rel="icon" type="image/png" href="LOGO_PVI.png">
+    
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -16,39 +18,1010 @@
             }
         }
     </script>
+    
+    <!-- Google Fonts & FontAwesome Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <!-- Stylesheet tùy chỉnh cho nội dung Hồ sơ năng lực -->
+    <style>
+        :root {
+            --primary-dark: #0a192f;
+            --primary-blue: #0f4c81;
+            --accent-orange: #e87e23;
+            --accent-gold: #f39c12;
+            --bg-light: #f8fafc;
+            --surface-white: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
+            --shadow-md: 0 10px 25px -5px rgba(15, 76, 129, 0.08);
+            --shadow-lg: 0 20px 30px -10px rgba(10, 25, 47, 0.12);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* HERO SECTION */
+        .hero {
+            background: linear-gradient(135deg, #071325 0%, #0f4c81 100%);
+            color: var(--surface-white);
+            padding: 80px 0 100px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(232,126,35,0.15) 0%, rgba(0,0,0,0) 70%);
+            pointer-events: none;
+        }
+
+        .hero-grid {
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 48px;
+            align-items: center;
+        }
+
+        .hero-tag {
+            color: var(--accent-orange);
+            font-weight: 700;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 12px;
+            display: inline-block;
+        }
+
+        .hero-title {
+            font-size: 38px;
+            font-weight: 800;
+            line-height: 1.2;
+            margin-bottom: 16px;
+            color: #ffffff;
+        }
+
+        .hero-subtitle {
+            font-size: 16px;
+            color: #cbd5e1;
+            margin-bottom: 32px;
+            line-height: 1.7;
+        }
+
+        .leadership-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-left: 4px solid var(--accent-orange);
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+
+        .quote-icon {
+            font-size: 32px;
+            color: var(--accent-orange);
+            margin-bottom: 12px;
+            opacity: 0.8;
+        }
+
+        .quote-text {
+            font-style: italic;
+            font-size: 15px;
+            color: #f1f5f9;
+            line-height: 1.7;
+            margin-bottom: 20px;
+        }
+
+        .quote-author {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .author-avatar {
+            width: 44px;
+            height: 44px;
+            background-color: var(--accent-orange);
+            color: var(--surface-white);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 18px;
+        }
+
+        .author-info h4 {
+            font-size: 15px;
+            font-weight: 700;
+            color: #ffffff;
+        }
+
+        .author-info p {
+            font-size: 12px;
+            color: var(--accent-gold);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+
+        /* METRICS BAR */
+        .metrics-container {
+            margin-top: -50px;
+            position: relative;
+            z-index: 10;
+            margin-bottom: 60px;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+        }
+
+        .metric-card {
+            background: var(--surface-white);
+            padding: 24px;
+            border-radius: 16px;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border-color);
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .metric-icon {
+            width: 48px;
+            height: 48px;
+            background: rgba(15, 76, 129, 0.08);
+            color: var(--primary-blue);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            margin: 0 auto 12px;
+        }
+
+        .metric-value {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--primary-dark);
+            margin-bottom: 4px;
+        }
+
+        .metric-label {
+            font-size: 12px;
+            color: var(--text-muted);
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* SECTION STYLING */
+        .section {
+            padding: 60px 0;
+        }
+
+        .section-header {
+            text-align: center;
+            max-width: 700px;
+            margin: 0 auto 48px;
+        }
+
+        .section-tag {
+            color: var(--primary-blue);
+            font-weight: 700;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .section-title {
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--primary-dark);
+            letter-spacing: -0.5px;
+        }
+
+        /* SECTION 1: PHILOSOPHY TRIPLE CARDS */
+        .philosophy-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+        }
+
+        .philosophy-card {
+            background-color: var(--surface-white);
+            border-radius: 16px;
+            padding: 32px;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-sm);
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .philosophy-card:hover {
+            border-color: var(--primary-blue);
+            box-shadow: var(--shadow-md);
+        }
+
+        .philosophy-num {
+            font-size: 36px;
+            font-weight: 900;
+            color: rgba(15, 76, 129, 0.15);
+            position: absolute;
+            top: 24px;
+            right: 28px;
+        }
+
+        .philosophy-card h3 {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--primary-dark);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .philosophy-card h3 i {
+            color: var(--accent-orange);
+        }
+
+        .philosophy-card p {
+            font-size: 14px;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        /* SECTION 2: LEGAL & CAPACITY TABLE */
+        .legal-wrapper {
+            background-color: var(--surface-white);
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+        }
+
+        .legal-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .legal-info-table {
+            padding: 40px;
+        }
+
+        .legal-row {
+            display: flex;
+            padding: 16px 0;
+            border-bottom: 1px dashed var(--border-color);
+        }
+
+        .legal-row:last-child {
+            border-bottom: none;
+        }
+
+        .legal-label {
+            width: 180px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            flex-shrink: 0;
+        }
+
+        .legal-value {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--primary-dark);
+        }
+
+        .legal-highlight {
+            color: var(--primary-blue);
+            font-weight: 700;
+        }
+
+        .legal-locations {
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 20px;
+            border-left: 1px solid var(--border-color);
+        }
+
+        .location-card {
+            background: var(--surface-white);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+        }
+
+        .location-icon {
+            width: 40px;
+            height: 40px;
+            background-color: rgba(232, 126, 35, 0.1);
+            color: var(--accent-orange);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .location-details h5 {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--primary-dark);
+            margin-bottom: 4px;
+        }
+
+        .location-details p {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        /* SECTION 3: QUALITY POLICY & TECH */
+        .policy-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+        }
+
+        .policy-card {
+            background: var(--surface-white);
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            padding: 32px;
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .policy-header {
+            margin-bottom: 20px;
+        }
+
+        .policy-badge {
+            display: inline-block;
+            background: var(--primary-dark);
+            color: var(--accent-orange);
+            font-weight: 800;
+            font-size: 12px;
+            padding: 4px 10px;
+            border-radius: 6px;
+            margin-bottom: 12px;
+        }
+
+        .policy-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--primary-dark);
+            line-height: 1.4;
+        }
+
+        .policy-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .policy-list li {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+            position: relative;
+            padding-left: 20px;
+            line-height: 1.6;
+        }
+
+        .policy-list li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            top: 0;
+            color: var(--accent-orange);
+            font-weight: bold;
+        }
+
+        .tech-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 16px;
+        }
+
+        .tech-tag {
+            background-color: rgba(15, 76, 129, 0.08);
+            color: var(--primary-blue);
+            font-size: 11px;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 6px;
+        }
+
+        /* SECTION 4: ORGANIZATIONAL CHART */
+        .org-section {
+            background-color: var(--surface-white);
+            border-top: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .org-chart-wrapper {
+            background-color: var(--bg-light);
+            padding: 40px 24px;
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+            overflow-x: auto;
+        }
+
+        .org-tree {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-width: 900px;
+        }
+
+        /* Nodes Styling */
+        .node-board {
+            background: linear-gradient(135deg, var(--primary-dark), #1e293b);
+            color: var(--surface-white);
+            font-weight: 700;
+            font-size: 14px;
+            padding: 12px 32px;
+            border-radius: 10px;
+            box-shadow: var(--shadow-sm);
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .line-v {
+            width: 2px;
+            height: 24px;
+            background-color: #cbd5e1;
+        }
+
+        /* Điều chỉnh ô Giám Đốc canh giữa tuyệt đối và nhánh Thư ký bên phải */
+        .director-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+        }
+
+        .director-wrapper {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .node-director {
+            background: linear-gradient(135deg, var(--primary-blue), #1e68a8);
+            color: var(--surface-white);
+            font-weight: 800;
+            font-size: 15px;
+            padding: 14px 36px;
+            border-radius: 12px;
+            box-shadow: var(--shadow-md);
+            text-align: center;
+            border: 2px solid var(--accent-orange);
+        }
+
+        .node-secretary {
+            position: absolute;
+            left: 100%;
+            margin-left: 24px;
+            background: var(--surface-white);
+            border: 1px solid var(--primary-blue);
+            color: var(--primary-blue);
+            font-size: 11px;
+            font-weight: 700;
+            padding: 10px 16px;
+            border-radius: 8px;
+            box-shadow: var(--shadow-sm);
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .node-secretary::before {
+            content: '';
+            position: absolute;
+            right: 100%;
+            top: 50%;
+            width: 24px;
+            height: 2px;
+            background-color: var(--primary-blue);
+        }
+
+        /* 4 Divisions Container */
+        .divisions-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            width: 100%;
+            margin-top: 24px;
+            position: relative;
+        }
+
+        .divisions-grid::before {
+            content: '';
+            position: absolute;
+            top: -24px;
+            left: 12.5%;
+            right: 12.5%;
+            height: 2px;
+            background-color: #cbd5e1;
+        }
+
+        .division-card {
+            background: var(--surface-white);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            padding: 16px;
+            box-shadow: var(--shadow-sm);
+            position: relative;
+        }
+
+        .division-card::before {
+            content: '';
+            position: absolute;
+            top: -24px;
+            left: 50%;
+            width: 2px;
+            height: 24px;
+            background-color: #cbd5e1;
+        }
+
+        .division-header {
+            background-color: var(--primary-dark);
+            color: var(--surface-white);
+            font-size: 12px;
+            font-weight: 700;
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 12px;
+        }
+
+        .division-header span {
+            display: block;
+            font-size: 10px;
+            font-weight: 400;
+            color: #94a3b8;
+            margin-top: 2px;
+        }
+
+        .dept-box {
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            padding: 10px;
+            margin-bottom: 8px;
+        }
+
+        .dept-box:last-child {
+            margin-bottom: 0;
+        }
+
+        .dept-title {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--primary-blue);
+            margin-bottom: 4px;
+            text-transform: uppercase;
+        }
+
+        .dept-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .dept-list li {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-bottom: 2px;
+            padding-left: 10px;
+            position: relative;
+        }
+
+        .dept-list li::before {
+            content: '•';
+            position: absolute;
+            left: 0;
+            color: var(--accent-orange);
+        }
+
+        /* RESPONSIVE DESIGN */
+        @media (max-width: 992px) {
+            .hero-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .metrics-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .philosophy-grid, .policy-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .legal-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .legal-locations {
+                border-left: none;
+                border-top: 1px solid var(--border-color);
+            }
+        }
+
+        @media (max-width: 600px) {
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .hero-title {
+                font-size: 28px;
+            }
+        }
+    </style>
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans antialiased selection:bg-brand-blue selection:text-white">
 
+    <!-- HEADER GIỮ NGUYÊN TỪ ABOUT.HTML -->
     <div id="header-placeholder"></div>
 
     <main>
-        <section class="relative bg-slate-900 text-white py-20 lg:py-24 overflow-hidden">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-                <span class="text-brand-orange font-bold text-xs tracking-widest uppercase">Real Quality - Real Value</span>
-                <h1 class="text-3xl sm:text-5xl font-extrabold tracking-tight leading-tight mt-2">
-                    Giải Pháp Xây Dựng & Kỹ Thuật Toàn Diện
-                </h1>
-                <p class="mt-4 text-slate-300 text-base leading-relaxed max-w-3xl">
-                    PV INCONS đồng hành cùng khách hàng với giải pháp từ thiết kế kiến trúc, mô phỏng BIM/3D đến thi công hoàn thiện và pháp lý xây dựng.
-                </p>
+        <!-- HERO SECTION -->
+        <section class="hero">
+            <div class="container">
+                <div class="hero-grid">
+                    <div>
+                        <span class="hero-tag">Hồ Sơ Năng Lực Doanh Nghiệp</span>
+                        <h1 class="hero-title">CÔNG TY TNHH THƯƠNG MẠI VÀ XÂY DỰNG PV INCONS</h1>
+                        <p class="hero-subtitle">
+                            Đơn vị tiên phong cung cấp giải pháp toàn diện từ Tư vấn đầu tư, Thiết kế kỹ thuật số (BIM/VDC), Thi công xây dựng đến dịch vụ Pháp lý công trình chuyên nghiệp.
+                        </p>
+                    </div>
+
+                    <!-- LEADERSHIP SPOTLIGHT CARD -->
+                    <div class="leadership-card">
+                        <div class="quote-icon"><i class="fa-solid fa-quote-left"></i></div>
+                        <p class="quote-text">
+                            "Chúng tôi không thực hiện những công việc đại trà để thỏa hiệp với tính chất rủi ro cao. Chúng tôi cung cấp giải pháp toàn diện để nâng tầm sự phát triển của doanh nghiệp và đối tác."
+                        </p>
+                        <div class="quote-author">
+                            <div class="author-avatar">P</div>
+                            <div class="author-info">
+                                <h4>TRẦN HOÀNG PHƯỚC</h4>
+                                <p>Giám đốc điều hành</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </section>
 
-        <section class="py-16 bg-white">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid lg:grid-cols-2 gap-12 items-center">
-                <div>
-                    <span class="text-brand-blue font-bold text-sm tracking-widest uppercase">Về Chúng Tôi</span>
-                    <h2 class="text-3xl font-bold text-slate-900 mt-2 mb-6">Đơn Vị Thi Công Uy Tín Tại Cần Thơ</h2>
-                    <p class="text-slate-600 text-sm leading-relaxed mb-4">
-                        CÔNG TY TNHH XÂY DỰNG VÀ THƯƠNG MẠI PV INCONS chuyên cung cấp các giải pháp xây dựng chất lượng cao. Sở hữu đội ngũ kỹ sư, kiến trúc sư giàu kinh nghiệm, làm chủ các công cụ hiện đại như Revit, Dynamo và công nghệ render 3D.
-                    </p>
+        <!-- METRICS RIBBON -->
+        <div class="container metrics-container">
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-icon"><i class="fa-solid fa-coins"></i></div>
+                    <div class="metric-value">9 Tỷ VNĐ</div>
+                    <div class="metric-label">Vốn Điều Lệ</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon"><i class="fa-solid fa-award"></i></div>
+                    <div class="metric-value">Hạng III</div>
+                    <div class="metric-label">Chứng Chỉ Năng Lực XD</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon"><i class="fa-solid fa-laptop-code"></i></div>
+                    <div class="metric-value">BIM & VDC</div>
+                    <div class="metric-label">Chuẩn Kỹ Thuật Số</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon"><i class="fa-solid fa-building-shield"></i></div>
+                    <div class="metric-value">100%</div>
+                    <div class="metric-label">Chuẩn Hóa Pháp Lý</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION 1: TRIẾT LÝ ĐIỀU HÀNH -->
+        <section class="section">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-tag">Định Hướng Chiến Lược</span>
+                    <h2 class="section-title">Triết Lý Điều Hành & Định Hướng Phát Triển</h2>
+                </div>
+
+                <div class="philosophy-grid">
+                    <div class="philosophy-card">
+                        <span class="philosophy-num">01</span>
+                        <h3><i class="fa-solid fa-chart-line"></i> ĐẦU TƯ</h3>
+                        <p>Kiến tạo cơ hội phát triển, mở rộng hệ sinh thái kinh doanh bền vững và kiên định đặt lợi ích dài hạn của Đối tác làm trọng tâm cốt lõi.</p>
+                    </div>
+                    <div class="philosophy-card">
+                        <span class="philosophy-num">02</span>
+                        <h3><i class="fa-solid fa-arrow-trend-up"></i> THƯƠNG MẠI</h3>
+                        <p>Kiểm soát chặt chẽ toàn bộ chuỗi giá trị, tối ưu hóa nguồn lực và đảm bảo tính minh bạch, hiệu quả tài chính tối đa.</p>
+                    </div>
+                    <div class="philosophy-card">
+                        <span class="philosophy-num">03</span>
+                        <h3><i class="fa-solid fa-compass-drafting"></i> XÂY DỰNG</h3>
+                        <p>Hiện thực hóa chuẩn mực kỹ thuật đỉnh cao thông qua việc áp dụng quy trình số hóa hiện đại BIM/VDC và thi công đạt chuẩn quốc tế.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 2: THÔNG TIN DOANH NGHIỆP & PHÁP LÝ -->
+        <section class="section">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-tag">Năng Lực Tầm Vóc</span>
+                    <h2 class="section-title">Thông Tin Doanh Nghiệp & Năng Lực Pháp Lý</h2>
+                </div>
+
+                <div class="legal-wrapper">
+                    <div class="legal-grid">
+                        <div class="legal-info-table">
+                            <div class="legal-row">
+                                <div class="legal-label">Mã số doanh nghiệp</div>
+                                <div class="legal-value legal-highlight">1501112147 <span style="font-weight: normal; color: var(--text-muted);">(Thành lập năm 2020)</span></div>
+                            </div>
+                            <div class="legal-row">
+                                <div class="legal-label">Đại diện pháp luật</div>
+                                <div class="legal-value">Ông <strong style="color: var(--primary-blue);">TRẦN HOÀNG PHƯỚC</strong> – Giám đốc</div>
+                            </div>
+                            <div class="legal-row">
+                                <div class="legal-label">Vốn điều lệ</div>
+                                <div class="legal-value">9.000.000.000 VNĐ (Chín tỷ đồng)</div>
+                            </div>
+                            <div class="legal-row">
+                                <div class="legal-label">Chứng chỉ năng lực</div>
+                                <div class="legal-value">
+                                    <strong style="color: var(--primary-dark);">Chứng chỉ Hạng III</strong> (Số: VIL-00050772)<br>
+                                    <span style="font-size: 12px; color: var(--text-muted);">Do Sở Xây dựng cấp – Hiệu lực đến năm 2031</span>
+                                </div>
+                            </div>
+                            <div class="legal-row">
+                                <div class="legal-label">Phạm vi hoạt động</div>
+                                <div class="legal-value" style="font-size: 13px; font-weight: 500;">
+                                    Thiết kế, thẩm tra thiết kế, thi công & giám sát công trình Dân dụng, Công nghiệp và Hạ tầng kỹ thuật.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="legal-locations">
+                            <div class="location-card">
+                                <div class="location-icon"><i class="fa-solid fa-building"></i></div>
+                                <div class="location-details">
+                                    <h5>Trụ Sở Chính (Vĩnh Long)</h5>
+                                    <p>292/30 Phan Văn Quân, P. Thành Phước, TX. Bình Minh, Tỉnh Vĩnh Long.</p>
+                                </div>
+                            </div>
+                            <div class="location-card">
+                                <div class="location-icon"><i class="fa-solid fa-city"></i></div>
+                                <div class="location-details">
+                                    <h5>Địa Điểm Kinh Doanh (Cần Thơ)</h5>
+                                    <p>P.007, Chung cư Hưng Phú 5 tầng lô B, Đ. Lý Thái Tổ, P. Hưng Phú, Q. Cái Răng, TP. Cần Thơ.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 3: CHÍNH SÁCH CHẤT LƯỢNG & CÔNG NGHỆ -->
+        <section class="section">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-tag">Tiêu Chuẩn Hành Động</span>
+                    <h2 class="section-title">Chính Sách Chất Lượng & Công Nghệ Cốt Lõi</h2>
+                </div>
+
+                <div class="policy-grid">
+                    <div class="policy-card">
+                        <div class="policy-header">
+                            <span class="policy-badge">01 / CHẤT LƯỢNG</span>
+                            <h3 class="policy-title">Cam Kết Giá Trị Thượng Tầng</h3>
+                        </div>
+                        <ul class="policy-list">
+                            <li>Mọi sản phẩm, dịch vụ và công trình phải đạt chất lượng tối đa, mang lại giá trị gia tăng thực chất.</li>
+                            <li>Kiên định đặt lợi ích dài hạn của Đối tác làm trọng tâm cho mọi quyết định đầu tư.</li>
+                        </ul>
+                    </div>
+
+                    <div class="policy-card">
+                        <div class="policy-header">
+                            <span class="policy-badge">02 / CÔNG NGHỆ</span>
+                            <h3 class="policy-title">Tiên Phong Số Hóa Chuẩn Quốc Tế</h3>
+                        </div>
+                        <ul class="policy-list">
+                            <li>Áp dụng toàn diện quy trình kỹ thuật số <strong>BIM & VDC</strong> làm ngôn ngữ làm việc chuẩn mực.</li>
+                            <li>Làm chủ hệ thống phần mềm chuyên sâu để đảm bảo độ chính xác và an toàn dữ liệu.</li>
+                        </ul>
+                        <div class="tech-tags">
+                            <span class="tech-tag">Autodesk Revit</span>
+                            <span class="tech-tag">Dynamo Scripting</span>
+                            <span class="tech-tag">3D Rendering</span>
+                        </div>
+                    </div>
+
+                    <div class="policy-card">
+                        <div class="policy-header">
+                            <span class="policy-badge">03 / PHÁT TRIỂN</span>
+                            <h3 class="policy-title">Đổi Mới & Bền Vững</h3>
+                        </div>
+                        <ul class="policy-list">
+                            <li>Liên tục nâng cao năng lực chuyên môn đội ngũ nhân sự để giữ vững vị thế dẫn dắt.</li>
+                            <li>Gắn liền hoạt động kinh doanh với việc kiến tạo các giá trị bền vững cho môi trường và cộng đồng.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 4: SƠ ĐỒ TỔ CHỨC CÔNG TY -->
+        <section class="section org-section">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-tag">Bộ Máy Vận Hành</span>
+                    <h2 class="section-title">Sơ Đồ Tổ Chức PV INCONS</h2>
+                    <p style="font-size: 13px; color: var(--text-muted); margin-top: 4px;">Phiên bản 2026 Rev 02 (Cập nhật 06/06/2026)</p>
+                </div>
+
+                <div class="org-chart-wrapper">
+                    <div class="org-tree">
+                        <!-- HỘI ĐỒNG THÀNH VIÊN -->
+                        <div class="node-board">Hội Đồng Thành Viên</div>
+                        <div class="line-v"></div>
+
+                        <!-- GIÁM ĐỐC + BỘ PHẠN PHÁP LÝ THƯ KÝ -->
+                        <div class="director-row">
+                            <div class="director-wrapper">
+                                <div class="node-director">
+                                    GIÁM ĐỐC
+                                </div>
+                                <div class="node-secretary">
+                                    <i class="fa-solid fa-scale-balanced"></i>
+                                    Bộ Phận Pháp Lý & Thư Ký
+                                </div>
+                            </div>
+                        </div>
+                        <div class="line-v"></div>
+
+                        <!-- 4 KHỐI CHỨC NĂNG -->
+                        <div class="divisions-grid">
+                            <!-- Khối Tài chính -->
+                            <div class="division-card">
+                                <div class="division-header">
+                                    KHỐI TÀI CHÍNH
+                                    <span>Phó Giám đốc (Tài chính / KT)</span>
+                                </div>
+                                <div class="dept-box">
+                                    <div class="dept-title">Phòng Hành Chính</div>
+                                    <ul class="dept-list">
+                                        <li>CV Hành chính tổng hợp</li>
+                                        <li>Chuyên viên C&B</li>
+                                    </ul>
+                                </div>
+                                <div class="dept-box">
+                                    <div class="dept-title">Phòng Kế Toán</div>
+                                    <ul class="dept-list">
+                                        <li>Kế toán trưởng</li>
+                                        <li>Kế toán viên & Thủ quỹ</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <!-- Khối Đầu tư -->
+                            <div class="division-card">
+                                <div class="division-header">
+                                    KHỐI ĐẦU TƯ
+                                    <span>Phó Giám đốc (Kinh tế / Quản trị)</span>
+                                </div>
+                                <div class="dept-box">
+                                    <div class="dept-title">Phòng Chiến Lược</div>
+                                    <ul class="dept-list">
+                                        <li>Phát triển dự án</li>
+                                        <li>Thẩm định dự án</li>
+                                    </ul>
+                                </div>
+                                <div class="dept-box">
+                                    <div class="dept-title">Phòng QL Đầu Tư</div>
+                                    <ul class="dept-list">
+                                        <li>Quản lý nguồn vốn</li>
+                                        <li>Huy động vốn</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <!-- Khối Kinh doanh -->
+                            <div class="division-card">
+                                <div class="division-header">
+                                    KHỐI KINH DOANH
+                                    <span>Phó Giám đốc (QTKD)</span>
+                                </div>
+                                <div class="dept-box">
+                                    <div class="dept-title">Phòng Kế Hoạch</div>
+                                    <ul class="dept-list">
+                                        <li>Phát triển thị trường</li>
+                                        <li>Nhân viên PR</li>
+                                    </ul>
+                                </div>
+                                <div class="dept-box">
+                                    <div class="dept-title">Phòng Bán Hàng</div>
+                                    <ul class="dept-list">
+                                        <li>Nhân viên kinh doanh</li>
+                                        <li>Nhân viên Telesales</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <!-- Khối Xây dựng -->
+                            <div class="division-card">
+                                <div class="division-header">
+                                    KHỐI XÂY DỰNG
+                                    <span>Phó Giám đốc (KTS / Kỹ sư)</span>
+                                </div>
+                                <div class="dept-box">
+                                    <div class="dept-title">Phòng Thiết Kế</div>
+                                    <ul class="dept-list">
+                                        <li>KTS / Kỹ sư BIM</li>
+                                        <li>Chuyên viên kỹ thuật</li>
+                                    </ul>
+                                </div>
+                                <div class="dept-box">
+                                    <div class="dept-title">Phòng Xây Dựng</div>
+                                    <ul class="dept-list">
+                                        <li>Kỹ sư QS / QC / GS</li>
+                                        <li>Chỉ huy trưởng</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
     </main>
 
+    <!-- FOOTER GIỮ NGUYÊN TỪ ABOUT.HTML -->
     <div id="footer-placeholder"></div>
 
     <script src="layout.js"></script>
