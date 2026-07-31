@@ -700,19 +700,25 @@
         }
 
         /* Tối ưu hiển thị vừa vặn cho màn hình điện thoại (< 768px) */
-        @media (max-width: 768px) {                     
+        @media (max-width: 768px) {
 
-            /* 1. Giảm bớt margin và cỡ chữ của phần Tiêu đề */
+            /* 1. Thu gọn Padding khoảng cách trên/dưới của Hero section */
+            .hero {
+                padding-top: 1.5rem !important;                
+            }
+
+            /* 2. Giảm bớt margin và cỡ chữ của phần Tiêu đề */
             .hero-tag {
                 display: inline-block;
-                margin-bottom: 1.5rem !important;                
+                margin-bottom: 1.5rem !important;
             }
 
             .hero-title {
                 font-size: 1.5rem !important;
-                /* Giảm nhẹ size chữ tiêu đề */               
+                /* Giảm nhẹ size chữ tiêu đề */
+                line-height: 1.4 !important;
                 margin-bottom: 0.75rem !important;
-            }       
+            }
         }
     </style>
 </head>
