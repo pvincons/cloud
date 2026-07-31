@@ -700,31 +700,19 @@
         }
 
         /* Tối ưu hiển thị vừa vặn cho màn hình điện thoại (< 768px) */
-        @media (max-width: 768px) {
+        @media (max-width: 768px) {                     
 
-            /* 1. Thu gọn Padding khoảng cách trên/dưới của Hero section */
-            .hero {
-                padding-top: 1.5rem !important;
-                padding-bottom: 1.5rem !important;
-            }          
-
-            /* 3. Giảm bớt margin và cỡ chữ của phần Tiêu đề */
+            /* 1. Giảm bớt margin và cỡ chữ của phần Tiêu đề */
             .hero-tag {
                 display: inline-block;
-                margin-bottom: 0.5rem !important;                
+                margin-bottom: 1.5rem !important;                
             }
 
             .hero-title {
-                font-size: 1.45rem !important;
+                font-size: 1.5rem !important;
                 /* Giảm nhẹ size chữ tiêu đề */               
                 margin-bottom: 0.75rem !important;
-            }
-
-            /* 4. Thu gọn thẻ Quote (Leadership Card) */
-            .leadership-card {
-                padding: 1.25rem !important;
-                /* Giảm padding trong card */
-            }         
+            }       
         }
     </style>
 </head>
