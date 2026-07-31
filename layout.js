@@ -8,7 +8,10 @@ async function loadLayout(pageId) {
         const headerHtml = await headerRes.text();
         const footerHtml = await footerRes.text();
 
-        document.getElementById('header-placeholder').innerHTML = headerHtml;
+        const headerPlaceholder = document.getElementById('header-placeholder');
+        if (headerPlaceholder) {
+            headerPlaceholder.outerHTML = headerHtml;
+        }        
         document.getElementById('footer-placeholder').innerHTML = footerHtml;
 
         // Highlight tab đang mở

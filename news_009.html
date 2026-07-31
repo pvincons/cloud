@@ -31,66 +31,7 @@
 </head>
 <body class="bg-slate-50 text-slate-800 antialiased">
 
-    <!-- Top Info Bar -->
-    <div class="bg-slate-900 text-slate-300 text-xs py-2 border-b border-slate-800">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
-            <div class="flex items-center space-x-6">
-                <span><i class="fa-solid fa-phone text-brand-orange mr-1.5"></i> CSKH: 0772 194 789</span>
-                <span class="hidden md:inline"><i class="fa-solid fa-envelope text-brand-orange mr-1.5"></i> pvincons@gmail.com</span>
-                <span class="hidden md:inline"><i class="fa-solid fa-location-dot text-brand-orange mr-1.5"></i> VP: P007 đường Lý Thái Tổ, phường Hưng Phú, Tp. Cần Thơ</span>
-            </div>
-            <div class="flex space-x-4">
-                <a href="#" class="hover:text-white transition"><i class="fa-brands fa-facebook"></i></a>
-                <a href="#" class="hover:text-white transition"><i class="fa-brands fa-linkedin"></i></a>
-                <a href="#" class="hover:text-white transition"><i class="fa-brands fa-youtube"></i></a>
-            </div>
-        </div>
-    </div>
-
-    <!-- Header Navigation -->
-    <header class="sticky top-0 z-50 bg-white/95 backdrop-blur-md shadow-sm border-b border-slate-200">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-            <!-- Logo -->
-            <a href="index.html" class="flex items-center space-x-3 group py-2">
-                <img src="logo.png" alt="PV INCONS Logo" class="h-12 sm:h-14 w-auto object-contain transition-transform group-hover:scale-105">
-            </a>
-
-            <!-- Desktop Nav Tabs -->
-            <nav class="hidden xl:flex space-x-1 h-full items-center font-bold text-xs xl:text-xs 2xl:text-sm uppercase tracking-wide">
-                <a href="index.html" data-tab="home" class="nav-tab-btn px-2.5 py-2 border-b-2 border-transparent text-slate-600 hover:text-brand-blue transition-all">TRANG CHỦ</a>
-                <a href="about.html" data-tab="about" class="nav-tab-btn px-2.5 py-2 border-b-2 border-transparent text-slate-600 hover:text-brand-blue transition-all">GIỚI THIỆU</a>
-                <a href="projects.html" data-tab="projects" class="nav-tab-btn px-2.5 py-2 border-b-2 border-transparent text-slate-600 hover:text-brand-blue transition-all">DỰ ÁN</a>
-                <a href="news.html" data-tab="news" class="nav-tab-btn px-2.5 py-2 border-b-2 border-brand-blue text-brand-blue transition-all">TIN TỨC</a>
-                <a href="services.html" data-tab="services" class="nav-tab-btn px-2.5 py-2 border-b-2 border-transparent text-slate-600 hover:text-brand-blue transition-all">DỊCH VỤ</a>
-                <a href="investment.html" data-tab="investment" class="nav-tab-btn px-2.5 py-2 border-b-2 border-transparent text-slate-600 hover:text-brand-blue transition-all">QUAN HỆ ĐẦU TƯ</a>
-                <a href="hr.html" data-tab="hr" class="nav-tab-btn px-2.5 py-2 border-b-2 border-transparent text-slate-600 hover:text-brand-blue transition-all">CHÍNH SÁCH NHÂN SỰ</a>
-            </nav>
-
-            <!-- CTA Button -->
-            <div class="hidden sm:flex items-center space-x-4">
-                <a href="#contact" class="bg-brand-blue hover:bg-brand-darkblue text-white font-semibold text-sm px-4 py-2.5 rounded-lg transition shadow-md shadow-brand-blue/20">
-                    <i class="fa-solid fa-paper-plane mr-1.5"></i> Liên Hệ
-                </a>
-            </div>
-
-            <!-- Mobile Menu Button -->
-            <button id="mobileMenuBtn" onclick="toggleMobileMenu()" class="xl:hidden text-slate-700 text-2xl focus:outline-none p-2">
-                <i class="fa-solid fa-bars"></i>
-            </button>
-        </div>
-
-        <!-- Mobile Menu Drawer -->
-        <div id="mobileMenu" class="hidden xl:hidden bg-white border-b border-slate-200 px-4 pt-2 pb-6 space-y-1 uppercase text-xs font-bold">
-            <a href="index.html" data-tab="home" class="mobile-tab-btn block w-full text-left py-2 px-3 rounded-lg text-slate-700 hover:bg-slate-100">TRANG CHỦ</a>
-            <a href="about.html" data-tab="about" class="mobile-tab-btn block w-full text-left py-2 px-3 rounded-lg text-slate-700 hover:bg-slate-100">GIỚI THIỆU</a>
-            <a href="projects.html" data-tab="projects" class="mobile-tab-btn block w-full text-left py-2 px-3 rounded-lg text-slate-700 hover:bg-slate-100">DỰ ÁN</a>
-            <a href="news.html" data-tab="news" class="mobile-tab-btn block w-full text-left py-2 px-3 rounded-lg text-brand-blue bg-slate-50">TIN TỨC</a>
-            <a href="services.html" data-tab="services" class="mobile-tab-btn block w-full text-left py-2 px-3 rounded-lg text-slate-700 hover:bg-slate-100">DỊCH VỤ</a>
-            <a href="investment.html" data-tab="investment" class="mobile-tab-btn block w-full text-left py-2 px-3 rounded-lg text-slate-700 hover:bg-slate-100">QUAN HỆ ĐẦU TƯ</a>
-            <a href="hr.html" data-tab="hr" class="mobile-tab-btn block w-full text-left py-2 px-3 rounded-lg text-slate-700 hover:bg-slate-100">CHÍNH SÁCH NHÂN SỰ</a>
-            <a href="#contact" onclick="closeMobileMenu()" class="block text-center bg-brand-blue text-white font-semibold py-2.5 rounded-lg mt-4 normal-case text-sm">Liên Hệ Báo Giá</a>
-        </div>
-    </header>
+    <div id="header-placeholder"></div>
 
     <!-- Hero Header Section -->
     <section class="bg-gradient-to-b from-slate-900 to-slate-800 text-white py-12 sm:py-16 relative overflow-hidden">
@@ -468,18 +409,10 @@
         </div>
     </section>
 
-    <!-- Footer -->
-    <footer class="bg-slate-900 text-slate-400 py-10 border-t border-slate-800 text-sm">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row justify-between items-center gap-4">
-            <p>&copy; 2026 <span class="text-white font-bold">PV INCONS</span>. All rights reserved.</p>
-            <div class="flex space-x-4 text-xs flex-wrap justify-center gap-y-2 font-semibold">
-                <a href="index.html" class="hover:text-white transition">Trang chủ</a>
-                <a href="about.html" class="hover:text-white transition">Giới thiệu</a>
-                <a href="projects.html" class="hover:text-white transition">Dự án</a>
-                <a href="services.html" class="hover:text-white transition">Dịch vụ</a>
-            </div>
-        </div>
-    </footer>
+    <div id="footer-placeholder"></div>
+    
+    <script src="layout.js"></script>
+    <script> loadLayout('news_009');</script>
 
     <!-- Mobile Navigation Script -->
     <script>
