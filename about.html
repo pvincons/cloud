@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <html lang="vi" class="scroll-smooth">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PV INCONS - GIỚI THIỆU</title>
     <link rel="icon" type="image/png" href="LOGO_PVI.png">
-    
+
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -18,11 +19,12 @@
             }
         }
     </script>
-    
+
     <!-- Google Fonts & FontAwesome Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
     <!-- Stylesheet tùy chỉnh cho nội dung Hồ sơ năng lực -->
@@ -37,7 +39,7 @@
             --text-main: #1e293b;
             --text-muted: #64748b;
             --border-color: #e2e8f0;
-            --shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
+            --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
             --shadow-md: 0 10px 25px -5px rgba(15, 76, 129, 0.08);
             --shadow-lg: 0 20px 30px -10px rgba(10, 25, 47, 0.12);
         }
@@ -64,7 +66,7 @@
             right: 0;
             width: 500px;
             height: 500px;
-            background: radial-gradient(circle, rgba(232,126,35,0.15) 0%, rgba(0,0,0,0) 70%);
+            background: radial-gradient(circle, rgba(232, 126, 35, 0.15) 0%, rgba(0, 0, 0, 0) 70%);
             pointer-events: none;
         }
 
@@ -107,7 +109,7 @@
             border-left: 4px solid var(--accent-orange);
             padding: 30px;
             border-radius: 16px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
         }
 
         .quote-icon {
@@ -672,7 +674,8 @@
                 grid-template-columns: repeat(2, 1fr);
             }
 
-            .philosophy-grid, .policy-grid {
+            .philosophy-grid,
+            .policy-grid {
                 grid-template-columns: 1fr;
             }
 
@@ -695,8 +698,86 @@
                 font-size: 28px;
             }
         }
+
+        /* Tối ưu hiển thị vừa vặn cho màn hình điện thoại (< 768px) */
+        @media (max-width: 768px) {
+
+            /* 1. Thu gọn Padding khoảng cách trên/dưới của Hero section */
+            .hero {
+                padding-top: 1.5rem !important;
+                padding-bottom: 1.5rem !important;
+            }
+
+            /* 2. Giảm khoảng cách (gap) giữa khối Tiêu đề và thẻ Leadership Card */
+            .hero-grid {
+                display: flex !important;
+                flex-direction: column !important;
+                gap: 1.25rem !important;
+                /* Thay vì gap 2.5rem - 3rem như mặc định */
+            }
+
+            /* 3. Giảm bớt margin và cỡ chữ của phần Tiêu đề */
+            .hero-tag {
+                display: inline-block;
+                margin-bottom: 0.5rem !important;
+                font-size: 0.75rem !important;
+            }
+
+            .hero-title {
+                font-size: 1.45rem !important;
+                /* Giảm nhẹ size chữ tiêu đề */
+                line-height: 1.25 !important;
+                /* Thu hẹp khoảng cách dòng */
+                margin-bottom: 0.75rem !important;
+            }
+
+            .hero-subtitle {
+                font-size: 0.85rem !important;
+                line-height: 1.4 !important;
+                margin-bottom: 0 !important;
+            }
+
+            /* 4. Thu gọn thẻ Quote (Leadership Card) */
+            .leadership-card {
+                padding: 1.25rem !important;
+                /* Giảm padding trong card */
+            }
+
+            .leadership-card .quote-icon {
+                margin-bottom: 0.5rem !important;
+                font-size: 1.25rem !important;
+            }
+
+            .leadership-card .quote-text {
+                font-size: 0.825rem !important;
+                line-height: 1.4 !important;
+                margin-bottom: 1rem !important;
+            }
+
+            .quote-author {
+                display: flex;
+                align-items: center;
+                gap: 0.75rem !important;
+            }
+
+            .author-avatar {
+                width: 40px !important;
+                height: 40px !important;
+                font-size: 0.9rem !important;
+            }
+
+            .author-info h4 {
+                font-size: 0.85rem !important;
+                margin-bottom: 0.1rem !important;
+            }
+
+            .author-info p {
+                font-size: 0.7rem !important;
+            }
+        }
     </style>
 </head>
+
 <body class="bg-slate-50 text-slate-800 font-sans antialiased selection:bg-brand-blue selection:text-white">
 
     <!-- HEADER GIỮ NGUYÊN TỪ ABOUT.HTML -->
@@ -711,7 +792,8 @@
                         <span class="hero-tag">Hồ Sơ Năng Lực Doanh Nghiệp</span>
                         <h1 class="hero-title">CÔNG TY TNHH THƯƠNG MẠI VÀ XÂY DỰNG PV INCONS</h1>
                         <p class="hero-subtitle">
-                            Đơn vị tiên phong cung cấp giải pháp toàn diện từ Tư vấn đầu tư, Thiết kế kỹ thuật số (BIM/VDC), Thi công xây dựng đến dịch vụ Pháp lý công trình chuyên nghiệp.
+                            Đơn vị tiên phong cung cấp giải pháp toàn diện từ Tư vấn đầu tư, Thiết kế kỹ thuật số
+                            (BIM/VDC), Thi công xây dựng đến dịch vụ Pháp lý công trình chuyên nghiệp.
                         </p>
                     </div>
 
@@ -719,7 +801,9 @@
                     <div class="leadership-card">
                         <div class="quote-icon"><i class="fa-solid fa-quote-left"></i></div>
                         <p class="quote-text">
-                            "Chúng tôi không thực hiện những công việc đại trà để thỏa hiệp với tính chất rủi ro cao. Chúng tôi cung cấp giải pháp toàn diện để nâng tầm sự phát triển của doanh nghiệp và đối tác."
+                            "Chúng tôi không thực hiện những công việc đại trà để thỏa hiệp với tính chất rủi ro cao.
+                            Chúng tôi cung cấp giải pháp toàn diện để nâng tầm sự phát triển của doanh nghiệp và đối
+                            tác."
                         </p>
                         <div class="quote-author">
                             <div class="author-avatar">P</div>
@@ -771,17 +855,20 @@
                     <div class="philosophy-card">
                         <span class="philosophy-num">01</span>
                         <h3><i class="fa-solid fa-chart-line"></i> ĐẦU TƯ</h3>
-                        <p>Kiến tạo cơ hội phát triển, mở rộng hệ sinh thái kinh doanh bền vững và kiên định đặt lợi ích dài hạn của Đối tác làm trọng tâm cốt lõi.</p>
+                        <p>Kiến tạo cơ hội phát triển, mở rộng hệ sinh thái kinh doanh bền vững và kiên định đặt lợi ích
+                            dài hạn của Đối tác làm trọng tâm cốt lõi.</p>
                     </div>
                     <div class="philosophy-card">
                         <span class="philosophy-num">02</span>
                         <h3><i class="fa-solid fa-arrow-trend-up"></i> THƯƠNG MẠI</h3>
-                        <p>Kiểm soát chặt chẽ toàn bộ chuỗi giá trị, tối ưu hóa nguồn lực và đảm bảo tính minh bạch, hiệu quả tài chính tối đa.</p>
+                        <p>Kiểm soát chặt chẽ toàn bộ chuỗi giá trị, tối ưu hóa nguồn lực và đảm bảo tính minh bạch,
+                            hiệu quả tài chính tối đa.</p>
                     </div>
                     <div class="philosophy-card">
                         <span class="philosophy-num">03</span>
                         <h3><i class="fa-solid fa-compass-drafting"></i> XÂY DỰNG</h3>
-                        <p>Hiện thực hóa chuẩn mực kỹ thuật đỉnh cao thông qua việc áp dụng quy trình số hóa hiện đại BIM/VDC và thi công đạt chuẩn quốc tế.</p>
+                        <p>Hiện thực hóa chuẩn mực kỹ thuật đỉnh cao thông qua việc áp dụng quy trình số hóa hiện đại
+                            BIM/VDC và thi công đạt chuẩn quốc tế.</p>
                     </div>
                 </div>
             </div>
@@ -799,43 +886,54 @@
                     <div class="legal-grid">
                         <div class="legal-info-table">
                             <!-- Hàng 1: Mã số doanh nghiệp -->
-                            <div class="legal-row flex flex-col sm:flex-row sm:justify-between sm:items-start gap-1 sm:gap-4">
+                            <div
+                                class="legal-row flex flex-col sm:flex-row sm:justify-between sm:items-start gap-1 sm:gap-4">
                                 <div class="legal-label sm:w-1/3 font-semibold">Mã số doanh nghiệp</div>
                                 <div class="legal-value legal-highlight sm:w-2/3">
-                                    1501112147 <span class="block sm:inline" style="font-weight: normal; color: var(--text-muted);">(Thành lập năm 2020)</span>
+                                    1501112147 <span class="block sm:inline"
+                                        style="font-weight: normal; color: var(--text-muted);">(Thành lập năm
+                                        2020)</span>
                                 </div>
                             </div>
 
                             <!-- Hàng 2: Đại diện pháp luật -->
-                            <div class="legal-row flex flex-col sm:flex-row sm:justify-between sm:items-start gap-1 sm:gap-4">
+                            <div
+                                class="legal-row flex flex-col sm:flex-row sm:justify-between sm:items-start gap-1 sm:gap-4">
                                 <div class="legal-label sm:w-1/3 font-semibold">Đại diện pháp luật</div>
                                 <div class="legal-value sm:w-2/3">
                                     Ông <strong style="color: var(--primary-blue);">TRẦN HOÀNG PHƯỚC</strong> ‒ Giám đốc
                                 </div>
                             </div>
 
-                           <!-- Hàng 3: Vốn điều lệ -->
-                            <div class="legal-row flex flex-col sm:flex-row sm:justify-between sm:items-start gap-1 sm:gap-4">
+                            <!-- Hàng 3: Vốn điều lệ -->
+                            <div
+                                class="legal-row flex flex-col sm:flex-row sm:justify-between sm:items-start gap-1 sm:gap-4">
                                 <div class="legal-label sm:w-1/3 font-semibold">Vốn điều lệ</div>
                                 <div class="legal-value sm:w-2/3">
-                                    9.000.000.000 VNĐ <span class="block sm:inline" style="font-weight: normal; color: var(--text-muted);">(Chín tỷ đồng)</span>
+                                    9.000.000.000 VNĐ <span class="block sm:inline"
+                                        style="font-weight: normal; color: var(--text-muted);">(Chín tỷ đồng)</span>
                                 </div>
                             </div>
 
-                           <!-- Hàng 4: Chứng chỉ năng lực -->
-                            <div class="legal-row flex flex-col sm:flex-row sm:justify-between sm:items-start gap-1 sm:gap-4">
+                            <!-- Hàng 4: Chứng chỉ năng lực -->
+                            <div
+                                class="legal-row flex flex-col sm:flex-row sm:justify-between sm:items-start gap-1 sm:gap-4">
                                 <div class="legal-label sm:w-1/3 font-semibold">Chứng chỉ năng lực</div>
                                 <div class="legal-value sm:w-2/3">
-                                    <strong style="color: var(--primary-dark);">Chứng chỉ Hạng III</strong> (Số: VIL-00050772)<br>
-                                    <span style="font-size: 12px; color: var(--text-muted);">Do Sở Xây dựng cấp ‒ Hiệu lực đến năm 2031</span>
+                                    <strong style="color: var(--primary-dark);">Chứng chỉ Hạng III</strong> (Số:
+                                    VIL-00050772)<br>
+                                    <span style="font-size: 12px; color: var(--text-muted);">Do Sở Xây dựng cấp ‒ Hiệu
+                                        lực đến năm 2031</span>
                                 </div>
                             </div>
 
-                           <!-- Hàng 5: Phạm vi hoạt động -->
-                            <div class="legal-row flex flex-col sm:flex-row sm:justify-between sm:items-start gap-1 sm:gap-4">
+                            <!-- Hàng 5: Phạm vi hoạt động -->
+                            <div
+                                class="legal-row flex flex-col sm:flex-row sm:justify-between sm:items-start gap-1 sm:gap-4">
                                 <div class="legal-label sm:w-1/3 font-semibold">Phạm vi hoạt động</div>
                                 <div class="legal-value sm:w-2/3" style="font-size: 13px; font-weight: 500;">
-                                    - Thiết kế, thẩm tra thiết kế, thi công & giám sát công trình Dân dụng, Công nghiệp và Hạ tầng kỹ thuật.
+                                    - Thiết kế, thẩm tra thiết kế, thi công & giám sát công trình Dân dụng, Công nghiệp
+                                    và Hạ tầng kỹ thuật.
                                     <br>
                                     - Các dịch vụ tư vấn pháp lý liên quan đến đầu tư bất động sản.
                                 </div>
@@ -878,7 +976,8 @@
                             <h3 class="policy-title">Cam Kết Giá Trị Thượng Tầng</h3>
                         </div>
                         <ul class="policy-list">
-                            <li>Mọi sản phẩm, dịch vụ và công trình phải đạt chất lượng tối đa, mang lại giá trị gia tăng thực chất.</li>
+                            <li>Mọi sản phẩm, dịch vụ và công trình phải đạt chất lượng tối đa, mang lại giá trị gia
+                                tăng thực chất.</li>
                             <li>Kiên định đặt lợi ích dài hạn của Đối tác làm trọng tâm cho mọi quyết định đầu tư.</li>
                         </ul>
                     </div>
@@ -889,7 +988,8 @@
                             <h3 class="policy-title">Tiên Phong Số Hóa Chuẩn Quốc Tế</h3>
                         </div>
                         <ul class="policy-list">
-                            <li>Áp dụng toàn diện quy trình kỹ thuật số <strong>BIM & VDC</strong> làm ngôn ngữ làm việc chuẩn mực.</li>
+                            <li>Áp dụng toàn diện quy trình kỹ thuật số <strong>BIM & VDC</strong> làm ngôn ngữ làm việc
+                                chuẩn mực.</li>
                             <li>Làm chủ hệ thống phần mềm chuyên sâu để đảm bảo độ chính xác và an toàn dữ liệu.</li>
                         </ul>
                         <div class="tech-tags">
@@ -906,7 +1006,8 @@
                         </div>
                         <ul class="policy-list">
                             <li>Liên tục nâng cao năng lực chuyên môn đội ngũ nhân sự để giữ vững vị thế dẫn dắt.</li>
-                            <li>Gắn liền hoạt động kinh doanh với việc kiến tạo các giá trị bền vững cho môi trường và cộng đồng.</li>
+                            <li>Gắn liền hoạt động kinh doanh với việc kiến tạo các giá trị bền vững cho môi trường và
+                                cộng đồng.</li>
                         </ul>
                     </div>
                 </div>
@@ -919,7 +1020,8 @@
                 <div class="section-header">
                     <span class="section-tag">Bộ Máy Vận Hành</span>
                     <h2 class="section-title">SƠ ĐỒ TỔ CHỨC PV INCONS</h2>
-                    <p style="font-size: 13px; color: var(--text-muted); margin-top: 4px;">Phiên bản 2026 Rev 02 (Cập nhật 06/06/2026)</p>
+                    <p style="font-size: 13px; color: var(--text-muted); margin-top: 4px;">Phiên bản 2026 Rev 02 (Cập
+                        nhật 06/06/2026)</p>
                 </div>
 
                 <div class="org-chart-wrapper">
@@ -1044,4 +1146,5 @@
     <script src="layout.js"></script>
     <script>loadLayout('about');</script>
 </body>
+
 </html>
