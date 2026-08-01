@@ -24,6 +24,48 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 
+<style>
+    /* Hiệu ứng mượt cho tiêu đề Banner */
+    .hero-title {
+        opacity: 0;
+        animation: heroFadeDown 1s cubic-bezier(1, 1, 1, 1) forwards;
+        animation-delay: 0.5s;
+    }
+
+    .hero-subtitle {
+        opacity: 0;
+        animation: heroFadeUp 1s cubic-bezier(1, 1, 1, 1) forwards;
+        animation-delay: 1.5s;
+        /* Xuất hiện sau tiêu đề 1.5s */
+    }
+
+    /* Keyframes trôi từ trên xuống */
+    @keyframes heroFadeDown {
+        from {
+            opacity: 0;
+            transform: translateY(-30px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Keyframes trôi từ dưới lên */
+    @keyframes heroFadeUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
+
 <body class="bg-slate-50 text-slate-800 font-sans antialiased selection:bg-brand-blue selection:text-white">
 
     <div id="header-placeholder"></div>
@@ -37,11 +79,14 @@
                 <div class="absolute inset-0 bg-black/40"></div>
             </div>
             <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-8 w-full text-center text-white">
+                <!-- Tiêu đề chính: Trôi từ trên xuống & có hiệu ứng bóng chữ -->
                 <h1
-                    class="text-2xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight uppercase mb-3 drop-shadow-md">
+                    class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold tracking-tight sm:tracking-wider uppercase mb-3 drop-shadow-lg hero-title whitespace-nowrap">
                     Kiến Tạo Tương Lai Vững Bền
                 </h1>
-                <p class="text-sm sm:text-base lg:text-lg text-slate-200 max-w-2xl mx-auto font-light leading-relaxed">
+                <!-- Phụ đề: Trôi từ dưới lên (xuất hiện sau tiêu đề 0.3s) -->
+                <p
+                    class="text-sm sm:text-lg md:text-xl lg:text-2xl text-slate-100 max-w-3xl mx-auto font-normal tracking-wide leading-relaxed hero-subtitle drop-shadow-md">
                     Đầu tư - Xây dựng - Pháp lý
                 </p>
             </div>
@@ -173,25 +218,45 @@
         </section>
 
         <!-- Quick Summary -->
-        <section class="py-16 bg-white border-t border-slate-200">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-4 uppercase">
-                    Chào mừng bạn đến với <br class="block sm:hidden" />PV INCONS
+        <section
+            class="py-20 bg-gradient-to-b from-slate-50 via-blue-50/30 to-slate-50 border-t border-slate-200 relative overflow-hidden">
+            <!-- Họa tiết đốm sáng mờ trang trí nền -->
+            <div
+                class="absolute -top-24 left-1/2 -translate-x-1/2 w-96 h-96 bg-brand-blue/10 rounded-full blur-3xl pointer-events-none">
+            </div>
+
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+                <!-- Tiêu đề chính phối màu Gradient -->
+                <h2 class="text-2xl sm:text-4xl font-extrabold text-slate-900 mb-4 uppercase tracking-tight">
+                    Chào mừng bạn đến với <br class="block sm:hidden">PV INCONS</span>
                 </h2>
-                <p class="text-slate-600 max-w-3xl mx-auto text-sm sm:text-base leading-relaxed">
-                    Đối tác tin cậy trong lĩnh vực Tư vấn đầu tư, Thiết kế thi công xây dựng và Pháp lý bất động sản.
+
+                <!-- Phụ đề -->
+                <p class="text-slate-600 max-w-3xl mx-auto text-sm sm:text-base leading-relaxed font-medium">
+                    Đối tác tin cậy trong lĩnh vực <span class="text-slate-900 font-semibold">Tư vấn đầu tư</span>,
+                    <span class="text-slate-900 font-semibold">Thiết kế thi công xây dựng</span> và <span
+                        class="text-slate-900 font-semibold">Pháp lý bất động sản</span>.
                 </p>
-                <div class="mt-8 flex justify-center gap-4">
+
+                <!-- Nút bấm tương tác nâng cao -->
+                <div class="mt-8 flex flex-wrap justify-center gap-4">
+                    <!-- Nút chính: Có icon trôi nhẹ khi hover -->
                     <a href="about.html"
-                        class="bg-brand-blue hover:bg-brand-darkblue text-white font-bold px-6 py-3 rounded-lg text-sm transition">Tìm
-                        Hiểu Thêm</a>
+                        class="group bg-brand-blue hover:bg-brand-darkblue text-white font-bold px-7 py-3.5 rounded-xl text-sm transition-all duration-300 shadow-lg shadow-brand-blue/25 hover:shadow-xl hover:shadow-brand-blue/40 hover:-translate-y-1 flex items-center gap-2">
+                        <span>Tìm Hiểu Thêm</span>
+                        <i
+                            class="fa-solid fa-arrow-right text-xs transition-transform duration-300 group-hover:translate-x-1"></i>
+                    </a>
+
+                    <!-- Nút phụ: Viền đổi màu khi hover -->
                     <a href="services.html"
-                        class="bg-white hover:bg-slate-100 text-slate-700 border font-bold px-6 py-3 rounded-lg text-sm transition">Xem
-                        Dịch Vụ</a>
+                        class="bg-white hover:bg-slate-900 hover:text-white text-slate-700 border border-slate-300 hover:border-slate-900 font-bold px-7 py-3.5 rounded-xl text-sm transition-all duration-300 shadow-sm hover:shadow-lg hover:-translate-y-1 flex items-center gap-2">
+                        <i class="fa-solid fa-layer-group text-xs"></i>
+                        <span>Xem Dịch Vụ</span>
+                    </a>
                 </div>
             </div>
         </section>
-
         <!-- News Section (3 Tin mới nhất) -->
         <section class="py-16 bg-slate-50 border-t border-slate-200">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -266,7 +331,7 @@
             }, { passive: true });
 
             function handleSwipe() {
-                const swipeThreshold = 50; // Khoảng cách vuốt tối thiểu (px) để nhận diện
+                const swipeThreshold = 70; // Khoảng cách vuốt tối thiểu (px) để nhận diện
                 const diffX = touchStartX - touchEndX;
 
                 if (diffX > swipeThreshold) {
@@ -280,6 +345,7 @@
         }
         setInterval(nextLatestProject, 4000);
     </script>
+
 </body>
 
 </html>

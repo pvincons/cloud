@@ -11,7 +11,7 @@ async function loadLayout(pageId) {
         const headerPlaceholder = document.getElementById('header-placeholder');
         if (headerPlaceholder) {
             headerPlaceholder.outerHTML = headerHtml;
-        }        
+        }
         document.getElementById('footer-placeholder').innerHTML = footerHtml;
 
         // Highlight tab đang mở
@@ -66,6 +66,55 @@ async function loadHomeNews() {
         }
     } catch (error) {
         console.error('Lỗi đồng bộ tin tức:', error);
+    }
+}
+
+// Hàm bắt sự kiện và gửi dữ liệu form qua AJAX
+async function submitContactForm(e) {
+    e.preventDefault(); // Chặn đứng hành vi chuyển trang của trình duyệt
+
+    const form = e.target;
+    const thankYouModal = document.getElementById('thankYouModal');
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const originalBtnText = submitBtn.innerText;
+
+    // Đổi trạng thái nút bấm
+    submitBtn.disabled = true;
+    submitBtn.innerText = 'Đang gửi...';
+
+    try {
+        const response = await fetch(form.action, {
+            method: 'POST',
+            body: new FormData(form),
+            headers: {
+                'Accept': 'application/json'
+            }
+        });
+
+        if (response.ok) {
+            form.reset(); // Xóa sạch dữ liệu ô nhập
+            if (thankYouModal) {
+                thankYouModal.classList.remove('hidden');
+                thankYouModal.classList.add('flex'); // Bật bảng thông báo
+            }
+        } else {
+            alert('Có lỗi xảy ra khi gửi thông tin. Vui lòng thử lại!');
+        }
+    } catch (error) {
+        alert('Không thể kết nối máy chủ. Vui lòng kiểm tra lại kết nối mạng!');
+    } finally {
+        // Mở lại nút bấm
+        submitBtn.disabled = false;
+        submitBtn.innerText = originalBtnText;
+    }
+}
+
+// Hàm đóng Bảng thông báo (Modal)
+function closeModal() {
+    const thankYouModal = document.getElementById('thankYouModal');
+    if (thankYouModal) {
+        thankYouModal.classList.add('hidden');
+        thankYouModal.classList.remove('flex');
     }
 }
 

@@ -733,6 +733,110 @@
                 /* Giảm padding trong card */
             }
         }
+        /* ==============================================
+   HIỆU ỨNG ĐỘNG CHO LEADERSHIP SPOTLIGHT CARD
+   ============================================== */
+
+/* 1. Tổng thể thẻ: Nâng thẻ + Tỏa sáng + Xuất hiện mượt */
+.leadership-card {
+    transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    animation: leadershipFadeUp 0.8s ease-out forwards;
+}
+
+.leadership-card:hover {
+    transform: translateY(-8px);
+    border-color: rgba(245, 158, 11, 0.8) !important; /* Đổi viền sang vàng ấm */
+    box-shadow: 0 20px 40px -10px rgba(245, 158, 11, 0.25), 0 0 20px rgba(245, 158, 11, 0.15);
+}
+
+/* 2. Dải ánh sáng quét ngang khi hover */
+.card-shimmer {
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 60%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.08),
+        transparent
+    );
+    transform: skewX(-25deg);
+    transition: left 0.8s ease-in-out;
+    pointer-events: none;
+}
+
+.leadership-card:hover .card-shimmer {
+    left: 150%;
+}
+
+/* 3. Icon ngoặc kép bay nhịp nhàng (Floating) */
+.float-animate {
+    animation: floatIcon 3s ease-in-out infinite;
+    transition: transform 0.3s ease, color 0.3s ease;
+}
+
+.leadership-card:hover .float-animate {
+    color: #fbbf24; /* Đổi màu tươi hơn khi hover */
+    transform: scale(1.15) rotate(-5deg);
+}
+
+@keyframes floatIcon {
+    0%, 100% {
+        transform: translateY(0px);
+    }
+    50% {
+        transform: translateY(-6px);
+    }
+}
+
+/* 4. Avatar nhấp nháy vòng sáng (Pulse Avatar) */
+.pulse-avatar {
+    position: relative;
+    transition: transform 0.3s ease;
+}
+
+.pulse-avatar::after {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    border-radius: 50%;
+    border: 2px solid rgba(245, 158, 11, 0.6);
+    animation: avatarPulse 2s infinite;
+    pointer-events: none;
+}
+
+.leadership-card:hover .pulse-avatar {
+    transform: scale(1.08);
+}
+
+@keyframes avatarPulse {
+    0% {
+        transform: scale(0.95);
+        opacity: 0.8;
+    }
+    50% {
+        transform: scale(1.15);
+        opacity: 0;
+    }
+    100% {
+        transform: scale(0.95);
+        opacity: 0;
+    }
+}
+
+/* 5. Keyframe xuất hiện khi mở trang */
+@keyframes leadershipFadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
     </style>
 </head>
 
@@ -756,20 +860,26 @@
                     </div>
 
                     <!-- LEADERSHIP SPOTLIGHT CARD -->
-                    <div class="leadership-card">
-                        <div class="quote-icon"><i class="fa-solid fa-quote-left"></i></div>
-                        <p class="quote-text">
-                            "Chúng tôi không thực hiện những công việc đại trà để thỏa hiệp với tính chất rủi ro cao.
-                            Chúng tôi cung cấp giải pháp toàn diện để nâng tầm sự phát triển của doanh nghiệp và đối
-                            tác."
-                        </p>
-                        <div class="quote-author">
-                            <div class="author-avatar">P</div>
-                            <div class="author-info">
-                                <h4>TRẦN HOÀNG PHƯỚC</h4>
-                                <p>Giám đốc điều hành</p>
-                            </div>
-                        </div>
+<div class="leadership-card group relative overflow-hidden">
+    <!-- Dải sáng quét qua thẻ khi hover -->
+    <div class="card-shimmer"></div>
+
+    <!-- Icon ngoặc kép có hiệu ứng bay nhịp nhàng -->
+    <div class="quote-icon float-animate"><i class="fa-solid fa-quote-left"></i></div>
+    
+    <p class="quote-text">
+        "Chúng tôi không thực hiện những công việc đại trà để thỏa hiệp với tính chất rủi ro cao. Chúng tôi cung cấp giải pháp toàn diện để nâng tầm sự phát triển của doanh nghiệp và đối tác."
+    </p>
+    
+    <div class="quote-author">
+        <!-- Avatar có vòng sáng nhấp nháy -->
+        <div class="author-avatar pulse-avatar">P</div>
+        <div class="author-info">
+            <h4>TRẦN HOÀNG PHƯỚC</h4>
+            <p>GIÁM ĐỐC ĐIỀU HÀNH</p>
+        </div>
+    </div>
+</div>
                     </div>
                 </div>
             </div>
