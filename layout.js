@@ -119,7 +119,7 @@ function closeModal() {
 }
 
 // ==============================================
-// XỬ LÝ THỐNG KÊ LƯỢT TRUY CẬP THỰC TẾ (GLOBAL API)
+// THỐNG KÊ LƯỢT TRUY CẬP THỰC TẾ (GLOBAL API)
 // ==============================================
 async function initVisitorCounter() {
     const totalVisitsEl = document.getElementById('totalVisits');
@@ -162,7 +162,7 @@ async function initVisitorCounter() {
     }
 
     // ------------------------------------------------------------------
-    // XỬ LÝ SỐ NGUỜI ĐANG TRỰC TUYẾN (Dựa trên khung giờ thực tế trong ngày)
+    // GIẢ LẬP SỐ NGUỜI ĐANG TRỰC TUYẾN (Dựa trên khung giờ thực tế trong ngày)
     // ------------------------------------------------------------------
     function updateOnlineCount() {
         const hour = new Date().getHours();
