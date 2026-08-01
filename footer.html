@@ -22,7 +22,7 @@
             <div class="lg:col-span-7 bg-white p-8 rounded-2xl border border-slate-200 shadow-md">
                 <h3 class="text-xl font-bold text-slate-900 mb-6">Thông Tin Liên Hệ</h3>
                 <!-- Form nhận và tự động gửi thông tin khách hàng về Formspree -->
-                <form action="https://formspree.io/f/xzdnldga" method="POST" class="space-y-4">
+                <form id="contactForm" action="https://formspree.io/f/xzdnldga" method="POST" class="space-y-4">
                     <div>
                         <input type="text" name="name" required
                             class="w-full border border-slate-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-brand-blue outline-none"
@@ -43,6 +43,29 @@
                         class="w-full bg-brand-blue hover:bg-brand-darkblue text-white font-bold py-3 rounded-lg transition">Gửi
                         Thông Tin</button>
                 </form>
+                <!-- Bảng thông báo (Modal) -->
+                <div id="thankYouModal"
+                    class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden items-center justify-center p-4 transition-all duration-300">
+                    <div
+                        class="bg-white rounded-2xl max-w-md w-full p-6 text-center shadow-2xl border border-slate-100 animate-in fade-in zoom-in duration-200">
+                        <!-- Icon tích xanh -->
+                        <div
+                            class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl shadow-inner">
+                            <i class="fa-solid fa-circle-check"></i>
+                        </div>
+
+                        <h3 class="text-xl font-bold text-slate-900 mb-2">Gửi thông tin thành công!</h3>
+                        <p class="text-slate-600 text-sm mb-6 leading-relaxed">
+                            Cảm ơn quý khách đã gửi thông tin. Chúng tôi sẽ liên hệ với quý khách trong thời gian sớm
+                            nhất.
+                        </p>
+
+                        <button onclick="closeModal()" type="button"
+                            class="w-full bg-brand-blue hover:bg-brand-darkblue text-white font-bold py-3 rounded-xl shadow-lg transition duration-200 active:scale-[0.98]">
+                            Đóng
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -61,3 +84,53 @@
         </div>
     </div>
 </footer>
+<script>
+    const contactForm = document.getElementById('contactForm');
+    const thankYouModal = document.getElementById('thankYouModal');
+
+    if (contactForm) {
+        contactForm.addEventListener('submit', async function (e) {
+            e.preventDefault(); // Chặn chuyển trang Formspree mặc định
+
+            const submitBtn = contactForm.querySelector('button[type="submit"]');
+            const originalBtnText = submitBtn.innerText;
+
+            // Đổi trạng thái nút khi đang gửi
+            submitBtn.disabled = true;
+            submitBtn.innerText = 'Đang gửi...';
+
+            const formData = new FormData(contactForm);
+
+            try {
+                const response = await fetch(contactForm.action, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    // Xóa trắng form & Hiện Popup cảm ơn
+                    contactForm.reset();
+                    thankYouModal.classList.remove('hidden');
+                    thankYouModal.classList.add('flex');
+                } else {
+                    alert('Có lỗi xảy ra trong quá trình gửi. Vui lòng thử lại!');
+                }
+            } catch (error) {
+                alert('Không thể kết nối máy chủ. Vui lòng kiểm tra lại kết nối mạng!');
+            } finally {
+                // Khôi phục nút gửi
+                submitBtn.disabled = false;
+                submitBtn.innerText = originalBtnText;
+            }
+        });
+    }
+
+    // Hàm đóng Popup
+    function closeModal() {
+        thankYouModal.classList.add('hidden');
+        thankYouModal.classList.remove('flex');
+    }
+</script>
