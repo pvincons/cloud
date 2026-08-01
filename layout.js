@@ -135,7 +135,7 @@ async function initVisitorCounter() {
         // Kiểm tra xem khách hàng này đã được đếm trong phiên làm việc (Session) này chưa
         // Mục đích: Tránh việc 1 người cố tình ấn F5 liên tục làm rác số liệu
         let endpoint = `https://api.counterapi.dev/v1/${NAMESPACE}/${KEY}/`;
-        
+
         if (!sessionStorage.getItem('pv_counted_session')) {
             endpoint += 'up'; // Tăng +1 trên Server toàn cầu nếu là người dùng mới vào web
             sessionStorage.setItem('pv_counted_session', 'true');
@@ -145,10 +145,10 @@ async function initVisitorCounter() {
         const response = await fetch(endpoint);
         if (response.ok) {
             const data = await response.json();
-            
+
             // CON SỐ CƠ SỞ KHỞI ĐIỂM + CON SỐ ĐẾM THẬT TỪ API
             // (Ví dụ cộng thêm 10,000 lượt xem tích lũy trước đây của công ty)
-            const BASE_OFFSET = 10000; 
+            const BASE_OFFSET = 10000;
             const finalTotal = (data.count || 0) + BASE_OFFSET;
 
             totalVisitsEl.innerText = Number(finalTotal).toLocaleString('vi-VN');
@@ -160,30 +160,6 @@ async function initVisitorCounter() {
         // Số dự phòng nếu mạng chập chờn hoặc API bị nghẽn
         totalVisitsEl.innerText = '10,050';
     }
-
-    // ------------------------------------------------------------------
-    // GIẢ LẬP SỐ NGUỜI ĐANG TRỰC TUYẾN (Dựa trên khung giờ thực tế trong ngày)
-    // ------------------------------------------------------------------
-    function updateOnlineCount() {
-        const hour = new Date().getHours();
-        let min = 3, max = 7;
-
-        // Giờ hành chính (8h - 17h) lượng khách truy cập sẽ cao hơn ban đêm
-        if (hour >= 8 && hour <= 17) {
-            min = 8;
-            max = 18;
-        } else if (hour > 17 && hour <= 22) {
-            min = 5;
-            max = 12;
-        }
-
-        const onlineCount = Math.floor(Math.random() * (max - min + 1)) + min;
-        onlineVisitorsEl.innerText = onlineCount;
-    }
-
-    updateOnlineCount();
-    // Thay đổi nhẹ số người trực tuyến sau mỗi 30 giây
-    setInterval(updateOnlineCount, 30000);
 }
 
 // Khởi chạy sau khi giao diện đã tải
