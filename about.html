@@ -733,110 +733,147 @@
                 /* Giảm padding trong card */
             }
         }
+
         /* ==============================================
-   HIỆU ỨNG ĐỘNG CHO LEADERSHIP SPOTLIGHT CARD
-   ============================================== */
+        HIỆU ỨNG ĐỘNG CHO LEADERSHIP SPOTLIGHT CARD
+        ============================================== */
 
-/* 1. Tổng thể thẻ: Nâng thẻ + Tỏa sáng + Xuất hiện mượt */
-.leadership-card {
-    transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-    animation: leadershipFadeUp 0.8s ease-out forwards;
-}
+        /* 1. Tổng thể thẻ: Nâng thẻ + Tỏa sáng + Xuất hiện mượt */
+        .leadership-card {
+            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            animation: leadershipFadeUp 1.5s ease-out forwards;
+        }
 
-.leadership-card:hover {
-    transform: translateY(-8px);
-    border-color: rgba(245, 158, 11, 0.8) !important; /* Đổi viền sang vàng ấm */
-    box-shadow: 0 20px 40px -10px rgba(245, 158, 11, 0.25), 0 0 20px rgba(245, 158, 11, 0.15);
-}
+        .leadership-card:hover {
+            transform: translateY(-8px);
+            border-color: rgba(245, 158, 11, 0.8) !important;
+            /* Đổi viền sang vàng ấm */
+            box-shadow: 0 20px 40px -10px rgba(245, 158, 11, 0.25), 0 0 20px rgba(245, 158, 11, 0.15);
+        }
 
-/* 2. Dải ánh sáng quét ngang khi hover */
-.card-shimmer {
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 60%;
-    height: 100%;
-    background: linear-gradient(
-        90deg,
-        transparent,
-        rgba(255, 255, 255, 0.08),
-        transparent
-    );
-    transform: skewX(-25deg);
-    transition: left 0.8s ease-in-out;
-    pointer-events: none;
-}
+        /* 2. Dải ánh sáng quét ngang khi hover */
+        .card-shimmer {
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 60%;
+            height: 100%;
+            background: linear-gradient(90deg,
+                    transparent,
+                    rgba(255, 255, 255, 0.08),
+                    transparent);
+            transform: skewX(-25deg);
+            transition: left 0.8s ease-in-out;
+            pointer-events: none;
+        }
 
-.leadership-card:hover .card-shimmer {
-    left: 150%;
-}
+        .leadership-card:hover .card-shimmer {
+            left: 150%;
+        }
 
-/* 3. Icon ngoặc kép bay nhịp nhàng (Floating) */
-.float-animate {
-    animation: floatIcon 3s ease-in-out infinite;
-    transition: transform 0.3s ease, color 0.3s ease;
-}
+        /* 3. Icon ngoặc kép bay nhịp nhàng (Floating) */
+        .float-animate {
+            animation: floatIcon 3s ease-in-out infinite;
+            transition: transform 0.3s ease, color 0.3s ease;
+        }
 
-.leadership-card:hover .float-animate {
-    color: #fbbf24; /* Đổi màu tươi hơn khi hover */
-    transform: scale(1.15) rotate(-5deg);
-}
+        .leadership-card:hover .float-animate {
+            color: #fbbf24;
+            /* Đổi màu tươi hơn khi hover */
+            transform: scale(1.15) rotate(-5deg);
+        }
 
-@keyframes floatIcon {
-    0%, 100% {
-        transform: translateY(0px);
-    }
-    50% {
-        transform: translateY(-6px);
-    }
-}
+        @keyframes floatIcon {
 
-/* 4. Avatar nhấp nháy vòng sáng (Pulse Avatar) */
-.pulse-avatar {
-    position: relative;
-    transition: transform 0.3s ease;
-}
+            0%,
+            100% {
+                transform: translateY(0px);
+            }
 
-.pulse-avatar::after {
-    content: '';
-    position: absolute;
-    inset: -4px;
-    border-radius: 50%;
-    border: 2px solid rgba(245, 158, 11, 0.6);
-    animation: avatarPulse 2s infinite;
-    pointer-events: none;
-}
+            50% {
+                transform: translateY(-6px);
+            }
+        }
 
-.leadership-card:hover .pulse-avatar {
-    transform: scale(1.08);
-}
+        /* 4. Avatar nhấp nháy vòng sáng (Pulse Avatar) */
+        .pulse-avatar {
+            position: relative;
+            transition: transform 0.3s ease;
+        }
 
-@keyframes avatarPulse {
-    0% {
-        transform: scale(0.95);
-        opacity: 0.8;
-    }
-    50% {
-        transform: scale(1.15);
-        opacity: 0;
-    }
-    100% {
-        transform: scale(0.95);
-        opacity: 0;
-    }
-}
+        .pulse-avatar::after {
+            content: '';
+            position: absolute;
+            inset: -4px;
+            border-radius: 50%;
+            border: 2px solid rgba(245, 158, 11, 0.6);
+            animation: avatarPulse 2s infinite;
+            pointer-events: none;
+        }
 
-/* 5. Keyframe xuất hiện khi mở trang */
-@keyframes leadershipFadeUp {
-    from {
-        opacity: 0;
-        transform: translateY(30px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
+        .leadership-card:hover .pulse-avatar {
+            transform: scale(1.08);
+        }
+
+        @keyframes avatarPulse {
+            0% {
+                transform: scale(0.95);
+                opacity: 0.8;
+            }
+
+            50% {
+                transform: scale(1.15);
+                opacity: 0;
+            }
+
+            100% {
+                transform: scale(0.95);
+                opacity: 0;
+            }
+        }
+
+        /* 5. LeadershipFadeUp xuất hiện khi mở trang */
+        @keyframes leadershipFadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* =========================================================
+   TỐI ƯU ĐẦY KHUNG CHỈ TRÊN MÁY TÍNH (DESKTOP >= 1024px)
+   Điện thoại & Tablet nhỏ sẽ giữ nguyên 100% code gốc
+   ========================================================= */
+        @media (min-width: 1024px) {
+            .org-chart-wrapper {
+                width: 100% !important;
+                max-width: 100% !important;
+                padding-left: 16px !important;
+                padding-right: 16px !important;
+            }
+
+            .org-tree {
+                width: 100% !important;
+                max-width: 100% !important;
+            }
+
+            .divisions-grid {
+                width: 100% !important;
+                display: grid !important;
+                grid-template-columns: repeat(4, 1fr) !important;
+                /* 4 khối dàn đều hết chiều rộng */
+                gap: 16px !important;
+            }
+
+            .division-card {
+                width: 100% !important;
+            }
+        }
     </style>
 </head>
 
@@ -860,28 +897,30 @@
                     </div>
 
                     <!-- LEADERSHIP SPOTLIGHT CARD -->
-<div class="leadership-card group relative overflow-hidden">
-    <!-- Dải sáng quét qua thẻ khi hover -->
-    <div class="card-shimmer"></div>
+                    <div class="leadership-card group relative overflow-hidden">
+                        <!-- Dải sáng quét qua thẻ khi hover -->
+                        <div class="card-shimmer"></div>
 
-    <!-- Icon ngoặc kép có hiệu ứng bay nhịp nhàng -->
-    <div class="quote-icon float-animate"><i class="fa-solid fa-quote-left"></i></div>
-    
-    <p class="quote-text">
-        "Chúng tôi không thực hiện những công việc đại trà để thỏa hiệp với tính chất rủi ro cao. Chúng tôi cung cấp giải pháp toàn diện để nâng tầm sự phát triển của doanh nghiệp và đối tác."
-    </p>
-    
-    <div class="quote-author">
-        <!-- Avatar có vòng sáng nhấp nháy -->
-        <div class="author-avatar pulse-avatar">P</div>
-        <div class="author-info">
-            <h4>TRẦN HOÀNG PHƯỚC</h4>
-            <p>GIÁM ĐỐC ĐIỀU HÀNH</p>
-        </div>
-    </div>
-</div>
+                        <!-- Icon ngoặc kép có hiệu ứng bay nhịp nhàng -->
+                        <div class="quote-icon float-animate"><i class="fa-solid fa-quote-left"></i></div>
+
+                        <p class="quote-text">
+                            "Chúng tôi không thực hiện những công việc đại trà để thỏa hiệp với tính chất rủi ro cao.
+                            Chúng tôi cung cấp giải pháp toàn diện để nâng tầm sự phát triển của doanh nghiệp và đối
+                            tác."
+                        </p>
+
+                        <div class="quote-author">
+                            <!-- Avatar có vòng sáng nhấp nháy -->
+                            <div class="author-avatar pulse-avatar">P</div>
+                            <div class="author-info">
+                                <h4>TRẦN HOÀNG PHƯỚC</h4>
+                                <p>GIÁM ĐỐC ĐIỀU HÀNH</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
+            </div>
             </div>
         </section>
 
@@ -911,37 +950,234 @@
             </div>
         </div>
 
-        <!-- SECTION 1: TRIẾT LÝ ĐIỀU HÀNH -->
-        <section class="section">
-            <div class="container">
-                <div class="section-header">
-                    <span class="section-tag">Tầm Nhìn Chiến Lược</span>
-                    <h2 class="section-title">Triết Lý Điều Hành - Định Hướng Phát Triển</h2>
+   <!-- SECTION: TRIẾT LÝ QUẢN TRỊ CHIẾN LƯỢC & NĂNG LỰC BẢO CHỨNG -->
+<section class="py-16 sm:py-20 bg-slate-50/80 border-y border-slate-200/60 relative overflow-hidden">
+    <!-- Họa tiết nền chìm tinh tế -->
+    <div class="absolute inset-0 bg-[radial-gradient(#e2e8f0_1px,transparent_1px)] [background-size:24px_24px] opacity-40 pointer-events-none"></div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        
+        <!-- HEADER CHIẾN LƯỢC -->
+        <div class="text-center max-w-3xl mx-auto mb-14">
+            <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-900 text-slate-200 text-[11px] font-bold uppercase tracking-widest shadow-md mb-4 border border-slate-800">
+                <span class="flex h-2 w-2 relative">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
+                </span>
+                Strategic Corporate Governance
+            </div>
+            <h2 class="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
+                Triết Lý Quản Trị Chiến Lược
+            </h2>
+            <p class="text-slate-600 text-sm sm:text-base mt-3 leading-relaxed font-medium">
+                Thế kiềng ba chân <span class="text-blue-700 font-bold">Đầu tư – Xây dựng – Pháp lý</span>: Nền tảng bảo chứng cho dòng vốn & sự phát triển trường tồn
+            </p>
+            <div class="w-16 h-1 bg-gradient-to-r from-blue-600 to-cyan-500 mx-auto mt-4 rounded-full"></div>
+        </div>
+
+        <!-- GRID 3 THẺ TẦM VÓC -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch">
+            
+            <!-- 1. TẦM NHÌN CHIẾN LƯỢC -->
+            <div class="bg-white rounded-3xl p-8 border border-slate-200/90 shadow-sm hover:shadow-2xl hover:-translate-y-1.5 transition-all duration-300 flex flex-col justify-between relative group hover:border-blue-500/40">
+                <div>
+                    <!-- Top Badge & Icon -->
+                    <div class="flex items-center justify-between mb-6">
+                        <div class="w-13 h-13 rounded-2xl bg-gradient-to-br from-blue-600 to-blue-700 text-white flex items-center justify-center text-2xl shadow-lg shadow-blue-600/25">
+                            <i class="fa-solid fa-compass"></i>
+                        </div>
+                        <span class="text-[11px] font-black uppercase tracking-widest text-slate-400 bg-slate-100 px-3 py-1 rounded-full border border-slate-200/60">01 / Vision</span>
+                    </div>
+
+                    <h3 class="text-xl font-extrabold text-slate-900 mb-3.5 tracking-tight">Tầm Nhìn Chiến Lược</h3>
+                    <p class="text-slate-600 text-sm leading-relaxed text-justify mb-6">
+                        Xác lập vị thế đơn vị dẫn dắt trong phân khúc Tư vấn Chiến lược & Triển khai toàn diện Hệ sinh thái <strong class="text-slate-900 font-bold">Đầu tư – Pháp lý – Xây dựng</strong>. PV INCONS định hướng nâng tầm giá trị các dự án bất động sản & công nghiệp, trở thành biểu tượng bảo chứng cho sự an toàn dòng vốn và gia tăng tài sản bền vững.
+                    </p>
                 </div>
 
-                <div class="philosophy-grid">
-                    <div class="philosophy-card">
-                        <span class="philosophy-num">01</span>
-                        <h3><i class="fa-solid fa-chart-line"></i> ĐẦU TƯ</h3>
-                        <p>Kiến tạo cơ hội phát triển, mở rộng hệ sinh thái kinh doanh bền vững và kiên định đặt lợi ích
-                            dài hạn của Đối tác làm trọng tâm cốt lõi.</p>
-                    </div>
-                    <div class="philosophy-card">
-                        <span class="philosophy-num">02</span>
-                        <h3><i class="fa-solid fa-arrow-trend-up"></i> THƯƠNG MẠI</h3>
-                        <p>Kiểm soát chặt chẽ toàn bộ chuỗi giá trị, tối ưu hóa nguồn lực và đảm bảo tính minh bạch,
-                            hiệu quả tài chính tối đa.</p>
-                    </div>
-                    <div class="philosophy-card">
-                        <span class="philosophy-num">03</span>
-                        <h3><i class="fa-solid fa-compass-drafting"></i> XÂY DỰNG</h3>
-                        <p>Hiện thực hóa chuẩn mực kỹ thuật đỉnh cao thông qua việc áp dụng quy trình số hóa hiện đại
-                            BIM/VDC và thi công đạt chuẩn quốc tế.</p>
-                    </div>
+                <!-- Highlight tags giúp cân bằng thị giác -->
+                <div class="pt-4 border-t border-slate-100 flex flex-wrap gap-2 text-[11px] font-semibold text-slate-500">
+                    <span class="bg-blue-50 text-blue-700 px-2.5 py-1 rounded-md border border-blue-100/80"><i class="fa-solid fa-check text-[10px] mr-1"></i> BĐS & Công nghiệp</span>
+                    <span class="bg-blue-50 text-blue-700 px-2.5 py-1 rounded-md border border-blue-100/80"><i class="fa-solid fa-check text-[10px] mr-1"></i> Bảo trợ Dòng vốn</span>
                 </div>
             </div>
-        </section>
 
+            <!-- 2. SỨ MỆNH KIẾN TẠO -->
+            <div class="bg-white rounded-3xl p-8 border border-slate-200/90 shadow-sm hover:shadow-2xl hover:-translate-y-1.5 transition-all duration-300 flex flex-col justify-between relative group hover:border-cyan-500/40">
+                <div>
+                    <!-- Top Badge & Icon -->
+                    <div class="flex items-center justify-between mb-6">
+                        <div class="w-13 h-13 rounded-2xl bg-gradient-to-br from-cyan-500 to-blue-600 text-white flex items-center justify-center text-2xl shadow-lg shadow-cyan-500/25">
+                            <i class="fa-solid fa-bullseye"></i>
+                        </div>
+                        <span class="text-[11px] font-black uppercase tracking-widest text-slate-400 bg-slate-100 px-3 py-1 rounded-full border border-slate-200/60">02 / Mission</span>
+                    </div>
+
+                    <h3 class="text-xl font-extrabold text-slate-900 mb-3.5 tracking-tight">Sứ Mệnh Kiến Tạo</h3>
+                    <p class="text-slate-600 text-sm leading-relaxed text-justify mb-6">
+                        Tối ưu hóa hiệu quả đầu tư thông qua việc hợp nhất <strong class="text-slate-900 font-bold">Hành lang Pháp lý chuẩn xác – Giải pháp Kỹ thuật vượt trội – Công nghệ BIM tiên phong</strong>. Chúng tôi sứ mệnh triệt tiêu rủi ro dự án, chuyển hóa nguồn vốn của Chủ đầu tư thành những công trình biểu tượng có giá trị thương mại cao và vận hành tối ưu.
+                    </p>
+                </div>
+
+                <!-- Highlight tags giúp cân bằng thị giác -->
+                <div class="pt-4 border-t border-slate-100 flex flex-wrap gap-2 text-[11px] font-semibold text-slate-500">
+                    <span class="bg-cyan-50 text-cyan-700 px-2.5 py-1 rounded-md border border-cyan-100/80"><i class="fa-solid fa-check text-[10px] mr-1"></i> Pháp lý Chuẩn xác</span>
+                    <span class="bg-cyan-50 text-cyan-700 px-2.5 py-1 rounded-md border border-cyan-100/80"><i class="fa-solid fa-check text-[10px] mr-1"></i> BIM Automation</span>
+                </div>
+            </div>
+
+            <!-- 3. GIÁ TRỊ CỐT LÕI -->
+            <div class="bg-white rounded-3xl p-8 border border-slate-200/90 shadow-sm hover:shadow-2xl hover:-translate-y-1.5 transition-all duration-300 flex flex-col justify-between relative group hover:border-indigo-500/40">
+                <div>
+                    <!-- Top Badge & Icon -->
+                    <div class="flex items-center justify-between mb-6">
+                        <div class="w-13 h-13 rounded-2xl bg-gradient-to-br from-indigo-600 to-blue-700 text-white flex items-center justify-center text-2xl shadow-lg shadow-indigo-600/25">
+                            <i class="fa-solid fa-shield-halved"></i>
+                        </div>
+                        <span class="text-[11px] font-black uppercase tracking-widest text-slate-400 bg-slate-100 px-3 py-1 rounded-full border border-slate-200/60">03 / Values</span>
+                    </div>
+
+                    <h3 class="text-xl font-extrabold text-slate-900 mb-4 tracking-tight">Giá Trị Cốt Lõi</h3>
+                    
+                    <ul class="space-y-3.5 text-xs sm:text-sm mb-6">
+                        <li class="flex items-start gap-3">
+                            <div class="w-5 h-5 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-xs shrink-0 mt-0.5">
+                                <i class="fa-solid fa-check"></i>
+                            </div>
+                            <span><strong class="text-slate-900 font-bold">Thượng tôn Pháp lý:</strong> An toàn tuyệt đối từ trắc đạc, quy hoạch đến hoàn công sở hữu.</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <div class="w-5 h-5 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-xs shrink-0 mt-0.5">
+                                <i class="fa-solid fa-check"></i>
+                            </div>
+                            <span><strong class="text-slate-900 font-bold">Tối ưu Dòng vốn:</strong> Hoạch định tài chính thông minh, tối đa hóa tỷ suất sinh lời (ROI).</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <div class="w-5 h-5 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-xs shrink-0 mt-0.5">
+                                <i class="fa-solid fa-check"></i>
+                            </div>
+                            <span><strong class="text-slate-900 font-bold">Kỹ thuật Tiên phong:</strong> Ứng dụng BIM & tự động hóa Revit/Dynamo chính xác vi mô.</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <div class="w-5 h-5 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-xs shrink-0 mt-0.5">
+                                <i class="fa-solid fa-check"></i>
+                            </div>
+                            <span><strong class="text-slate-900 font-bold">Đồng hành Chiến lược:</strong> Lấy sự an tâm và thành công của CĐT làm thước đo giá trị.</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="pt-4 border-t border-slate-100 text-[11px] font-semibold text-slate-400 text-right">
+                    Cam kết chất lượng trọn đời
+                </div>
+            </div>
+
+        </div>
+
+        <!-- THANH BẢO CHỨNG NIỀM TIN TĂNG ĐỘ UY TÍN (TRUST INDICATOR BAR) -->
+        <div class="mt-12 bg-slate-900 text-white rounded-2xl p-6 shadow-xl border border-slate-800 grid grid-cols-1 sm:grid-cols-3 gap-6 text-center divide-y sm:divide-y-0 sm:divide-x divide-slate-800">
+            <div class="pt-2 sm:pt-0">
+                <div class="text-2xl font-extrabold text-blue-400">100%</div>
+                <div class="text-xs text-slate-400 font-medium mt-1">An toàn Pháp lý & Quy hoạch</div>
+            </div>
+            <div class="pt-4 sm:pt-0">
+                <div class="text-2xl font-extrabold text-cyan-400">BIM Level 2</div>
+                <div class="text-xs text-slate-400 font-medium mt-1">Chuẩn hóa Mô hình 3D & Tiến độ</div>
+            </div>
+            <div class="pt-4 sm:pt-0">
+                <div class="text-2xl font-extrabold text-indigo-400">Tối ưu ROI</div>
+                <div class="text-xs text-slate-400 font-medium mt-1">Kiểm soát chặt chẽ Suất đầu tư</div>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+   <!-- SECTION: TRIẾT LÝ ĐIỀU HÀNH - ĐỊNH HƯỚNG PHÁT TRIỂN (4 MỤC) -->
+<section class="py-16 bg-slate-50/50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <!-- HEADER -->
+        <div class="text-center max-w-3xl mx-auto mb-12">
+            <span class="text-xs font-bold uppercase tracking-widest text-slate-500 block mb-2">
+                Chiến Lược Phát Triển
+            </span>
+            <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+                Triết Lý Điều Hành - Định Hướng Phát Triển
+            </h2>
+        </div>
+
+        <!-- GRID 4 CỘT DÀN ĐỀU MÁY TÍNH -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            
+            <!-- 01. ĐẦU TƯ -->
+            <div class="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between relative group">
+                <div>
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="text-amber-600 text-xl font-bold flex items-center gap-2">
+                            <i class="fa-solid fa-chart-line"></i>
+                            <span class="text-slate-900 text-base uppercase font-extrabold tracking-wide">ĐẦU TƯ</span>
+                        </div>
+                        <span class="text-3xl font-black text-slate-200 group-hover:text-amber-500/20 transition-colors">01</span>
+                    </div>
+                    <p class="text-slate-600 text-xs sm:text-sm leading-relaxed">
+                        Kiến tạo cơ hội phát triển, mở rộng hệ sinh thái kinh doanh bền vững và kiên định đặt lợi ích dài hạn của Đối tác làm trọng tâm cốt lõi.
+                    </p>
+                </div>
+            </div>
+
+            <!-- 02. THƯƠNG MẠI -->
+            <div class="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between relative group">
+                <div>
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="text-amber-600 text-xl font-bold flex items-center gap-2">
+                            <i class="fa-solid fa-arrow-trend-up"></i>
+                            <span class="text-slate-900 text-base uppercase font-extrabold tracking-wide">THƯƠNG MẠI</span>
+                        </div>
+                        <span class="text-3xl font-black text-slate-200 group-hover:text-amber-500/20 transition-colors">02</span>
+                    </div>
+                    <p class="text-slate-600 text-xs sm:text-sm leading-relaxed">
+                        Kiểm soát chặt chẽ toàn bộ chuỗi giá trị, tối ưu hóa nguồn lực và đảm bảo tính minh bạch, hiệu quả tài chính tối đa.
+                    </p>
+                </div>
+            </div>
+
+            <!-- 03. XÂY DỰNG -->
+            <div class="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between relative group">
+                <div>
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="text-amber-600 text-xl font-bold flex items-center gap-2">
+                            <i class="fa-solid fa-compass-drafting"></i>
+                            <span class="text-slate-900 text-base uppercase font-extrabold tracking-wide">XÂY DỰNG</span>
+                        </div>
+                        <span class="text-3xl font-black text-slate-200 group-hover:text-amber-500/20 transition-colors">03</span>
+                    </div>
+                    <p class="text-slate-600 text-xs sm:text-sm leading-relaxed">
+                        Hiện thực hóa chuẩn mực kỹ thuật đỉnh cao thông qua việc áp dụng quy trình số hóa hiện đại BIM/VDC và thi công đạt chuẩn quốc tế.
+                    </p>
+                </div>
+            </div>
+
+            <!-- 04. PHÁP LÝ (MỤC MỚI BỔ SUNG) -->
+            <div class="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between relative group">
+                <div>
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="text-amber-600 text-xl font-bold flex items-center gap-2">
+                            <i class="fa-solid fa-scale-balanced"></i>
+                            <span class="text-slate-900 text-base uppercase font-extrabold tracking-wide">PHÁP LÝ</span>
+                        </div>
+                        <span class="text-3xl font-black text-slate-200 group-hover:text-amber-500/20 transition-colors">04</span>
+                    </div>
+                    <p class="text-slate-600 text-xs sm:text-sm leading-relaxed">
+                        Kiến tạo hành lang pháp lý vững chắc, chủ động kiểm soát rủi ro từ quy hoạch, cấp phép đến hoàn công, bảo vệ an toàn tối đa cho dòng vốn.
+                    </p>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</section>
         <!-- SECTION 2: THÔNG TIN DOANH NGHIỆP & PHÁP LÝ -->
         <section class="section">
             <div class="container">
