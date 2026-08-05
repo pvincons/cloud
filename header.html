@@ -9,7 +9,8 @@
     iframe[id*=":1.container"],
     iframe[class*="goog-te-banner"],
     iframe.skiptranslate,
-    body > .skiptranslate {
+    body > .skiptranslate,
+    #google_translate_element {
         display: none !important;
         visibility: hidden !important;
         height: 0 !important;
@@ -40,13 +41,50 @@
     }
 </style>
 
+<!-- Khung chứa Google Translate Widget chạy ngầm -->
+<div id="google_translate_element"></div>
+
+<!-- Script khởi tạo Google Translate Engine trên tên miền thực tế -->
+<script type="text/javascript">
+    function googleTranslateElementInit() {
+        new google.translate.TranslateElement({
+            pageLanguage: 'vi',
+            includedLanguages: 'en,vi',
+            layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+            autoDisplay: false
+        }, 'google_translate_element');
+    }
+</script>
+<script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
 <script>
-    // Ép body luôn nằm ở mép trên cùng, ngăn Google Script tự chen khoảng trắng
+    // Ép body luôn nằm ở mép trên cùng
     setInterval(function() {
         if (document.body && document.body.style.top !== '0px') {
             document.body.style.top = '0px';
         }
     }, 100);
+
+    // Hàm đổi ngôn ngữ chuẩn hóa cho tên miền chính pvincons.com, www.pvincons.com & localhost
+    function toggleLanguage() {
+        var isEn = document.cookie.indexOf('/en') !== -1;
+        var host = location.hostname;
+        var rootDomain = host.replace(/^www\./, '');
+
+        if (isEn) {
+            // Xóa Cookie trên mọi cấp độ Domain (Root, Subdomain, Localhost)
+            var pastDate = "expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/;";
+            document.cookie = "googtrans=; " + pastDate;
+            document.cookie = "googtrans=; domain=" + host + "; " + pastDate;
+            document.cookie = "googtrans=; domain=." + rootDomain + "; " + pastDate;
+        } else {
+            // Thiết lập Cookie dịch /vi/en đồng bộ trên mọi cấp độ Domain
+            document.cookie = "googtrans=/vi/en; path=/;";
+            document.cookie = "googtrans=/vi/en; path=/; domain=" + host + ";";
+            document.cookie = "googtrans=/vi/en; path=/; domain=." + rootDomain + ";";
+        }
+        location.reload();
+    }
 </script>
 
 <!-- Top Info Bar -->
@@ -108,7 +146,7 @@
         <!-- CTA Button & Switcher (Desktop) -->
         <div class="hidden sm:flex items-center space-x-3">
             <button type="button" 
-                    onclick="if(document.cookie.indexOf('/en') !== -1){document.cookie='googtrans=;path=/;expires=Thu, 01 Jan 1970 00:00:00 GMT';document.cookie='googtrans=;path=/;domain=' + location.hostname;}else{document.cookie='googtrans=/vi/en;path=/';}location.reload();" 
+                    onclick="toggleLanguage()" 
                     class="flex items-center justify-center w-9 h-9 rounded-full bg-slate-100/80 hover:bg-slate-200/80 border border-slate-200/80 transition-all cursor-pointer shadow-xs"
                     title="Bấm để đổi ngôn ngữ / Switch language">
                 <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'/%3E" 
@@ -159,7 +197,7 @@
         <div class="flex items-center justify-between py-2.5 px-3 border-t border-slate-100 mt-2 normal-case font-normal">
             <span class="text-slate-500 text-xs">Ngôn ngữ / Language:</span>
             <button type="button" 
-                    onclick="if(document.cookie.indexOf('/en') !== -1){document.cookie='googtrans=;path=/;expires=Thu, 01 Jan 1970 00:00:00 GMT';document.cookie='googtrans=;path=/;domain=' + location.hostname;}else{document.cookie='googtrans=/vi/en;path=/';}location.reload();" 
+                    onclick="toggleLanguage()" 
                     class="flex items-center justify-center w-9 h-9 rounded-full bg-slate-100 border border-slate-200 cursor-pointer shadow-xs">
                 <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'/%3E" 
                      onload="this.onload=null; this.src = document.cookie.indexOf('/en') !== -1 ? 'https://flagcdn.com/24x18/vn.png' : 'https://flagcdn.com/24x18/gb.png'" 
