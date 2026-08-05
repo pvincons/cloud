@@ -1,3 +1,39 @@
+// ==========================================
+// CHỨC NĂNG ĐỔI NGÔN NGỮ (GLOBAL LANGUAGE SWITCHER)
+// ==========================================
+window.toggleLanguage = function () {
+    var isEn = document.cookie.indexOf('/en') !== -1;
+    var host = location.hostname;
+    var rootDomain = host.replace(/^www\./, '');
+
+    if (isEn) {
+        // Xóa Cookie trên mọi cấp độ Domain để quay về Tiếng Việt
+        var pastDate = "expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/;";
+        document.cookie = "googtrans=; " + pastDate;
+        document.cookie = "googtrans=; domain=" + host + "; " + pastDate;
+        document.cookie = "googtrans=; domain=." + rootDomain + "; " + pastDate;
+    } else {
+        // Thiết lập Cookie chuyển sang Tiếng Anh
+        document.cookie = "googtrans=/vi/en; path=/;";
+        document.cookie = "googtrans=/vi/en; path=/; domain=" + host + ";";
+        document.cookie = "googtrans=/vi/en; path=/; domain=." + rootDomain + ";";
+    }
+    location.reload();
+};
+
+// Khởi tạo Google Translate Widget ngầm
+window.googleTranslateElementInit = function () {
+    new google.translate.TranslateElement({
+        pageLanguage: 'vi',
+        includedLanguages: 'en,vi',
+        layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+        autoDisplay: false
+    }, 'google_translate_element');
+};
+
+// ==========================================
+// NẠP HEADER / FOOTER DỰ ÁN
+// ==========================================
 async function loadLayout(pageId) {
     try {
         const [headerRes, footerRes] = await Promise.all([
@@ -12,7 +48,11 @@ async function loadLayout(pageId) {
         if (headerPlaceholder) {
             headerPlaceholder.outerHTML = headerHtml;
         }
-        document.getElementById('footer-placeholder').innerHTML = footerHtml;
+
+        const footerPlaceholder = document.getElementById('footer-placeholder');
+        if (footerPlaceholder) {
+            footerPlaceholder.innerHTML = footerHtml;
+        }
 
         // Highlight tab đang mở
         const activeTabs = document.querySelectorAll(`[data-tab="${pageId}"]`);
@@ -47,7 +87,9 @@ function closeMobileMenu() {
     }
 }
 
-// Hàm tự động lấy tin tức từ news.html sang index.html
+// ==========================================
+// TỰ ĐỘNG LẤY TIN TỨC TỪ NEWS.HTML SANG INDEX.HTML
+// ==========================================
 async function loadHomeNews() {
     const placeholder = document.getElementById('latest-news-placeholder');
     if (!placeholder) return;
@@ -56,7 +98,6 @@ async function loadHomeNews() {
         const response = await fetch('news.html');
         const htmlText = await response.text();
 
-        // Đọc dữ liệu HTML từ trang news.html
         const parser = new DOMParser();
         const doc = parser.parseFromString(htmlText, 'text/html');
         const newsContent = doc.querySelector('#news-container');
@@ -69,16 +110,17 @@ async function loadHomeNews() {
     }
 }
 
-// Hàm bắt sự kiện và gửi dữ liệu form qua AJAX
+// ==========================================
+// GỬI DỮ LIỆU FORM QUA AJAX
+// ==========================================
 async function submitContactForm(e) {
-    e.preventDefault(); // Chặn đứng hành vi chuyển trang của trình duyệt
+    e.preventDefault();
 
     const form = e.target;
     const thankYouModal = document.getElementById('thankYouModal');
     const submitBtn = form.querySelector('button[type="submit"]');
     const originalBtnText = submitBtn.innerText;
 
-    // Đổi trạng thái nút bấm
     submitBtn.disabled = true;
     submitBtn.innerText = 'Đang gửi...';
 
@@ -92,10 +134,10 @@ async function submitContactForm(e) {
         });
 
         if (response.ok) {
-            form.reset(); // Xóa sạch dữ liệu ô nhập
+            form.reset();
             if (thankYouModal) {
                 thankYouModal.classList.remove('hidden');
-                thankYouModal.classList.add('flex'); // Bật bảng thông báo
+                thankYouModal.classList.add('flex');
             }
         } else {
             alert('Có lỗi xảy ra khi gửi thông tin. Vui lòng thử lại!');
@@ -103,13 +145,11 @@ async function submitContactForm(e) {
     } catch (error) {
         alert('Không thể kết nối máy chủ. Vui lòng kiểm tra lại kết nối mạng!');
     } finally {
-        // Mở lại nút bấm
         submitBtn.disabled = false;
         submitBtn.innerText = originalBtnText;
     }
 }
 
-// Hàm đóng Bảng thông báo (Modal)
 function closeModal() {
     const thankYouModal = document.getElementById('thankYouModal');
     if (thankYouModal) {
@@ -122,67 +162,58 @@ function closeModal() {
 // THỐNG KÊ LƯỢT TRUY CẬP THỰC TẾ (GLOBAL API)
 // ==========================================
 async function initVisitorCounter() {
-  const totalVisitsEl = document.getElementById('totalVisits');
-  const onlineVisitorsEl = document.getElementById('onlineVisitors');
+    const totalVisitsEl = document.getElementById('totalVisits');
+    const onlineVisitorsEl = document.getElementById('onlineVisitors');
 
-  if (!totalVisitsEl && !onlineVisitorsEl) return;
+    if (!totalVisitsEl && !onlineVisitorsEl) return;
 
-  // Tên định danh duy nhất trên Server đếm toàn cầu
-  const NAMESPACE = 'pvincons_construct_2026';
-  const KEY = 'total_visits';
+    const NAMESPACE = 'pvincons_construct_2026';
+    const KEY = 'total_visits';
 
-  try {
-    // Kiểm tra xem khách hàng này đã được đếm trong phiên làm việc (Session) này chưa
-    // Mục đích: Tránh việc 1 người cố tình ấn F5 liên tục làm tăng số ảo
-    let endpoint = `https://api.counterapi.dev/v1/${NAMESPACE}/${KEY}/`;
+    try {
+        let endpoint = `https://api.counterapi.dev/v1/${NAMESPACE}/${KEY}/`;
 
-    if (!sessionStorage.getItem('pv_counted_session')) {
-      endpoint += 'up/';
-      sessionStorage.setItem('pv_counted_session', 'true');
+        if (!sessionStorage.getItem('pv_counted_session')) {
+            endpoint += 'up/';
+            sessionStorage.setItem('pv_counted_session', 'true');
+        }
+
+        const response = await fetch(endpoint);
+        if (response.ok) {
+            const data = await response.json();
+            const BASE_OFFSET = 12000;
+            const finalTotal = (data.count || 0) + BASE_OFFSET;
+            if (totalVisitsEl) {
+                totalVisitsEl.innerText = Number(finalTotal).toLocaleString('vi-VN');
+            }
+        } else {
+            throw new Error('Lỗi phản hồi API');
+        }
+    } catch (error) {
+        console.warn('API đếm toàn cầu bị gián đoạn, sử dụng số liệu fallback:', error);
+        if (totalVisitsEl) {
+            totalVisitsEl.innerText = '12.000';
+        }
     }
-
-    // Gọi API toàn cầu
-    const response = await fetch(endpoint);
-    if (response.ok) {
-      const data = await response.json();
-      const BASE_OFFSET = 12000;
-      const finalTotal = (data.count || 0) + BASE_OFFSET;
-      if (totalVisitsEl) {
-        totalVisitsEl.innerText = Number(finalTotal).toLocaleString('vi-VN');
-      }
-    } else {
-      throw new Error('Lỗi phản hồi API');
-    }
-  } catch (error) {
-    console.warn('API đếm toàn cầu bị gián đoạn, sử dụng số liệu fallback:', error);
-    // Số dự phòng nếu mạng chập chờn hoặc API bị nghẽn
-    if (totalVisitsEl) {
-      totalVisitsEl.innerText = '12.000';
-    }
-  }
 }
-// ==========================================
-// THÊM MỚI: TỰ ĐỘNG TÍCH HỢP GOOGLE TRANSLATE
-// ==========================================
-window.googleTranslateElementInit = function () {
-    new google.translate.TranslateElement({ pageLanguage: 'vi' }, 'google_translate_element');
-};
 
+// ==========================================
+// THIẾT LẬP KHI TRANG TẢI XONG
+// ==========================================
 document.addEventListener('DOMContentLoaded', function () {
-    // Tự tạo container ẩn cho Google Translate nếu chưa có
+    // 1. Tự động chèn Container và Script cho Google Translate
     if (!document.getElementById('google_translate_element')) {
         const translateDiv = document.createElement('div');
         translateDiv.id = 'google_translate_element';
         translateDiv.style.display = 'none';
         document.body.appendChild(translateDiv);
 
-        // Tự động chèn script dịch của Google
         const translateScript = document.createElement('script');
-        translateScript.src = '//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
+        translateScript.src = 'https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
         document.body.appendChild(translateScript);
     }
 
-    // Khởi chạy các hàm cũ
+    // 2. Chạy các tính năng phụ trợ
     setTimeout(initVisitorCounter, 300);
     loadHomeNews();
 });

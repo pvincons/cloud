@@ -1,6 +1,5 @@
 <!-- Mã ép ẩn hoàn toàn thanh Google Translate -->
 <style>
-    /* 1. Ẩn tất cả dạng khung/iframe của Google Translate (cả phiên bản cũ lẫn mới) */
     .goog-te-banner-frame,
     iframe.goog-te-banner-frame,
     .goog-te-banner,
@@ -19,7 +18,6 @@
         pointer-events: none !important;
     }
 
-    /* 2. Triệt hạ khoảng trống bị đẩy xuống ở đỉnh trang */
     html {
         margin-top: 0px !important;
         padding-top: 0px !important;
@@ -30,7 +28,6 @@
         position: static !important;
     }
 
-    /* 3. Ẩn khung xem bản gốc khi rê chuột vào văn bản */
     #goog-gt-tt,
     .goog-te-balloon-frame {
         display: none !important;
@@ -40,52 +37,6 @@
         box-shadow: none !important;
     }
 </style>
-
-<!-- Khung chứa Google Translate Widget chạy ngầm -->
-<div id="google_translate_element"></div>
-
-<!-- Script khởi tạo Google Translate Engine trên tên miền thực tế -->
-<script type="text/javascript">
-    function googleTranslateElementInit() {
-        new google.translate.TranslateElement({
-            pageLanguage: 'vi',
-            includedLanguages: 'en,vi',
-            layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
-            autoDisplay: false
-        }, 'google_translate_element');
-    }
-</script>
-<script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
-
-<script>
-    // Ép body luôn nằm ở mép trên cùng
-    setInterval(function() {
-        if (document.body && document.body.style.top !== '0px') {
-            document.body.style.top = '0px';
-        }
-    }, 100);
-
-    // Hàm đổi ngôn ngữ chuẩn hóa cho tên miền chính pvincons.com, www.pvincons.com & localhost
-    function toggleLanguage() {
-        var isEn = document.cookie.indexOf('/en') !== -1;
-        var host = location.hostname;
-        var rootDomain = host.replace(/^www\./, '');
-
-        if (isEn) {
-            // Xóa Cookie trên mọi cấp độ Domain (Root, Subdomain, Localhost)
-            var pastDate = "expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/;";
-            document.cookie = "googtrans=; " + pastDate;
-            document.cookie = "googtrans=; domain=" + host + "; " + pastDate;
-            document.cookie = "googtrans=; domain=." + rootDomain + "; " + pastDate;
-        } else {
-            // Thiết lập Cookie dịch /vi/en đồng bộ trên mọi cấp độ Domain
-            document.cookie = "googtrans=/vi/en; path=/;";
-            document.cookie = "googtrans=/vi/en; path=/; domain=" + host + ";";
-            document.cookie = "googtrans=/vi/en; path=/; domain=." + rootDomain + ";";
-        }
-        location.reload();
-    }
-</script>
 
 <!-- Top Info Bar -->
 <div class="bg-slate-900 text-slate-300 text-xs py-2 border-b border-slate-800">
@@ -171,7 +122,7 @@
     <!-- Mobile Menu Drawer -->
     <div id="mobileMenu"
         class="hidden xl:hidden bg-white border-b border-slate-200 px-4 pt-2 pb-6 space-y-1 uppercase text-xs font-bold">
-        <a href="index.html" data-tab="home"
+        <a href="index.html" data-tab="index"
             class="mobile-tab-btn block w-full text-left py-2 px-3 rounded-lg text-slate-700 hover:bg-slate-100">TRANG
             CHỦ</a>
         <a href="about.html" data-tab="about"
