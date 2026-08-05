@@ -118,54 +118,71 @@ function closeModal() {
     }
 }
 
-// ==============================================
+// ==========================================
 // THỐNG KÊ LƯỢT TRUY CẬP THỰC TẾ (GLOBAL API)
-// ==============================================
+// ==========================================
 async function initVisitorCounter() {
-    const totalVisitsEl = document.getElementById('totalVisits');
-    const onlineVisitorsEl = document.getElementById('onlineVisitors');
+  const totalVisitsEl = document.getElementById('totalVisits');
+  const onlineVisitorsEl = document.getElementById('onlineVisitors');
 
-    if (!totalVisitsEl || !onlineVisitorsEl) return;
+  if (!totalVisitsEl && !onlineVisitorsEl) return;
 
-    // Tên định danh duy nhất cho PV INCONS trên Server đếm toàn cầu
-    const NAMESPACE = 'pvincons_construct_2026';
-    const KEY = 'total_visits';
+  // Tên định danh duy nhất trên Server đếm toàn cầu
+  const NAMESPACE = 'pvincons_construct_2026';
+  const KEY = 'total_visits';
 
-    try {
-        // Kiểm tra xem khách hàng này đã được đếm trong phiên làm việc (Session) này chưa
-        // Mục đích: Tránh việc 1 người cố tình ấn F5 liên tục làm rác số liệu
-        let endpoint = `https://api.counterapi.dev/v1/${NAMESPACE}/${KEY}/`;
+  try {
+    // Kiểm tra xem khách hàng này đã được đếm trong phiên làm việc (Session) này chưa
+    // Mục đích: Tránh việc 1 người cố tình ấn F5 liên tục làm tăng số ảo
+    let endpoint = `https://api.counterapi.dev/v1/${NAMESPACE}/${KEY}/`;
 
-        if (!sessionStorage.getItem('pv_counted_session')) {
-            endpoint += 'up'; // Tăng +1 trên Server toàn cầu nếu là người dùng mới vào web
-            sessionStorage.setItem('pv_counted_session', 'true');
-        }
-
-        // Gọi API toàn cầu
-        const response = await fetch(endpoint);
-        if (response.ok) {
-            const data = await response.json();
-
-            // CON SỐ CƠ SỞ KHỞI ĐIỂM + CON SỐ ĐẾM THẬT TỪ API
-            // (Ví dụ cộng thêm 10,000 lượt xem tích lũy trước đây của công ty)
-            const BASE_OFFSET = 10000;
-            const finalTotal = (data.count || 0) + BASE_OFFSET;
-
-            totalVisitsEl.innerText = Number(finalTotal).toLocaleString('vi-VN');
-        } else {
-            throw new Error('Lỗi phản hồi API');
-        }
-    } catch (error) {
-        console.warn('API đếm toàn cầu bị gián đoạn, sử dụng số liệu fallback:', error);
-        // Số dự phòng nếu mạng chập chờn hoặc API bị nghẽn
-        totalVisitsEl.innerText = '10,050';
+    if (!sessionStorage.getItem('pv_counted_session')) {
+      endpoint += 'up/';
+      sessionStorage.setItem('pv_counted_session', 'true');
     }
+
+    // Gọi API toàn cầu
+    const response = await fetch(endpoint);
+    if (response.ok) {
+      const data = await response.json();
+      const BASE_OFFSET = 12000;
+      const finalTotal = (data.count || 0) + BASE_OFFSET;
+      if (totalVisitsEl) {
+        totalVisitsEl.innerText = Number(finalTotal).toLocaleString('vi-VN');
+      }
+    } else {
+      throw new Error('Lỗi phản hồi API');
+    }
+  } catch (error) {
+    console.warn('API đếm toàn cầu bị gián đoạn, sử dụng số liệu fallback:', error);
+    // Số dự phòng nếu mạng chập chờn hoặc API bị nghẽn
+    if (totalVisitsEl) {
+      totalVisitsEl.innerText = '12.000';
+    }
+  }
 }
+// ==========================================
+// THÊM MỚI: TỰ ĐỘNG TÍCH HỢP GOOGLE TRANSLATE
+// ==========================================
+window.googleTranslateElementInit = function () {
+    new google.translate.TranslateElement({ pageLanguage: 'vi' }, 'google_translate_element');
+};
 
-// Khởi chạy sau khi giao diện đã tải
 document.addEventListener('DOMContentLoaded', function () {
-    setTimeout(initVisitorCounter, 300);
-});
+    // Tự tạo container ẩn cho Google Translate nếu chưa có
+    if (!document.getElementById('google_translate_element')) {
+        const translateDiv = document.createElement('div');
+        translateDiv.id = 'google_translate_element';
+        translateDiv.style.display = 'none';
+        document.body.appendChild(translateDiv);
 
-// Chạy hàm khi trang web tải xong
-document.addEventListener('DOMContentLoaded', loadHomeNews);
+        // Tự động chèn script dịch của Google
+        const translateScript = document.createElement('script');
+        translateScript.src = '//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
+        document.body.appendChild(translateScript);
+    }
+
+    // Khởi chạy các hàm cũ
+    setTimeout(initVisitorCounter, 300);
+    loadHomeNews();
+});

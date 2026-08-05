@@ -484,7 +484,6 @@
             border: 1px solid var(--border-color);
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
-            /* Giúp cuộn mượt hơn trên iPhone (iOS) */
             scroll-behavior: smooth;
         }
 
@@ -494,9 +493,7 @@
             align-items: center;
             min-width: 900px;
             width: max-content;
-            /* Giữ chuẩn kích thước sơ đồ */
             margin: 0 auto;
-            /* Căn giữa nội dung trong khung cuộn */
         }
 
         /* Nodes Styling */
@@ -706,15 +703,11 @@
             }
         }
 
-        /* Tối ưu hiển thị vừa vặn cho màn hình điện thoại (< 768px) */
         @media (max-width: 768px) {
-
-            /* 1. Thu gọn Padding khoảng cách trên/dưới của Hero section */
             .hero {
                 padding-top: 1.5rem !important;
             }
 
-            /* 2. Giảm bớt margin và cỡ chữ của phần Tiêu đề */
             .hero-tag {
                 display: inline-block;
                 margin-bottom: 1.5rem !important;
@@ -722,23 +715,16 @@
 
             .hero-title {
                 font-size: 1.5rem !important;
-                /* Giảm nhẹ size chữ tiêu đề */
                 line-height: 1.6 !important;
                 margin-bottom: 0.75rem !important;
             }
 
-            /* 3. Thu gọn thẻ Quote (Leadership Card) */
             .leadership-card {
                 padding-top: 1.0rem !important;
-                /* Giảm padding trong card */
             }
         }
 
-        /* ==============================================
-        HIỆU ỨNG ĐỘNG CHO LEADERSHIP SPOTLIGHT CARD
-        ============================================== */
-
-        /* 1. Tổng thể thẻ: Nâng thẻ + Tỏa sáng + Xuất hiện mượt */
+        /* LEADERSHIP SPOTLIGHT CARD ANIMATIONS */
         .leadership-card {
             transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
             animation: leadershipFadeUp 1.3s ease-out forwards;
@@ -747,11 +733,9 @@
         .leadership-card:hover {
             transform: translateY(-8px);
             border-color: rgba(245, 158, 11, 0.8) !important;
-            /* Đổi viền sang vàng ấm */
             box-shadow: 0 20px 40px -10px rgba(245, 158, 11, 0.25), 0 0 20px rgba(245, 158, 11, 0.15);
         }
 
-        /* 2. Dải ánh sáng quét ngang khi hover */
         .card-shimmer {
             position: absolute;
             top: 0;
@@ -771,7 +755,6 @@
             left: 150%;
         }
 
-        /* 3. Icon ngoặc kép bay nhịp nhàng (Floating) */
         .float-animate {
             animation: floatIcon 3s ease-in-out infinite;
             transition: transform 0.3s ease, color 0.3s ease;
@@ -779,23 +762,14 @@
 
         .leadership-card:hover .float-animate {
             color: #fbbf24;
-            /* Đổi màu tươi hơn khi hover */
             transform: scale(1.15) rotate(-5deg);
         }
 
         @keyframes floatIcon {
-
-            0%,
-            100% {
-                transform: translateY(0px);
-            }
-
-            50% {
-                transform: translateY(-6px);
-            }
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-6px); }
         }
 
-        /* 4. Avatar nhấp nháy vòng sáng (Pulse Avatar) */
         .pulse-avatar {
             position: relative;
             transition: transform 0.3s ease;
@@ -816,39 +790,22 @@
         }
 
         @keyframes avatarPulse {
-            0% {
-                transform: scale(0.95);
-                opacity: 0.8;
-            }
-
-            50% {
-                transform: scale(1.15);
-                opacity: 0;
-            }
-
-            100% {
-                transform: scale(0.95);
-                opacity: 0;
-            }
+            0% { transform: scale(0.95); opacity: 0.8; }
+            50% { transform: scale(1.15); opacity: 0; }
+            100% { transform: scale(0.95); opacity: 0; }
         }
 
-        /* 5. LeadershipFadeUp xuất hiện khi mở trang */
         @keyframes leadershipFadeUp {
             from {
                 opacity: 0;
                 transform: translateY(30px);
             }
-
             to {
                 opacity: 1;
                 transform: translateY(0);
             }
         }
 
-        /* =========================================================
-   TỐI ƯU ĐẦY KHUNG CHỈ TRÊN MÁY TÍNH (DESKTOP >= 1024px)
-   Điện thoại & Tablet nhỏ sẽ giữ nguyên 100% code gốc
-   ========================================================= */
         @media (min-width: 1024px) {
             .org-chart-wrapper {
                 width: 100% !important;
@@ -866,7 +823,6 @@
                 width: 100% !important;
                 display: grid !important;
                 grid-template-columns: repeat(4, 1fr) !important;
-                /* 4 khối dàn đều hết chiều rộng */
                 gap: 16px !important;
             }
 
@@ -875,6 +831,24 @@
             }
         }
     </style>
+     <!-- Open Graph Meta Tags (Dành cho Zalo, Facebook, Messenger) -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://pvincons.com/" />
+    <meta property="og:title" content="CÔNG TY TNHH THƯƠNG MẠI VÀ XÂY DỰNG PV INCONS" />
+    <meta property="og:description"
+        content="Chuyên cung cấp giải pháp toàn diện từ Tư vấn, Quản lý Đầu tư; Thiết kế Kiến trúc theo tiêu chuẩn số BIM/VDC và Thi công Xây dựng; Cùng các Dịch vụ Pháp lý Dự án, Công trình chuyên nghiệp." />
+    <!-- ĐƯỜNG DẪN ẢNH VỚI THƯ MỤC "IMG" IN HOA VÀ "logo.png" CHỮ THƯỜNG -->
+    <meta property="og:image" content="https://pvincons.com/IMG/logo.png" />
+    <meta property="og:image:secure_url" content="https://pvincons.com/IMG/logo.png" />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <!-- Twitter Card Tags -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="CÔNG TY TNHH THƯƠNG MẠI VÀ XÂY DỰNG PV INCONS" />
+    <meta name="twitter:description"
+        content="Chuyên cung cấp giải pháp toàn diện từ Tư vấn, Quản lý Đầu tư; Thiết kế Kiến trúc theo tiêu chuẩn số BIM/VDC và Thi công Xây dựng; Cùng các Dịch vụ Pháp lý Dự án, Công trình chuyên nghiệp." />
+    <meta name="twitter:image" content="https://pvincons.com/IMG/logo.png" />
 </head>
 
 <body class="bg-slate-50 text-slate-800 font-sans antialiased selection:bg-brand-blue selection:text-white">
@@ -888,31 +862,28 @@
             <div class="container">
                 <div class="hero-grid">
                     <div>
-                        <span class="hero-tag">SƠ LƯỢC VỀ CÔNG TY</span>
+                        <span class="hero-tag">TỔNG QUAN VỀ CÔNG TY</span>
                         <h1 class="hero-title">CÔNG TY TNHH THƯƠNG MẠI VÀ XÂY DỰNG PV INCONS</h1>
                         <!-- CỤM DỰ ÁN VỚI CHẤM PHÁT SÁNG CĂN CHUẨN TÂM CHỮ P & H -->
                         <div class="space-y-4 text-slate-200 text-sm sm:text-base font-['Inter',sans-serif]">
 
-                            <!-- Item 1: Căn tâm theo chữ P -->
+                            <!-- Item 1 -->
                             <div class="flex items-start gap-3">
-                                <!-- Thay mt-2.5 thành mt-1.5 (hoặc mt-[6px]) để đẩy chấm sáng lên cao -->
-                                <span
-                                    class="w-2.5 h-2.5 rounded-full bg-amber-400 mt-1.5 shrink-0 shadow-[0_0_8px_rgba(251,191,36,0.85)]"></span>
+                                <span class="w-2.5 h-2.5 rounded-full bg-amber-400 mt-1.5 shrink-0 shadow-[0_0_8px_rgba(251,191,36,0.85)]"></span>
                                 <p class="leading-relaxed text-justify">
-                                    <strong class="text-white font-semibold">PV INCONS</strong> chính thức thành lập vào
-                                    ngày <span class="text-amber-400 font-medium">12/03/2020</span>, khởi đầu hành trình
-                                    kiến tạo tương lai bền vững.
+                                    <strong class="text-white font-semibold">PV INCONS</strong> chính thức được thành lập vào
+                                    ngày <span class="text-amber-400 font-medium">12/3/2020</span>, khởi đầu hành trình
+                                    kiến tạo tương lai vững bền.
                                 </p>
                             </div>
 
-                            <!-- Item 2: Căn tâm theo chữ H -->
+                            <!-- Item 2 -->
                             <div class="flex items-start gap-3">
-                                <span
-                                    class="w-2.5 h-2.5 rounded-full bg-amber-400 mt-1.5 shrink-0 shadow-[0_0_8px_rgba(251,191,36,0.85)]"></span>
+                                <span class="w-2.5 h-2.5 rounded-full bg-amber-400 mt-1.5 shrink-0 shadow-[0_0_8px_rgba(251,191,36,0.85)]"></span>
                                 <p class="leading-relaxed text-justify">
                                     <strong class="text-white font-semibold">Hiện tại công ty</strong> tập trung phát
-                                    triển các lĩnh vực hoạt động cốt lõi, bao gồm: Tư vấn, Quản lý Đầu tư, Thiết kế Kỹ
-                                    thuật số (BIM/VDC) và Thi công Xây dựng, cùng Dịch vụ Pháp lý Dự án, Công trình
+                                    triển các lĩnh vực hoạt động cốt lõi, bao gồm: Tư vấn, Quản lý Đầu tư; Thiết kế Kiến trúc
+                                    theo tiêu chuẩn số BIM/VDC và Thi công Xây dựng; Cùng các Dịch vụ Pháp lý Dự án, Công trình
                                     chuyên nghiệp.
                                 </p>
                             </div>
@@ -921,10 +892,8 @@
 
                     <!-- LEADERSHIP SPOTLIGHT CARD -->
                     <div class="leadership-card group relative overflow-hidden">
-                        <!-- Dải sáng quét qua thẻ khi hover -->
                         <div class="card-shimmer"></div>
 
-                        <!-- Icon ngoặc kép có hiệu ứng bay nhịp nhàng -->
                         <div class="quote-icon float-animate"><i class="fa-solid fa-quote-left"></i></div>
 
                         <p class="quote-text">
@@ -934,7 +903,6 @@
                         </p>
 
                         <div class="quote-author">
-                            <!-- Avatar có vòng sáng nhấp nháy -->
                             <div class="author-avatar pulse-avatar">P</div>
                             <div class="author-info">
                                 <h4>TRẦN HOÀNG PHƯỚC</h4>
@@ -943,7 +911,6 @@
                         </div>
                     </div>
                 </div>
-            </div>
             </div>
         </section>
 
@@ -973,23 +940,16 @@
             </div>
         </div>
 
-        <!-- Cấu hình Font Inter hiện đại (đặt trong thẻ <head>) -->
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
-            rel="stylesheet">
-
-        <!-- SECTION: TẦM NHÌN - SỨ MỆNH - GIÁ TRỊ CỐT LÕI (FONT CHỮ CHUẨN CÂN ĐỐI) -->
+        <!-- SECTION: TẦM NHÌN - SỨ MỆNH - GIÁ TRỊ CỐT LÕI -->
         <section class="py-16 bg-white text-slate-700 font-['Inter',sans-serif]">
             <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
 
                 <!-- KHỐI 1: TẦM NHÌN - SỨ MỆNH -->
                 <div class="mb-14">
-                    <!-- Tiêu đề chính -->
-                    <h2
-                        class="text-2xl sm:text-3xl font-extrabold text-[#1c355e] text-center mb-10 tracking-[0.12em] uppercase">
+                    <h2 class="text-2xl sm:text-3xl font-extrabold text-[#1c355e] text-center mb-10 tracking-[0.12em] uppercase">
                         Tầm Nhìn - Sứ Mệnh
                     </h2>
 
-                    <!-- Lưới 2 cột dóng hàng cân bằng -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-10 lg:gap-14">
 
                         <!-- Cột Tầm Nhìn -->
@@ -1002,9 +962,8 @@
                             </div>
 
                             <div class="space-y-3.5 text-sm leading-relaxed text-slate-600">
-                                <p class="font-medium text-slate-800">
-                                    PV Incons thiết lập chuẩn mực và dẫn dắt hệ sinh thái Đầu tư, Xây dựng, Pháp
-                                    lý</strong>:
+                                <p class="font-semibold text-slate-800">
+                                    PV Incons thiết lập chuẩn mực và dẫn dắt hệ sinh thái Đầu tư, Xây dựng, Pháp lý:
                                 </p>
                                 <ul class="space-y-2 pl-1">
                                     <li class="flex items-start gap-2.5">
@@ -1033,17 +992,17 @@
                             </div>
 
                             <div class="space-y-3.5 text-sm leading-relaxed text-slate-600">
-                                <p class="font-medium text-slate-800">
+                                <p class="font-semibold text-slate-800">
                                     Cam kết kiến tạo chuẩn mực, nâng tầm giá trị cho từng dự án và công trình:
                                 </p>
                                 <ul class="space-y-2 pl-1">
                                     <li class="flex items-start gap-2.5">
                                         <span class="text-[#c29624] font-bold text-xs mt-0.5">•</span>
-                                        <span>Hợp nhất hành lang pháp lý chuẩn xác</strong></span>
+                                        <span>Hợp nhất hành lang pháp lý chuẩn xác</span>
                                     </li>
                                     <li class="flex items-start gap-2.5">
                                         <span class="text-[#c29624] font-bold text-xs mt-0.5">•</span>
-                                        <span>Làm chủ giải pháp kỹ thuật công nghệ vượt trội</strong></span>
+                                        <span>Làm chủ giải pháp kỹ thuật công nghệ vượt trội</span>
                                     </li>
                                     <li class="flex items-start gap-2.5">
                                         <span class="text-[#c29624] font-bold text-xs mt-0.5">•</span>
@@ -1056,31 +1015,24 @@
                     </div>
                 </div>
 
-                <!-- Đường kẻ phân cách nhẹ -->
                 <div class="w-16 h-px bg-slate-200 mx-auto mb-12"></div>
 
-                <!-- KHỐI GIÁ TRỊ CỐT LÕI (1 DÒNG TRÊN DESKTOP - 2 DÒNG TRÊN MOBILE) -->
+                <!-- KHỐI GIÁ TRỊ CỐT LÕI -->
                 <div class="text-center">
-                    <h2
-                        class="text-2xl sm:text-3xl font-extrabold text-[#1c355e] text-center mb-6 tracking-[0.12em] uppercase">
+                    <h2 class="text-2xl sm:text-3xl font-extrabold text-[#1c355e] text-center mb-6 tracking-[0.12em] uppercase">
                         Giá Trị Cốt Lõi
                     </h2>
 
-                    <!-- Bố cục điều hướng: flex-col (dọc trên mobile) -> md:flex-row (ngang trên desktop) -->
-                    <div
-                        class="flex flex-col md:flex-row items-center justify-center gap-y-2.5 md:gap-y-0 text-xs sm:text-sm font-bold text-[#c29624] tracking-wider uppercase">
+                    <div class="flex flex-col md:flex-row items-center justify-center gap-y-2.5 md:gap-y-0 text-xs sm:text-sm font-bold text-[#c29624] tracking-wider uppercase">
 
-                        <!-- Cụm 1 (Nằm ở Dòng 1 trên Mobile) -->
                         <div class="flex items-center gap-2.5 sm:gap-4 whitespace-nowrap">
                             <span>Thượng Tôn Pháp Luật</span>
                             <span class="text-slate-300 font-normal">|</span>
                             <span>Tối Ưu Dòng Vốn</span>
                         </div>
 
-                        <!-- Dấu phân cách giữa 2 cụm (Ẩn trên mobile, Hiện trên desktop) -->
                         <span class="hidden md:inline text-slate-300 font-normal mx-2.5 sm:mx-4">|</span>
 
-                        <!-- Cụm 2 (Xuống Dòng 2 trên Mobile) -->
                         <div class="flex items-center gap-2.5 sm:gap-4 whitespace-nowrap">
                             <span>Kỹ Thuật Tiên Phong</span>
                             <span class="text-slate-300 font-normal">|</span>
@@ -1093,11 +1045,10 @@
             </div>
         </section>
 
-        <!-- SECTION: TRIẾT LÝ ĐIỀU HÀNH (4 MỤC) -->
+        <!-- SECTION: TRIẾT LÝ ĐIỀU HÀNH -->
         <section class="py-16 bg-slate-50/50">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
-                <!-- HEADER -->
                 <div class="text-center max-w-3xl mx-auto mb-12">
                     <span class="text-xs font-bold uppercase tracking-widest text-slate-500 block mb-2">
                         Chiến Lược Phát Triển
@@ -1107,21 +1058,17 @@
                     </h2>
                 </div>
 
-                <!-- GRID 4 CỘT DÀN ĐỀU MÁY TÍNH -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
 
                     <!-- 01. ĐẦU TƯ -->
-                    <div
-                        class="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between relative group">
+                    <div class="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between relative group">
                         <div>
                             <div class="flex items-center justify-between mb-4">
                                 <div class="text-amber-600 text-xl font-bold flex items-center gap-2">
                                     <i class="fa-solid fa-chart-line"></i>
-                                    <span class="text-slate-900 text-base uppercase font-extrabold tracking-wide">ĐẦU
-                                        TƯ</span>
+                                    <span class="text-slate-900 text-base uppercase font-extrabold tracking-wide">ĐẦU TƯ</span>
                                 </div>
-                                <span
-                                    class="text-3xl font-black text-slate-200 group-hover:text-amber-500/20 transition-colors">01</span>
+                                <span class="text-3xl font-black text-slate-200 group-hover:text-amber-500/20 transition-colors">01</span>
                             </div>
                             <p class="text-slate-600 text-xs sm:text-sm leading-relaxed text-justify">
                                 Kiến tạo cơ hội phát triển, mở rộng hệ sinh thái kinh doanh bền vững và kiên định đặt
@@ -1131,17 +1078,14 @@
                     </div>
 
                     <!-- 02. THƯƠNG MẠI -->
-                    <div
-                        class="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between relative group">
+                    <div class="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between relative group">
                         <div>
                             <div class="flex items-center justify-between mb-4">
                                 <div class="text-amber-600 text-xl font-bold flex items-center gap-2">
                                     <i class="fa-solid fa-arrow-trend-up"></i>
-                                    <span class="text-slate-900 text-base uppercase font-extrabold tracking-wide">THƯƠNG
-                                        MẠI</span>
+                                    <span class="text-slate-900 text-base uppercase font-extrabold tracking-wide">THƯƠNG MẠI</span>
                                 </div>
-                                <span
-                                    class="text-3xl font-black text-slate-200 group-hover:text-amber-500/20 transition-colors">02</span>
+                                <span class="text-3xl font-black text-slate-200 group-hover:text-amber-500/20 transition-colors">02</span>
                             </div>
                             <p class="text-slate-600 text-xs sm:text-sm leading-relaxed text-justify">
                                 Kiểm soát chặt chẽ toàn bộ chuỗi giá trị, tối ưu hóa nguồn lực và đảm bảo tính minh
@@ -1151,17 +1095,14 @@
                     </div>
 
                     <!-- 03. XÂY DỰNG -->
-                    <div
-                        class="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between relative group">
+                    <div class="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between relative group">
                         <div>
                             <div class="flex items-center justify-between mb-4">
                                 <div class="text-amber-600 text-xl font-bold flex items-center gap-2">
                                     <i class="fa-solid fa-compass-drafting"></i>
-                                    <span class="text-slate-900 text-base uppercase font-extrabold tracking-wide">XÂY
-                                        DỰNG</span>
+                                    <span class="text-slate-900 text-base uppercase font-extrabold tracking-wide">XÂY DỰNG</span>
                                 </div>
-                                <span
-                                    class="text-3xl font-black text-slate-200 group-hover:text-amber-500/20 transition-colors">03</span>
+                                <span class="text-3xl font-black text-slate-200 group-hover:text-amber-500/20 transition-colors">03</span>
                             </div>
                             <p class="text-slate-600 text-xs sm:text-sm leading-relaxed text-justify">
                                 Hiện thực hóa chuẩn mực kỹ thuật đỉnh cao thông qua việc áp dụng quy trình số hóa hiện
@@ -1170,18 +1111,15 @@
                         </div>
                     </div>
 
-                    <!-- 04. PHÁP LÝ (MỤC MỚI BỔ SUNG) -->
-                    <div
-                        class="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between relative group">
+                    <!-- 04. PHÁP LÝ -->
+                    <div class="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between relative group">
                         <div>
                             <div class="flex items-center justify-between mb-4">
                                 <div class="text-amber-600 text-xl font-bold flex items-center gap-2">
                                     <i class="fa-solid fa-scale-balanced"></i>
-                                    <span class="text-slate-900 text-base uppercase font-extrabold tracking-wide">PHÁP
-                                        LÝ</span>
+                                    <span class="text-slate-900 text-base uppercase font-extrabold tracking-wide">PHÁP LÝ</span>
                                 </div>
-                                <span
-                                    class="text-3xl font-black text-slate-200 group-hover:text-amber-500/20 transition-colors">04</span>
+                                <span class="text-3xl font-black text-slate-200 group-hover:text-amber-500/20 transition-colors">04</span>
                             </div>
                             <p class="text-slate-600 text-xs sm:text-sm leading-relaxed text-justify">
                                 Kiến tạo hành lang pháp lý vững chắc, chủ động kiểm soát rủi ro từ quy hoạch, cấp phép
@@ -1194,6 +1132,7 @@
 
             </div>
         </section>
+
         <!-- SECTION 2: THÔNG TIN DOANH NGHIỆP -->
         <section class="section">
             <div class="container">
@@ -1206,19 +1145,15 @@
                     <div class="legal-grid">
                         <div class="legal-info-table">
                             <!-- Hàng 1: Mã số doanh nghiệp -->
-                            <div
-                                class="legal-row flex flex-col sm:flex-row sm:justify-between sm:items-start gap-1 sm:gap-4">
+                            <div class="legal-row flex flex-col sm:flex-row sm:justify-between sm:items-start gap-1 sm:gap-4">
                                 <div class="legal-label sm:w-1/3 font-semibold">Mã số doanh nghiệp</div>
                                 <div class="legal-value legal-highlight sm:w-2/3">
-                                    1501112147 <span class="block sm:inline"
-                                        style="font-weight: normal; color: var(--text-muted);">(Thành lập năm
-                                        2020)</span>
+                                    1501112147 <span class="block sm:inline" style="font-weight: normal; color: var(--text-muted);">(Thành lập năm 2020)</span>
                                 </div>
                             </div>
 
                             <!-- Hàng 2: Đại diện pháp luật -->
-                            <div
-                                class="legal-row flex flex-col sm:flex-row sm:justify-between sm:items-start gap-1 sm:gap-4">
+                            <div class="legal-row flex flex-col sm:flex-row sm:justify-between sm:items-start gap-1 sm:gap-4">
                                 <div class="legal-label sm:w-1/3 font-semibold">Đại diện pháp luật</div>
                                 <div class="legal-value sm:w-2/3">
                                     Ông <strong style="color: var(--primary-blue);">TRẦN HOÀNG PHƯỚC</strong> ‒ Giám đốc
@@ -1226,34 +1161,27 @@
                             </div>
 
                             <!-- Hàng 3: Vốn điều lệ -->
-                            <div
-                                class="legal-row flex flex-col sm:flex-row sm:justify-between sm:items-start gap-1 sm:gap-4">
+                            <div class="legal-row flex flex-col sm:flex-row sm:justify-between sm:items-start gap-1 sm:gap-4">
                                 <div class="legal-label sm:w-1/3 font-semibold">Vốn điều lệ</div>
                                 <div class="legal-value sm:w-2/3">
-                                    9.000.000.000 VNĐ <span class="block sm:inline"
-                                        style="font-weight: normal; color: var(--text-muted);">(Chín tỷ đồng)</span>
+                                    9.000.000.000 VNĐ <span class="block sm:inline" style="font-weight: normal; color: var(--text-muted);">(Chín tỷ đồng)</span>
                                 </div>
                             </div>
 
                             <!-- Hàng 4: Chứng chỉ năng lực -->
-                            <div
-                                class="legal-row flex flex-col sm:flex-row sm:justify-between sm:items-start gap-1 sm:gap-4">
+                            <div class="legal-row flex flex-col sm:flex-row sm:justify-between sm:items-start gap-1 sm:gap-4">
                                 <div class="legal-label sm:w-1/3 font-semibold">Năng Lực Tổ Chức</div>
                                 <div class="legal-value sm:w-2/3">
-                                    <strong style="color: var(--primary-dark);">Chứng Nhận</strong> (Số:
-                                    VIL-00050772)<br>
-                                    <span style="font-size: 12px; color: var(--text-muted);">Do Sở Xây dựng cấp ‒ Hiệu
-                                        lực đến năm 2031</span>
+                                    <strong style="color: var(--primary-dark);">Chứng Nhận</strong> (Số: VIL-00050772)<br>
+                                    <span style="font-size: 12px; color: var(--text-muted);">Do Sở Xây dựng cấp ‒ Hiệu lực đến năm 2031</span>
                                 </div>
                             </div>
 
                             <!-- Hàng 5: Phạm vi hoạt động -->
-                            <div
-                                class="legal-row flex flex-col sm:flex-row sm:justify-between sm:items-start gap-1 sm:gap-4">
+                            <div class="legal-row flex flex-col sm:flex-row sm:justify-between sm:items-start gap-1 sm:gap-4">
                                 <div class="legal-label sm:w-1/3 font-semibold">Phạm vi hoạt động</div>
-                                <div class="legal-value sm:w-2/3" style="font-size: 13px; font-weight: 500; text-justify">
-                                    - Thiết kế, thẩm tra thiết kế, thi công & giám sát công trình Dân dụng, Công nghiệp
-                                    và Hạ tầng kỹ thuật.
+                                <div class="legal-value sm:w-2/3" style="font-size: 13px; font-weight: 500; text-align: justify;">
+                                    - Thiết kế, thẩm tra thiết kế, thi công & giám sát công trình Dân dụng, Công nghiệp và Hạ tầng kỹ thuật.
                                     <br>
                                     - Các dịch vụ tư vấn pháp lý liên quan đến đầu tư bất động sản.
                                 </div>
@@ -1296,8 +1224,7 @@
                             <h3 class="policy-title">Cam Kết Giá Trị Thượng Tầng</h3>
                         </div>
                         <ul class="policy-list text-justify">
-                            <li>Mọi sản phẩm, dịch vụ và công trình phải đạt chất lượng tối đa, mang lại giá trị gia
-                                tăng thực chất.</li>
+                            <li>Mọi sản phẩm, dịch vụ và công trình phải đạt chất lượng tối đa, mang lại giá trị gia tăng thực chất.</li>
                             <li>Kiên định đặt lợi ích dài hạn của Đối tác làm trọng tâm cho mọi quyết định đầu tư.</li>
                         </ul>
                     </div>
@@ -1308,8 +1235,7 @@
                             <h3 class="policy-title">Tiên Phong Số Hóa Chuẩn Quốc Tế</h3>
                         </div>
                         <ul class="policy-list text-justify">
-                            <li>Áp dụng toàn diện quy trình kỹ thuật số <strong>BIM & VDC</strong> làm ngôn ngữ làm việc
-                                chuẩn mực.</li>
+                            <li>Áp dụng toàn diện quy trình kỹ thuật số <strong>BIM & VDC</strong> làm ngôn ngữ làm việc chuẩn mực.</li>
                             <li>Làm chủ hệ thống phần mềm chuyên sâu để đảm bảo độ chính xác và an toàn dữ liệu.</li>
                         </ul>
                         <div class="tech-tags">
@@ -1326,8 +1252,7 @@
                         </div>
                         <ul class="policy-list text-justify">
                             <li>Liên tục nâng cao năng lực chuyên môn đội ngũ nhân sự để giữ vững vị thế dẫn dắt.</li>
-                            <li>Gắn liền hoạt động kinh doanh với việc kiến tạo các giá trị bền vững cho môi trường và
-                                cộng đồng.</li>
+                            <li>Gắn liền hoạt động kinh doanh với việc kiến tạo các giá trị bền vững cho môi trường và cộng đồng.</li>
                         </ul>
                     </div>
                 </div>
@@ -1340,8 +1265,7 @@
                 <div class="section-header">
                     <span class="section-tag">Bộ Máy Vận Hành</span>
                     <h2 class="section-title">SƠ ĐỒ TỔ CHỨC <br class="block sm:hidden" />PV INCONS</h2>
-                    <p style="font-size: 13px; color: var(--text-muted); margin-top: 4px;">Phiên bản 2026 Rev 02 (Cập
-                        nhật 06/06/2026)</p>
+                    <p style="font-size: 13px; color: var(--text-muted); margin-top: 4px;">Phiên bản 2026 Rev 02 (Cập nhật 06/06/2026)</p>
                 </div>
 
                 <div class="org-chart-wrapper">

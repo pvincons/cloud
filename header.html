@@ -1,3 +1,54 @@
+<!-- Mã ép ẩn hoàn toàn thanh Google Translate -->
+<style>
+    /* 1. Ẩn tất cả dạng khung/iframe của Google Translate (cả phiên bản cũ lẫn mới) */
+    .goog-te-banner-frame,
+    iframe.goog-te-banner-frame,
+    .goog-te-banner,
+    .VIpgJd-Z443b-O929Ac,
+    .VIpgJd-Z443b-O929Ac-b9A42b,
+    iframe[id*=":1.container"],
+    iframe[class*="goog-te-banner"],
+    iframe.skiptranslate,
+    body > .skiptranslate {
+        display: none !important;
+        visibility: hidden !important;
+        height: 0 !important;
+        width: 0 !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
+    }
+
+    /* 2. Triệt hạ khoảng trống bị đẩy xuống ở đỉnh trang */
+    html {
+        margin-top: 0px !important;
+        padding-top: 0px !important;
+    }
+    body {
+        top: 0px !important;
+        margin-top: 0px !important;
+        position: static !important;
+    }
+
+    /* 3. Ẩn khung xem bản gốc khi rê chuột vào văn bản */
+    #goog-gt-tt,
+    .goog-te-balloon-frame {
+        display: none !important;
+    }
+    .goog-text-highlight {
+        background-color: transparent !important;
+        box-shadow: none !important;
+    }
+</style>
+
+<script>
+    // Ép body luôn nằm ở mép trên cùng, ngăn Google Script tự chen khoảng trắng
+    setInterval(function() {
+        if (document.body && document.body.style.top !== '0px') {
+            document.body.style.top = '0px';
+        }
+    }, 100);
+</script>
+
 <!-- Top Info Bar -->
 <div class="bg-slate-900 text-slate-300 text-xs py-2 border-b border-slate-800">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
@@ -25,13 +76,13 @@
         <!-- Logo -->
         <a href="index.html" class="flex items-center space-x-3 group py-2">
             <img src="IMG/logo.png" alt="PV INCONS Logo"
-                class="h-12 sm:h-14 w-auto object-contain transition-transform group-hover:scale-105">
+                class="h-16 sm:h-18 w-auto object-contain transition-transform group-hover:scale-105">
         </a>
 
         <!-- Desktop Nav Tabs -->
         <nav
             class="hidden xl:flex space-x-1 h-full items-center font-bold text-xs xl:text-xs 2xl:text-sm uppercase tracking-wide">
-            <a href="index.html" data-tab="home"
+            <a href="index.html" data-tab="index"
                 class="nav-tab-btn px-2.5 py-2 border-b-2 border-transparent text-slate-600 hover:text-brand-blue transition-all">TRANG
                 CHỦ</a>
             <a href="about.html" data-tab="about"
@@ -54,8 +105,19 @@
                 SÁCH NHÂN SỰ</a>
         </nav>
 
-        <!-- CTA Button -->
-        <div class="hidden sm:flex items-center space-x-4">
+        <!-- CTA Button & Switcher (Desktop) -->
+        <div class="hidden sm:flex items-center space-x-3">
+            <button type="button" 
+                    onclick="if(document.cookie.indexOf('/en') !== -1){document.cookie='googtrans=;path=/;expires=Thu, 01 Jan 1970 00:00:00 GMT';document.cookie='googtrans=;path=/;domain=' + location.hostname;}else{document.cookie='googtrans=/vi/en;path=/';}location.reload();" 
+                    class="flex items-center justify-center w-9 h-9 rounded-full bg-slate-100/80 hover:bg-slate-200/80 border border-slate-200/80 transition-all cursor-pointer shadow-xs"
+                    title="Bấm để đổi ngôn ngữ / Switch language">
+                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'/%3E" 
+                     onload="this.onload=null; this.src = document.cookie.indexOf('/en') !== -1 ? 'https://flagcdn.com/24x18/vn.png' : 'https://flagcdn.com/24x18/gb.png'" 
+                     alt="Language Flag" 
+                     class="w-5 h-3.5 object-cover rounded-[2px]">
+            </button>
+
+            <!-- Nút Liên Hệ -->
             <a href="#contact"
                 class="bg-brand-blue hover:bg-brand-darkblue text-white font-semibold text-sm px-4 py-2.5 rounded-lg transition shadow-md shadow-brand-blue/20">
                 <i class="fa-solid fa-paper-plane mr-1.5"></i> Liên Hệ
@@ -92,8 +154,22 @@
         <a href="hr.html" data-tab="hr"
             class="mobile-tab-btn block w-full text-left py-2 px-3 rounded-lg text-slate-700 hover:bg-slate-100">CHÍNH
             SÁCH NHÂN SỰ</a>
+
+        <!-- Switcher (Mobile) -->
+        <div class="flex items-center justify-between py-2.5 px-3 border-t border-slate-100 mt-2 normal-case font-normal">
+            <span class="text-slate-500 text-xs">Ngôn ngữ / Language:</span>
+            <button type="button" 
+                    onclick="if(document.cookie.indexOf('/en') !== -1){document.cookie='googtrans=;path=/;expires=Thu, 01 Jan 1970 00:00:00 GMT';document.cookie='googtrans=;path=/;domain=' + location.hostname;}else{document.cookie='googtrans=/vi/en;path=/';}location.reload();" 
+                    class="flex items-center justify-center w-9 h-9 rounded-full bg-slate-100 border border-slate-200 cursor-pointer shadow-xs">
+                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'/%3E" 
+                     onload="this.onload=null; this.src = document.cookie.indexOf('/en') !== -1 ? 'https://flagcdn.com/24x18/vn.png' : 'https://flagcdn.com/24x18/gb.png'" 
+                     alt="Language Flag" 
+                     class="w-5 h-3.5 object-cover rounded-[2px]">
+            </button>
+        </div>
+
         <a href="#contact" onclick="closeMobileMenu()"
-            class="block text-center bg-brand-blue text-white font-semibold py-2.5 rounded-lg mt-4 normal-case text-sm">Liên
-            Hệ Báo Giá</a>
+            class="block text-center bg-brand-blue text-white font-semibold py-2.5 rounded-lg mt-3 normal-case text-sm">Liên
+            Hệ</a>
     </div>
 </header>
