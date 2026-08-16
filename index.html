@@ -1,989 +1,752 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PV INCONS Data Website - Admin Studio v1.0</title>
-  <!-- Tailwind CSS -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Font Inter & Lucide Icons -->
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
-  <script src="https://unpkg.com/lucide@latest"></script>
-  <style>
-    body { font-family: 'Inter', sans-serif; }
-    ::-webkit-scrollbar { width: 6px; height: 6px; }
-    ::-webkit-scrollbar-track { background: #13151b; }
-    ::-webkit-scrollbar-thumb { background: #2a2e39; border-radius: 3px; }
-    ::-webkit-scrollbar-thumb:hover { background: #3b4050; }
-  </style>
-</head>
-<body class="bg-[#0f1117] text-gray-200 h-screen overflow-hidden text-sm select-none">
-
-  <!-- ==================== 1. MÀN HÌNH ĐĂNG NHẬP (AUTH GATE MODAL) ==================== -->
-  <div id="login-modal" class="fixed inset-0 bg-[#090a0f]/90 backdrop-blur-md z-50 flex items-center justify-center p-4">
-    <div class="bg-[#14171f] border border-[#262a36] rounded-xl p-6 w-full max-w-md shadow-2xl space-y-5">
-      <div class="text-center space-y-2">
-        <!-- Logo Nhận Diện Thương Hiệu PV INCONS -->
-        <div class="w-12 h-12 bg-gradient-to-br from-[#1b2230] to-[#14171f] border border-[#2a2e3d] rounded-xl flex items-center justify-center mx-auto shadow-lg shadow-black/50 p-2">
-          <svg viewBox="0 0 100 100" class="w-8 h-8 drop-shadow">
-            <polygon points="50,2 98,50 50,98 2,50" fill="none"/>
-            <path d="M 28 28 L 50 6 L 72 28 L 50 50 Z" fill="#4a90e2" />
-            <path d="M 6 50 L 28 28 L 50 50 L 28 72 Z" fill="#4a90e2" />
-            <path d="M 28 72 L 50 50 L 72 72 L 50 94 Z" fill="#f58220" />
-          </svg>
-        </div>
-        <h2 class="text-lg font-bold text-gray-100">PV INCONS Data Website Studio</h2>
-        <p class="text-xs text-gray-400">Phiên bản v1.0 • Xác thực GitHub Quản trị dữ liệu</p>
-      </div>
-
-      <div class="space-y-3">
-        <div class="space-y-1">
-          <label class="text-[11px] font-semibold text-gray-400 uppercase">GitHub Owner / User</label>
-          <input type="text" id="auth-owner" placeholder="VD: pv-incons" class="w-full bg-[#0f1117] border border-[#2a2e3d] rounded-lg px-3 py-2 text-xs text-gray-200 outline-none focus:border-rose-500 font-mono">
-        </div>
-
-        <div class="space-y-1">
-          <label class="text-[11px] font-semibold text-gray-400 uppercase">Repository Name</label>
-          <input type="text" id="auth-repo" placeholder="VD: website" class="w-full bg-[#0f1117] border border-[#2a2e3d] rounded-lg px-3 py-2 text-xs text-gray-200 outline-none focus:border-rose-500 font-mono">
-        </div>
-
-        <div class="space-y-1">
-          <label class="text-[11px] font-semibold text-gray-400 uppercase">Personal Access Token (PAT)</label>
-          <input type="password" id="auth-token" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" class="w-full bg-[#0f1117] border border-[#2a2e3d] rounded-lg px-3 py-2 text-xs text-gray-200 outline-none focus:border-rose-500 font-mono">
-        </div>
-      </div>
-
-      <button id="btn-login" class="w-full bg-rose-600 hover:bg-rose-500 text-white font-semibold py-2.5 rounded-lg text-xs transition shadow-lg shadow-rose-900/20 flex items-center justify-center gap-2">
-        <i data-lucide="key-round" class="w-4 h-4"></i>
-        <span>Xác nhận & Vào Studio v1.0</span>
-      </button>
-
-      <div class="text-[11px] text-gray-500 text-center leading-relaxed">
-        Bản quyền thuộc về <strong>PV INCONS</strong>. Mọi quyền được bảo lưu.
-      </div>
-    </div>
-  </div>
-
-  <!-- ==================== 2. MODAL THÔNG TIN & BẢN QUYỀN (ABOUT & COPYRIGHT) ==================== -->
-  <div id="about-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-    <div class="bg-[#14171f] border border-[#2a2e3d] rounded-xl p-6 w-full max-w-lg shadow-2xl space-y-4">
-      <div class="flex items-center justify-between border-b border-[#222630] pb-3">
-        <div class="flex items-center gap-2.5">
-          <div class="w-8 h-8 bg-[#1b2230] border border-[#2a2e3d] rounded-lg flex items-center justify-center p-1.5">
-            <svg viewBox="0 0 100 100" class="w-full h-full">
-              <path d="M 28 28 L 50 6 L 72 28 L 50 50 Z" fill="#4a90e2" />
-              <path d="M 6 50 L 28 28 L 50 50 L 28 72 Z" fill="#4a90e2" />
-              <path d="M 28 72 L 50 50 L 72 72 L 50 94 Z" fill="#f58220" />
-            </svg>
-          </div>
-          <div>
-            <h3 class="text-sm font-bold text-gray-100">PV INCONS Data Website Studio</h3>
-            <p class="text-[11px] text-rose-400 font-mono">Phiên bản v1.0 (Core Engine v4.3.0)</p>
-          </div>
-        </div>
-        <button id="btn-close-about" class="text-gray-400 hover:text-white p-1 rounded-lg">
-          <i data-lucide="x" class="w-5 h-5"></i>
-        </button>
-      </div>
-
-      <div class="space-y-3 text-xs text-gray-300 leading-relaxed">
-        <div class="bg-[#0f1117] p-3 rounded-lg border border-[#222630] space-y-1.5">
-          <div class="font-semibold text-gray-200">🏢 Đơn vị chủ quản: PV INCONS</div>
-          <div>Lĩnh vực: Quản lý dự án, thiết kế, lập dự toán và phát triển hạ tầng kỹ thuật xây dựng tại khu vực Cần Thơ và Đồng bằng Sông Cửu Long.</div>
-        </div>
-
-        <div class="bg-[#0f1117] p-3 rounded-lg border border-[#222630] space-y-1">
-          <div class="font-semibold text-emerald-400">⚖️ Tuyên bố Bản quyền & Miễn trừ trách nhiệm</div>
-          <p class="text-gray-400 text-[11px]">
-            © 2026 PV INCONS. Tất cả các quyền được bảo lưu. Phần mềm quản trị dữ liệu website này được xây dựng độc quyền phục vụ công tác vận hành nội bộ. Nghiêm cấm sao chép, phân phối hoặc chỉnh sửa mã nguồn khi chưa có văn bản chấp thuận chính thức từ Ban Giám Đốc PV INCONS.
-          </p>
-        </div>
-      </div>
-
-      <div class="flex justify-end pt-2">
-        <button id="btn-close-about-2" class="bg-[#222630] hover:bg-gray-700 text-gray-200 text-xs font-semibold px-4 py-2 rounded-lg transition">
-          Đóng cửa sổ
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ==================== 3. GIAO DIỆN CHÍNH (MAIN WORKSPACE) ==================== -->
-  <div id="admin-workspace" class="h-full flex flex-col hidden">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="PV INCONS - Công ty Tư vấn Thiết kế Kiến trúc, Thi công Xây dựng & Giải pháp BIM Chuyên nghiệp tại Cần Thơ.">
+    <title>PV INCONS | Kiến Trúc - Xây Dựng - Giải Pháp BIM</title>
     
-    <!-- TOP NAVBAR -->
-    <header class="h-12 border-b border-[#222630] bg-[#14171f] px-4 flex items-center justify-between shrink-0">
-      <div class="flex items-center gap-3">
-        <!-- Logo nhận diện trên Header -->
-        <div id="btn-open-about" class="flex items-center gap-2 cursor-pointer group" title="Xem thông tin phiên bản & bản quyền">
-          <div class="w-7 h-7 bg-[#1b2230] border border-[#2a2e3d] rounded-lg flex items-center justify-center p-1 group-hover:border-rose-500 transition shadow">
-            <svg viewBox="0 0 100 100" class="w-full h-full">
-              <path d="M 28 28 L 50 6 L 72 28 L 50 50 Z" fill="#4a90e2" />
-              <path d="M 6 50 L 28 28 L 50 50 L 28 72 Z" fill="#4a90e2" />
-              <path d="M 28 72 L 50 50 L 72 72 L 50 94 Z" fill="#f58220" />
-            </svg>
-          </div>
-          <span class="font-bold text-gray-100 group-hover:text-rose-400 transition text-xs">PV INCONS Studio</span>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #0f172a;
+            --primary-light: #1e293b;
+            --accent: #d97706;
+            --accent-hover: #b45309;
+            --text-dark: #0f172a;
+            --text-muted: #475569;
+            --bg-light: #f8fafc;
+            --white: #ffffff;
+            --border: #e2e8f0;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.1);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+            --shadow-lg: 0 10px 25px rgba(0,0,0,0.12);
+            --radius: 8px;
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            line-height: 1.6;
+        }
+
+        /* Utility Classes */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 28px;
+            border-radius: var(--radius);
+            font-weight: 600;
+            text-decoration: none;
+            transition: var(--transition);
+            cursor: pointer;
+            border: none;
+            font-size: 0.95rem;
+        }
+
+        .btn-primary {
+            background-color: var(--accent);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--accent-hover);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            color: var(--white);
+            border: 2px solid var(--white);
+        }
+
+        .btn-outline:hover {
+            background-color: var(--white);
+            color: var(--primary);
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 48px;
+        }
+
+        .section-title h2 {
+            font-size: 2.25rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: -0.5px;
+        }
+
+        .section-title p {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Header / Navbar */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 80px;
+        }
+
+        .logo {
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: var(--white);
+            text-decoration: none;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .logo span {
+            color: var(--accent);
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 32px;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: #cbd5e1;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: var(--transition);
+        }
+
+        .nav-links a:hover {
+            color: var(--accent);
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.9) 0%, rgba(30, 41, 59, 0.85) 100%), 
+                        url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1920&q=80') center/cover no-repeat;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            color: var(--white);
+            padding-top: 80px;
+        }
+
+        .hero-content {
+            max-width: 800px;
+        }
+
+        .hero-tag {
+            display: inline-block;
+            background-color: rgba(217, 119, 6, 0.2);
+            color: var(--accent);
+            border: 1px solid var(--accent);
+            padding: 6px 16px;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            line-height: 1.15;
+            margin-bottom: 20px;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            color: #94a3b8;
+            margin-bottom: 36px;
+            max-width: 650px;
+        }
+
+        .hero-btns {
+            display: flex;
+            gap: 16px;
+        }
+
+        /* About Section */
+        .about {
+            padding: 100px 0;
+            background-color: var(--white);
+        }
+
+        .about-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+        }
+
+        .about-text h3 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 16px;
+        }
+
+        .about-text p {
+            color: var(--text-muted);
+            margin-bottom: 20px;
+            font-size: 1.05rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-top: 32px;
+        }
+
+        .stat-card {
+            background-color: var(--bg-light);
+            padding: 20px;
+            border-radius: var(--radius);
+            border-left: 4px solid var(--accent);
+        }
+
+        .stat-card h4 {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--primary);
+        }
+
+        .stat-card p {
+            font-size: 0.9rem;
+            margin-bottom: 0;
+        }
+
+        /* Services Section */
+        .services {
+            padding: 100px 0;
+            background-color: var(--bg-light);
+        }
+
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 30px;
+        }
+
+        .service-card {
+            background: var(--white);
+            padding: 36px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition);
+            border: 1px solid var(--border);
+        }
+
+        .service-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--accent);
+        }
+
+        .service-icon {
+            width: 60px;
+            height: 60px;
+            background-color: rgba(217, 119, 6, 0.1);
+            color: var(--accent);
+            border-radius: var(--radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 24px;
+        }
+
+        .service-card h3 {
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 12px;
+        }
+
+        .service-card p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        /* BIM Advantage Section */
+        .bim-section {
+            padding: 100px 0;
+            background-color: var(--primary);
+            color: var(--white);
+        }
+
+        .bim-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+        }
+
+        .bim-features {
+            list-style: none;
+            margin-top: 24px;
+        }
+
+        .bim-features li {
+            margin-bottom: 16px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            font-size: 1.05rem;
+            color: #cbd5e1;
+        }
+
+        .bim-features li::before {
+            content: "✓";
+            color: var(--accent);
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        /* Projects Section */
+        .projects {
+            padding: 100px 0;
+            background-color: var(--white);
+        }
+
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+        }
+
+        .project-card {
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+            position: relative;
+            background-color: var(--primary-light);
+        }
+
+        .project-img {
+            width: 100%;
+            height: 260px;
+            object-fit: cover;
+            transition: var(--transition);
+        }
+
+        .project-card:hover .project-img {
+            transform: scale(1.05);
+            opacity: 0.85;
+        }
+
+        .project-info {
+            padding: 24px;
+            background-color: var(--white);
+        }
+
+        .project-info h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 6px;
+        }
+
+        .project-info p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        /* Contact Section */
+        .contact {
+            padding: 100px 0;
+            background-color: var(--bg-light);
+        }
+
+        .contact-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+        }
+
+        .contact-info h3 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 16px;
+        }
+
+        .contact-detail-item {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 24px;
+            align-items: flex-start;
+        }
+
+        .contact-detail-item div h4 {
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .contact-detail-item div p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        .contact-form {
+            background-color: var(--white);
+            padding: 40px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--primary);
+            font-size: 0.9rem;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            font-size: 0.95rem;
+            outline: none;
+            transition: var(--transition);
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.1);
+        }
+
+        /* Footer */
+        footer {
+            background-color: var(--primary);
+            color: #94a3b8;
+            padding: 40px 0;
+            text-align: center;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            font-size: 0.9rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                height: auto;
+                padding: 16px 0;
+                gap: 16px;
+            }
+            .nav-links {
+                gap: 16px;
+                font-size: 0.85rem;
+            }
+            .hero h1 {
+                font-size: 2.25rem;
+            }
+            .about-grid, .bim-container, .contact-grid {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+            .hero-btns {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header / Nav -->
+    <header>
+        <div class="container navbar">
+            <a href="#" class="logo">PV <span>INCONS</span></a>
+            <ul class="nav-links">
+                <li><a href="#about">Giới Thiệu</a></li>
+                <li><a href="#services">Dịch Vụ</a></li>
+                <li><a href="#bim">Giải Pháp BIM</a></li>
+                <li><a href="#projects">Dự Án</a></li>
+                <li><a href="#contact">Liên Hệ</a></li>
+            </ul>
+            <a href="#contact" class="btn btn-primary">Tư Vấn Ngay</a>
         </div>
-
-        <span class="text-xs bg-rose-500/10 text-rose-400 border border-rose-500/20 px-2 py-0.5 rounded font-mono font-bold">v1.0</span>
-        <span class="text-gray-600">/</span>
-        <span id="active-module-badge" class="text-xs text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20 font-mono">
-          posts-news.json Active
-        </span>
-      </div>
-
-      <div class="flex items-center gap-3">
-        <!-- Tiện ích Backup / Import JSON nhanh -->
-        <div class="flex items-center gap-1.5 border-r border-[#2a2e3d] pr-3">
-          <button id="btn-export-backup" class="text-gray-400 hover:text-emerald-400 text-[11px] bg-[#1c202b] hover:bg-emerald-500/10 border border-[#2a2e3d] px-2.5 py-1 rounded transition flex items-center gap-1 font-mono" title="Tải toàn bộ dữ liệu JSON dự phòng">
-            <i data-lucide="download" class="w-3 h-3"></i> Tải Backup
-          </button>
-          <label class="text-gray-400 hover:text-blue-400 text-[11px] bg-[#1c202b] hover:bg-blue-500/10 border border-[#2a2e3d] px-2.5 py-1 rounded transition flex items-center gap-1 font-mono cursor-pointer" title="Nhập file JSON vào Studio">
-            <i data-lucide="upload" class="w-3 h-3"></i> Nhập JSON
-            <input type="file" id="import-json-file" accept=".json" class="hidden">
-          </label>
-        </div>
-
-        <span class="text-xs text-gray-400 font-mono flex items-center gap-1">
-          <i data-lucide="github" class="w-3.5 h-3.5 text-gray-300"></i>
-          <span id="display-repo-info" class="text-gray-200 font-semibold">user/repo</span>
-        </span>
-        <button id="btn-logout" class="bg-[#222630] hover:bg-rose-600/20 hover:text-rose-400 text-gray-400 text-xs px-2.5 py-1 rounded transition flex items-center gap-1 font-medium">
-          <i data-lucide="log-out" class="w-3 h-3"></i> Đăng xuất
-        </button>
-      </div>
     </header>
 
-    <!-- MAIN CONTENT (3 CỘT) -->
-    <div class="flex flex-1 overflow-hidden">
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <span class="hero-tag">Kiến Trúc & Solution Partner</span>
+                <h1>Giải Pháp Kiến Trúc, Xây Dựng & BIM Chuyên Nghiệp</h1>
+                <p>PV INCONS đồng hành cùng bạn từ tư vấn thiết kế, diễn họa 3D, tối ưu quy trình BIM (Autodesk Revit / Dynamo) đến thi công trọn gói và hoàn thiện pháp lý xây dựng.</p>
+                <div class="hero-btns">
+                    <a href="#projects" class="btn btn-primary">Xem Dự Án Dự Kiến</a>
+                    <a href="#services" class="btn btn-outline">Tìm Hiểu Dịch Vụ</a>
+                </div>
+            </div>
+        </div>
+    </section>
 
-      <!-- CỘT 1: TAB CHA & DANH SÁCH BÀI VIẾT + BỘ LỌC -->
-      <aside class="w-80 border-r border-[#222630] bg-[#12141c] flex flex-col shrink-0">
-        
-        <!-- CÁC TAB CHA -->
-        <div class="p-3 border-b border-[#222630]">
-          <div class="text-[11px] font-semibold text-gray-500 uppercase tracking-wider mb-2">Danh mục hệ thống</div>
-          <nav class="space-y-1" id="sidebar-nav">
+    <!-- About Section -->
+    <section class="about" id="about">
+        <div class="container">
+            <div class="about-grid">
+                <div class="about-text">
+                    <span style="color: var(--accent); font-weight: 700; text-transform: uppercase; font-size: 0.85rem;">Về PV INCONS</span>
+                    <h3>Tiên Phong Ứng Dụng Công Nghệ Vào Xây Dựng</h3>
+                    <p>Công ty TNHH Đầu tư & Xây dựng PV INCONS là đơn vị hoạt động chuyên sâu trong lĩnh vực tư vấn thiết kế kiến trúc, thi công xây dựng và cung cấp giải pháp chuyển đổi số BIM cho các dự án nhà phố, biệt thự và công trình thương mại tại Cần Thơ cũng như khu vực ĐBSCL.</p>
+                    <p>Với định hướng chuẩn hóa kỹ thuật, tối ưu hóa công năng và áp dụng quy trình quản lý hiện đại, chúng tôi cam kết mang lại sản phẩm chất lượng cao nhất cho chủ đầu tư.</p>
+                    
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <h4>100%</h4>
+                            <p>Chuẩn Quy Hoạch & Định Hướng</p>
+                        </div>
+                        <div class="stat-card">
+                            <h4>BIM</h4>
+                            <p>Quy Trình Quản Lý 3D Tiên Tiến</p>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <img src="https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=800&q=80" alt="Thiết kế kiến trúc PV INCONS" style="width:100%; border-radius: var(--radius); box-shadow: var(--shadow-md);">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section class="services" id="services">
+        <div class="container">
+            <div class="section-title">
+                <h2>Dịch Vụ Trọng Tâm</h2>
+                <p>Cung cấp giải pháp toàn diện từ khâu ý tưởng đến khi bàn giao công trình hoàn thiện</p>
+            </div>
             
-            <a href="#" data-folder="news" data-title="Tin tức" class="nav-tab active flex items-center justify-between px-3 py-2 rounded-lg bg-rose-600/10 text-rose-400 font-medium border border-rose-500/20 transition">
-              <div class="flex items-center gap-2.5">
-                <i data-lucide="newspaper" class="w-4 h-4 text-rose-500"></i>
-                <span>Tin tức</span>
-              </div>
-              <span class="text-[10px] bg-rose-500/20 text-rose-300 px-1.5 py-0.2 rounded font-mono tab-count" id="count-news">0</span>
-            </a>
+            <div class="services-grid">
+                <!-- Service 1 -->
+                <div class="service-card">
+                    <div class="service-icon">📐</div>
+                    <h3>Thiết Kế Kiến Trúc & Nội Thất</h3>
+                    <p>Tư vấn thiết kế kiến trúc nhà phố, biệt thự, nhà xưởng và công trình thương mại. Tối ưu không gian sống, đón gió, đón sáng tự nhiên chuẩn phong thủy.</p>
+                </div>
 
-            <a href="#" data-folder="projects" data-title="Dự án" class="nav-tab flex items-center justify-between px-3 py-2 rounded-lg text-gray-400 hover:bg-[#1a1d26] hover:text-gray-200 transition">
-              <div class="flex items-center gap-2.5">
-                <i data-lucide="folder-kanban" class="w-4 h-4"></i>
-                <span>Dự án</span>
-              </div>
-              <span class="text-[10px] bg-gray-800 text-gray-400 px-1.5 py-0.2 rounded font-mono tab-count" id="count-projects">0</span>
-            </a>
+                <!-- Service 2 -->
+                <div class="service-card">
+                    <div class="service-icon">🏗️</div>
+                    <h3>Thi Công Xây Dựng Trọn Gói</h3>
+                    <p>Thi công phần thô đến hoàn thiện với vật tư chính hãng, giám sát chặt chẽ, đảm bảo tiến độ và chất lượng kết cấu theo chuẩn TCVN.</p>
+                </div>
 
-            <a href="#" data-folder="services" data-title="Dịch vụ" class="nav-tab flex items-center justify-between px-3 py-2 rounded-lg text-gray-400 hover:bg-[#1a1d26] hover:text-gray-200 transition">
-              <div class="flex items-center gap-2.5">
-                <i data-lucide="layers" class="w-4 h-4"></i>
-                <span>Dịch vụ</span>
-              </div>
-              <span class="text-[10px] bg-gray-800 text-gray-400 px-1.5 py-0.2 rounded font-mono tab-count" id="count-services">0</span>
-            </a>
+                <!-- Service 3 -->
+                <div class="service-card">
+                    <div class="service-icon">💻</div>
+                    <h3>Ứng Dụng & Tư Vấn BIM</h3>
+                    <p>Triển khai mô hình BIM (Revit, Dynamo automation) giúp phát hiện xung đột kết cấu - ME, bóc tách khối lượng chính xác và tối ưu chi phí đầu tư.</p>
+                </div>
 
-            <a href="#" data-folder="investors" data-title="Quan hệ đầu tư" class="nav-tab flex items-center justify-between px-3 py-2 rounded-lg text-gray-400 hover:bg-[#1a1d26] hover:text-gray-200 transition">
-              <div class="flex items-center gap-2.5">
-                <i data-lucide="trending-up" class="w-4 h-4"></i>
-                <span>Quan hệ đầu tư</span>
-              </div>
-              <span class="text-[10px] bg-gray-800 text-gray-400 px-1.5 py-0.2 rounded font-mono tab-count" id="count-investors">0</span>
-            </a>
+                <!-- Service 4 -->
+                <div class="service-card">
+                    <div class="service-icon">🖼️</div>
+                    <h3>Diễn Họa Kiến Trúc 3D</h3>
+                    <p>Render ảnh & video 3D kiến trúc cao cấp với Chaos Vantage, D5 Render, Lumion. Giúp chủ đầu tư hình dung công trình sống động như thực tế.</p>
+                </div>
 
-            <a href="#" data-folder="hr" data-title="Chính sách nhân sự" class="nav-tab flex items-center justify-between px-3 py-2 rounded-lg text-gray-400 hover:bg-[#1a1d26] hover:text-gray-200 transition">
-              <div class="flex items-center gap-2.5">
-                <i data-lucide="users" class="w-4 h-4"></i>
-                <span>Chính sách nhân sự</span>
-              </div>
-              <span class="text-[10px] bg-gray-800 text-gray-400 px-1.5 py-0.2 rounded font-mono tab-count" id="count-hr">0</span>
-            </a>
+                <!-- Service 5 -->
+                <div class="service-card">
+                    <div class="service-icon">📜</div>
+                    <h3>Pháp Lý & Xin Phép Xây Dựng</h3>
+                    <p>Hỗ trợ lập hồ sơ trích đo hiện trạng (VN-2000), xin cấp phép xây dựng, tư vấn hoàn công và chứng nhận quyền sở hữu công trình tại Cần Thơ.</p>
+                </div>
 
-          </nav>
+                <!-- Service 6 -->
+                <div class="service-card">
+                    <div class="service-icon">🔍</div>
+                    <h3>Thẩm Tra & Giám Sát Tác Giả</h3>
+                    <p>Thẩm tra bản vẽ kết cấu, giám sát kỹ thuật công trình đảm bảo thi công đúng bản vẽ và tiêu chuẩn an toàn lao động.</p>
+                </div>
+            </div>
         </div>
+    </section>
 
-        <!-- TIÊU ĐỀ & SYNC BUTTON -->
-        <div class="p-3 border-b border-[#222630] flex items-center justify-between bg-[#0f1117]">
-          <span class="text-xs font-semibold text-gray-300 uppercase tracking-wider flex items-center gap-1.5">
-            <i data-lucide="list" class="w-3.5 h-3.5 text-rose-500"></i>
-            Bài viết: <span id="current-tab-label" class="text-rose-400">Tin tức</span>
-          </span>
-          <button id="btn-sync-github" title="Tải file trực tiếp từ GitHub về Studio" class="text-blue-400 hover:underline text-[11px] font-medium flex items-center gap-1">
-            <i data-lucide="refresh-cw" class="w-3 h-3"></i> Tải từ GitHub
-          </button>
+    <!-- BIM Advantage -->
+    <section class="bim-section" id="bim">
+        <div class="container">
+            <div class="bim-container">
+                <div>
+                    <span style="color: var(--accent); font-weight: 700; text-transform: uppercase; font-size: 0.85rem;">Công Nghệ Nòng Cốt</span>
+                    <h2 style="font-size: 2.25rem; font-weight: 800; margin: 12px 0 20px 0;">Sức Mạnh Của Mô Hình BIM Trong Thiết Kế</h2>
+                    <p style="color: #94a3b8;">PV INCONS đi đầu trong việc tích hợp quy trình BIM vào mọi quy mô dự án. Chúng tôi giúp xóa bỏ sai sót trên bản vẽ 2D truyền thống.</p>
+                    
+                    <ul class="bim-features">
+                        <li><strong>Bóc tách khối lượng tự động:</strong> Giảm thiểu sai lệch vật tư, tối ưu ngân sách xây dựng.</li>
+                        <li><strong>Kiểm tra xung đột Clash Detection:</strong> Phát hiện lỗi va chạm giữa Kết cấu và M&E trước khi thi công.</li>
+                        <li><strong>Tự động hóa với Dynamo Script:</strong> Đẩy nhanh tiến độ lập bản vẽ kỹ thuật chi tiết.</li>
+                        <li><strong>Tích hợp mô hình 3D trực quan:</strong> Dễ dàng trao đổi giữa KTS, Kỹ sư và Chủ đầu tư.</li>
+                    </ul>
+                </div>
+                <div>
+                    <img src="https://images.unsplash.com/photo-1581094794329-c8112a89af12?auto=format&fit=crop&w=800&q=80" alt="BIM Workflow" style="width:100%; border-radius: var(--radius); opacity: 0.9;">
+                </div>
+            </div>
         </div>
+    </section>
 
-        <!-- BỘ LỌC TÌM KIẾM BÀI VIẾT (FILTER SECTION) -->
-        <div class="p-2 border-b border-[#222630] bg-[#14171f] space-y-2">
-          <div class="flex gap-1.5">
-            <select id="filter-category" class="w-1/2 bg-[#0f1117] border border-[#2a2e3d] rounded-md px-2 py-1 text-[11px] text-gray-300 outline-none focus:border-rose-500 cursor-pointer">
-              <option value="">Tất cả Category</option>
-            </select>
-            <div class="relative w-1/2">
-              <input type="text" id="filter-search" placeholder="Lọc nhãn/tiêu đề..." class="w-full bg-[#0f1117] border border-[#2a2e3d] rounded-md pl-6 pr-2 py-1 text-[11px] text-gray-300 outline-none focus:border-rose-500">
-              <i data-lucide="search" class="w-3 h-3 text-gray-500 absolute left-1.5 top-2"></i>
+    <!-- Projects Section -->
+    <section class="projects" id="projects">
+        <div class="container">
+            <div class="section-title">
+                <h2>Dự Án Tiêu Biểu</h2>
+                <p>Một số giải pháp không gian kiến trúc được tối ưu hóa cho từng chủ đầu tư</p>
             </div>
-          </div>
+
+            <div class="projects-grid">
+                <!-- Project 1 -->
+                <div class="project-card">
+                    <img src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=600&q=80" alt="Nhà phố Ninh Kiều" class="project-img">
+                    <div class="project-info">
+                        <h3>Nhà Phố Phố Hiện Đại 4 Tầng</h3>
+                        <p>📍 Ninh Kiều, TP. Cần Thơ — Diện tích 44.5m²</p>
+                    </div>
+                </div>
+
+                <!-- Project 2 -->
+                <div class="project-card">
+                    <img src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=600&q=80" alt="Biệt thự Hưng Lợi" class="project-img">
+                    <div class="project-info">
+                        <h3>Biệt Thự Vườn Mới</h3>
+                        <p>📍 Hưng Lợi, TP. Cần Thơ — Phong cách hiện đại tối giản</p>
+                    </div>
+                </div>
+
+                <!-- Project 3 -->
+                <div class="project-card">
+                    <img src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=600&q=80" alt="Showroom Thương Mại" class="project-img">
+                    <div class="project-info">
+                        <h3>Tổ Hợp Văn Phòng & Showroom</h3>
+                        <p>📍 Vĩnh Long — Diễn họa D5 Render & Revit BIM</p>
+                    </div>
+                </div>
+            </div>
         </div>
+    </section>
 
-        <!-- DANH SÁCH BÀI VIẾT -->
-        <div id="posts-list-container" class="flex-1 overflow-y-auto p-2 space-y-1.5"></div>
-      </aside>
+    <!-- Contact Section -->
+    <section class="contact" id="contact">
+        <div class="container">
+            <div class="contact-grid">
+                <div class="contact-info">
+                    <span style="color: var(--accent); font-weight: 700; text-transform: uppercase; font-size: 0.85rem;">Liên Hệ Với Chúng Tôi</span>
+                    <h3>Sẵn Sàng Cho Dự Án Của Bạn?</h3>
+                    <p style="color: var(--text-muted); margin-bottom: 32px;">Hãy liên hệ với PV INCONS để nhận tư vấn phương án thiết kế, giải pháp BIM hoặc báo giá thi công chi tiết nhất.</p>
 
-      <!-- CỘT 2: FORM NHẬP LIỆU & CẬP NHẬT -->
-      <main class="flex-1 flex flex-col bg-[#14171f] overflow-hidden border-r border-[#222630]">
-        
-        <div class="h-12 border-b border-[#222630] px-6 flex items-center justify-between bg-[#12141c] shrink-0">
-          <div class="flex items-center gap-2">
-            <i data-lucide="edit-3" class="w-4 h-4 text-rose-500"></i>
-            <span id="form-title" class="font-semibold text-gray-200">Soạn bài viết cho [Tin tức]</span>
-            <!-- BẢNG TRẠNG THÁI CẬP NHẬT -->
-            <span id="edit-status-badge" class="hidden text-[11px] bg-amber-500/10 text-amber-400 px-2 py-0.5 rounded border border-amber-500/20 font-mono">
-              Đang sửa bài ID: #<span id="editing-id-text"></span>
-            </span>
-          </div>
-          
-          <div class="flex items-center gap-2">
-            <button id="btn-cancel-edit" class="hidden px-2.5 py-1.5 text-xs text-amber-400 hover:text-amber-300 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 rounded transition font-medium">
-              Hủy sửa
-            </button>
+                    <div class="contact-detail-item">
+                        <div style="font-size: 1.5rem; color: var(--accent);">📍</div>
+                        <div>
+                            <h4>Địa Chỉ Văn Phòng</h4>
+                            <p>Quận Ninh Kiều, Thành phố Cần Thơ, Việt Nam</p>
+                        </div>
+                    </div>
 
-            <button id="btn-reset" class="px-3 py-1.5 text-xs text-gray-400 hover:text-white transition font-medium">
-              Làm mới form
-            </button>
+                    <div class="contact-detail-item">
+                        <div style="font-size: 1.5rem; color: var(--accent);">🌐</div>
+                        <div>
+                            <h4>Website & Domain</h4>
+                            <p>pvincons.com | pvincons.cloud</p>
+                        </div>
+                    </div>
 
-            <!-- NÚT THÊM / CẬP NHẬT VÀO DANH SÁCH TẠM -->
-            <button id="btn-add-to-list" class="bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold px-3 py-1.5 rounded flex items-center gap-1.5 transition shadow-lg shadow-blue-900/20">
-              <i id="btn-add-icon" data-lucide="plus-circle" class="w-3.5 h-3.5"></i>
-              <span id="btn-add-text">Lưu vào danh sách</span>
-            </button>
+                    <div class="contact-detail-item">
+                        <div style="font-size: 1.5rem; color: var(--accent);">✉️</div>
+                        <div>
+                            <h4>Email Liên Hệ</h4>
+                            <p>contact@pvincons.com</p>
+                        </div>
+                    </div>
+                </div>
 
-            <!-- NÚT XUẤT BẢN TRỰC TIẾP LÊN GITHUB MAIN -->
-            <button id="btn-publish-github" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold px-3 py-1.5 rounded flex items-center gap-1.5 transition shadow-lg shadow-emerald-900/20">
-              <i data-lucide="cloud-upload" class="w-3.5 h-3.5"></i>
-              Xuất bản lên GitHub Main
-            </button>
-          </div>
+                <div class="contact-form">
+                    <h3 style="font-size: 1.35rem; margin-bottom: 20px; color: var(--primary);">Đăng Ký Tư Vấn Trực Tuyến</h3>
+                    <form onsubmit="event.preventDefault(); alert('Cảm ơn bạn! PV INCONS sẽ liên hệ lại sớm nhất.');">
+                        <div class="form-group">
+                            <label for="name">Họ và tên *</label>
+                            <input type="text" id="name" placeholder="Ví dụ: Nguyễn Văn A" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="phone">Số điện thoại *</label>
+                            <input type="tel" id="phone" placeholder="0901234567" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="service">Dịch vụ quan tâm</label>
+                            <input type="text" id="service" placeholder="Thiết kế nhà / BIM / Thi công / Xin phép">
+                        </div>
+                        <div class="form-group">
+                            <label for="message">Nội dung chi tiết</label>
+                            <textarea id="message" rows="4" placeholder="Mô tả nhu cầu thiết kế hoặc thông tin khu đất..."></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="width: 100%;">Gửi Yêu Cầu Tư Vấn</button>
+                    </form>
+                </div>
+            </div>
         </div>
+    </section>
 
-        <!-- FORM INPUTS -->
-        <div class="flex-1 overflow-y-auto p-6 space-y-5">
-          
-          <div class="grid grid-cols-2 gap-4">
-            <div class="space-y-1.5">
-              <label class="block text-xs font-semibold text-gray-300">Mã ID (<code class="text-rose-400">id</code>)</label>
-              <input type="number" id="input-id" value="1" class="w-full bg-[#0f1117] border border-[#2a2e3d] focus:border-rose-500 rounded-lg px-3.5 py-2 text-gray-100 font-mono text-xs outline-none">
-            </div>
-            <div class="space-y-1.5">
-              <label class="block text-xs font-semibold text-gray-300">Ngày đăng (<code class="text-rose-400">date</code>)</label>
-              <input type="text" id="input-date" placeholder="DD/MM/YYYY" class="w-full bg-[#0f1117] border border-[#2a2e3d] focus:border-rose-500 rounded-lg px-3.5 py-2 text-gray-100 font-mono text-xs outline-none">
-            </div>
-          </div>
-
-          <div class="grid grid-cols-2 gap-4">
-            <div class="space-y-1.5">
-              <label class="block text-xs font-semibold text-gray-300">Phân loại (<code class="text-rose-400">category</code>)</label>
-              <select id="select-category" class="w-full bg-[#0f1117] border border-[#2a2e3d] focus:border-rose-500 rounded-lg px-3 py-2 text-gray-100 text-xs outline-none cursor-pointer">
-                <!-- Dynamically populated per tab -->
-              </select>
-            </div>
-
-            <div class="space-y-1.5">
-              <label class="block text-xs font-semibold text-gray-300">Nhãn Hiển Thị (<code class="text-rose-400">categoryLabel</code>)</label>
-              <input type="text" id="input-category-label" value="" class="w-full bg-[#0f1117] border border-[#2a2e3d] focus:border-rose-500 rounded-lg px-3.5 py-2 text-gray-300 font-mono text-xs outline-none">
-            </div>
-          </div>
-
-          <!-- CÁC TRƯỜNG RIÊNG CHO TAB DỰ ÁN -->
-          <div id="project-extra-fields" class="hidden space-y-4 pt-2 border-t border-[#222630]">
-            <div class="text-xs font-bold text-rose-400 uppercase tracking-wider">Thông tin chi tiết dự án</div>
-            
-            <div class="grid grid-cols-2 gap-4">
-              <div class="space-y-1.5">
-                <label class="block text-xs font-semibold text-gray-300">Mã Dự Án / Ký hiệu (<code class="text-rose-400">code</code>)</label>
-                <input type="text" id="input-code" placeholder="VD: DA-CANTHO-01" class="w-full bg-[#0f1117] border border-[#2a2e3d] focus:border-rose-500 rounded-lg px-3.5 py-2 text-gray-100 font-mono text-xs outline-none">
-              </div>
-              <div class="space-y-1.5">
-                <label class="block text-xs font-semibold text-gray-300">Quy mô (<code class="text-rose-400">scale</code>)</label>
-                <input type="text" id="input-scale" placeholder="VD: 5 Tầng - Tổng diện tích 850m2" class="w-full bg-[#0f1117] border border-[#2a2e3d] focus:border-rose-500 rounded-lg px-3.5 py-2 text-gray-100 text-xs outline-none">
-              </div>
-            </div>
-
-            <div class="grid grid-cols-3 gap-4">
-              <div class="space-y-1.5">
-                <label class="block text-xs font-semibold text-gray-300">Chủ đầu tư (<code class="text-rose-400">client</code>)</label>
-                <input type="text" id="input-client" placeholder="VD: Tập đoàn ABC" class="w-full bg-[#0f1117] border border-[#2a2e3d] focus:border-rose-500 rounded-lg px-3.5 py-2 text-gray-100 text-xs outline-none">
-              </div>
-              <div class="space-y-1.5">
-                <label class="block text-xs font-semibold text-gray-300">Địa điểm (<code class="text-rose-400">location</code>)</label>
-                <input type="text" id="input-location" placeholder="VD: Bình Thủy, Cần Thơ" class="w-full bg-[#0f1117] border border-[#2a2e3d] focus:border-rose-500 rounded-lg px-3.5 py-2 text-gray-100 text-xs outline-none">
-              </div>
-              <div class="space-y-1.5">
-                <label class="block text-xs font-semibold text-gray-300">Đơn vị thi công (<code class="text-rose-400">architect</code>)</label>
-                <input type="text" id="input-architect" placeholder="VD: PV INCONS" class="w-full bg-[#0f1117] border border-[#2a2e3d] focus:border-rose-500 rounded-lg px-3.5 py-2 text-gray-100 text-xs outline-none">
-              </div>
-            </div>
-
-            <div class="grid grid-cols-2 gap-4">
-              <div class="space-y-1.5">
-                <label class="block text-xs font-semibold text-gray-300">Thống kê / Nổi bật (<code class="text-rose-400">stats</code>)</label>
-                <textarea id="input-stats" rows="3" placeholder="Mỗi dòng 1 cặp Key: Value&#10;Tiến độ: 85%&#10;Bảo hành: 5 năm" class="w-full bg-[#0f1117] border border-[#2a2e3d] focus:border-rose-500 rounded-lg p-2.5 text-gray-100 font-mono text-xs outline-none transition"></textarea>
-              </div>
-              <div class="space-y-1.5">
-                <label class="block text-xs font-semibold text-gray-300">Các ý chính (<code class="text-rose-400">bulletPoints</code>)</label>
-                <textarea id="input-bullet-points" rows="3" placeholder="Mỗi ý 1 dòng&#10;Đạt tiêu chuẩn chất lượng ISO&#10;Tối ưu chi phí thi công" class="w-full bg-[#0f1117] border border-[#2a2e3d] focus:border-rose-500 rounded-lg p-2.5 text-gray-100 font-mono text-xs outline-none transition"></textarea>
-              </div>
-            </div>
-          </div>
-
-          <!-- CÁC TRƯỜNG RIÊNG CHO TAB DỊCH VỤ -->
-          <div id="service-extra-fields" class="hidden space-y-4 pt-2 border-t border-[#222630]">
-            <div class="text-xs font-bold text-rose-400 uppercase tracking-wider">Thông tin chi tiết dịch vụ</div>
-            
-            <div class="grid grid-cols-2 gap-4">
-              <div class="space-y-1.5">
-                <label class="block text-xs font-semibold text-gray-300">Mã Dịch Vụ / Ký hiệu (<code class="text-rose-400">code</code>)</label>
-                <input type="text" id="input-service-code" placeholder="VD: SERV-DESIGN" class="w-full bg-[#0f1117] border border-[#2a2e3d] focus:border-rose-500 rounded-lg px-3.5 py-2 text-gray-100 font-mono text-xs outline-none">
-              </div>
-              <div class="space-y-1.5">
-                <label class="block text-xs font-semibold text-gray-300">Tên Icon Lucide (<code class="text-rose-400">icon</code>)</label>
-                <input type="text" id="input-service-icon" placeholder="VD: pen-tool, building, layers" class="w-full bg-[#0f1117] border border-[#2a2e3d] focus:border-rose-500 rounded-lg px-3.5 py-2 text-gray-100 font-mono text-xs outline-none">
-              </div>
-            </div>
-
-            <div class="space-y-1.5">
-              <label class="block text-xs font-semibold text-gray-300">Các hạng mục / Ý chính (<code class="text-rose-400">bulletPoints</code>)</label>
-              <textarea id="input-service-bullet-points" rows="3" placeholder="Mỗi ý 1 dòng&#10;Thiết kế kiến trúc sáng tạo&#10;Tối ưu không gian sử dụng" class="w-full bg-[#0f1117] border border-[#2a2e3d] focus:border-rose-500 rounded-lg p-2.5 text-gray-100 font-mono text-xs outline-none transition"></textarea>
-            </div>
-          </div>
-
-          <div class="space-y-1.5">
-            <label class="block text-xs font-semibold text-gray-300">
-              Tiêu đề bài viết / Tên dịch vụ (<code class="text-rose-400">title</code>) <span class="text-rose-500">*</span>
-            </label>
-            <input type="text" id="input-title" placeholder="VD: Thiết Kế Kiến Trúc & Kết Cấu Công Trình" class="w-full bg-[#0f1117] border border-[#2a2e3d] focus:border-rose-500 focus:ring-1 focus:ring-rose-500 rounded-lg px-3.5 py-2 text-gray-100 outline-none transition text-sm">
-          </div>
-
-          <div class="space-y-1.5">
-            <label class="block text-xs font-semibold text-gray-300">Mô tả tóm tắt (<code class="text-rose-400">summary</code>)</label>
-            <textarea id="input-summary" rows="2" placeholder="VD: Giải pháp toàn diện từ khâu lập bản vẽ đến dự toán." class="w-full bg-[#0f1117] border border-[#2a2e3d] focus:border-rose-500 rounded-lg p-3 text-gray-100 outline-none transition text-sm"></textarea>
-          </div>
-
-          <div class="space-y-1.5">
-            <label class="block text-xs font-semibold text-gray-300">Đường dẫn Hình ảnh (<code class="text-rose-400">image</code>)</label>
-            <input type="text" id="input-image" placeholder="https://i.pinimg.com/1200x/..." class="w-full bg-[#0f1117] border border-[#2a2e3d] focus:border-rose-500 rounded-lg px-3.5 py-2 text-gray-100 outline-none transition text-xs font-mono">
-          </div>
-
-          <div class="space-y-1.5">
-            <label class="block text-xs font-semibold text-gray-300">Đường dẫn file HTML chi tiết (<code class="text-rose-400">link</code>)</label>
-            <input type="text" id="input-link" placeholder="content/services/services_001.html" class="w-full bg-[#0f1117] border border-[#2a2e3d] focus:border-rose-500 rounded-lg px-3.5 py-2 text-gray-100 outline-none transition text-xs font-mono">
-          </div>
-
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p>© 2026 PV INCONS Construction & Trading. All Rights Reserved.</p>
+            <p style="font-size: 0.8rem; margin-top: 6px; color: #64748b;">Thiết kế & phát triển tối ưu cho quy trình Kiến Trúc, Xây Dựng và BIM.</p>
         </div>
-      </main>
+    </footer>
 
-      <!-- CỘT 3: PREVIEW JSON -->
-      <aside class="w-96 bg-[#0c0d12] flex flex-col shrink-0">
-        <div class="h-12 border-b border-[#222630] px-4 flex items-center justify-between bg-[#12141c]">
-          <div class="flex items-center gap-2 text-xs font-semibold text-gray-300 font-mono">
-            <i data-lucide="code-2" class="w-4 h-4 text-emerald-400"></i>
-            <span id="json-header-filename">posts-news.json</span>
-          </div>
-          <button id="btn-copy" class="text-[11px] text-rose-400 hover:underline flex items-center gap-1 font-mono">
-            <i data-lucide="copy" class="w-3 h-3"></i> Copy
-          </button>
-        </div>
-
-        <div class="flex-1 p-4 overflow-y-auto font-mono text-xs">
-          <pre id="json-output" class="text-emerald-400 leading-relaxed whitespace-pre-wrap break-all bg-[#08090c] p-4 rounded-lg border border-[#1e222d]">[]</pre>
-        </div>
-
-        <div class="p-3 border-t border-[#222630] bg-[#12141c] text-[11px] text-gray-500 flex justify-between items-center font-mono">
-          <span>PV INCONS v1.0</span>
-          <span class="text-emerald-500">Mảng JSON Tab Hiện Tại</span>
-        </div>
-      </aside>
-
-    </div>
-  </div>
-
-  <!-- JAVASCRIPT LOGIC -->
-  <script>
-    lucide.createIcons();
-
-    let authConfig = JSON.parse(localStorage.getItem('pv_github_auth')) || null;
-    let db = JSON.parse(localStorage.getItem('pv_studio_db')) || { news: [], projects: [], services: [], investors: [], hr: [] };
-    let currentFolder = "news";
-    let currentTitle = "Tin tức";
-    let editingPostId = null;
-
-    // Định nghĩa danh mục cho từng tab (Tab dự án đã được cập nhật mới)
-    const TAB_CATEGORIES = {
-      news: [
-        { value: "tin-noi-bat", label: "TIN NỔI BẬT", text: "tin-noi-bat (Tin nổi bật)" },
-        { value: "cong-ty", label: "TIN TỨC", text: "cong-ty (Công ty)" },
-        { value: "chuyen-gia", label: "CHUYÊN GIA", text: "chuyen-gia (Chuyên gia)" },
-        { value: "thi-truong", label: "THỊ TRƯỜNG", text: "thi-truong (Thị trường)" },
-        { value: "phap-luat", label: "PHÁP LUẬT", text: "phap-luat (Pháp luật)" },
-        { value: "khach-hang-bao-chi", label: "BÁO CHÍ", text: "khach-hang-bao-chi (Khách hàng & Báo chí)" }
-      ],
-      projects: [
-        { value: "dang-trien-khai", label: "ĐANG TRIỂN KHAI", text: "dang-trien-khai (Đang triển khai)" },
-        { value: "da-hoan-thanh", label: "ĐÃ HOÀN THÀNH", text: "da-hoan-thanh (Đã hoàn thành)" },
-        { value: "moi-nha-dau-tu", label: "DANH SÁCH MỜI NHÀ ĐẦU TƯ", text: "moi-nha-dau-tu (Danh sách mời nhà đầu tư)" }
-      ],
-      services: [
-        { value: "pricing", label: "BẢNG GIÁ DỊCH VỤ", text: "pricing (Bảng giá dịch vụ)" },
-        { value: "documents", label: "TÀI LIỆU MẪU", text: "documents (Tài liệu mẫu)" }
-      ],
-      investors: [
-        { value: "quan-he-co-dong", label: "CỔ ĐÔNG", text: "quan-he-co-dong (Quan hệ cổ đông)" },
-        { value: "tai-chinh", label: "TÀI CHÍNH", text: "tai-chinh (Báo cáo tài chính)" }
-      ],
-      hr: [
-        { value: "tuyen-dung", label: "TUYỂN DỤNG", text: "tuyen-dung (Tuyển dụng nhân sự)" },
-        { value: "chinh-sach", label: "CHÍNH SÁCH", text: "chinh-sach (Chính sách đãi ngộ)" }
-      ]
-    };
-
-    function getTodayFormatted() {
-      const today = new Date();
-      const dd = String(today.getDate()).padStart(2, '0');
-      const mm = String(today.getMonth() + 1).padStart(2, '0');
-      const yyyy = today.getFullYear();
-      return `${dd}/${mm}/${yyyy}`;
-    }
-
-    function utf8_to_b64(str) {
-      return window.btoa(unescape(encodeURIComponent(str)));
-    }
-
-    function b64_to_utf8(str) {
-      return decodeURIComponent(escape(window.atob(str)));
-    }
-
-    const loginModal = document.getElementById('login-modal');
-    const adminWorkspace = document.getElementById('admin-workspace');
-    const inputOwner = document.getElementById('auth-owner');
-    const inputRepo = document.getElementById('auth-repo');
-    const inputToken = document.getElementById('auth-token');
-    const displayRepoInfo = document.getElementById('display-repo-info');
-
-    // Modal About & Copyright logic
-    const aboutModal = document.getElementById('about-modal');
-    document.getElementById('btn-open-about').addEventListener('click', () => aboutModal.classList.remove('hidden'));
-    document.getElementById('btn-close-about').addEventListener('click', () => aboutModal.classList.add('hidden'));
-    document.getElementById('btn-close-about-2').addEventListener('click', () => aboutModal.classList.add('hidden'));
-
-    const inputId = document.getElementById('input-id');
-    const selectCategory = document.getElementById('select-category');
-    const inputCategoryLabel = document.getElementById('input-category-label');
-    const inputTitle = document.getElementById('input-title');
-    const inputSummary = document.getElementById('input-summary');
-    const inputDate = document.getElementById('input-date');
-    const inputImage = document.getElementById('input-image');
-    const inputLink = document.getElementById('input-link');
-
-    // Project fields
-    const inputCode = document.getElementById('input-code');
-    const inputScale = document.getElementById('input-scale');
-    const inputClient = document.getElementById('input-client');
-    const inputLocation = document.getElementById('input-location');
-    const inputArchitect = document.getElementById('input-architect');
-    const inputStats = document.getElementById('input-stats');
-    const inputBulletPoints = document.getElementById('input-bullet-points');
-    const projectExtraFields = document.getElementById('project-extra-fields');
-
-    // Service fields
-    const inputServiceCode = document.getElementById('input-service-code');
-    const inputServiceIcon = document.getElementById('input-service-icon');
-    const inputServiceBulletPoints = document.getElementById('input-service-bullet-points');
-    const serviceExtraFields = document.getElementById('service-extra-fields');
-
-    const jsonOutput = document.getElementById('json-output');
-    const postsListContainer = document.getElementById('posts-list-container');
-    const filterCategory = document.getElementById('filter-category');
-    const filterSearch = document.getElementById('filter-search');
-
-    const editStatusBadge = document.getElementById('edit-status-badge');
-    const editingIdText = document.getElementById('editing-id-text');
-    const btnCancelEdit = document.getElementById('btn-cancel-edit');
-    const btnAddToList = document.getElementById('btn-add-to-list');
-    const btnAddText = document.getElementById('btn-add-text');
-
-    inputDate.value = getTodayFormatted();
-
-    function initAuth() {
-      if (authConfig && authConfig.token) {
-        loginModal.classList.add('hidden');
-        adminWorkspace.classList.remove('hidden');
-        displayRepoInfo.innerText = `${authConfig.owner}/${authConfig.repo}`;
-        setTabContext('news', 'Tin tức');
-      } else {
-        loginModal.classList.remove('hidden');
-        adminWorkspace.classList.add('hidden');
-      }
-    }
-
-    document.getElementById('btn-login').addEventListener('click', async () => {
-      const owner = inputOwner.value.trim();
-      const repo = inputRepo.value.trim();
-      const token = inputToken.value.trim();
-
-      if (!owner || !repo || !token) return alert('Vui lòng điền đầy đủ 3 thông tin!');
-
-      try {
-        const res = await fetch(`https://api.github.com/repos/${owner}/${repo}`, {
-          headers: { "Authorization": `Bearer ${token}` }
-        });
-
-        if (res.ok) {
-          authConfig = { owner, repo, token };
-          localStorage.setItem('pv_github_auth', JSON.stringify(authConfig));
-          alert('✅ Xác thực thành công Studio v1.0!');
-          initAuth();
-        } else {
-          alert('❌ Đăng nhập thất bại: Token hoặc Tên Repo không hợp lệ!');
-        }
-      } catch (err) {
-        alert('❌ Không thể kết nối tới GitHub API.');
-      }
-    });
-
-    document.getElementById('btn-logout').addEventListener('click', () => {
-      if (confirm('Bạn có muốn đăng xuất?')) {
-        localStorage.removeItem('pv_github_auth');
-        authConfig = null;
-        initAuth();
-      }
-    });
-
-    function updateTabCounts() {
-      ['news', 'projects', 'services', 'investors', 'hr'].forEach(folder => {
-        const countEl = document.getElementById(`count-${folder}`);
-        if (countEl) countEl.innerText = (db[folder] || []).length;
-      });
-    }
-
-    function updateCategoryDropdowns(folder) {
-      const categories = TAB_CATEGORIES[folder] || [];
-      selectCategory.innerHTML = '';
-      categories.forEach((cat) => {
-        const option = document.createElement('option');
-        option.value = cat.value;
-        option.setAttribute('data-label', cat.label);
-        option.textContent = cat.text;
-        selectCategory.appendChild(option);
-      });
-      if (categories.length > 0) {
-        inputCategoryLabel.value = categories[0].label;
-      }
-
-      filterCategory.innerHTML = '<option value="">Tất cả Category</option>';
-      categories.forEach(cat => {
-        const opt = document.createElement('option');
-        opt.value = cat.value;
-        opt.textContent = cat.value;
-        filterCategory.appendChild(opt);
-      });
-    }
-
-    function renderPostsList() {
-      updateTabCounts();
-      const currentList = db[currentFolder] || [];
-      jsonOutput.textContent = JSON.stringify(currentList, null, 2);
-      localStorage.setItem('pv_studio_db', JSON.stringify(db));
-
-      const selectedCat = filterCategory.value;
-      const searchKeyword = filterSearch.value.toLowerCase().trim();
-
-      const filteredList = currentList.filter(post => {
-        const matchCat = !selectedCat || post.category === selectedCat;
-        const matchSearch = !searchKeyword ||
-          (post.title && post.title.toLowerCase().includes(searchKeyword)) ||
-          (post.categoryLabel && post.categoryLabel.toLowerCase().includes(searchKeyword)) ||
-          (post.summary && post.summary.toLowerCase().includes(searchKeyword));
-        return matchCat && matchSearch;
-      });
-
-      if (filteredList.length === 0) {
-        postsListContainer.innerHTML = `<div class="p-4 text-center text-xs text-gray-600">Không tìm thấy bài viết phù hợp trong Tab <strong>${currentTitle}</strong>.</div>`;
-        return;
-      }
-
-      postsListContainer.innerHTML = '';
-      filteredList.forEach((post) => {
-        const originalIndex = currentList.findIndex(p => p.id === post.id);
-        const isEditing = editingPostId === post.id;
-
-        const item = document.createElement('div');
-        item.className = `p-2.5 rounded-lg border transition flex items-start justify-between gap-2 group cursor-pointer ${
-          isEditing 
-            ? 'bg-amber-500/10 border-amber-500/80' 
-            : 'bg-[#181b24] border-[#282c38] hover:border-rose-500/50'
-        }`;
-
-        item.innerHTML = `
-          <div class="flex-1 overflow-hidden" onclick="editPost(${originalIndex})">
-            <div class="flex items-center gap-1.5 text-[10px] text-gray-400 font-mono mb-1">
-              <span class="bg-rose-500/10 text-rose-400 px-1.5 py-0.2 rounded font-bold">#${post.id}</span>
-              <span class="bg-gray-800 text-gray-300 px-1 py-0.2 rounded text-[9px] uppercase">${post.categoryLabel || post.category}</span>
-              <span>${post.date}</span>
-            </div>
-            <div class="text-xs font-semibold text-gray-200 truncate group-hover:text-rose-400 transition">${post.title || 'Bài chưa có tiêu đề'}</div>
-          </div>
-          <button onclick="deletePost(${originalIndex})" class="text-gray-500 hover:text-rose-500 p-1 rounded transition" title="Xóa">
-            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
-          </button>
-        `;
-        postsListContainer.appendChild(item);
-      });
-      lucide.createIcons();
-    }
-
-    function getNextId() {
-      const currentList = db[currentFolder] || [];
-      if (currentList.length === 0) return 1;
-      return Math.max(...currentList.map(p => parseInt(p.id) || 0)) + 1;
-    }
-
-    function setTabContext(folder, title) {
-      currentFolder = folder;
-      currentTitle = title;
-
-      const fileName = `posts-${currentFolder}.json`;
-      document.getElementById('active-module-badge').innerText = `${fileName} Active`;
-      document.getElementById('json-header-filename').innerText = fileName;
-      document.getElementById('form-title').innerText = `Soạn bài viết cho [${currentTitle}]`;
-      document.getElementById('current-tab-label').innerText = currentTitle;
-
-      updateCategoryDropdowns(folder);
-
-      projectExtraFields.classList.add('hidden');
-      serviceExtraFields.classList.add('hidden');
-
-      if (currentFolder === 'projects') {
-        projectExtraFields.classList.remove('hidden');
-      } else if (currentFolder === 'services') {
-        serviceExtraFields.classList.remove('hidden');
-      }
-
-      resetForm();
-    }
-
-    filterCategory.addEventListener('change', renderPostsList);
-    filterSearch.addEventListener('input', renderPostsList);
-
-    document.querySelectorAll('.nav-tab').forEach(tab => {
-      tab.addEventListener('click', (e) => {
-        e.preventDefault();
-        document.querySelectorAll('.nav-tab').forEach(t => {
-          t.className = "nav-tab flex items-center justify-between px-3 py-2 rounded-lg text-gray-400 hover:bg-[#1a1d26] hover:text-gray-200 transition";
-          const icon = t.querySelector('i');
-          if (icon) icon.classList.remove('text-rose-500');
-        });
-
-        tab.className = "nav-tab active flex items-center justify-between px-3 py-2 rounded-lg bg-rose-600/10 text-rose-400 font-medium border border-rose-500/20 transition";
-        const currentIcon = tab.querySelector('i');
-        if (currentIcon) currentIcon.classList.add('text-rose-500');
-
-        setTabContext(tab.getAttribute('data-folder'), tab.getAttribute('data-title'));
-      });
-    });
-
-    selectCategory.addEventListener('change', (e) => {
-      inputCategoryLabel.value = e.target.options[e.target.selectedIndex].getAttribute('data-label') || e.target.value.toUpperCase();
-    });
-
-    window.editPost = function(index) {
-      const post = db[currentFolder][index];
-      if (!post) return;
-
-      editingPostId = post.id;
-
-      inputId.value = post.id;
-      selectCategory.value = post.category || '';
-      inputCategoryLabel.value = post.categoryLabel || '';
-      inputTitle.value = post.title || '';
-      inputSummary.value = post.summary || '';
-      inputDate.value = post.date || getTodayFormatted();
-      inputImage.value = post.image || '';
-      inputLink.value = post.link || '';
-
-      if (currentFolder === 'projects') {
-        inputCode.value = post.code || '';
-        inputScale.value = post.scale || '';
-        inputClient.value = post.client || '';
-        inputLocation.value = post.location || '';
-        inputArchitect.value = post.architect || '';
-        
-        if (post.stats && typeof post.stats === 'object') {
-          inputStats.value = Object.entries(post.stats).map(([k, v]) => `${k}: ${v}`).join('\n');
-        } else {
-          inputStats.value = '';
-        }
-
-        if (Array.isArray(post.bulletPoints)) {
-          inputBulletPoints.value = post.bulletPoints.join('\n');
-        } else {
-          inputBulletPoints.value = '';
-        }
-      } else if (currentFolder === 'services') {
-        inputServiceCode.value = post.code || '';
-        inputServiceIcon.value = post.icon || '';
-        if (Array.isArray(post.bulletPoints)) {
-          inputServiceBulletPoints.value = post.bulletPoints.join('\n');
-        } else {
-          inputServiceBulletPoints.value = '';
-        }
-      }
-
-      editStatusBadge.classList.remove('hidden');
-      editingIdText.innerText = post.id;
-      btnCancelEdit.classList.remove('hidden');
-      btnAddText.innerText = "Cập nhật bài viết";
-      btnAddToList.className = "bg-amber-600 hover:bg-amber-500 text-white text-xs font-semibold px-3 py-1.5 rounded flex items-center gap-1.5 transition shadow-lg shadow-amber-900/20";
-
-      renderPostsList();
-    };
-
-    function resetForm() {
-      editingPostId = null;
-      const nextId = getNextId();
-      inputId.value = nextId;
-      inputLink.value = `content/${currentFolder}/${currentFolder}_${String(nextId).padStart(3, '0')}.html`;
-      inputTitle.value = '';
-      inputSummary.value = '';
-      inputImage.value = '';
-      inputDate.value = getTodayFormatted();
-
-      const categories = TAB_CATEGORIES[currentFolder] || [];
-      if (categories.length > 0) {
-        selectCategory.value = categories[0].value;
-        inputCategoryLabel.value = categories[0].label;
-      }
-
-      if (currentFolder === 'projects') {
-        inputCode.value = '';
-        inputScale.value = '';
-        inputClient.value = '';
-        inputLocation.value = '';
-        inputArchitect.value = '';
-        inputStats.value = '';
-        inputBulletPoints.value = '';
-      } else if (currentFolder === 'services') {
-        inputServiceCode.value = '';
-        inputServiceIcon.value = '';
-        inputServiceBulletPoints.value = '';
-      }
-
-      editStatusBadge.classList.add('hidden');
-      btnCancelEdit.classList.add('hidden');
-      btnAddText.innerText = "Lưu vào danh sách";
-      btnAddToList.className = "bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold px-3 py-1.5 rounded flex items-center gap-1.5 transition shadow-lg shadow-blue-900/20";
-
-      renderPostsList();
-    }
-
-    btnCancelEdit.addEventListener('click', resetForm);
-    document.getElementById('btn-reset').addEventListener('click', resetForm);
-
-    btnAddToList.addEventListener('click', () => {
-      const title = inputTitle.value.trim();
-      if (!title) return alert('Vui lòng nhập tiêu đề bài viết!');
-
-      const postData = {
-        id: parseInt(inputId.value) || 1,
-        category: selectCategory.value,
-        categoryLabel: inputCategoryLabel.value,
-        title: title,
-        summary: inputSummary.value,
-        date: inputDate.value || getTodayFormatted(),
-        image: inputImage.value,
-        link: inputLink.value
-      };
-
-      if (currentFolder === 'projects') {
-        postData.code = inputCode.value.trim();
-        postData.scale = inputScale.value.trim();
-        postData.client = inputClient.value.trim();
-        postData.location = inputLocation.value.trim();
-        postData.architect = inputArchitect.value.trim();
-
-        const statsObj = {};
-        inputStats.value.split('\n').forEach(line => {
-          if (line.includes(':')) {
-            const [k, ...v] = line.split(':');
-            if (k.trim()) statsObj[k.trim()] = v.join(':').trim();
-          }
-        });
-        if (Object.keys(statsObj).length > 0) postData.stats = statsObj;
-
-        const bulletArr = inputBulletPoints.value.split('\n').map(i => i.trim()).filter(i => i.length > 0);
-        if (bulletArr.length > 0) postData.bulletPoints = bulletArr;
-
-      } else if (currentFolder === 'services') {
-        postData.code = inputServiceCode.value.trim();
-        postData.icon = inputServiceIcon.value.trim();
-
-        const serviceBulletArr = inputServiceBulletPoints.value.split('\n').map(i => i.trim()).filter(i => i.length > 0);
-        if (serviceBulletArr.length > 0) postData.bulletPoints = serviceBulletArr;
-      }
-
-      if (!db[currentFolder]) db[currentFolder] = [];
-
-      if (editingPostId !== null) {
-        const idx = db[currentFolder].findIndex(p => p.id === editingPostId);
-        if (idx !== -1) {
-          db[currentFolder][idx] = postData;
-        } else {
-          db[currentFolder].push(postData);
-        }
-      } else {
-        const existingIdx = db[currentFolder].findIndex(p => p.id === postData.id);
-        if (existingIdx !== -1) {
-          if (confirm(`ID #${postData.id} đã tồn tại. Bạn có muốn ghi đè?`)) {
-            db[currentFolder][existingIdx] = postData;
-          } else {
-            return;
-          }
-        } else {
-          db[currentFolder].push(postData);
-        }
-      }
-
-      resetForm();
-    });
-
-    // Export Backup JSON
-    document.getElementById('btn-export-backup').addEventListener('click', () => {
-      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db, null, 2));
-      const downloadAnchor = document.createElement('a');
-      downloadAnchor.setAttribute("href", dataStr);
-      downloadAnchor.setAttribute("download", `pv_incons_studio_backup_v1.0_${getTodayFormatted().replace(/\//g, '-')}.json`);
-      document.body.appendChild(downloadAnchor);
-      downloadAnchor.click();
-      downloadAnchor.remove();
-    });
-
-    // Import JSON file
-    document.getElementById('import-json-file').addEventListener('change', (event) => {
-      const fileReader = new FileReader();
-      if (event.target.files[0]) {
-        fileReader.readAsText(event.target.files[0], "UTF-8");
-        fileReader.onload = (e) => {
-          try {
-            const importedData = JSON.parse(e.target.result);
-            if (typeof importedData === 'object' && importedData !== null) {
-              db = importedData;
-              resetForm();
-              alert('✅ Đã nạp dữ liệu JSON vào Studio thành công!');
-            } else {
-              alert('❌ Cấu trúc file JSON không hợp lệ.');
-            }
-          } catch (err) {
-            alert('❌ Lỗi đọc file JSON.');
-          }
-        };
-      }
-    });
-
-    document.getElementById('btn-sync-github').addEventListener('click', async () => {
-      if (!authConfig) return alert('Chưa đăng nhập!');
-      const filePath = `content/posts-${currentFolder}.json`;
-      const url = `https://api.github.com/repos/${authConfig.owner}/${authConfig.repo}/contents/${filePath}`;
-
-      try {
-        const res = await fetch(url, { headers: { "Authorization": `Bearer ${authConfig.token}` } });
-        if (res.ok) {
-          const data = await res.json();
-          const content = JSON.parse(b64_to_utf8(data.content));
-          db[currentFolder] = content;
-          resetForm();
-          alert(`✅ Đã tải thành công ${content.length} bài viết từ ${filePath}!`);
-        } else {
-          alert(`⚠️ Chưa tìm thấy file ${filePath} trên GitHub.`);
-        }
-      } catch (err) {
-        alert('❌ Lỗi kết nối khi tải file từ GitHub!');
-      }
-    });
-
-    document.getElementById('btn-publish-github').addEventListener('click', async () => {
-      if (!authConfig) return alert('Chưa đăng nhập!');
-
-      const currentList = db[currentFolder] || [];
-      const filePath = `content/posts-${currentFolder}.json`;
-      const apiUrl = `https://api.github.com/repos/${authConfig.owner}/${authConfig.repo}/contents/${filePath}`;
-
-      const btn = document.getElementById('btn-publish-github');
-      btn.innerText = "Đang xuất bản...";
-      btn.disabled = true;
-
-      try {
-        let sha = "";
-        const getRes = await fetch(apiUrl, { headers: { "Authorization": `Bearer ${authConfig.token}` } });
-        if (getRes.ok) {
-          const fileData = await getRes.json();
-          sha = fileData.sha;
-        }
-
-        const contentStr = JSON.stringify(currentList, null, 2);
-        const putRes = await fetch(apiUrl, {
-          method: "PUT",
-          headers: {
-            "Authorization": `Bearer ${authConfig.token}`,
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            message: `PV INCONS Studio v1.0: Cập nhật ${filePath} (${getTodayFormatted()})`,
-            content: utf8_to_b64(contentStr),
-            sha: sha ? sha : undefined,
-            branch: "main"
-          })
-        });
-
-        if (putRes.ok) {
-          alert(`🚀 XUẤT BẢN THÀNH CÔNG!\nFile ${filePath} đã được đẩy lên GitHub Main.`);
-        } else {
-          const err = await putRes.json();
-          alert(`❌ Lỗi xuất bản: ${err.message}`);
-        }
-      } catch (err) {
-        alert('❌ Không thể kết nối tới GitHub API!');
-      } finally {
-        btn.innerHTML = `<i data-lucide="cloud-upload" class="w-3.5 h-3.5"></i> Xuất bản lên GitHub Main`;
-        btn.disabled = false;
-        lucide.createIcons();
-      }
-    });
-
-    window.deletePost = function(index) {
-      if (confirm('Xóa bài này khỏi danh sách?')) {
-        db[currentFolder].splice(index, 1);
-        resetForm();
-      }
-    };
-
-    document.getElementById('btn-copy').addEventListener('click', () => {
-      navigator.clipboard.writeText(jsonOutput.textContent);
-      alert('📋 Đã sao chép Mảng JSON!');
-    });
-
-    inputId.addEventListener('input', () => {
-      if (editingPostId === null) {
-        inputLink.value = `content/${currentFolder}/${currentFolder}_${String(inputId.value || 1).padStart(3, '0')}.html`;
-      }
-    });
-
-    initAuth();
-  </script>
 </body>
 </html>
