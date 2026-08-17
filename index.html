@@ -5,6 +5,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PV INCONS - Portal Workspace</title>
+    <meta name="description"
+        content="Cung cấp giải pháp toàn diện từ Tư vấn, Quản lý Đầu tư; Thiết kế Kiến trúc theo tiêu chuẩn số BIM/VDC và Thi công Xây dựng; Cùng các Dịch vụ Pháp lý Dự án, Công trình chuyên nghiệp.">
+    <link rel="icon" type="image/webp" href="assets/pic/PVI_CLOUD.webp">
+
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons CDN -->
@@ -57,27 +61,26 @@
 
 <body class="min-h-screen flex flex-col justify-between relative selection:bg-blue-500 selection:text-white">
     <!-- 1. VIDEO NỀN MÂY TRÔI CHÂN THẬT -->
-    <video autoplay loop muted playsinline 
-           poster="./assets/pic/white-cloud-blue-sky-sea.webp" 
-           class="fixed inset-0 w-full h-full object-cover -z-20 filter brightness-90">
-        <source src="./assets/video/clouds.mp4" type="video/mp4">
+    <video autoplay loop muted playsinline poster="assets/pic/white-cloud-blue-sky-sea.webp"
+        class="fixed inset-0 w-full h-full object-cover -z-20 filter brightness-90">
+        <source src="assets/video/5200649-hd_1920_1080_30fps.mp4" type="video/mp4">
     </video>
 
     <!-- 3. LỚP PHỦ MỜ -->
-    <!-- <div class="fixed inset-0 bg-slate-950/60 backdrop-blur-[2px] -z-10"></div> -->
+    <div class="fixed inset-0 bg-slate-950/20 backdrop-blur-[2px] -z-10"></div>
 
     <!-- HEADER TỔNG THỂ -->
     <header class="w-full max-w-5xl mx-auto px-4 pt-6 pb-2 z-10 flex items-center justify-between">
+        <!-- Bọc cả Logo và Chữ chung trong 1 div này -->
         <div class="flex items-center gap-3">
-            <div
-                class="src=./assets/pic/PVI_CLOUD.webp">                
-            </div>
+            <img src="./assets/pic/PVI_CLOUD.webp" alt="PV INCONS Logo" class="h-9 w-auto object-contain" />
+
             <div>
                 <h1 class="font-extrabold text-white text-base leading-none tracking-wider flex items-center gap-2">
                     PV INCONS <span
-                        class="text-[10px] bg-blue-500/20 text-blue-300 border border-blue-400/30 px-1.5 py-0.5 rounded font-mono">CDE</span>
+                        class="text-[10px] bg-blue-500/20 text-blue-400 px-1.5 py-0.5 rounded border border-blue-500/30 font-semibold">CDE</span>
                 </h1>
-                <span class="text-[10px] text-slate-300 font-mono tracking-widest uppercase">Enterprise Workspace</span>
+                <p class="text-[9px] text-slate-400 font-medium tracking-widest mt-1">ENTERPRISE WORKSPACE</p>
             </div>
         </div>
 
@@ -111,18 +114,19 @@
                             class="module-card p-4 rounded-2xl flex items-center justify-between cursor-pointer group">
                             <div class="flex items-center gap-4">
                                 <div
-                                    class="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-400 flex items-center justify-center text-xl shrink-0 group-hover:scale-105 transition-transform">
+                                    class="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-400 flex items-center 
+                                    justify-center text-xl shrink-0 group-hover:scale-105 transition-transform">
                                     <i class="fa-solid fa-chart-pie"></i>
                                 </div>
                                 <div>
                                     <div class="flex items-center gap-2">
                                         <h3
                                             class="font-bold text-sm text-white tracking-wide group-hover:text-amber-300 transition-colors">
-                                            01. ĐẦU TƯ</h3>
+                                            ĐẦU TƯ</h3>
                                         <span
                                             class="text-[10px] bg-amber-500/20 text-amber-300 border border-amber-500/30 px-2 py-0.5 rounded-md font-semibold">Public</span>
                                     </div>
-                                    <p class="text-xs text-slate-300 mt-1">Bảng tính tài chính & mô phỏng</p>
+                                    <p class="text-xs text-slate-300 mt-1">Bảng tính chỉ số đầu tư & tài chính</p>
                                 </div>
                             </div>
                             <i
@@ -141,7 +145,7 @@
                                     <div class="flex items-center gap-2">
                                         <h3
                                             class="font-bold text-sm text-white tracking-wide group-hover:text-blue-300 transition-colors">
-                                            02. BIM - VDC</h3>
+                                            BIM - VDC</h3>
                                         <span
                                             class="text-[10px] bg-blue-500/20 text-blue-300 border border-blue-500/30 px-2 py-0.5 rounded-md font-semibold">Khóa
                                             CDE</span>
@@ -165,7 +169,7 @@
                                     <div class="flex items-center gap-2">
                                         <h3
                                             class="font-bold text-sm text-white tracking-wide group-hover:text-emerald-300 transition-colors">
-                                            03. QUẢN LÝ NỘI BỘ</h3>
+                                            QUẢN LÝ NỘI BỘ</h3>
                                         <span
                                             class="text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-2 py-0.5 rounded-md font-semibold">Khóa
                                             Nội bộ</span>
