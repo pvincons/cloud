@@ -1,0 +1,24 @@
+pv-incons-portal/
+│
+├── frontend/                  # Khung giao diện hiện tại
+│   ├── index.html
+│   ├── style.css
+│   └── layout.js              # Gọi API kết nối với Backend
+│
+├── backend/                   # [CẦN TẠO MỚI] Hệ thống Server & Gemini AI
+│   ├── .env                   # Lưu API Key và cấu hình bảo mật
+│   ├── package.json           # Khai báo các thư viện phụ thuộc
+│   ├── server.js              # File chạy chính của Backend API Server
+│   │
+│   ├── config/
+│   │   └── gemini.js          # Khởi tạo kết nối Google Gemini SDK
+│   │
+│   ├── services/              # Xử lý logic AI & Dữ liệu
+│   │   ├── geminiService.js   # Gọi Gemini API (Text, Vision, Audio)
+│   │   ├── ragService.js      # Tìm kiếm vector & nạp ngữ cảnh CDE
+│   │   └── fileParser.js      # Trích xuất nội dung file PDF, Excel, DWG
+│   │
+│   └── routes/                # Cổng API cho Frontend gọi
+│       ├── cde.js             # API tìm kiếm & hỏi đáp tài liệu CDE
+│       ├── sop.js             # API kiểm tra quy chuẩn thiết kế / QA-QC
+│       └── report.js          # API tự động tạo báo cáo công trường

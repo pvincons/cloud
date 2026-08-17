@@ -1,0 +1,31 @@
+/* Tùy chỉnh Scrollbar cho Live Activity Feed */
+.custom-scrollbar::-webkit-scrollbar {
+    width: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: rgba(15, 23, 42, 0.6);
+    border-radius: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(51, 65, 85, 0.8);
+    border-radius: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(59, 130, 246, 0.8);
+}
+
+/* Hiệu ứng hover cho thẻ card */
+.project-card, .module-card {
+    will-change: transform, border-color;
+}
+
+.project-card:hover {
+    transform: translateY(-2px);
+}
+
+.module-card:hover {
+    transform: translateY(-2px);
+}
