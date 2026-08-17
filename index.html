@@ -3,750 +3,237 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="PV INCONS - Công ty Tư vấn Thiết kế Kiến trúc, Thi công Xây dựng & Giải pháp BIM Chuyên nghiệp tại Cần Thơ.">
-    <title>PV INCONS | Kiến Trúc - Xây Dựng - Giải Pháp BIM</title>
-    
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    
+    <title>PV INCONS - Portal Workspace</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root {
-            --primary: #0f172a;
-            --primary-light: #1e293b;
-            --accent: #d97706;
-            --accent-hover: #b45309;
-            --text-dark: #0f172a;
-            --text-muted: #475569;
-            --bg-light: #f8fafc;
-            --white: #ffffff;
-            --border: #e2e8f0;
-            --shadow-sm: 0 1px 3px rgba(0,0,0,0.1);
-            --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
-            --shadow-lg: 0 10px 25px rgba(0,0,0,0.12);
-            --radius: 8px;
-            --transition: all 0.3s ease;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
-        }
-
-        html {
-            scroll-behavior: smooth;
-        }
-
         body {
-            background-color: var(--bg-light);
-            color: var(--text-dark);
-            line-height: 1.6;
+            color: #0f172a;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            overflow-x: hidden;
         }
 
-        /* Utility Classes */
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 24px;
+        /* KHUNG KÍNH MỜ TƯƠI SÁNG (LIGHT GLASSMORPHISM) */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.82);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.95);
+            box-shadow: 0 20px 50px -10px rgba(15, 23, 42, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.9);
         }
 
-        .btn {
-            display: inline-block;
-            padding: 12px 28px;
-            border-radius: var(--radius);
-            font-weight: 600;
-            text-decoration: none;
-            transition: var(--transition);
-            cursor: pointer;
-            border: none;
-            font-size: 0.95rem;
+        /* CARD PHÂN HỆ NỀN SÁNG */
+        .module-card {
+            background: rgba(255, 255, 255, 0.7);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            backdrop-filter: blur(10px);
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
         }
-
-        .btn-primary {
-            background-color: var(--accent);
-            color: var(--white);
-        }
-
-        .btn-primary:hover {
-            background-color: var(--accent-hover);
+        .module-card:hover {
+            background: rgba(255, 255, 255, 0.98);
+            border-color: #3b82f6;
             transform: translateY(-2px);
-            box-shadow: var(--shadow-md);
+            box-shadow: 0 12px 24px -8px rgba(37, 99, 235, 0.15);
         }
 
-        .btn-outline {
-            background-color: transparent;
-            color: var(--white);
-            border: 2px solid var(--white);
+        /* Ô NHẬP LIỆU LIGHT THEME */
+        .input-box {
+            background: rgba(248, 250, 252, 0.85);
+            border: 1px solid #cbd5e1;
+            transition: all 0.2s ease;
         }
-
-        .btn-outline:hover {
-            background-color: var(--white);
-            color: var(--primary);
-        }
-
-        .section-title {
-            text-align: center;
-            margin-bottom: 48px;
-        }
-
-        .section-title h2 {
-            font-size: 2.25rem;
-            font-weight: 800;
-            color: var(--primary);
-            margin-bottom: 12px;
-            text-transform: uppercase;
-            letter-spacing: -0.5px;
-        }
-
-        .section-title p {
-            color: var(--text-muted);
-            font-size: 1.1rem;
-            max-width: 600px;
-            margin: 0 auto;
-        }
-
-        /* Header / Navbar */
-        header {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            background-color: rgba(15, 23, 42, 0.95);
-            backdrop-filter: blur(8px);
-            z-index: 1000;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-        }
-
-        .navbar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            height: 80px;
-        }
-
-        .logo {
-            font-size: 1.75rem;
-            font-weight: 800;
-            color: var(--white);
-            text-decoration: none;
-            letter-spacing: 1px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .logo span {
-            color: var(--accent);
-        }
-
-        .nav-links {
-            display: flex;
-            list-style: none;
-            gap: 32px;
-            align-items: center;
-        }
-
-        .nav-links a {
-            color: #cbd5e1;
-            text-decoration: none;
-            font-weight: 500;
-            font-size: 0.95rem;
-            transition: var(--transition);
-        }
-
-        .nav-links a:hover {
-            color: var(--accent);
-        }
-
-        /* Hero Section */
-        .hero {
-            background: linear-gradient(135deg, rgba(15, 23, 42, 0.9) 0%, rgba(30, 41, 59, 0.85) 100%), 
-                        url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1920&q=80') center/cover no-repeat;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            color: var(--white);
-            padding-top: 80px;
-        }
-
-        .hero-content {
-            max-width: 800px;
-        }
-
-        .hero-tag {
-            display: inline-block;
-            background-color: rgba(217, 119, 6, 0.2);
-            color: var(--accent);
-            border: 1px solid var(--accent);
-            padding: 6px 16px;
-            border-radius: 50px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            margin-bottom: 20px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .hero h1 {
-            font-size: 3.5rem;
-            font-weight: 800;
-            line-height: 1.15;
-            margin-bottom: 20px;
-        }
-
-        .hero p {
-            font-size: 1.2rem;
-            color: #94a3b8;
-            margin-bottom: 36px;
-            max-width: 650px;
-        }
-
-        .hero-btns {
-            display: flex;
-            gap: 16px;
-        }
-
-        /* About Section */
-        .about {
-            padding: 100px 0;
-            background-color: var(--white);
-        }
-
-        .about-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 60px;
-            align-items: center;
-        }
-
-        .about-text h3 {
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: var(--primary);
-            margin-bottom: 16px;
-        }
-
-        .about-text p {
-            color: var(--text-muted);
-            margin-bottom: 20px;
-            font-size: 1.05rem;
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 20px;
-            margin-top: 32px;
-        }
-
-        .stat-card {
-            background-color: var(--bg-light);
-            padding: 20px;
-            border-radius: var(--radius);
-            border-left: 4px solid var(--accent);
-        }
-
-        .stat-card h4 {
-            font-size: 2rem;
-            font-weight: 800;
-            color: var(--primary);
-        }
-
-        .stat-card p {
-            font-size: 0.9rem;
-            margin-bottom: 0;
-        }
-
-        /* Services Section */
-        .services {
-            padding: 100px 0;
-            background-color: var(--bg-light);
-        }
-
-        .services-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 30px;
-        }
-
-        .service-card {
-            background: var(--white);
-            padding: 36px;
-            border-radius: var(--radius);
-            box-shadow: var(--shadow-sm);
-            transition: var(--transition);
-            border: 1px solid var(--border);
-        }
-
-        .service-card:hover {
-            transform: translateY(-5px);
-            box-shadow: var(--shadow-lg);
-            border-color: var(--accent);
-        }
-
-        .service-icon {
-            width: 60px;
-            height: 60px;
-            background-color: rgba(217, 119, 6, 0.1);
-            color: var(--accent);
-            border-radius: var(--radius);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            margin-bottom: 24px;
-        }
-
-        .service-card h3 {
-            font-size: 1.35rem;
-            font-weight: 700;
-            color: var(--primary);
-            margin-bottom: 12px;
-        }
-
-        .service-card p {
-            color: var(--text-muted);
-            font-size: 0.95rem;
-        }
-
-        /* BIM Advantage Section */
-        .bim-section {
-            padding: 100px 0;
-            background-color: var(--primary);
-            color: var(--white);
-        }
-
-        .bim-container {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 60px;
-            align-items: center;
-        }
-
-        .bim-features {
-            list-style: none;
-            margin-top: 24px;
-        }
-
-        .bim-features li {
-            margin-bottom: 16px;
-            display: flex;
-            align-items: flex-start;
-            gap: 12px;
-            font-size: 1.05rem;
-            color: #cbd5e1;
-        }
-
-        .bim-features li::before {
-            content: "✓";
-            color: var(--accent);
-            font-weight: bold;
-            font-size: 1.2rem;
-        }
-
-        /* Projects Section */
-        .projects {
-            padding: 100px 0;
-            background-color: var(--white);
-        }
-
-        .projects-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 30px;
-        }
-
-        .project-card {
-            border-radius: var(--radius);
-            overflow: hidden;
-            box-shadow: var(--shadow-sm);
-            position: relative;
-            background-color: var(--primary-light);
-        }
-
-        .project-img {
-            width: 100%;
-            height: 260px;
-            object-fit: cover;
-            transition: var(--transition);
-        }
-
-        .project-card:hover .project-img {
-            transform: scale(1.05);
-            opacity: 0.85;
-        }
-
-        .project-info {
-            padding: 24px;
-            background-color: var(--white);
-        }
-
-        .project-info h3 {
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: var(--primary);
-            margin-bottom: 6px;
-        }
-
-        .project-info p {
-            color: var(--text-muted);
-            font-size: 0.9rem;
-        }
-
-        /* Contact Section */
-        .contact {
-            padding: 100px 0;
-            background-color: var(--bg-light);
-        }
-
-        .contact-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 60px;
-        }
-
-        .contact-info h3 {
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: var(--primary);
-            margin-bottom: 16px;
-        }
-
-        .contact-detail-item {
-            display: flex;
-            gap: 16px;
-            margin-bottom: 24px;
-            align-items: flex-start;
-        }
-
-        .contact-detail-item div h4 {
-            font-weight: 700;
-            color: var(--primary);
-        }
-
-        .contact-detail-item div p {
-            color: var(--text-muted);
-            font-size: 0.95rem;
-        }
-
-        .contact-form {
-            background-color: var(--white);
-            padding: 40px;
-            border-radius: var(--radius);
-            box-shadow: var(--shadow-sm);
-            border: 1px solid var(--border);
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: var(--primary);
-            font-size: 0.9rem;
-        }
-
-        .form-group input,
-        .form-group textarea {
-            width: 100%;
-            padding: 12px 16px;
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            font-size: 0.95rem;
-            outline: none;
-            transition: var(--transition);
-        }
-
-        .form-group input:focus,
-        .form-group textarea:focus {
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.1);
-        }
-
-        /* Footer */
-        footer {
-            background-color: var(--primary);
-            color: #94a3b8;
-            padding: 40px 0;
-            text-align: center;
-            border-top: 1px solid rgba(255,255,255,0.05);
-            font-size: 0.9rem;
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .navbar {
-                flex-direction: column;
-                height: auto;
-                padding: 16px 0;
-                gap: 16px;
-            }
-            .nav-links {
-                gap: 16px;
-                font-size: 0.85rem;
-            }
-            .hero h1 {
-                font-size: 2.25rem;
-            }
-            .about-grid, .bim-container, .contact-grid {
-                grid-template-columns: 1fr;
-                gap: 40px;
-            }
-            .hero-btns {
-                flex-direction: column;
-            }
+        .input-box:focus-within {
+            border-color: #2563eb;
+            background: #ffffff;
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
         }
     </style>
 </head>
-<body>
+<body class="min-h-screen flex flex-col justify-between relative selection:bg-blue-500 selection:text-white">
 
-    <!-- Header / Nav -->
-    <header>
-        <div class="container navbar">
-            <a href="#" class="logo">PV <span>INCONS</span></a>
-            <ul class="nav-links">
-                <li><a href="#about">Giới Thiệu</a></li>
-                <li><a href="#services">Dịch Vụ</a></li>
-                <li><a href="#bim">Giải Pháp BIM</a></li>
-                <li><a href="#projects">Dự Án</a></li>
-                <li><a href="#contact">Liên Hệ</a></li>
-            </ul>
-            <a href="#contact" class="btn btn-primary">Tư Vấn Ngay</a>
+    <!-- 1. VIDEO NỀN MÂY NẮNG TRỜI 10H SÁNG TƯƠI SÁNG CHÂN THẬT -->
+    <video autoplay loop muted playsinline 
+           poster="https://images.unsplash.com/photo-1513002749550-c59d786b8e6c?auto=format&fit=crop&w=1920&q=80" 
+           class="fixed inset-0 w-full h-full object-cover -z-20 filter brightness-[1.02] contrast-[1.02]">
+        <source src="https://assets.mixkit.co/videos/preview/mixkit-clouds-and-blue-sky-2408-large.mp4" type="video/mp4">
+    </video>
+
+    <!-- 2. TIA NẮNG ẤM 10H SÁNG (SUNLIGHT GLOW OVERLAY) -->
+    <div class="fixed top-0 right-1/4 w-[600px] h-[600px] bg-gradient-to-br from-amber-200/30 via-sky-100/20 to-transparent rounded-full blur-3xl pointer-events-none -z-10"></div>
+    <div class="fixed inset-0 bg-sky-900/5 backdrop-blur-[1px] -z-10"></div>
+
+    <!-- HEADER TỔNG THỂ -->
+    <header class="w-full max-w-5xl mx-auto px-4 pt-6 pb-2 z-10 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-gradient-to-tr from-blue-600 via-indigo-600 to-sky-500 text-white rounded-xl flex items-center justify-center font-black text-base shadow-md shadow-blue-600/20 border border-white/40">
+                PV
+            </div>
+            <div>
+                <h1 class="font-extrabold text-slate-900 text-base leading-none tracking-wider flex items-center gap-2">
+                    PV INCONS <span class="text-[10px] bg-blue-600 text-white font-bold px-1.5 py-0.5 rounded font-mono shadow-sm">CDE</span>
+                </h1>
+                <span class="text-[10px] text-slate-600 font-mono tracking-widest uppercase font-semibold">Enterprise Workspace</span>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-3">
+            <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[11px] bg-white/80 border border-white/90 text-slate-700 shadow-sm backdrop-blur-md font-semibold">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                System Online
+            </span>
         </div>
     </header>
 
-    <!-- Hero Section -->
-    <section class="hero">
-        <div class="container">
-            <div class="hero-content">
-                <span class="hero-tag">Kiến Trúc & Solution Partner</span>
-                <h1>Giải Pháp Kiến Trúc, Xây Dựng & BIM Chuyên Nghiệp</h1>
-                <p>PV INCONS đồng hành cùng bạn từ tư vấn thiết kế, diễn họa 3D, tối ưu quy trình BIM (Autodesk Revit / Dynamo) đến thi công trọn gói và hoàn thiện pháp lý xây dựng.</p>
-                <div class="hero-btns">
-                    <a href="#projects" class="btn btn-primary">Xem Dự Án Dự Kiến</a>
-                    <a href="#services" class="btn btn-outline">Tìm Hiểu Dịch Vụ</a>
-                </div>
-            </div>
-        </div>
-    </section>
+    <!-- MAIN CONTAINER (Mobile: 1 cột | Desktop: 2 cột nằm ngang) -->
+    <main class="w-full max-w-md lg:max-w-5xl mx-auto px-3 py-4 z-10 my-auto">
+        <div class="glass-panel rounded-3xl overflow-hidden">
+            <div class="grid grid-cols-1 lg:grid-cols-2 divide-y lg:divide-y-0 lg:divide-x divide-slate-200/70">
 
-    <!-- About Section -->
-    <section class="about" id="about">
-        <div class="container">
-            <div class="about-grid">
-                <div class="about-text">
-                    <span style="color: var(--accent); font-weight: 700; text-transform: uppercase; font-size: 0.85rem;">Về PV INCONS</span>
-                    <h3>Tiên Phong Ứng Dụng Công Nghệ Vào Xây Dựng</h3>
-                    <p>Công ty TNHH Đầu tư & Xây dựng PV INCONS là đơn vị hoạt động chuyên sâu trong lĩnh vực tư vấn thiết kế kiến trúc, thi công xây dựng và cung cấp giải pháp chuyển đổi số BIM cho các dự án nhà phố, biệt thự và công trình thương mại tại Cần Thơ cũng như khu vực ĐBSCL.</p>
-                    <p>Với định hướng chuẩn hóa kỹ thuật, tối ưu hóa công năng và áp dụng quy trình quản lý hiện đại, chúng tôi cam kết mang lại sản phẩm chất lượng cao nhất cho chủ đầu tư.</p>
+                <!-- KHỐI 1: CHỌN PHÂN HỆ LÀM VIỆC (TRÊN MOBILE / BÊN TRÁI DESKTOP) -->
+                <section class="p-6 sm:p-8 flex flex-col justify-center">
                     
-                    <div class="stats-grid">
-                        <div class="stat-card">
-                            <h4>100%</h4>
-                            <p>Chuẩn Quy Hoạch & Định Hướng</p>
+                    <div class="flex items-center justify-between mb-6">
+                        <h2 class="text-xs font-bold text-slate-600 uppercase tracking-[0.2em] flex items-center gap-2">
+                            <i class="fa-solid fa-layer-group text-blue-600"></i> CHỌN PHÂN HỆ LÀM VIỆC
+                        </h2>
+                        <span class="text-[10px] text-slate-500 font-mono font-semibold">WORKSPACE</span>
+                    </div>
+
+                    <div class="space-y-4">
+                        <!-- KHỐI 01: ĐẦU TƯ -->
+                        <div onclick="selectModule('Đầu tư')" class="module-card p-4 rounded-2xl flex items-center justify-between cursor-pointer group shadow-sm">
+                            <div class="flex items-center gap-4">
+                                <div class="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-600 flex items-center justify-center text-xl shrink-0 group-hover:scale-105 transition-transform">
+                                    <i class="fa-solid fa-chart-pie"></i>
+                                </div>
+                                <div>
+                                    <div class="flex items-center gap-2">
+                                        <h3 class="font-bold text-sm text-slate-800 tracking-wide group-hover:text-amber-600 transition-colors">01. ĐẦU TƯ</h3>
+                                        <span class="text-[10px] bg-amber-100 text-amber-800 border border-amber-300 px-2 py-0.5 rounded-md font-bold">Public</span>
+                                    </div>
+                                    <p class="text-xs text-slate-500 mt-1 font-medium">Bảng tính tài chính & mô phỏng</p>
+                                </div>
+                            </div>
+                            <i class="fa-solid fa-chevron-right text-xs text-slate-400 group-hover:text-amber-600 transition-colors pl-2"></i>
                         </div>
-                        <div class="stat-card">
-                            <h4>BIM</h4>
-                            <p>Quy Trình Quản Lý 3D Tiên Tiến</p>
+
+                        <!-- KHỐI 02: BIM - VDC -->
+                        <div onclick="selectModule('BIM - VDC')" class="module-card p-4 rounded-2xl flex items-center justify-between cursor-pointer group shadow-sm">
+                            <div class="flex items-center gap-4">
+                                <div class="w-12 h-12 rounded-xl bg-blue-500/10 border border-blue-500/30 text-blue-600 flex items-center justify-center text-xl shrink-0 group-hover:scale-105 transition-transform">
+                                    <i class="fa-solid fa-cubes"></i>
+                                </div>
+                                <div>
+                                    <div class="flex items-center gap-2">
+                                        <h3 class="font-bold text-sm text-slate-800 tracking-wide group-hover:text-blue-600 transition-colors">02. BIM - VDC</h3>
+                                        <span class="text-[10px] bg-blue-100 text-blue-800 border border-blue-300 px-2 py-0.5 rounded-md font-bold">Khóa CDE</span>
+                                    </div>
+                                    <p class="text-xs text-slate-500 mt-1 font-medium">Cơ sở dữ liệu kỹ thuật dự án</p>
+                                </div>
+                            </div>
+                            <i class="fa-solid fa-lock text-xs text-slate-400 group-hover:text-blue-600 transition-colors pl-2"></i>
+                        </div>
+
+                        <!-- KHỐI 03: QUẢN LÝ NỘI BỘ -->
+                        <div onclick="selectModule('Quản lý nội bộ')" class="module-card p-4 rounded-2xl flex items-center justify-between cursor-pointer group shadow-sm">
+                            <div class="flex items-center gap-4">
+                                <div class="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 flex items-center justify-center text-xl shrink-0 group-hover:scale-105 transition-transform">
+                                    <i class="fa-solid fa-folder-closed"></i>
+                                </div>
+                                <div>
+                                    <div class="flex items-center gap-2">
+                                        <h3 class="font-bold text-sm text-slate-800 tracking-wide group-hover:text-emerald-600 transition-colors">03. QUẢN LÝ NỘI BỘ</h3>
+                                        <span class="text-[10px] bg-emerald-100 text-emerald-800 border border-emerald-300 px-2 py-0.5 rounded-md font-bold">Khóa Nội bộ</span>
+                                    </div>
+                                    <p class="text-xs text-slate-500 mt-1 font-medium">Quy trình SOP & form mẫu chuẩn</p>
+                                </div>
+                            </div>
+                            <i class="fa-solid fa-lock text-xs text-slate-400 group-hover:text-emerald-600 transition-colors pl-2"></i>
                         </div>
                     </div>
-                </div>
-                <div>
-                    <img src="https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=800&q=80" alt="Thiết kế kiến trúc PV INCONS" style="width:100%; border-radius: var(--radius); box-shadow: var(--shadow-md);">
-                </div>
-            </div>
-        </div>
-    </section>
 
-    <!-- Services Section -->
-    <section class="services" id="services">
-        <div class="container">
-            <div class="section-title">
-                <h2>Dịch Vụ Trọng Tâm</h2>
-                <p>Cung cấp giải pháp toàn diện từ khâu ý tưởng đến khi bàn giao công trình hoàn thiện</p>
-            </div>
-            
-            <div class="services-grid">
-                <!-- Service 1 -->
-                <div class="service-card">
-                    <div class="service-icon">📐</div>
-                    <h3>Thiết Kế Kiến Trúc & Nội Thất</h3>
-                    <p>Tư vấn thiết kế kiến trúc nhà phố, biệt thự, nhà xưởng và công trình thương mại. Tối ưu không gian sống, đón gió, đón sáng tự nhiên chuẩn phong thủy.</p>
-                </div>
+                </section>
 
-                <!-- Service 2 -->
-                <div class="service-card">
-                    <div class="service-icon">🏗️</div>
-                    <h3>Thi Công Xây Dựng Trọn Gói</h3>
-                    <p>Thi công phần thô đến hoàn thiện với vật tư chính hãng, giám sát chặt chẽ, đảm bảo tiến độ và chất lượng kết cấu theo chuẩn TCVN.</p>
-                </div>
-
-                <!-- Service 3 -->
-                <div class="service-card">
-                    <div class="service-icon">💻</div>
-                    <h3>Ứng Dụng & Tư Vấn BIM</h3>
-                    <p>Triển khai mô hình BIM (Revit, Dynamo automation) giúp phát hiện xung đột kết cấu - ME, bóc tách khối lượng chính xác và tối ưu chi phí đầu tư.</p>
-                </div>
-
-                <!-- Service 4 -->
-                <div class="service-card">
-                    <div class="service-icon">🖼️</div>
-                    <h3>Diễn Họa Kiến Trúc 3D</h3>
-                    <p>Render ảnh & video 3D kiến trúc cao cấp với Chaos Vantage, D5 Render, Lumion. Giúp chủ đầu tư hình dung công trình sống động như thực tế.</p>
-                </div>
-
-                <!-- Service 5 -->
-                <div class="service-card">
-                    <div class="service-icon">📜</div>
-                    <h3>Pháp Lý & Xin Phép Xây Dựng</h3>
-                    <p>Hỗ trợ lập hồ sơ trích đo hiện trạng (VN-2000), xin cấp phép xây dựng, tư vấn hoàn công và chứng nhận quyền sở hữu công trình tại Cần Thơ.</p>
-                </div>
-
-                <!-- Service 6 -->
-                <div class="service-card">
-                    <div class="service-icon">🔍</div>
-                    <h3>Thẩm Tra & Giám Sát Tác Giả</h3>
-                    <p>Thẩm tra bản vẽ kết cấu, giám sát kỹ thuật công trình đảm bảo thi công đúng bản vẽ và tiêu chuẩn an toàn lao động.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- BIM Advantage -->
-    <section class="bim-section" id="bim">
-        <div class="container">
-            <div class="bim-container">
-                <div>
-                    <span style="color: var(--accent); font-weight: 700; text-transform: uppercase; font-size: 0.85rem;">Công Nghệ Nòng Cốt</span>
-                    <h2 style="font-size: 2.25rem; font-weight: 800; margin: 12px 0 20px 0;">Sức Mạnh Của Mô Hình BIM Trong Thiết Kế</h2>
-                    <p style="color: #94a3b8;">PV INCONS đi đầu trong việc tích hợp quy trình BIM vào mọi quy mô dự án. Chúng tôi giúp xóa bỏ sai sót trên bản vẽ 2D truyền thống.</p>
+                <!-- KHỐI 2: ĐĂNG NHẬP TÀI KHOẢN (DƯỚI MOBILE / BÊN PHẢI DESKTOP) -->
+                <section class="p-6 sm:p-8 bg-white/40 lg:bg-transparent flex flex-col justify-center">
                     
-                    <ul class="bim-features">
-                        <li><strong>Bóc tách khối lượng tự động:</strong> Giảm thiểu sai lệch vật tư, tối ưu ngân sách xây dựng.</li>
-                        <li><strong>Kiểm tra xung đột Clash Detection:</strong> Phát hiện lỗi va chạm giữa Kết cấu và M&E trước khi thi công.</li>
-                        <li><strong>Tự động hóa với Dynamo Script:</strong> Đẩy nhanh tiến độ lập bản vẽ kỹ thuật chi tiết.</li>
-                        <li><strong>Tích hợp mô hình 3D trực quan:</strong> Dễ dàng trao đổi giữa KTS, Kỹ sư và Chủ đầu tư.</li>
-                    </ul>
-                </div>
-                <div>
-                    <img src="https://images.unsplash.com/photo-1581094794329-c8112a89af12?auto=format&fit=crop&w=800&q=80" alt="BIM Workflow" style="width:100%; border-radius: var(--radius); opacity: 0.9;">
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Projects Section -->
-    <section class="projects" id="projects">
-        <div class="container">
-            <div class="section-title">
-                <h2>Dự Án Tiêu Biểu</h2>
-                <p>Một số giải pháp không gian kiến trúc được tối ưu hóa cho từng chủ đầu tư</p>
-            </div>
-
-            <div class="projects-grid">
-                <!-- Project 1 -->
-                <div class="project-card">
-                    <img src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=600&q=80" alt="Nhà phố Ninh Kiều" class="project-img">
-                    <div class="project-info">
-                        <h3>Nhà Phố Phố Hiện Đại 4 Tầng</h3>
-                        <p>📍 Ninh Kiều, TP. Cần Thơ — Diện tích 44.5m²</p>
-                    </div>
-                </div>
-
-                <!-- Project 2 -->
-                <div class="project-card">
-                    <img src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=600&q=80" alt="Biệt thự Hưng Lợi" class="project-img">
-                    <div class="project-info">
-                        <h3>Biệt Thự Vườn Mới</h3>
-                        <p>📍 Hưng Lợi, TP. Cần Thơ — Phong cách hiện đại tối giản</p>
-                    </div>
-                </div>
-
-                <!-- Project 3 -->
-                <div class="project-card">
-                    <img src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=600&q=80" alt="Showroom Thương Mại" class="project-img">
-                    <div class="project-info">
-                        <h3>Tổ Hợp Văn Phòng & Showroom</h3>
-                        <p>📍 Vĩnh Long — Diễn họa D5 Render & Revit BIM</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Contact Section -->
-    <section class="contact" id="contact">
-        <div class="container">
-            <div class="contact-grid">
-                <div class="contact-info">
-                    <span style="color: var(--accent); font-weight: 700; text-transform: uppercase; font-size: 0.85rem;">Liên Hệ Với Chúng Tôi</span>
-                    <h3>Sẵn Sàng Cho Dự Án Của Bạn?</h3>
-                    <p style="color: var(--text-muted); margin-bottom: 32px;">Hãy liên hệ với PV INCONS để nhận tư vấn phương án thiết kế, giải pháp BIM hoặc báo giá thi công chi tiết nhất.</p>
-
-                    <div class="contact-detail-item">
-                        <div style="font-size: 1.5rem; color: var(--accent);">📍</div>
-                        <div>
-                            <h4>Địa Chỉ Văn Phòng</h4>
-                            <p>Quận Ninh Kiều, Thành phố Cần Thơ, Việt Nam</p>
-                        </div>
+                    <div class="flex items-center justify-between mb-6">
+                        <h2 class="font-bold text-sm text-slate-900 tracking-wider flex items-center gap-2">
+                            <i class="fa-solid fa-user-shield text-blue-600"></i> ĐĂNG NHẬP TÀI KHOẢN
+                        </h2>
+                        <span class="text-xs text-slate-500 font-mono font-medium">SSO Portal</span>
                     </div>
 
-                    <div class="contact-detail-item">
-                        <div style="font-size: 1.5rem; color: var(--accent);">🌐</div>
-                        <div>
-                            <h4>Website & Domain</h4>
-                            <p>pvincons.com | pvincons.cloud</p>
+                    <form onsubmit="handleLogin(event)" class="space-y-4">
+                        <!-- Username Input -->
+                        <div class="input-box rounded-xl px-4 py-3.5 flex items-center gap-3">
+                            <i class="fa-regular fa-user text-slate-400 text-sm w-4 text-center"></i>
+                            <input type="text" id="username" placeholder="Tên đăng nhập / Mã NV" required 
+                                class="bg-transparent text-sm text-slate-900 placeholder-slate-400 w-full focus:outline-none font-semibold">
                         </div>
-                    </div>
 
-                    <div class="contact-detail-item">
-                        <div style="font-size: 1.5rem; color: var(--accent);">✉️</div>
-                        <div>
-                            <h4>Email Liên Hệ</h4>
-                            <p>contact@pvincons.com</p>
+                        <!-- Password Input -->
+                        <div class="input-box rounded-xl px-4 py-3.5 flex items-center gap-3">
+                            <i class="fa-solid fa-lock text-slate-400 text-sm w-4 text-center"></i>
+                            <input type="password" id="password" placeholder="Mật khẩu" required 
+                                class="bg-transparent text-sm text-slate-900 placeholder-slate-400 w-full focus:outline-none font-semibold">
+                            <button type="button" onclick="togglePassword()" class="text-slate-400 hover:text-slate-700 transition-colors">
+                                <i id="eyeIcon" class="fa-regular fa-eye text-sm"></i>
+                            </button>
                         </div>
-                    </div>
-                </div>
 
-                <div class="contact-form">
-                    <h3 style="font-size: 1.35rem; margin-bottom: 20px; color: var(--primary);">Đăng Ký Tư Vấn Trực Tuyến</h3>
-                    <form onsubmit="event.preventDefault(); alert('Cảm ơn bạn! PV INCONS sẽ liên hệ lại sớm nhất.');">
-                        <div class="form-group">
-                            <label for="name">Họ và tên *</label>
-                            <input type="text" id="name" placeholder="Ví dụ: Nguyễn Văn A" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="phone">Số điện thoại *</label>
-                            <input type="tel" id="phone" placeholder="0901234567" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="service">Dịch vụ quan tâm</label>
-                            <input type="text" id="service" placeholder="Thiết kế nhà / BIM / Thi công / Xin phép">
-                        </div>
-                        <div class="form-group">
-                            <label for="message">Nội dung chi tiết</label>
-                            <textarea id="message" rows="4" placeholder="Mô tả nhu cầu thiết kế hoặc thông tin khu đất..."></textarea>
-                        </div>
-                        <button type="submit" class="btn btn-primary" style="width: 100%;">Gửi Yêu Cầu Tư Vấn</button>
+                        <!-- Submit Button -->
+                        <button type="submit" class="w-full py-3.5 bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold text-xs tracking-wider uppercase rounded-xl shadow-lg shadow-blue-600/25 transition-all duration-200 mt-2 flex items-center justify-center gap-2 active:scale-[0.99]">
+                            <span>ĐĂNG NHẬP SUB-WORKSPACE</span>
+                            <i class="fa-solid fa-arrow-right-to-bracket text-xs"></i>
+                        </button>
                     </form>
-                </div>
+
+                </section>
+
             </div>
         </div>
-    </section>
+    </main>
 
-    <!-- Footer -->
-    <footer>
-        <div class="container">
-            <p>© 2026 PV INCONS Construction & Trading. All Rights Reserved.</p>
-            <p style="font-size: 0.8rem; margin-top: 6px; color: #64748b;">Thiết kế & phát triển tối ưu cho quy trình Kiến Trúc, Xây Dựng và BIM.</p>
+    <!-- FOOTER TỔNG THỂ -->
+    <footer class="w-full max-w-5xl mx-auto px-4 py-4 z-10 flex flex-col sm:flex-row items-center justify-between border-t border-slate-900/10 text-xs text-slate-700 gap-2 font-medium">
+        <div>
+            &copy; 2026 <span class="text-slate-900 font-bold">PV INCONS Enterprise Workspace</span>. All rights reserved.
+        </div>
+        <div class="flex items-center gap-4 text-[11px]">
+            <a href="#" class="hover:text-blue-600 transition-colors">Chính sách bảo mật</a>
+            <span>•</span>
+            <a href="#" class="hover:text-blue-600 transition-colors">Hỗ trợ kỹ thuật</a>
+            <span>•</span>
+            <span class="font-mono text-slate-500 font-semibold">v2.6.0-prod</span>
         </div>
     </footer>
 
+    <!-- INTERACTIVE JAVASCRIPT -->
+    <script>
+        function togglePassword() {
+            const pwdInput = document.getElementById('password');
+            const eyeIcon = document.getElementById('eyeIcon');
+            if (pwdInput.type === 'password') {
+                pwdInput.type = 'text';
+                eyeIcon.classList.replace('fa-eye', 'fa-eye-slash');
+            } else {
+                pwdInput.type = 'password';
+                eyeIcon.classList.replace('fa-eye-slash', 'fa-eye');
+            }
+        }
+
+        function selectModule(name) {
+            document.getElementById('username').focus();
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const user = document.getElementById('username').value;
+            alert(`Đang khởi tạo phiên làm việc SSO cho tài khoản: ${user}`);
+        }
+    </script>
 </body>
 </html>
