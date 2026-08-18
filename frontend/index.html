@@ -1,395 +1,403 @@
 <!DOCTYPE html>
-<html lang="vi" class="h-full">
+<html lang="vi" class="h-full bg-slate-950">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PV INCONS - Portal Workspace</title>
-    <!-- Tailwind CSS CDN -->
+    <title>PV INCONS - CDE Command Center v3.0 Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
-    <!-- Custom CSS -->
+    
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <script src="https://apis.google.com/js/api.js" async defer></script>
+    
     <link rel="stylesheet" href="style.css">
 </head>
-<body class="min-h-screen bg-slate-950 text-slate-100 flex flex-col justify-between relative selection:bg-blue-600 selection:text-white font-sans antialiased">
+<body class="h-full font-sans text-slate-100 selection:bg-blue-600 selection:text-white antialiased flex flex-col md:flex-row overflow-x-hidden">
 
-    <!-- 1. VIDEO NỀN DỰ PHÒNG & LỚP PHỦ -->
-    <video autoplay loop muted playsinline 
-           poster="https://images.unsplash.com/photo-1541888946425-d0fbb186a5b7?auto=format&fit=crop&w=1920&q=80" 
-           class="fixed inset-0 w-full h-full object-cover -z-20 filter brightness-[0.4] contrast-125">
-        <source src="assets/video/clouds.mp4" type="video/mp4">
-    </video>
-    <div class="fixed inset-0 bg-slate-950/65 backdrop-blur-[3px] -z-10"></div>
+    <div id="mobileBackdrop" onclick="toggleMobileMenu()" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-40 hidden md:hidden transition-opacity"></div>
 
-    <!-- 2. HEADER TỔNG THỂ -->
-    <header class="sticky top-0 z-50 bg-slate-900/80 backdrop-blur-md border-b border-slate-800/80 px-6 py-3 flex items-center justify-between shadow-lg">
-        <!-- Logo & Title -->
-        <div class="flex items-center gap-3">
-            <div class="bg-blue-600 text-white font-black text-lg px-3 py-1.5 rounded-lg shadow-md tracking-wider flex items-center gap-1">
-                <span>PV</span>
-            </div>
-            <div>
-                <div class="flex items-center gap-2">
-                    <span class="font-extrabold text-sm tracking-wide text-white">PV INCONS</span>
-                    <span class="bg-slate-800 text-blue-400 text-[10px] font-bold px-1.5 py-0.5 rounded border border-blue-500/30">CDE</span>
-                </div>
-                <p class="text-[10px] text-slate-400 font-medium tracking-widest uppercase">Enterprise Workspace</p>
-            </div>
-        </div>
-
-        <!-- Search Bar -->
-        <div class="flex-1 max-w-xl mx-8">
-            <div class="relative flex items-center">
-                <i data-lucide="search" class="absolute left-3.5 w-4 h-4 text-slate-400"></i>
-                <input type="text" id="searchInput" 
-                       placeholder="Tìm dự án NP2801, bản vẽ ARC-TANG1..." 
-                       class="w-full bg-slate-800/90 border border-slate-700/70 rounded-xl pl-10 pr-4 py-2 text-xs text-slate-200 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition shadow-inner">
-            </div>
-        </div>
-
-        <!-- User & Status -->
-        <div class="flex items-center gap-4">
-            <button class="relative p-2 text-slate-400 hover:text-white transition rounded-lg hover:bg-slate-800">
-                <i data-lucide="message-square" class="w-4 h-4"></i>
-            </button>
-            <button class="relative p-2 text-slate-400 hover:text-white transition rounded-lg hover:bg-slate-800">
-                <i data-lucide="bell" class="w-4 h-4"></i>
-                <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-rose-500 rounded-full animate-ping"></span>
-                <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-rose-500 rounded-full"></span>
-            </button>
-
-            <div class="h-5 w-[1px] bg-slate-800"></div>
-
-            <div class="flex items-center gap-2.5">
-                <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80" 
-                     alt="Avatar" class="w-8 h-8 rounded-full border border-blue-500/50 object-cover">
-                <div class="text-left">
-                    <div class="text-xs font-bold text-slate-200 flex items-center gap-1">
-                        KTS Chủ trì <i data-lucide="chevron-down" class="w-3 h-3 text-slate-400"></i>
-                    </div>
-                </div>
-            </div>
-
-            <div class="flex items-center gap-1.5 bg-emerald-950/80 border border-emerald-500/30 px-2.5 py-1 rounded-full text-[11px] font-medium text-emerald-400">
-                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                System Online
-            </div>
-        </div>
-    </header>
-
-    <!-- 3. NỘI DUNG CHÍNH (MAIN DASHBOARD) -->
-    <main class="max-w-[1600px] mx-auto w-full px-6 py-6 flex-1 space-y-6">
-
-        <!-- SECTION A: DỰ ÁN TRỌNG ĐIỂM -->
-        <section>
-            <div class="flex items-center justify-between mb-3">
-                <h2 class="text-sm font-bold text-slate-200 uppercase tracking-wider flex items-center gap-2">
-                    <i data-lucide="layers" class="w-4 h-4 text-blue-400"></i> Dự án Trọng điểm
-                </h2>
-                <button class="text-xs text-blue-400 hover:underline font-medium">Xem tất cả (12)</button>
-            </div>
-
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <!-- Project Card 1 -->
-                <div class="project-card bg-slate-900/80 border border-slate-800/90 rounded-2xl overflow-hidden hover:border-blue-500/60 transition group cursor-pointer shadow-lg">
-                    <div class="relative h-28 overflow-hidden">
-                        <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=500&q=80" 
-                             alt="NP2601" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
-                        <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent"></div>
-                        <span class="absolute top-2 right-2 bg-slate-950/80 text-amber-400 text-[10px] font-bold px-2 py-0.5 rounded border border-amber-500/30">Thiết kế</span>
-                    </div>
-                    <div class="p-3.5 space-y-2">
-                        <h3 class="font-bold text-xs text-slate-100 truncate group-hover:text-blue-400 transition">NP2601 - Biệt thự Ninh Kiều, Cần Thơ</h3>
-                        <div class="space-y-1">
-                            <div class="flex justify-between text-[10px] text-slate-400">
-                                <span>Tiến độ tổng thể</span>
-                                <span class="font-bold text-blue-400">65%</span>
-                            </div>
-                            <div class="w-full bg-slate-800 rounded-full h-1.5 overflow-hidden">
-                                <div class="bg-blue-500 h-1.5 rounded-full" style="width: 65%"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Project Card 2 -->
-                <div class="project-card bg-slate-900/80 border border-slate-800/90 rounded-2xl overflow-hidden hover:border-blue-500/60 transition group cursor-pointer shadow-lg">
-                    <div class="relative h-28 overflow-hidden">
-                        <img src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=500&q=80" 
-                             alt="BT2602" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
-                        <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent"></div>
-                        <span class="absolute top-2 right-2 bg-slate-950/80 text-emerald-400 text-[10px] font-bold px-2 py-0.5 rounded border border-emerald-500/30">Thi công</span>
-                    </div>
-                    <div class="p-3.5 space-y-2">
-                        <h3 class="font-bold text-xs text-slate-100 truncate group-hover:text-blue-400 transition">BT2602 - Nhà phố Bình Minh, Vĩnh Long</h3>
-                        <div class="space-y-1">
-                            <div class="flex justify-between text-[10px] text-slate-400">
-                                <span>Tiến độ tổng thể</span>
-                                <span class="font-bold text-emerald-400">80%</span>
-                            </div>
-                            <div class="w-full bg-slate-800 rounded-full h-1.5 overflow-hidden">
-                                <div class="bg-emerald-500 h-1.5 rounded-full" style="width: 80%"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Project Card 3 -->
-                <div class="project-card bg-slate-900/80 border border-slate-800/90 rounded-2xl overflow-hidden hover:border-blue-500/60 transition group cursor-pointer shadow-lg">
-                    <div class="relative h-28 overflow-hidden">
-                        <img src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=500&q=80" 
-                             alt="RESORT_MUI_NE" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
-                        <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent"></div>
-                        <span class="absolute top-2 right-2 bg-slate-950/80 text-purple-400 text-[10px] font-bold px-2 py-0.5 rounded border border-purple-500/30">Quy hoạch</span>
-                    </div>
-                    <div class="p-3.5 space-y-2">
-                        <h3 class="font-bold text-xs text-slate-100 truncate group-hover:text-blue-400 transition">RESORT_MUI_NE - Phan Thiết</h3>
-                        <div class="space-y-1">
-                            <div class="flex justify-between text-[10px] text-slate-400">
-                                <span>Tiến độ tổng thể</span>
-                                <span class="font-bold text-purple-400">30%</span>
-                            </div>
-                            <div class="w-full bg-slate-800 rounded-full h-1.5 overflow-hidden">
-                                <div class="bg-purple-500 h-1.5 rounded-full" style="width: 30%"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Project Card 4 -->
-                <div class="project-card bg-slate-900/80 border border-slate-800/90 rounded-2xl overflow-hidden hover:border-blue-500/60 transition group cursor-pointer shadow-lg">
-                    <div class="relative h-28 overflow-hidden">
-                        <img src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=500&q=80" 
-                             alt="XUONG2604" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
-                        <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent"></div>
-                        <span class="absolute top-2 right-2 bg-slate-950/80 text-cyan-400 text-[10px] font-bold px-2 py-0.5 rounded border border-cyan-500/30">Hoàn công</span>
-                    </div>
-                    <div class="p-3.5 space-y-2">
-                        <h3 class="font-bold text-xs text-slate-100 truncate group-hover:text-blue-400 transition">XUONG2604 - Tiền chế Vĩnh Long</h3>
-                        <div class="space-y-1">
-                            <div class="flex justify-between text-[10px] text-slate-400">
-                                <span>Tiến độ tổng thể</span>
-                                <span class="font-bold text-cyan-400">95%</span>
-                            </div>
-                            <div class="w-full bg-slate-800 rounded-full h-1.5 overflow-hidden">
-                                <div class="bg-cyan-500 h-1.5 rounded-full" style="width: 95%"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- SECTION B: CDE TREE + MODULES + LIVE FEED -->
-        <section class="grid grid-cols-12 gap-5">
-
-            <!-- CỘT 1: CÂY THƯ MỤC CDE CHUẨN ISO 19650 (4 Cols) -->
-            <div class="col-span-12 lg:col-span-4 bg-slate-900/80 border border-slate-800/90 rounded-2xl p-4 shadow-xl flex flex-col justify-between backdrop-blur-md">
-                <div>
-                    <div class="flex items-center justify-between pb-3 mb-3 border-b border-slate-800">
-                        <span class="text-[11px] font-bold text-blue-400 tracking-wider uppercase flex items-center gap-1.5">
-                            <i data-lucide="folder-tree" class="w-4 h-4"></i> ISO 19650 CDE Structure
-                        </span>
-                        <span class="text-[10px] bg-slate-800 text-slate-400 px-2 py-0.5 rounded">Standard</span>
-                    </div>
-
-                    <div class="text-xs font-semibold text-slate-300 mb-2 truncate bg-slate-950/60 p-2 rounded-lg border border-slate-800 flex items-center gap-2">
-                        <i data-lucide="folder" class="w-4 h-4 text-amber-400 shrink-0"></i>
-                        <span>[MÃ DỰ ÁN]_[TÊN_DỰ_ÁN]_[ĐỊA BÀN]</span>
-                    </div>
-
-                    <!-- Tree View List -->
-                    <ul class="space-y-1 text-xs text-slate-300 font-medium select-none">
-                        <!-- WIP -->
-                        <li>
-                            <div class="tree-toggle flex items-center gap-2 p-1.5 hover:bg-slate-800/60 rounded-lg cursor-pointer transition text-amber-400">
-                                <i data-lucide="chevron-down" class="w-3.5 h-3.5 transform transition-transform"></i>
-                                <i data-lucide="folder-git" class="w-4 h-4"></i>
-                                <span>01_WIP</span>
-                                <span class="text-[10px] text-slate-500 font-normal ml-auto">(Arch, Struct, MEP)</span>
-                            </div>
-                            <ul class="pl-6 border-l border-slate-800 ml-3 my-1 space-y-1 text-slate-400">
-                                <li class="p-1 hover:text-slate-200 cursor-pointer">📄 Architecture_Draft.rvt</li>
-                                <li class="p-1 hover:text-slate-200 cursor-pointer">📄 Structure_Analysis.sdb</li>
-                            </ul>
-                        </li>
-
-                        <!-- SHARED -->
-                        <li>
-                            <div class="tree-toggle flex items-center gap-2 p-1.5 hover:bg-slate-800/60 rounded-lg cursor-pointer transition text-blue-400">
-                                <i data-lucide="chevron-down" class="w-3.5 h-3.5 transform transition-transform -rotate-90"></i>
-                                <i data-lucide="folder-symlink" class="w-4 h-4"></i>
-                                <span>02_SHARED</span>
-                            </div>
-                            <ul class="pl-6 border-l border-slate-800 ml-3 my-1 space-y-1 text-slate-400 hidden">
-                                <li class="p-1 hover:text-slate-200 cursor-pointer">📄 Coord_Model_S1.nwd</li>
-                            </ul>
-                        </li>
-
-                        <!-- PUBLISHED -->
-                        <li>
-                            <div class="tree-toggle flex items-center gap-2 p-1.5 hover:bg-slate-800/60 rounded-lg cursor-pointer transition text-emerald-400">
-                                <i data-lucide="chevron-down" class="w-3.5 h-3.5 transform transition-transform"></i>
-                                <i data-lucide="folder-check" class="w-4 h-4"></i>
-                                <span>03_PUBLISHED</span>
-                            </div>
-                            <ul class="pl-6 border-l border-slate-800 ml-3 my-1 space-y-1 text-slate-400">
-                                <li class="p-1 hover:text-emerald-300 cursor-pointer flex items-center gap-1.5">
-                                    <i data-lucide="file-text" class="w-3 h-3"></i> Phap_Ly_Xin_Phep
-                                </li>
-                                <li class="p-1 hover:text-emerald-300 cursor-pointer flex items-center gap-1.5">
-                                    <i data-lucide="file-code" class="w-3 h-3"></i> Shop_Drawings
-                                </li>
-                                <li class="p-1 hover:text-emerald-300 cursor-pointer flex items-center gap-1.5">
-                                    <i data-lucide="file-spreadsheet" class="w-3 h-3"></i> BOQ_Chuan
-                                </li>
-                                <li class="p-1 hover:text-emerald-300 cursor-pointer flex items-center gap-1.5">
-                                    <i data-lucide="file-check" class="w-3 h-3"></i> Hoan_Cong
-                                </li>
-                            </ul>
-                        </li>
-
-                        <!-- ARCHIVED -->
-                        <li>
-                            <div class="tree-toggle flex items-center gap-2 p-1.5 hover:bg-slate-800/60 rounded-lg cursor-pointer transition text-slate-400">
-                                <i data-lucide="chevron-down" class="w-3.5 h-3.5 transform transition-transform -rotate-90"></i>
-                                <i data-lucide="folder-archive" class="w-4 h-4"></i>
-                                <span>04_ARCHIVED</span>
-                            </div>
-                            <ul class="pl-6 border-l border-slate-800 ml-3 my-1 space-y-1 text-slate-500 hidden">
-                                <li class="p-1 hover:text-slate-300 cursor-pointer">📦 Baseline_V1.0.zip</li>
-                            </ul>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-
-            <!-- CỘT 2: LƯỚI 4 PHÂN HỆ LÀM VIỆC CHÍNH (5 Cols) -->
-            <div class="col-span-12 lg:col-span-5 grid grid-cols-2 gap-4">
-                <!-- Module 1 -->
-                <a href="#" class="module-card bg-slate-900/80 border border-slate-800/90 rounded-2xl p-5 shadow-xl hover:border-blue-500 transition group flex flex-col justify-between backdrop-blur-md">
-                    <div>
-                        <div class="w-10 h-10 rounded-xl bg-blue-600/20 border border-blue-500/40 text-blue-400 flex items-center justify-center mb-3 group-hover:scale-110 transition">
-                            <i data-lucide="box" class="w-5 h-5"></i>
-                        </div>
-                        <h3 class="text-sm font-bold text-slate-100 group-hover:text-blue-400 transition mb-1">01. Dự án & Bản vẽ (CDE)</h3>
-                        <p class="text-[11px] text-slate-400 leading-relaxed">Cơ sở dữ liệu kỹ thuật dự án, mô hình BIM & bản vẽ CAD.</p>
-                    </div>
-                    <div class="mt-4 flex items-center text-[11px] text-blue-400 font-semibold group-hover:translate-x-1 transition">
-                        Truy cập phân hệ <i data-lucide="arrow-right" class="w-3.5 h-3.5 ml-1"></i>
-                    </div>
-                </a>
-
-                <!-- Module 2 -->
-                <a href="#" class="module-card bg-slate-900/80 border border-slate-800/90 rounded-2xl p-5 shadow-xl hover:border-indigo-500 transition group flex flex-col justify-between backdrop-blur-md">
-                    <div>
-                        <div class="w-10 h-10 rounded-xl bg-indigo-600/20 border border-indigo-500/40 text-indigo-400 flex items-center justify-center mb-3 group-hover:scale-110 transition">
-                            <i data-lucide="library" class="w-5 h-5"></i>
-                        </div>
-                        <h3 class="text-sm font-bold text-slate-100 group-hover:text-indigo-400 transition mb-1">02. Thư viện Số (Assets)</h3>
-                        <p class="text-[11px] text-slate-400 leading-relaxed">Thư viện Family Revit, CAD block & vật liệu chuẩn hóa.</p>
-                    </div>
-                    <div class="mt-4 flex items-center text-[11px] text-indigo-400 font-semibold group-hover:translate-x-1 transition">
-                        Truy cập phân hệ <i data-lucide="arrow-right" class="w-3.5 h-3.5 ml-1"></i>
-                    </div>
-                </a>
-
-                <!-- Module 3 -->
-                <a href="#" class="module-card bg-slate-900/80 border border-slate-800/90 rounded-2xl p-5 shadow-xl hover:border-emerald-500 transition group flex flex-col justify-between backdrop-blur-md">
-                    <div>
-                        <div class="w-10 h-10 rounded-xl bg-emerald-600/20 border border-emerald-500/40 text-emerald-400 flex items-center justify-center mb-3 group-hover:scale-110 transition">
-                            <i data-lucide="clipboard-check" class="w-5 h-5"></i>
-                        </div>
-                        <h3 class="text-sm font-bold text-slate-100 group-hover:text-emerald-400 transition mb-1">03. Quy trình & QA/QC (SOP)</h3>
-                        <p class="text-[11px] text-slate-400 leading-relaxed">Quy trình SOP, kiểm soát chất lượng & form mẫu chuẩn.</p>
-                    </div>
-                    <div class="mt-4 flex items-center text-[11px] text-emerald-400 font-semibold group-hover:translate-x-1 transition">
-                        Truy cập phân hệ <i data-lucide="arrow-right" class="w-3.5 h-3.5 ml-1"></i>
-                    </div>
-                </a>
-
-                <!-- Module 4 -->
-                <a href="#" class="module-card bg-slate-900/80 border border-slate-800/90 rounded-2xl p-5 shadow-xl hover:border-amber-500 transition group flex flex-col justify-between backdrop-blur-md">
-                    <div>
-                        <div class="w-10 h-10 rounded-xl bg-amber-600/20 border border-amber-500/40 text-amber-400 flex items-center justify-center mb-3 group-hover:scale-110 transition">
-                            <i data-lucide="smartphone" class="w-5 h-5"></i>
-                        </div>
-                        <h3 class="text-sm font-bold text-slate-100 group-hover:text-amber-400 transition mb-1">04. Báo cáo Công trường</h3>
-                        <p class="text-[11px] text-slate-400 leading-relaxed">Nhật ký công trình số, vật tư thực địa & báo cáo sự cố.</p>
-                    </div>
-                    <div class="mt-4 flex items-center text-[11px] text-amber-400 font-semibold group-hover:translate-x-1 transition">
-                        Truy cập phân hệ <i data-lucide="arrow-right" class="w-3.5 h-3.5 ml-1"></i>
-                    </div>
-                </a>
-            </div>
-
-            <!-- CỘT 3: LIVE ACTIVITY FEED (3 Cols) -->
-            <div class="col-span-12 lg:col-span-3 bg-slate-900/80 border border-slate-800/90 rounded-2xl p-4 shadow-xl flex flex-col backdrop-blur-md">
-                <div class="flex items-center justify-between pb-3 mb-3 border-b border-slate-800">
-                    <span class="text-xs font-bold text-slate-200 uppercase tracking-wider flex items-center gap-2">
-                        <i data-lucide="activity" class="w-4 h-4 text-emerald-400"></i> Live Activity Feed
-                    </span>
-                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                </div>
-
-                <div class="space-y-3.5 overflow-y-auto max-h-[320px] pr-1 custom-scrollbar">
-                    <!-- Feed Item 1 -->
-                    <div class="flex items-start gap-3 text-xs">
-                        <div class="w-7 h-7 rounded-full bg-blue-600/20 border border-blue-500/40 text-blue-400 flex items-center justify-center font-bold text-[10px] shrink-0 mt-0.5">
-                            KTS
-                        </div>
-                        <div>
-                            <p class="text-slate-200 font-medium leading-tight">Đã tải lên bản vẽ <span class="text-blue-400">ARC-TANG1.dwg</span></p>
-                            <span class="text-[10px] text-slate-500">31 mins ago • Dự án NP2601</span>
-                        </div>
-                    </div>
-
-                    <!-- Feed Item 2 -->
-                    <div class="flex items-start gap-3 text-xs">
-                        <div class="w-7 h-7 rounded-full bg-emerald-600/20 border border-emerald-500/40 text-emerald-400 flex items-center justify-center font-bold text-[10px] shrink-0 mt-0.5">
-                            BIM
-                        </div>
-                        <div>
-                            <p class="text-slate-200 font-medium leading-tight">Phê duyệt mô hình <span class="text-emerald-400">STR-S2-REV03</span></p>
-                            <span class="text-[10px] text-slate-500">2 hours ago • BT2602</span>
-                        </div>
-                    </div>
-
-                    <!-- Feed Item 3 -->
-                    <div class="flex items-start gap-3 text-xs">
-                        <div class="w-7 h-7 rounded-full bg-amber-600/20 border border-amber-500/40 text-amber-400 flex items-center justify-center font-bold text-[10px] shrink-0 mt-0.5">
-                            GS
-                        </div>
-                        <div>
-                            <p class="text-slate-200 font-medium leading-tight">Cập nhật nhật ký thi công ngày 17/08</p>
-                            <span class="text-[10px] text-slate-500">5 hours ago • XUONG2604</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-        </section>
-    </main>
-
-    <!-- 4. FOOTER -->
-    <footer class="bg-slate-900/90 border-t border-slate-800/80 px-6 py-3 text-center sm:text-left text-[11px] text-slate-400 flex flex-col sm:flex-row items-center justify-between gap-2 backdrop-blur-md">
+    <aside id="sidebar" class="fixed md:static inset-y-0 left-0 z-50 w-72 bg-slate-900 border-r border-slate-800 flex flex-col justify-between -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out shrink-0">
         <div>
-            © 2026 <span class="font-bold text-slate-300">PV INCONS</span>. All rights reserved.
-        </div>
-        <div class="flex items-center gap-4 text-slate-400">
-            <a href="#" class="hover:text-slate-200 transition">Chính sách bảo mật</a>
-            <span>•</span>
-            <a href="#" class="hover:text-slate-200 transition">Hỗ trợ kỹ thuật</a>
-            <span>•</span>
-            <span class="font-mono text-[10px] bg-slate-800 px-2 py-0.5 rounded text-slate-400">v2.6.0-prod</span>
-        </div>
-    </footer>
+            <div class="h-16 px-5 border-b border-slate-800 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 bg-blue-600 rounded-xl flex items-center justify-center font-black text-white text-lg shadow-lg shadow-blue-600/30">
+                        PV
+                    </div>
+                    <div>
+                        <h1 class="font-bold text-sm tracking-wide text-white">PV INCONS</h1>
+                        <p class="text-[10px] text-blue-400 font-semibold tracking-wider uppercase">CDE Command v3.0 Pro</p>
+                    </div>
+                </div>
+                <button onclick="toggleMobileMenu()" class="p-1.5 text-slate-400 hover:text-white md:hidden rounded-lg hover:bg-slate-800">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
 
-    <!-- Custom JavaScript -->
+            <nav class="p-4 space-y-1.5 text-xs font-medium">
+                <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-btn nav-active w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-400 hover:text-slate-100 hover:bg-slate-800/60 transition text-left">
+                    <i data-lucide="layout-dashboard" class="w-4 h-4"></i> <span>Tổng quan (Dashboard)</span>
+                </button>
+                <button onclick="switchTab('cde')" id="nav-cde" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-400 hover:text-slate-100 hover:bg-slate-800/60 transition text-left">
+                    <i data-lucide="folder-tree" class="w-4 h-4"></i> <span>Quản lý CDE (ISO 19650)</span>
+                </button>
+                <button onclick="switchTab('projects')" id="nav-projects" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-400 hover:text-slate-100 hover:bg-slate-800/60 transition text-left">
+                    <i data-lucide="layers" class="w-4 h-4"></i> <span>Danh sách Dự án</span>
+                </button>
+                <button onclick="switchTab('assets')" id="nav-assets" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-400 hover:text-slate-100 hover:bg-slate-800/60 transition text-left">
+                    <i data-lucide="box" class="w-4 h-4"></i> <span>Thư viện Assets & BIM</span>
+                </button>
+                <button onclick="switchTab('sop')" id="nav-sop" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-400 hover:text-slate-100 hover:bg-slate-800/60 transition text-left">
+                    <i data-lucide="clipboard-check" class="w-4 h-4"></i> <span>Quy trình QA/QC & SOP</span>
+                </button>
+                <button onclick="switchTab('reports')" id="nav-reports" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-400 hover:text-slate-100 hover:bg-slate-800/60 transition text-left">
+                    <i data-lucide="smartphone" class="w-4 h-4"></i> <span>Báo cáo Công trường</span>
+                </button>
+            </nav>
+        </div>
+
+        <div class="p-4 border-t border-slate-800 space-y-3">
+            <div class="bg-slate-950/60 rounded-xl p-3 border border-slate-800/80 text-[11px] space-y-1.5">
+                <div class="flex items-center justify-between text-slate-400">
+                    <span class="flex items-center gap-1.5"><i data-lucide="cloud text-emerald-400" class="w-3.5 h-3.5"></i> Google Drive</span>
+                    <span id="gdriveStatusDot" class="w-2 h-2 rounded-full bg-rose-500"></span>
+                </div>
+                <div id="gdriveStorageName" class="font-mono text-slate-200 truncate font-semibold">Chưa kết nối Drive</div>
+                <div id="gdriveLastSync" class="text-[9px] text-slate-500 truncate">Trạng thái: Ngoại tuyến</div>
+            </div>
+
+            <div class="flex items-center gap-3 pt-1">
+                <div class="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center font-bold text-xs text-white border border-blue-400 shrink-0">
+                    TP
+                </div>
+                <div class="text-xs truncate">
+                    <div class="font-bold text-slate-200 truncate">KTS Chủ trì</div>
+                    <div class="text-[10px] text-slate-400">Tân Phước</div>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <div class="flex-1 flex flex-col min-w-0 h-full overflow-y-auto relative">
+
+        <header class="sticky top-0 z-30 h-16 bg-slate-900/90 backdrop-blur-md border-b border-slate-800 px-4 md:px-6 flex items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <button onclick="toggleMobileMenu()" class="p-2 text-slate-400 hover:text-white md:hidden rounded-lg bg-slate-800">
+                    <i data-lucide="menu" class="w-5 h-5"></i>
+                </button>
+                <div>
+                    <h2 class="text-[10px] md:text-xs font-bold uppercase tracking-wider text-blue-400" id="currentTabBreadcrumb">Hệ thống điều hành CDE</h2>
+                    <p class="text-xs md:text-sm font-extrabold text-slate-100" id="currentTabTitle">Bảng Điều Khiển Trung Tâm</p>
+                </div>
+            </div>
+
+            <div class="flex-1 max-w-md mx-2">
+                <div class="relative">
+                    <i data-lucide="search" class="absolute left-3 top-2.5 w-4 h-4 text-slate-400"></i>
+                    <input type="text" id="globalSearchInput" placeholder="Tìm kiếm bản vẽ, dự án NP2601, file rvt/dwg..." class="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-4 py-2 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-blue-500 transition">
+                </div>
+            </div>
+
+            <div class="flex items-center gap-2">
+                <button id="btnConnectGDrive" onclick="handleGoogleDriveAuth()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold px-3.5 py-2 rounded-xl text-xs flex items-center gap-2 transition shadow-lg shadow-emerald-600/20 cursor-pointer">
+                    <i data-lucide="cloud" class="w-4 h-4"></i>
+                    <span class="hidden lg:inline">Kết nối Drive Shared</span>
+                </button>
+                <button onclick="selectLocalCDEFolder()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium px-3 py-2 rounded-xl text-xs flex items-center gap-1.5 transition cursor-pointer">
+                    <i data-lucide="hard-drive" class="w-4 h-4"></i>
+                    <span class="hidden lg:inline">Local CDE</span>
+                </button>
+                <button class="p-2 text-slate-400 hover:text-white rounded-xl bg-slate-800/60 hover:bg-slate-800 relative">
+                    <i data-lucide="bell" class="w-4 h-4"></i>
+                    <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-rose-500 rounded-full"></span>
+                </button>
+            </div>
+        </header>
+
+        <main class="p-4 md:p-6 flex-1 space-y-6">
+
+            <section id="tab-dashboard" class="tab-content space-y-6">
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
+                    <div class="bg-slate-900/80 border border-slate-800 p-4 rounded-2xl flex items-center justify-between">
+                        <div>
+                            <p class="text-[11px] font-medium text-slate-400">Dự án Đang chạy</p>
+                            <p class="text-lg md:text-xl font-bold text-slate-100 mt-0.5">04 Công trình</p>
+                        </div>
+                        <div class="w-9 h-9 rounded-xl bg-blue-600/20 border border-blue-500/30 text-blue-400 flex items-center justify-center">
+                            <i data-lucide="building-2" class="w-5 h-5"></i>
+                        </div>
+                    </div>
+                    <div class="bg-slate-900/80 border border-slate-800 p-4 rounded-2xl flex items-center justify-between">
+                        <div>
+                            <p class="text-[11px] font-medium text-slate-400">Hồ sơ CDE (WIP)</p>
+                            <p class="text-lg md:text-xl font-bold text-amber-400 mt-0.5">12 File</p>
+                        </div>
+                        <div class="w-9 h-9 rounded-xl bg-amber-600/20 border border-amber-500/30 text-amber-400 flex items-center justify-center">
+                            <i data-lucide="folder-git" class="w-5 h-5"></i>
+                        </div>
+                    </div>
+                    <div class="bg-slate-900/80 border border-slate-800 p-4 rounded-2xl flex items-center justify-between">
+                        <div>
+                            <p class="text-[11px] font-medium text-slate-400">Bản vẽ Phê duyệt</p>
+                            <p class="text-lg md:text-xl font-bold text-emerald-400 mt-0.5">85%</p>
+                        </div>
+                        <div class="w-9 h-9 rounded-xl bg-emerald-600/20 border border-emerald-500/30 text-emerald-400 flex items-center justify-center">
+                            <i data-lucide="file-check-2" class="w-5 h-5"></i>
+                        </div>
+                    </div>
+                    <div class="bg-slate-900/80 border border-slate-800 p-4 rounded-2xl flex items-center justify-between">
+                        <div>
+                            <p class="text-[11px] font-medium text-slate-400">Sự cố Công trường</p>
+                            <p class="text-lg md:text-xl font-bold text-rose-400 mt-0.5">0 Bug</p>
+                        </div>
+                        <div class="w-9 h-9 rounded-xl bg-rose-600/20 border border-rose-500/30 text-rose-400 flex items-center justify-center">
+                            <i data-lucide="shield-alert" class="w-5 h-5"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="lg:col-span-2 space-y-6">
+                        <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 shadow-xl space-y-4">
+                            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                                <h3 class="text-xs font-bold text-slate-200 uppercase tracking-wider flex items-center gap-2">
+                                    <i data-lucide="git-merge" class="w-4 h-4 text-blue-400"></i> Tiến trình Lưu trữ ISO 19650
+                                </h3>
+                                <button onclick="switchTab('cde')" class="text-xs text-blue-400 hover:underline">Chi tiết CDE →</button>
+                            </div>
+                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                                <div class="bg-slate-950 p-3 rounded-xl border border-amber-500/30 card-hover-effect">
+                                    <span class="text-[10px] font-bold text-amber-400 uppercase">01_WIP</span>
+                                    <p class="text-lg font-bold text-slate-100 mt-1">12 File</p>
+                                    <p class="text-[10px] text-slate-500">Đang thiết kế</p>
+                                </div>
+                                <div class="bg-slate-950 p-3 rounded-xl border border-blue-500/30 card-hover-effect">
+                                    <span class="text-[10px] font-bold text-blue-400 uppercase">02_SHARED</span>
+                                    <p class="text-lg font-bold text-slate-100 mt-1">05 File</p>
+                                    <p class="text-[10px] text-slate-500">Đang phối hợp</p>
+                                </div>
+                                <div class="bg-slate-950 p-3 rounded-xl border border-emerald-500/30 card-hover-effect">
+                                    <span class="text-[10px] font-bold text-emerald-400 uppercase">03_PUBLISHED</span>
+                                    <p class="text-lg font-bold text-slate-100 mt-1">28 File</p>
+                                    <p class="text-[10px] text-slate-500">Đã phát hành</p>
+                                </div>
+                                <div class="bg-slate-950 p-3 rounded-xl border border-slate-700 card-hover-effect">
+                                    <span class="text-[10px] font-bold text-slate-400 uppercase">04_ARCHIVED</span>
+                                    <p class="text-lg font-bold text-slate-100 mt-1">140 File</p>
+                                    <p class="text-[10px] text-slate-500">Lưu trữ dự án</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 shadow-xl space-y-4">
+                            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                                <h3 class="text-xs font-bold text-slate-200 uppercase tracking-wider flex items-center gap-2">
+                                    <i data-lucide="star" class="w-4 h-4 text-amber-400"></i> Dự án Trọng điểm
+                                </h3>
+                                <button onclick="switchTab('projects')" class="text-xs text-blue-400 hover:underline">Xem tất cả →</button>
+                            </div>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div onclick="switchTab('projects')" class="bg-slate-950 border border-slate-800 rounded-xl overflow-hidden card-hover-effect cursor-pointer group">
+                                    <div class="h-28 relative overflow-hidden bg-slate-900">
+                                        <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=500&q=80" alt="NP2601" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                                        <span class="absolute top-2 left-2 bg-blue-600 text-white font-mono text-[9px] px-2 py-0.5 rounded font-bold">NP2601</span>
+                                        <span class="absolute top-2 right-2 bg-black/70 text-slate-200 text-[9px] px-2 py-0.5 rounded backdrop-blur-md">Thiết kế</span>
+                                    </div>
+                                    <div class="p-3">
+                                        <h4 class="text-xs font-bold text-slate-100 truncate group-hover:text-blue-400 transition">Biệt thự Phố Tân Cổ Điển 5 Tầng</h4>
+                                        <p class="text-[10px] text-slate-400 mt-0.5">Ninh Kiều, Cần Thơ | Mặt tiền 5.8m</p>
+                                        <div class="mt-2 flex items-center justify-between text-[10px]">
+                                            <span class="text-slate-400">Tiến độ</span>
+                                            <span class="text-blue-400 font-mono font-bold">85%</span>
+                                        </div>
+                                        <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden mt-1">
+                                            <div class="bg-blue-500 h-full w-[85%]"></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div onclick="switchTab('projects')" class="bg-slate-950 border border-slate-800 rounded-xl overflow-hidden card-hover-effect cursor-pointer group">
+                                    <div class="h-28 relative overflow-hidden bg-slate-900">
+                                        <img src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=500&q=80" alt="BT2602" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                                        <span class="absolute top-2 left-2 bg-emerald-600 text-white font-mono text-[9px] px-2 py-0.5 rounded font-bold">BT2602</span>
+                                        <span class="absolute top-2 right-2 bg-black/70 text-slate-200 text-[9px] px-2 py-0.5 rounded backdrop-blur-md">Thi công</span>
+                                    </div>
+                                    <div class="p-3">
+                                        <h4 class="text-xs font-bold text-slate-100 truncate group-hover:text-emerald-400 transition">BT2602 - Nhà phố Bình Minh</h4>
+                                        <p class="text-[10px] text-slate-400 mt-0.5">Bình Minh, Vĩnh Long</p>
+                                        <div class="mt-2 flex items-center justify-between text-[10px]">
+                                            <span class="text-slate-400">Tiến độ</span>
+                                            <span class="text-emerald-400 font-mono font-bold">80%</span>
+                                        </div>
+                                        <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden mt-1">
+                                            <div class="bg-emerald-500 h-full w-[80%]"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-6">
+                        <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 shadow-xl space-y-3">
+                            <h3 class="text-xs font-bold text-slate-200 uppercase tracking-wider flex items-center gap-2">
+                                <i data-lucide="check-square" class="w-4 h-4 text-emerald-400"></i> Cần nghiệm thu QA/QC
+                            </h3>
+                            <div class="space-y-2 text-xs">
+                                <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800 space-y-1">
+                                    <p class="font-semibold text-slate-200">SOP-01: Kiểm tra trích đo Ninh Kiều</p>
+                                    <span class="text-[10px] text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">Đã duyệt</span>
+                                </div>
+                                <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800 space-y-1">
+                                    <p class="font-semibold text-slate-200">SOP-03: Nghiệm thu móng & dầm T1</p>
+                                    <span class="text-[10px] text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20">Đang chờ ký</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 shadow-xl space-y-3">
+                            <div class="flex items-center justify-between pb-2 border-b border-slate-800">
+                                <h3 class="text-xs font-bold text-slate-200 uppercase tracking-wider flex items-center gap-2">
+                                    <i data-lucide="activity" class="w-4 h-4 text-emerald-400"></i> Hoạt động CDE
+                                </h3>
+                                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                            </div>
+                            <div id="activityFeedList" class="space-y-3 max-h-[260px] overflow-y-auto custom-scrollbar pr-1">
+                                <div class="flex items-start gap-2.5 text-xs">
+                                    <div class="w-6 h-6 rounded-full bg-blue-600/20 border border-blue-500/40 text-blue-400 flex items-center justify-center font-bold text-[9px] shrink-0 mt-0.5">KTS</div>
+                                    <div class="min-w-0">
+                                        <p class="text-slate-200 text-[11px]"><span class="font-semibold text-blue-400">Tân Phước</span> đã tải lên <span class="font-mono text-amber-400">ARC_NP2601_Rev02.rvt</span></p>
+                                        <span class="text-[9px] text-slate-500">10 phút trước • 01_WIP</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="tab-cde" class="tab-content hidden space-y-4">
+                <div class="flex flex-wrap items-center justify-between gap-3 bg-slate-900/80 p-3 rounded-2xl border border-slate-800">
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs font-medium text-slate-400">Lọc nhanh:</span>
+                        <button onclick="filterByExt('all')" class="px-2.5 py-1 rounded-lg bg-blue-600 text-white text-[11px] font-semibold">Tất cả</button>
+                        <button onclick="filterByExt('rvt')" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-blue-400 text-[11px]">.RVT (Revit)</button>
+                        <button onclick="filterByExt('dwg')" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-amber-400 text-[11px]">.DWG (CAD)</button>
+                        <button onclick="filterByExt('pdf')" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-rose-400 text-[11px]">.PDF (Dự án)</button>
+                    </div>
+                    <div class="text-[11px] text-slate-400 font-mono bg-slate-950 px-3 py-1 rounded-xl border border-slate-800" id="cdeBreadcrumb">
+                        Root > NP2601_Biệt thự Ninh Kiều > 01_WIP
+                    </div>
+                </div>
+
+                <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 shadow-xl">
+                    <div class="flex items-center justify-between pb-3 border-b border-slate-800 mb-4">
+                        <div class="flex items-center gap-2">
+                            <i data-lucide="folder-tree" class="w-4 h-4 text-blue-400"></i>
+                            <h3 class="text-xs font-bold text-slate-200 uppercase tracking-wider">Cấu trúc CDE ISO 19650 & Cloud Drive</h3>
+                        </div>
+                        <span class="text-[10px] bg-slate-800 text-slate-400 px-2 py-0.5 rounded font-mono">Click vào File để mở xem/tải trực tiếp</span>
+                    </div>
+
+                    <div id="cdeTreeContainer" class="max-h-[450px] overflow-y-auto custom-scrollbar pr-2 space-y-1">
+                        <div class="text-xs space-y-1 select-none">
+                            <div onclick="toggleFolder(this)" class="flex items-center gap-2 p-2 hover:bg-slate-800/60 rounded-xl cursor-pointer text-amber-400 font-semibold transition">
+                                <i data-lucide="chevron-down" class="w-4 h-4 transform transition-transform"></i>
+                                <i data-lucide="folder-git" class="w-4 h-4"></i>
+                                <span>01_WIP (Work In Progress)</span>
+                            </div>
+                            <ul class="pl-6 space-y-1 border-l border-slate-800 ml-4 text-slate-400">
+                                <li onclick="openFilePreview('ARC_KienTruc_NP2601_Rev02.rvt', '42.5 MB', 'Revit File', 'KTS Tân Phước', '18/08/2026', 'Rev 02')" class="cde-file-item p-2 hover:bg-slate-800/80 rounded-lg cursor-pointer flex items-center justify-between group transition">
+                                    <div class="flex items-center gap-2">
+                                        <i data-lucide="box" class="w-4 h-4 text-blue-400"></i>
+                                        <span class="text-slate-200 group-hover:text-blue-400 transition font-mono">ARC_KienTruc_NP2601_Rev02.rvt</span>
+                                    </div>
+                                    <span class="text-[10px] bg-blue-500/10 text-blue-400 px-2 py-0.5 rounded border border-blue-500/20">42.5 MB</span>
+                                </li>
+                                <li onclick="openFilePreview('STR_KetCau_NP2601_ThiCong.dwg', '18.2 MB', 'AutoCAD Drawing', 'KS Nguyễn Văn A', '17/08/2026', 'Rev 01')" class="cde-file-item p-2 hover:bg-slate-800/80 rounded-lg cursor-pointer flex items-center justify-between group transition">
+                                    <div class="flex items-center gap-2">
+                                        <i data-lucide="file-code" class="w-4 h-4 text-amber-400"></i>
+                                        <span class="text-slate-200 group-hover:text-amber-400 transition font-mono">STR_KetCau_NP2601_ThiCong.dwg</span>
+                                    </div>
+                                    <span class="text-[10px] bg-amber-500/10 text-amber-400 px-2 py-0.5 rounded border border-amber-500/20">18.2 MB</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="tab-projects" class="tab-content hidden space-y-4">
+                <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 shadow-xl">
+                    <h3 class="text-xs font-bold text-slate-200 uppercase tracking-wider mb-4">Danh sách Dự án PV INCONS</h3>
+                    <p class="text-xs text-slate-400">Quản lý các công trình biệt thự phố Cần Thơ, nhà phố Vĩnh Long...</p>
+                </div>
+            </section>
+
+            <section id="tab-assets" class="tab-content hidden space-y-4">
+                <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 shadow-xl">
+                    <h3 class="text-xs font-bold text-slate-200 uppercase tracking-wider mb-4">Thư viện Asset BIM & Dynamo Scripts</h3>
+                    <p class="text-xs text-slate-400">Quản lý kho Revit Families, PyRevit Plugins & Dynamo node...</p>
+                </div>
+            </section>
+
+            <section id="tab-sop" class="tab-content hidden space-y-4">
+                <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 shadow-xl">
+                    <h3 class="text-xs font-bold text-slate-200 uppercase tracking-wider mb-4">Tiêu chuẩn Quy trình QA/QC 2026</h3>
+                    <p class="text-xs text-slate-400">Bảng kiểm duyệt nghiệm thu móng, trích đo Ninh Kiều và hồ sơ thi công...</p>
+                </div>
+            </section>
+
+            <section id="tab-reports" class="tab-content hidden space-y-4">
+                <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 shadow-xl">
+                    <h3 class="text-xs font-bold text-slate-200 uppercase tracking-wider mb-4">Nhật ký & Báo cáo Công trường</h3>
+                    <p class="text-xs text-slate-400">Báo cáo tình hình nhân công, vật tư và hình ảnh thực địa...</p>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
     <script src="layout.js"></script>
     <script>
-        if (typeof lucide !== 'undefined') {
-            lucide.createIcons();
+        // Tab Switcher Logic
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('nav-active'));
+            
+            const selectedTab = document.getElementById('tab-' + tabId);
+            const selectedNav = document.getElementById('nav-' + tabId);
+            
+            if (selectedTab) selectedTab.classList.remove('hidden');
+            if (selectedNav) selectedNav.classList.add('nav-active');
+
+            const titleMap = {
+                'dashboard': 'Bảng Điều Khiển Trung Tâm',
+                'cde': 'Cây Thư Mục & Luồng Hồ Sơ ISO 19650',
+                'projects': 'Danh Sách Công Trình & Tiến Độ',
+                'assets': 'Thư Viện Assets BIM & Revit Families',
+                'sop': 'Quy Trình QA/QC & Kiểm Soát Chất Lượng',
+                'reports': 'Báo Cáo Nhật Ký Thi Công Thực Địa'
+            };
+            document.getElementById('currentTabTitle').innerText = titleMap[tabId] || 'CDE System';
+        }
+
+        // Mobile Menu Toggle
+        function toggleMobileMenu() {
+            const sidebar = document.getElementById('sidebar');
+            const backdrop = document.getElementById('mobileBackdrop');
+            sidebar.classList.toggle('-translate-x-full');
+            backdrop.classList.toggle('hidden');
+        }
+
+        // Folder Toggle
+        function toggleFolder(element) {
+            const subList = element.nextElementSibling;
+            if (subList && subList.tagName === 'UL') {
+                subList.classList.toggle('hidden');
+                const icon = element.querySelector('[data-lucide="chevron-down"]');
+                if (icon) icon.classList.toggle('rotate-180');
+            }
         }
     </script>
 </body>

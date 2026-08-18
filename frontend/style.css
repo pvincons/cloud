@@ -1,31 +1,91 @@
-/* Tùy chỉnh Scrollbar cho Live Activity Feed */
+/* ==========================================================================
+   PV INCONS - CDE COMMAND CENTER v3.0 PRO STYLES
+   ========================================================================== */
+
+/* 1. Scrollbar Tùy chỉnh (Giao diện Dark Mode) */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(15, 23, 42, 0.8);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #334155;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #2563eb;
+}
+
+/* Scrollbar mỏng cho Widget Feed & Tree View */
 .custom-scrollbar::-webkit-scrollbar {
     width: 4px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-track {
-    background: rgba(15, 23, 42, 0.6);
-    border-radius: 4px;
+    background: rgba(15, 23, 42, 0.4);
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-    background: rgba(51, 65, 85, 0.8);
+    background: #1e293b;
     border-radius: 4px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    background: rgba(59, 130, 246, 0.8);
+    background: #3b82f6;
 }
 
-/* Hiệu ứng hover cho thẻ card */
-.project-card, .module-card {
-    will-change: transform, border-color;
+/* 2. Style Trạng thái Sidebar Navigation Active */
+.nav-active {
+    background-color: rgba(37, 99, 235, 0.15) !important;
+    color: #60a5fa !important;
+    border: 1px solid rgba(59, 130, 246, 0.35) !important;
+    font-weight: 600 !important;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.1);
 }
 
-.project-card:hover {
+/* 3. Hiệu ứng Hover & Transition cho Card & Button */
+.card-hover-effect {
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card-hover-effect:hover {
     transform: translateY(-2px);
+    border-color: rgba(59, 130, 246, 0.4);
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
 }
 
-.module-card:hover {
-    transform: translateY(-2px);
+/* 4. Animation Keyframes */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(4px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fade-in {
+    animation: fadeIn 0.3s ease-out forwards;
+}
+
+/* 5. CDE Tree View & Google Drive Sync Items */
+.cde-folder-header {
+    transition: background-color 0.2s ease;
+}
+
+.cde-file-item {
+    transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
+}
+
+.cde-file-item:hover {
+    background-color: rgba(30, 41, 59, 0.8);
+    transform: translateX(2px);
 }
