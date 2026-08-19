@@ -71,7 +71,6 @@
 
     <!-- HEADER TỔNG THỂ -->
     <header class="w-full max-w-5xl mx-auto px-4 pt-6 pb-2 z-10 flex items-center justify-between">
-        <!-- Bọc cả Logo và Chữ chung trong 1 div này -->
         <div class="flex items-center gap-3">
             <img src="./assets/pic/PVI_CLOUD.webp" alt="PV INCONS Logo" class="h-9 w-auto object-contain" />
 
@@ -88,17 +87,17 @@
             <span
                 class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[11px] bg-slate-900/80 border border-white/10 text-slate-200 shadow-sm backdrop-blur-md font-medium">
                 <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                System Online
+                <span id="onlineCounter">60</span> Person | System Online
             </span>
         </div>
     </header>
 
-    <!-- MAIN CONTAINER (Mobile: 1 cột | Desktop: 2 cột nằm ngang) -->
+    <!-- MAIN CONTAINER -->
     <main class="w-full max-w-md lg:max-w-5xl mx-auto px-3 py-4 z-10 my-auto">
         <div class="glass-panel rounded-3xl overflow-hidden shadow-2xl">
             <div class="grid grid-cols-1 lg:grid-cols-2 divide-y lg:divide-y-0 lg:divide-x divide-white/10">
 
-                <!-- KHỐI 1: CHỌN PHÂN HỆ LÀM VIỆC (TRÊN MOBILE / BÊN TRÁI DESKTOP) -->
+                <!-- KHỐI 1: CHỌN PHÂN HỆ LÀM VIỆC -->
                 <section class="p-6 sm:p-8 flex flex-col justify-center">
 
                     <div class="flex items-center justify-between mb-6">
@@ -109,27 +108,27 @@
                     </div>
 
                     <div class="space-y-4">
-                        <!-- KHỐI 01: ĐẦU TƯ -->
-                        <a href="content/investment/calculate.html"
+                        <!-- KHỐI 01: ĐỐI TÁC & KHÁCH HÀNG -->
+                        <a href="content/partner/index.html"
                             class="module-card p-4 rounded-2xl flex items-center justify-between cursor-pointer group">
                             <div class="flex items-center gap-4">
-                                <div class="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-400 flex items-center 
+                                <div class="w-12 h-12 rounded-xl bg-orange-500/10 border border-orange-500/30 text-orange-400 flex items-center 
                                     justify-center text-xl shrink-0 group-hover:scale-105 transition-transform">
-                                    <i class="fa-solid fa-chart-pie"></i>
+                                    <i class="fa-solid fa-handshake"></i>
                                 </div>
                                 <div>
                                     <div class="flex items-center gap-2">
                                         <h3
-                                            class="font-bold text-sm text-white tracking-wide group-hover:text-amber-300 transition-colors">
-                                            ĐẦU TƯ</h3>
+                                            class="font-bold text-sm text-white tracking-wide group-hover:text-orange-300 transition-colors">
+                                            ĐỐI TÁC - KHÁCH HÀNG</h3>
                                         <span
-                                            class="text-[10px] bg-amber-500/20 text-amber-300 border border-amber-500/30 px-2 py-0.5 rounded-md font-semibold">Public</span>
+                                            class="text-[10px] bg-orange-500/20 text-orange-300 border border-orange-500/30 px-2 py-0.5 rounded-md font-semibold">Public</span>
                                     </div>
-                                    <p class="text-xs text-slate-300 mt-1">Bảng tính chỉ số đầu tư & tài chính</p>
+                                    <p class="text-xs text-slate-300 mt-1">Cổng dịch vụ Đối tác & Khách hàng</p>
                                 </div>
                             </div>
                             <i
-                                class="fa-solid fa-chevron-right text-xs text-slate-400 group-hover:text-amber-400 transition-colors pl-2"></i>
+                                class="fa-solid fa-chevron-right text-xs text-slate-400 group-hover:text-orange-400 transition-colors pl-2"></i>
                         </a>
 
                         <!-- KHỐI 02: BIM - VDC -->
@@ -173,7 +172,7 @@
                                             class="text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-2 py-0.5 rounded-md font-semibold">Khóa
                                             Nội bộ</span>
                                     </div>
-                                    <p class="text-xs text-slate-300 mt-1">Quy trình SOP & form mẫu chuẩn</p>
+                                    <p class="text-xs text-slate-300 mt-1">Quy trình SOP & Form mẫu chuẩn</p>
                                 </div>
                             </div>
                             <i
@@ -183,7 +182,7 @@
 
                 </section>
 
-                <!-- KHỐI 2: ĐĂNG NHẬP TÀI KHOẢN (DƯỚI MOBILE / BÊN PHẢI DESKTOP) -->
+                <!-- KHỐI 2: ĐĂNG NHẬP TÀI KHOẢN -->
                 <section class="p-6 sm:p-8 bg-slate-950/30 lg:bg-transparent flex flex-col justify-center">
 
                     <div class="flex items-center justify-between mb-6">
@@ -260,11 +259,69 @@
             document.getElementById('username').focus();
         }
 
+        // XỬ LÝ ĐĂNG NHẬP & CHUYỂN HƯỚNG CÁC PHÂN HỆ
         function handleLogin(e) {
             e.preventDefault();
-            const user = document.getElementById('username').value;
-            alert(`Đang khởi tạo phiên làm việc SSO cho tài khoản: ${user}`);
+            const user = document.getElementById('username').value.trim();
+            const pass = document.getElementById('password').value;
+
+            // 1. Tài khoản Super Admin -> Chuyển trực tiếp tới admin/index.html
+            if (user === 'admin' && pass === '0939751194') {
+                localStorage.setItem('currentUser', JSON.stringify({
+                    username: user,
+                    role: 'SUPER_ADMIN',
+                    permissions: 'ALL'
+                }));
+                window.location.href = 'admin/index.html';
+                return;
+            }
+
+            // 2. Tài khoản Nội bộ (đuôi -int) -> Chuyển đến Quản lý Nội bộ
+            if (user.toLowerCase().endsWith('-int')) {
+                localStorage.setItem('currentUser', JSON.stringify({
+                    username: user,
+                    role: 'INTERNAL_USER',
+                    module: 'QUAN_LY_NOI_BO'
+                }));
+                window.location.href = 'content/internal/index.html';
+                return;
+            }
+
+            // 3. Tài khoản BIM - VDC (đuôi -cde) -> Chuyển đến BIM - VDC
+            if (user.toLowerCase().endsWith('-cde')) {
+                localStorage.setItem('currentUser', JSON.stringify({
+                    username: user,
+                    role: 'BIM_USER',
+                    module: 'BIM_VDC'
+                }));
+                window.location.href = 'content/bim-vdc/index.html';
+                return;
+            }
+
+            // 4. Báo lỗi nếu tài khoản không khớp quy tắc
+            alert('Tài khoản không hợp lệ!\nVui lòng sử dụng tài khoản đuôi "-int" (Nội bộ), "-cde" (BIM-VDC) hoặc tài khoản admin.');
         }
+
+        // GIẢ LẬP SỐ NGƯỜI ONLINE
+        (function simulateOnlineUsers() {
+            let onlineUsers = Math.floor(Math.random() * (140 - 80 + 1)) + 80;
+            const counterEl = document.getElementById('onlineCounter');
+
+            if (counterEl) {
+                counterEl.textContent = onlineUsers;
+
+                function updateCount() {
+                    const delta = Math.floor(Math.random() * 7) - 3;
+                    onlineUsers = Math.max(45, Math.min(220, onlineUsers + delta));
+                    counterEl.textContent = onlineUsers;
+
+                    const randomTime = Math.floor(Math.random() * 3000) + 3000;
+                    setTimeout(updateCount, randomTime);
+                }
+
+                setTimeout(updateCount, 3000);
+            }
+        })();
     </script>
 
     <!-- Cuối file index.html ngoài cùng (root) -->

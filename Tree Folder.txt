@@ -1,24 +1,13 @@
-pv-incons-portal/
-│
-├── frontend/                  # Khung giao diện hiện tại
-│   ├── index.html
-│   ├── style.css
-│   └── layout.js              # Gọi API kết nối với Backend
-│
-├── backend/                   # [CẦN TẠO MỚI] Hệ thống Server & Gemini AI
-│   ├── .env                   # Lưu API Key và cấu hình bảo mật
-│   ├── package.json           # Khai báo các thư viện phụ thuộc
-│   ├── server.js              # File chạy chính của Backend API Server
-│   │
-│   ├── config/
-│   │   └── gemini.js          # Khởi tạo kết nối Google Gemini SDK
-│   │
-│   ├── services/              # Xử lý logic AI & Dữ liệu
-│   │   ├── geminiService.js   # Gọi Gemini API (Text, Vision, Audio)
-│   │   ├── ragService.js      # Tìm kiếm vector & nạp ngữ cảnh CDE
-│   │   └── fileParser.js      # Trích xuất nội dung file PDF, Excel, DWG
-│   │
-│   └── routes/                # Cổng API cho Frontend gọi
-│       ├── cde.js             # API tìm kiếm & hỏi đáp tài liệu CDE
-│       ├── sop.js             # API kiểm tra quy chuẩn thiết kế / QA-QC
-│       └── report.js          # API tự động tạo báo cáo công trường
+GIT_CLOUD/
+├── admin/                # Phân hệ Super Admin Root
+│   └── index.html
+├── assets/               # CSS, JS, Fonts, Logo chung toàn Portal
+├── content/              # Các phân hệ Workspace theo Role
+│   ├── bim-vdc/          # Kỹ thuật BIM - VDC CDE
+│   │   └── index.html
+│   ├── internal/         # Quản lý Nội bộ
+│   │   └── index.html
+│   └── partner/          # Cổng Khách hàng / CRM
+│       ├── index.html
+│       └── calculate.html# (Công cụ tính kinh phí nằm tại đây)
+└── index.html            # Trang chủ Portal / Route hub
