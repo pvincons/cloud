@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản Lý Nội Bộ - PV INCONS Workspace</title>
+    <!-- AUTH GUARD ANTI-FOUC -->
+    <script src="../../assets/js/auth-guard.js"></script>
+    <script>protectRoute('INTERNAL');</script>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            color: #f8fafc;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #0f172a;
+        }
+
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .card-item {
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: all 0.2s ease;
+        }
+
+        .card-item:hover {
+            background: rgba(30, 41, 59, 0.8);
+            border-color: rgba(16, 185, 129, 0.4);
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+
+<body class="min-h-screen flex flex-col justify-between p-4 md:p-8">
+
+    <!-- HEADER -->
+    <header class="w-full max-w-6xl mx-auto flex items-center justify-between pb-6 border-b border-white/10">
+        <div class="flex items-center gap-3">
+            <div
+                class="w-10 h-10 rounded-xl bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 flex items-center justify-center text-xl">
+                <i class="fa-solid fa-folder-closed"></i>
+            </div>
+            <div>
+                <h1 class="font-extrabold text-white text-lg tracking-wide">QUẢN LÝ NỘI BỘ</h1>
+                <p class="text-xs text-emerald-400 font-medium">Quy trình SOP & Form mẫu chuẩn</p>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-4">
+            <div class="text-right hidden sm:block">
+                <p id="userInfo" class="text-xs font-bold text-white">User: --</p>
+                <span
+                    class="text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-2 py-0.5 rounded font-mono">INTERNAL_USER</span>
+            </div>
+            <button onclick="logout()"
+                class="px-3 py-2 bg-slate-800 hover:bg-rose-600/80 text-white rounded-lg text-xs font-semibold border border-white/10 transition-colors flex items-center gap-2">
+                <i class="fa-solid fa-right-from-bracket"></i> Đăng xuất
+            </button>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT -->
+    <main class="w-full max-w-6xl mx-auto my-8 grow">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+            <!-- Card 1: Quy trình SOP -->
+            <div class="card-item p-6 rounded-2xl flex flex-col justify-between cursor-pointer">
+                <div>
+                    <div
+                        class="w-12 h-12 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-2xl mb-4">
+                        <i class="fa-solid fa-list-check"></i>
+                    </div>
+                    <h2 class="font-bold text-base text-white mb-2">Sổ tay Quy trình SOP</h2>
+                    <p class="text-xs text-slate-400 leading-relaxed">Hệ thống quy trình chuẩn hóa các hoạt động thi
+                        công, nghiệm thu và vận hành dự án.</p>
+                </div>
+                <div
+                    class="mt-6 pt-4 border-t border-white/5 flex justify-between items-center text-xs text-emerald-400 font-medium">
+                    <span>Truy cập tài liệu</span>
+                    <i class="fa-solid fa-arrow-right"></i>
+                </div>
+            </div>
+
+            <!-- Card 2: Form mẫu chuẩn -->
+            <div class="card-item p-6 rounded-2xl flex flex-col justify-between cursor-pointer">
+                <div>
+                    <div
+                        class="w-12 h-12 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-2xl mb-4">
+                        <i class="fa-solid fa-file-lines"></i>
+                    </div>
+                    <h2 class="font-bold text-base text-white mb-2">Thư viện Form mẫu</h2>
+                    <p class="text-xs text-slate-400 leading-relaxed">Biểu mẫu đề nghị thanh toán, biên bản nghiệm thu,
+                        hợp đồng mẫu và báo cáo công việc.</p>
+                </div>
+                <div
+                    class="mt-6 pt-4 border-t border-white/5 flex justify-between items-center text-xs text-emerald-400 font-medium">
+                    <span>Tải về form mẫu</span>
+                    <i class="fa-solid fa-arrow-right"></i>
+                </div>
+            </div>
+
+            <!-- Card 3: Quản trị Nhân sự & Hành chính -->
+            <div class="card-item p-6 rounded-2xl flex flex-col justify-between cursor-pointer">
+                <div>
+                    <div
+                        class="w-12 h-12 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-2xl mb-4">
+                        <i class="fa-solid fa-users-gear"></i>
+                    </div>
+                    <h2 class="font-bold text-base text-white mb-2">Hành chính & Nhân sự</h2>
+                    <p class="text-xs text-slate-400 leading-relaxed">Đăng ký nghỉ phép, quản lý hồ sơ nhân sự và chấm
+                        công nội bộ doanh nghiệp.</p>
+                </div>
+                <div
+                    class="mt-6 pt-4 border-t border-white/5 flex justify-between items-center text-xs text-emerald-400 font-medium">
+                    <span>Xem thông tin</span>
+                    <i class="fa-solid fa-arrow-right"></i>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer
+        class="w-full max-w-6xl mx-auto pt-6 border-t border-white/10 flex justify-between items-center text-xs text-slate-400">
+        <div>&copy; 2026 PV INCONS Enterprise Workspace. Internal Module.</div>
+        <div>SOP Platform v2.6.0</div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const userSession = JSON.parse(localStorage.getItem('currentUser') || '{}');
+            if (userSession.username) {
+                document.getElementById('userInfo').innerText = `User: ${userSession.username}`;
+            }
+        });
+
+        function logout() {
+            localStorage.removeItem('currentUser');
+            window.location.href = '../../index.html';
+        }
+    </script>
+</body>
+
+</html>
