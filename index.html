@@ -79,7 +79,7 @@
         <div class="flex items-center gap-3">
             <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[11px] bg-slate-900/80 border border-white/10 text-slate-200 shadow-sm backdrop-blur-md font-medium">
                 <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                <span id="onlineCounter">60</span> Person | System Online
+                <span id="onlineCounter">76</span><i class="fa-solid fa-user text-xs text-slate-300"></i> | System Online
             </span>
         </div>
     </header>
@@ -158,8 +158,7 @@
                         <span class="text-xs text-slate-400 font-mono">SSO Portal</span>
                     </div>
 
-                    <!-- Bỏ onsubmit="handleLogin(event)" để không bị trùng lặp xử lý -->
-                    <form class="space-y-4">
+                    <form id="loginForm" class="space-y-4">
                         <div class="input-box rounded-xl px-4 py-3.5 flex items-center gap-3">
                             <i class="fa-regular fa-user text-slate-400 text-sm w-4 text-center"></i>
                             <input type="text" id="username" placeholder="Tên đăng nhập / Mã NV" required
@@ -175,7 +174,7 @@
                             </button>
                         </div>
 
-                        <button type="submit"
+                        <button type="submit" id="submitBtn"
                             class="w-full py-3.5 bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-500 hover:from-blue-500 hover:to-indigo-500 text-white font-bold text-xs tracking-wider uppercase rounded-xl shadow-lg shadow-blue-600/30 transition-all duration-200 mt-2 flex items-center justify-center gap-2 active:scale-[0.99]">
                             <span>ĐĂNG NHẬP SUB-WORKSPACE</span>
                             <i class="fa-solid fa-arrow-right-to-bracket text-xs"></i>
