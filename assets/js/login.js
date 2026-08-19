@@ -1,60 +1,55 @@
-document.addEventListener('DOMContentLoaded', () => {
-  const form = document.querySelector('form');
-  if (!form) return;
+// Dán link bạn vừa sao chép từ Google Apps Script vào đây
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzTHhPd4KdRpGgScuw_IBzaRcl_5TSac6guGm1Lvrws0UhzsOGJNM_nR2W406kslRFO/exec';
 
-  form.addEventListener('submit', async function (e) {
-    e.preventDefault();
+document.querySelector('form')?.addEventListener('submit', async function (e) {
+  e.preventDefault();
 
-    const usernameInput = document.querySelector('#username') || document.querySelector('input[type="text"]');
-    const passwordInput = document.querySelector('#password') || document.querySelector('input[type="password"]');
+  const username = document.querySelector('input[type="text"]').value.trim();
+  const password = document.querySelector('input[type="password"]').value.trim();
 
-    const username = usernameInput ? usernameInput.value.trim() : '';
-    const password = passwordInput ? passwordInput.value.trim() : '';
+  try {
+    // 1. Đọc dữ liệu tài khoản từ Google Sheets
+    const response = await fetch(SCRIPT_URL);
+    const rows = await response.json();
 
-    try {
-      // Đọc danh sách tài khoản từ file JSON (đường dẫn tính từ vị trí trang index.html)
-      const response = await fetch('./assets/data/users.json');
-      if (!response.ok) throw new Error('Không thể đọc file users.json');
-      
-      const USERS_DB = await response.json();
+    // 2. Kiểm tra khớp User & Pass (bỏ qua dòng tiêu đề [0])
+    const matchedUser = rows.slice(1).find(
+      row => String(row[0]).trim() === username && String(row[1]).trim() === password
+    );
 
-      // Kiểm tra sự tồn tại và mật khẩu
-      if (!USERS_DB[username] || USERS_DB[username] !== password) {
-        alert('Tài khoản hoặc mật khẩu không chính xác!');
-        return;
-      }
-
-      let role = '';
-      let redirectUrl = '';
-
-      // Phân quyền và tạo đường dẫn điều hướng
-      if (username === 'admin') {
-        role = 'SUPER_ADMIN';
-        redirectUrl = './admin/index.html';
-      } else if (username.toLowerCase().endsWith('-int')) {
-        role = 'INTERNAL_USER';
-        redirectUrl = './content/internal/index.html';
-      } else if (username.toLowerCase().endsWith('-vdc')) {
-        role = 'BIM_VDC';
-        redirectUrl = './content/bim-vdc/index.html';
-      } else {
-        alert('Tài khoản chưa được phân quyền phân hệ!');
-        return;
-      }
-
-      // Lưu LocalStorage đồng bộ dữ liệu với auth-guard.js
-      localStorage.setItem('access_token', 'token-' + Date.now());
-      localStorage.setItem('currentUser', JSON.stringify({
-        username: username,
-        role: role
-      }));
-
-      // Chuyển hướng trang
-      window.location.href = redirectUrl;
-
-    } catch (error) {
-      console.error(error);
-      alert('Không thể tải dữ liệu tài khoản từ hệ thống! Hãy chạy dự án qua Live Server.');
+    if (!matchedUser) {
+      alert('Tài khoản hoặc mật khẩu không chính xác!');
+      return;
     }
-  });
+
+    // 3. Phân luồng điều hướng
+    let role = '';
+    let redirectUrl = '';
+
+    if (username === 'admin') {
+      role = 'SUPER_ADMIN';
+      redirectUrl = './admin/index.html';
+    } else if (username.endsWith('-int')) {
+      role = 'INTERNAL_USER';
+      redirectUrl = './content/internal/index.html';
+    } else if (username.endsWith('-vdc')) {
+      role = 'BIM_VDC';
+      redirectUrl = './content/bim-vdc/index.html';
+    } else {
+      alert('Tài khoản chưa được phân quyền phân hệ!');
+      return;
+    }
+
+    // 4. Lưu Session
+    localStorage.setItem('access_token', 'token-' + Date.now());
+    localStorage.setItem('currentUser', JSON.stringify({
+      username: username,
+      role: role
+    }));
+
+    window.location.href = redirectUrl;
+
+  } catch (error) {
+    alert('Không thể kết nối đến cơ sở dữ liệu Google Sheets!');
+  }
 });
