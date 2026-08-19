@@ -6,7 +6,7 @@ function protectRoute(requiredRole = null) {
   const token = localStorage.getItem('access_token');
   if (!token) {
     alert('Bạn chưa đăng nhập!');
-    window.location.href = '/login.html';
+    window.location.href = '../../index.html';
     return;
   }
 
@@ -15,7 +15,7 @@ function protectRoute(requiredRole = null) {
   // Nếu trang yêu cầu Role cụ thể mà User không đáp ứng
   if (requiredRole && (!userSession || userSession.role !== requiredRole)) {
     alert(`Cảnh báo: Bạn không có quyền truy cập khu vực này!`);
-    window.location.href = '/index.html';
+    window.location.href = '../../index.html';
     return;
   }
 
