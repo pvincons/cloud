@@ -79,7 +79,7 @@
         <div class="flex items-center gap-3">
             <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[11px] bg-slate-900/80 border border-white/10 text-slate-200 shadow-sm backdrop-blur-md font-medium">
                 <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                <span id="onlineCounter">76</span><i class="fa-solid fa-user text-xs text-slate-300"></i> | System Online
+                <span id="onlineCounter">76</span><i class="fa-solid fa-user text-xs text-slate-300"></i>| System Online
             </span>
         </div>
     </header>
@@ -219,7 +219,7 @@
         }
 
         (function simulateOnlineUsers() {
-            let onlineUsers = Math.floor(Math.random() * (140 - 80 + 1)) + 80;
+            let onlineUsers = Math.floor(Math.random() * (100 - 80 + 1)) + 60;
             const counterEl = document.getElementById('onlineCounter');
 
             if (counterEl) {

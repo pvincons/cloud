@@ -157,9 +157,17 @@
                     </div>
                 </div>
             </div>
-            <div class="mt-6 flex justify-end gap-2">
-                <button onclick="togglePasswordModal(false)" class="px-3 py-2 bg-slate-700 hover:bg-slate-600 text-xs font-semibold text-white rounded-lg">Hủy</button>
-                <button onclick="submitChangePassword()" class="px-3 py-2 bg-emerald-600 hover:bg-emerald-500 text-xs font-semibold text-white rounded-lg">Cập nhật</button>
+
+            <!-- FOOTER MODAL (CÓ BIỂU TƯỢNG LOADING) -->
+            <div class="mt-6 flex items-center justify-between">
+                <div id="passLoading" class="hidden flex items-center gap-2 text-xs text-emerald-400 animate-pulse">
+                    <i class="fa-solid fa-circle-notch fa-spin text-sm"></i>
+                    <span>Đang cập nhật mật khẩu mới...</span>
+                </div>
+                <div class="flex items-center gap-2 ml-auto">
+                    <button id="btnCancelPass" onclick="togglePasswordModal(false)" class="px-3 py-2 bg-slate-700 hover:bg-slate-600 text-xs font-semibold text-white rounded-lg transition-colors">Hủy</button>
+                    <button id="btnSubmitPass" onclick="submitChangePassword()" class="px-3 py-2 bg-emerald-600 hover:bg-emerald-500 text-xs font-semibold text-white rounded-lg transition-colors">Cập nhật</button>
+                </div>
             </div>
         </div>
     </div>
@@ -172,7 +180,7 @@
     </footer>
 
     <script>
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzSUCULCw3M_QivXc8cTP7FsbZY7sK2eg0qpQSiOa9ZvM7S8tqKav7p-X2mE7majbHW/exec';
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzkIAJeJivQPmDEcKYKHpEjSFi_9mOLrS_nN-C6pSdyXD8i3CK7RPn8srwTgo7xeDKN/exec';
 
         document.addEventListener('DOMContentLoaded', function () {
             const userSession = JSON.parse(localStorage.getItem('currentUser') || '{}');
@@ -189,8 +197,14 @@
 
         function togglePasswordModal(show) {
             const modal = document.getElementById('passModal');
-            if (show) modal.classList.remove('hidden');
-            else modal.classList.add('hidden');
+            if (show) {
+                modal.classList.remove('hidden');
+            } else {
+                modal.classList.add('hidden');
+                document.getElementById('passLoading').classList.add('hidden');
+                document.getElementById('oldPass').value = '';
+                document.getElementById('newPass').value = '';
+            }
         }
 
         function togglePassVisibility(inputId, eyeId) {
@@ -217,6 +231,17 @@
                 return;
             }
 
+            const loadingEl = document.getElementById('passLoading');
+            const btnSubmit = document.getElementById('btnSubmitPass');
+            const btnCancel = document.getElementById('btnCancelPass');
+
+            // Bật Loading & Vô hiệu hóa nút bấm
+            loadingEl.classList.remove('hidden');
+            btnSubmit.disabled = true;
+            btnCancel.disabled = true;
+            btnSubmit.classList.add('opacity-50', 'cursor-not-allowed');
+            btnCancel.classList.add('opacity-50', 'cursor-not-allowed');
+
             try {
                 const response = await fetch(SCRIPT_URL, {
                     method: 'POST',
@@ -232,13 +257,18 @@
                 if (result === 'SUCCESS') {
                     alert('Đổi mật khẩu thành công!');
                     togglePasswordModal(false);
-                    document.getElementById('oldPass').value = '';
-                    document.getElementById('newPass').value = '';
                 } else {
                     alert('Mật khẩu cũ không chính xác!');
                 }
             } catch (error) {
                 alert('Không thể kết nối đến cơ sở dữ liệu!');
+            } finally {
+                // Tắt Loading & Mở lại nút bấm
+                loadingEl.classList.add('hidden');
+                btnSubmit.disabled = false;
+                btnCancel.disabled = false;
+                btnSubmit.classList.remove('opacity-50', 'cursor-not-allowed');
+                btnCancel.classList.remove('opacity-50', 'cursor-not-allowed');
             }
         }
     </script>

@@ -12,6 +12,11 @@ function protectRoute(requiredRole = null) {
   
   if (requiredRole && (!userSession || userSession.role !== requiredRole)) {
     alert(`Cảnh báo: Bạn không có quyền truy cập khu vực này!`);
+    
+    // Tự động lấy tên file hiện tại thay vì ghi cứng
+    const currentPage = window.location.pathname.split('/').pop();
+    sessionStorage.setItem('unauthorized_from', currentPage);
+
     window.location.href = '../../index.html';
     return;
   }

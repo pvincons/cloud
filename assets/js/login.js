@@ -1,5 +1,5 @@
 // Link Google Apps Script
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzSUCULCw3M_QivXc8cTP7FsbZY7sK2eg0qpQSiOa9ZvM7S8tqKav7p-X2mE7majbHW/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzkIAJeJivQPmDEcKYKHpEjSFi_9mOLrS_nN-C6pSdyXD8i3CK7RPn8srwTgo7xeDKN/exec';
 
 document.getElementById('loginForm')?.addEventListener('submit', async function (e) {
   e.preventDefault();
@@ -17,10 +17,15 @@ document.getElementById('loginForm')?.addEventListener('submit', async function 
   // 1. Chuyển nút sang trạng thái xoay tròn & Đang xác minh...
   if (submitBtn) {
     submitBtn.disabled = true;
-    submitBtn.classList.add('opacity-80', 'cursor-not-allowed');
+    submitBtn.classList.add('opacity-75', 'cursor-not-allowed', 'pointer-events-none', 'transition-all', 'duration-200');
     submitBtn.innerHTML = `
-      <i class="fa-solid fa-circle-notch animate-spin text-sm"></i>
-      <span>ĐANG XÁC MINH...</span>
+        <div class="inline-flex items-center justify-center gap-2">
+            <svg class="animate-spin h-4 w-4 text-current" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <span class="font-medium tracking-wider text-xs uppercase">Đang xác minh...</span>
+        </div>
     `;
   }
 
@@ -63,7 +68,7 @@ document.getElementById('loginForm')?.addEventListener('submit', async function 
       role = 'BIM_VDC';
       redirectUrl = './content/bim-vdc/index.html';
     } else {
-      alert('Tài khoản chưa được phân quyền phân hệ!');
+      alert('Tài khoản chưa được phân quyền!');
       resetBtn();
       return;
     }
@@ -78,7 +83,7 @@ document.getElementById('loginForm')?.addEventListener('submit', async function 
     window.location.href = redirectUrl;
 
   } catch (error) {
-    alert('Không thể kết nối đến cơ sở dữ liệu Google Sheets!');
+    alert('Không thể kết nối đến cơ sở dữ liệu');
     resetBtn();
   }
 });
