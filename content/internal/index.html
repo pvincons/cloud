@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản Lý Nội Bộ - PV INCONS Workspace</title>
+    <!-- AUTH GUARD ANTI-FOUC -->
+    <script src="../../assets/js/auth-guard.js"></script>
+    <script>protectRoute('INTERNAL_USER');</script>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            color: #f8fafc;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #0f172a;
+        }
+
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .card-item {
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: all 0.2s ease;
+        }
+
+        .card-item:hover {
+            background: rgba(30, 41, 59, 0.8);
+            border-color: rgba(16, 185, 129, 0.4);
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+
+<body class="min-h-screen flex flex-col justify-between p-4 md:p-8">
+
+    <!-- HEADER -->
+    <header class="w-full max-w-6xl mx-auto flex items-center justify-between pb-6 border-b border-white/10">
+        <div class="flex items-center gap-3">
+            <div
+                class="w-10 h-10 rounded-xl bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 flex items-center justify-center text-xl">
+                <i class="fa-solid fa-folder-closed"></i>
+            </div>
+            <div>
+                <h1 class="font-extrabold text-white text-lg tracking-wide">QUẢN LÝ NỘI BỘ</h1>
+                <p class="text-xs text-emerald-400 font-medium">Quy trình SOP & Form mẫu chuẩn</p>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-4">
+            <div class="text-right hidden sm:block">
+                <p id="userInfo" class="text-xs font-bold text-white">User: --</p>
+                <span
+                    class="text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-2 py-0.5 rounded font-mono">INTERNAL_USER</span>
+            </div>
+            <button onclick="togglePasswordModal(true)"
+                class="px-3 py-2 bg-slate-800 hover:bg-emerald-600/80 text-white rounded-lg text-xs font-semibold border border-white/10 transition-colors flex items-center gap-2">
+                <i class="fa-solid fa-key"></i> Đổi mật khẩu
+            </button>
+            <button onclick="logout()"
+                class="px-3 py-2 bg-slate-800 hover:bg-rose-600/80 text-white rounded-lg text-xs font-semibold border border-white/10 transition-colors flex items-center gap-2">
+                <i class="fa-solid fa-right-from-bracket"></i> Đăng xuất
+            </button>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT -->
+    <main class="w-full max-w-6xl mx-auto my-8 grow">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+            <!-- Card 1: Quy trình SOP -->
+            <div class="card-item p-6 rounded-2xl flex flex-col justify-between cursor-pointer">
+                <div>
+                    <div
+                        class="w-12 h-12 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-2xl mb-4">
+                        <i class="fa-solid fa-list-check"></i>
+                    </div>
+                    <h2 class="font-bold text-base text-white mb-2">Sổ tay Quy trình SOP</h2>
+                    <p class="text-xs text-slate-400 leading-relaxed">Hệ thống quy trình chuẩn hóa các hoạt động thi
+                        công, nghiệm thu và vận hành dự án.</p>
+                </div>
+                <div
+                    class="mt-6 pt-4 border-t border-white/5 flex justify-between items-center text-xs text-emerald-400 font-medium">
+                    <span>Truy cập tài liệu</span>
+                    <i class="fa-solid fa-arrow-right"></i>
+                </div>
+            </div>
+
+            <!-- Card 2: Form mẫu chuẩn -->
+            <a href="form.html" class="card-item p-6 rounded-2xl flex flex-col justify-between cursor-pointer">
+                <div>
+                    <div
+                        class="w-12 h-12 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-2xl mb-4">
+                        <i class="fa-solid fa-file-lines"></i>
+                    </div>
+                    <h2 class="font-bold text-base text-white mb-2">Thư viện Form mẫu</h2>
+                    <p class="text-xs text-slate-400 leading-relaxed">Biểu mẫu đề nghị thanh toán, biên bản nghiệm thu,
+                        hợp đồng mẫu và báo cáo công việc.</p>
+                </div>
+                <div
+                    class="mt-6 pt-4 border-t border-white/5 flex justify-between items-center text-xs text-emerald-400 font-medium">
+                    <span>Tải về form mẫu</span>
+                    <i class="fa-solid fa-arrow-right"></i>
+                </div>
+            </a>
+
+            <!-- Card 3: Quản trị Nhân sự & Hành chính -->
+            <div class="card-item p-6 rounded-2xl flex flex-col justify-between cursor-pointer">
+                <div>
+                    <div
+                        class="w-12 h-12 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-2xl mb-4">
+                        <i class="fa-solid fa-users-gear"></i>
+                    </div>
+                    <h2 class="font-bold text-base text-white mb-2">Hành chính & Nhân sự</h2>
+                    <p class="text-xs text-slate-400 leading-relaxed">Đăng ký nghỉ phép, quản lý hồ sơ nhân sự và chấm
+                        công nội bộ doanh nghiệp.</p>
+                </div>
+                <div
+                    class="mt-6 pt-4 border-t border-white/5 flex justify-between items-center text-xs text-emerald-400 font-medium">
+                    <span>Xem thông tin</span>
+                    <i class="fa-solid fa-arrow-right"></i>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- MODAL ĐỔI MẬT KHẨU -->
+    <div id="passModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
+        <div class="glass-panel w-full max-w-md p-6 rounded-2xl shadow-xl">
+            <h3 class="text-base font-bold text-white mb-4 flex items-center gap-2">
+                <i class="fa-solid fa-key text-emerald-400"></i> Đổi Mật Khẩu
+            </h3>
+            <div class="space-y-3">
+                <div>
+                    <label class="text-xs text-slate-300">Mật khẩu hiện tại</label>
+                    <div class="relative mt-1">
+                        <input type="password" id="oldPass" class="w-full px-3 py-2 pr-10 bg-slate-800/80 border border-white/10 rounded-lg text-xs text-white focus:outline-none focus:border-emerald-500">
+                        <button type="button" onclick="togglePassVisibility('oldPass', 'eyeOld')" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white transition-colors">
+                            <i id="eyeOld" class="fa-solid fa-eye text-xs"></i>
+                        </button>
+                    </div>
+                </div>
+                <div>
+                    <label class="text-xs text-slate-300">Mật khẩu mới</label>
+                    <div class="relative mt-1">
+                        <input type="password" id="newPass" class="w-full px-3 py-2 pr-10 bg-slate-800/80 border border-white/10 rounded-lg text-xs text-white focus:outline-none focus:border-emerald-500">
+                        <button type="button" onclick="togglePassVisibility('newPass', 'eyeNew')" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white transition-colors">
+                            <i id="eyeNew" class="fa-solid fa-eye text-xs"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FOOTER MODAL (CÓ BIỂU TƯỢNG LOADING) -->
+            <div class="mt-6 flex items-center justify-between">
+                <div id="passLoading" class="hidden flex items-center gap-2 text-xs text-emerald-400 animate-pulse">
+                    <i class="fa-solid fa-circle-notch fa-spin text-sm"></i>
+                    <span>Đang cập nhật mật khẩu mới...</span>
+                </div>
+                <div class="flex items-center gap-2 ml-auto">
+                    <button id="btnCancelPass" onclick="togglePasswordModal(false)" class="px-3 py-2 bg-slate-700 hover:bg-slate-600 text-xs font-semibold text-white rounded-lg transition-colors">Hủy</button>
+                    <button id="btnSubmitPass" onclick="submitChangePassword()" class="px-3 py-2 bg-emerald-600 hover:bg-emerald-500 text-xs font-semibold text-white rounded-lg transition-colors">Cập nhật</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer
+        class="w-full max-w-6xl mx-auto pt-6 border-t border-white/10 flex justify-between items-center text-xs text-slate-400">
+        <div>&copy; 2026 PV INCONS Enterprise Workspace. Internal Module.</div>
+        <div>SOP Platform v2.6.0</div>
+    </footer>
+
+    <script>
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzkIAJeJivQPmDEcKYKHpEjSFi_9mOLrS_nN-C6pSdyXD8i3CK7RPn8srwTgo7xeDKN/exec';
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const userSession = JSON.parse(localStorage.getItem('currentUser') || '{}');
+            if (userSession.username) {
+                document.getElementById('userInfo').innerText = `User: ${userSession.username}`;
+            }
+        });
+
+        function logout() {
+            localStorage.removeItem('currentUser');
+            localStorage.removeItem('access_token');
+            window.location.href = '../../index.html';
+        }
+
+        function togglePasswordModal(show) {
+            const modal = document.getElementById('passModal');
+            if (show) {
+                modal.classList.remove('hidden');
+            } else {
+                modal.classList.add('hidden');
+                document.getElementById('passLoading').classList.add('hidden');
+                document.getElementById('oldPass').value = '';
+                document.getElementById('newPass').value = '';
+            }
+        }
+
+        function togglePassVisibility(inputId, eyeId) {
+            const input = document.getElementById(inputId);
+            const eye = document.getElementById(eyeId);
+            if (input.type === 'password') {
+                input.type = 'text';
+                eye.classList.remove('fa-eye');
+                eye.classList.add('fa-eye-slash');
+            } else {
+                input.type = 'password';
+                eye.classList.remove('fa-eye-slash');
+                eye.classList.add('fa-eye');
+            }
+        }
+
+        async function submitChangePassword() {
+            const oldPassword = document.getElementById('oldPass').value.trim();
+            const newPassword = document.getElementById('newPass').value.trim();
+            const userSession = JSON.parse(localStorage.getItem('currentUser') || '{}');
+
+            if (!oldPassword || !newPassword) {
+                alert('Vui lòng nhập đầy đủ thông tin mật khẩu!');
+                return;
+            }
+
+            const loadingEl = document.getElementById('passLoading');
+            const btnSubmit = document.getElementById('btnSubmitPass');
+            const btnCancel = document.getElementById('btnCancelPass');
+
+            // Bật Loading & Vô hiệu hóa nút bấm
+            loadingEl.classList.remove('hidden');
+            btnSubmit.disabled = true;
+            btnCancel.disabled = true;
+            btnSubmit.classList.add('opacity-50', 'cursor-not-allowed');
+            btnCancel.classList.add('opacity-50', 'cursor-not-allowed');
+
+            try {
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify({
+                        username: userSession.username,
+                        oldPassword: oldPassword,
+                        newPassword: newPassword
+                    })
+                });
+
+                const result = await response.text();
+                if (result === 'SUCCESS') {
+                    alert('Đổi mật khẩu thành công!');
+                    togglePasswordModal(false);
+                } else {
+                    alert('Mật khẩu cũ không chính xác!');
+                }
+            } catch (error) {
+                alert('Không thể kết nối đến cơ sở dữ liệu!');
+            } finally {
+                // Tắt Loading & Mở lại nút bấm
+                loadingEl.classList.add('hidden');
+                btnSubmit.disabled = false;
+                btnCancel.disabled = false;
+                btnSubmit.classList.remove('opacity-50', 'cursor-not-allowed');
+                btnCancel.classList.remove('opacity-50', 'cursor-not-allowed');
+            }
+        }
+    </script>
+</body>
+
+</html>
