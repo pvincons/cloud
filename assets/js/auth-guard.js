@@ -4,7 +4,7 @@ function protectRoute(requiredRole = null) {
   const token = localStorage.getItem('access_token');
   if (!token) {
     alert('Bạn chưa đăng nhập!');
-    window.location.href = '../../login.html';
+    window.location.href = '../../index.html';
     return;
   }
 
@@ -17,7 +17,7 @@ function protectRoute(requiredRole = null) {
     const currentPage = window.location.pathname.split('/').pop();
     sessionStorage.setItem('unauthorized_from', currentPage);
 
-    window.location.href = '../../login.html';
+    window.location.href = '../../index.html';
     return;
   }
 
