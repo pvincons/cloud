@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BIM - VDC CDE Workspace - PV INCONS</title>
+    <!-- AUTH GUARD ANTI-FOUC -->
+    <script src="../../assets/js/auth-guard.js"></script>
+    <script>protectRoute('BIM_VDC');</script>
+     
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            color: #f8fafc;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #0f172a;
+        }
+
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .card-item {
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: all 0.2s ease;
+        }
+
+        .card-item:hover {
+            background: rgba(30, 41, 59, 0.8);
+            border-color: rgba(59, 130, 246, 0.4);
+            transform: translateY(-2px);
+        }
+
+        /* Custom scrollbar cho CDE explorer */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.6);
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(59, 130, 246, 0.3);
+            border-radius: 3px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: rgba(59, 130, 246, 0.6);
+        }
+    </style>
+</head>
+
+<body class="min-h-screen flex flex-col justify-between p-4 md:p-8">
+
+    <!-- HEADER -->
+    <header class="w-full max-w-6xl mx-auto flex items-center justify-between pb-6 border-b border-white/10">
+        <div class="flex items-center gap-3">
+            <div
+                class="w-10 h-10 rounded-xl bg-blue-500/20 border border-blue-500/30 text-blue-400 flex items-center justify-center text-xl">
+                <i class="fa-solid fa-cubes"></i>
+            </div>
+            <div>
+                <h1 class="font-extrabold text-white text-lg tracking-wide">BIM - VDC CDE WORKSPACE</h1>
+                <p class="text-xs text-blue-400 font-medium">Cơ sở dữ liệu kỹ thuật dự án tập trung</p>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-4">
+            <div class="text-right hidden sm:block">
+                <p id="userInfo" class="text-xs font-bold text-white">User: --</p>
+                <span
+                    class="text-[10px] bg-blue-500/20 text-blue-300 border border-blue-500/30 px-2 py-0.5 rounded font-mono">BIM_CDE_USER</span>
+            </div>
+            <button onclick="togglePasswordModal(true)"
+                class="px-3 py-2 bg-slate-800 hover:bg-blue-600/80 text-white rounded-lg text-xs font-semibold border border-white/10 transition-colors flex items-center gap-2">
+                <i class="fa-solid fa-key"></i> Đổi mật khẩu
+            </button>
+            <button onclick="logout()"
+                class="px-3 py-2 bg-slate-800 hover:bg-rose-600/80 text-white rounded-lg text-xs font-semibold border border-white/10 transition-colors flex items-center gap-2">
+                <i class="fa-solid fa-right-from-bracket"></i> Đăng xuất
+            </button>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT -->
+    <main class="w-full max-w-6xl mx-auto my-8 grow">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+            <!-- Card 1: Kho Mô hình 3D Revit (KẾT NỐI TRỰC TIẾP database/bim-vdc) -->
+            <a onclick="openCDEExplorer()" class="card-item p-6 rounded-2xl flex flex-col justify-between cursor-pointer group">
+                <div>
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-12 h-12 rounded-xl bg-blue-500/10 text-blue-400 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-database"></i>
+                        </div>
+                        <span id="cdeServerBadge" class="text-[10px] px-2 py-1 rounded-full bg-slate-700/80 text-slate-300 border border-white/10 flex items-center gap-1.5">
+                            <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span> database/bim-vdc
+                        </span>
+                    </div>
+                    <h2 class="font-bold text-base text-white mb-2 group-hover:text-blue-400 transition-colors">Kho Mô hình CDE (Revit)</h2>
+                    <p class="text-xs text-slate-400 leading-relaxed">Lưu trữ & duyệt mô hình Kiến trúc, Kết cấu, MEP trực tiếp từ thư mục nội bộ <code class="text-blue-300 bg-slate-800 px-1 py-0.5 rounded">database/bim-vdc</code>.</p>
+                </div>
+                <div class="mt-6 pt-4 border-t border-white/5 flex justify-between items-center text-xs text-blue-400 font-medium">
+                    <span>Mở kho dữ liệu Database</span>
+                    <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
+                </div>
+            </a>
+
+            <!-- Card 2: Tiêu chuẩn OmniClass & Keynote -->
+            <a href="/content/bim-vdc/public/cde_containers.html" class="card-item p-6 rounded-2xl flex flex-col justify-between cursor-pointer group">
+                <div>
+                    <div class="w-12 h-12 rounded-xl bg-blue-500/10 text-blue-400 flex items-center justify-center text-2xl mb-4 group-hover:scale-110 transition-transform">
+                        <i class="fa-solid fa-diagram-project"></i>
+                    </div>
+                    <h2 class="font-bold text-base text-white mb-2 group-hover:text-blue-400 transition-colors">Master Information Register (MIR)</h2>
+                    <p class="text-xs text-slate-400 leading-relaxed">Danh mục quản lý tập trung toàn bộ file dùng chung cho toàn dự án chuẩn ISO 19650</p>
+                </div>
+                <div class="mt-6 pt-4 border-t border-white/5 flex justify-between items-center text-xs text-blue-400 font-medium">
+                    <span>Mở bảng danh mục</span>
+                    <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
+                </div>
+            </a>
+
+            <!-- Card 3: BIM Execution Plan (BEP) -->
+            <div class="card-item p-6 rounded-2xl flex flex-col justify-between cursor-pointer group">
+                <div>
+                    <div class="w-12 h-12 rounded-xl bg-blue-500/10 text-blue-400 flex items-center justify-center text-2xl mb-4 group-hover:scale-110 transition-transform">
+                        <i class="fa-solid fa-gears"></i>
+                    </div>
+                    <h2 class="font-bold text-base text-white mb-2 group-hover:text-blue-400 transition-colors">Kế hoạch BEP & Clash Detection</h2>
+                    <p class="text-xs text-slate-400 leading-relaxed">Tài liệu BEP, phối hợp kiểm tra xung đột vị trí và xử lý lỗi mô hình.</p>
+                </div>
+                <div class="mt-6 pt-4 border-t border-white/5 flex justify-between items-center text-xs text-blue-400 font-medium">
+                    <span>Xem kế hoạch BEP</span>
+                    <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- MODAL EXPLORER KHO DỮ LIỆU DATABASE/BIM-VDC -->
+    <div id="cdeModal" class="fixed inset-0 bg-black/75 backdrop-blur-md hidden flex items-center justify-center p-4 z-50">
+        <div class="glass-panel w-full max-w-5xl rounded-2xl shadow-2xl flex flex-col max-h-[85vh] border border-blue-500/30 overflow-hidden">
+            <!-- Header Modal -->
+            <div class="p-5 border-b border-white/10 flex items-center justify-between bg-slate-900/60">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center text-lg border border-blue-500/30">
+                        <i class="fa-solid fa-folder-tree"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-base font-bold text-white flex items-center gap-2">
+                            Dữ liệu Tập trung CDE <span class="text-xs font-mono font-normal text-blue-400 bg-blue-950/80 px-2 py-0.5 rounded border border-blue-500/30">database/bim-vdc</span>
+                        </h3>
+                        <p class="text-xs text-slate-400">Trình duyệt tập tin & mô hình BIM cho toàn bộ dự án</p>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-3">
+                    <button onclick="toggleServerSettings()" title="Cấu hình API Server" class="p-2 text-slate-400 hover:text-white bg-slate-800 hover:bg-slate-700 rounded-lg text-xs transition-colors border border-white/10 flex items-center gap-1.5">
+                        <i class="fa-solid fa-sliders"></i> <span class="hidden sm:inline">Cấu hình URL</span>
+                    </button>
+                    <button onclick="loadCDEFiles(currentPath)" title="Tải lại" class="p-2 text-slate-400 hover:text-white bg-slate-800 hover:bg-slate-700 rounded-lg text-xs transition-colors border border-white/10">
+                        <i class="fa-solid fa-arrows-rotate"></i>
+                    </button>
+                    <button onclick="closeCDEExplorer()" class="p-2 text-slate-400 hover:text-rose-400 bg-slate-800 hover:bg-rose-950/50 rounded-lg text-xs transition-colors border border-white/10">
+                        <i class="fa-solid fa-xmark text-base"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Panel cài đặt Server URL (Mặc định ẩn) -->
+            <div id="serverConfigPanel" class="hidden bg-slate-900/90 border-b border-white/10 p-3 px-5 flex flex-wrap items-center justify-between gap-3 text-xs">
+                <div class="flex items-center gap-2 grow max-w-xl">
+                    <label class="text-slate-300 font-medium shrink-0">Server API URL:</label>
+                    <input type="text" id="apiServerUrlInput" value="http://localhost:3000" class="w-full px-3 py-1.5 bg-slate-800 border border-white/10 rounded text-white text-xs focus:outline-none focus:border-blue-500 font-mono">
+                </div>
+                <div class="flex items-center gap-2">
+                    <button onclick="saveServerUrl()" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded font-medium transition-colors">Lưu kết nối</button>
+                    <button onclick="toggleServerSettings()" class="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-slate-200 rounded font-medium transition-colors">Đóng</button>
+                </div>
+            </div>
+
+            <!-- Thanh điều hướng đường dẫn & Tìm kiếm -->
+            <div class="p-3 px-5 bg-slate-800/40 border-b border-white/10 flex flex-wrap items-center justify-between gap-3 text-xs">
+                <!-- Breadcrumbs -->
+                <div id="cdeBreadcrumbs" class="flex items-center gap-1.5 overflow-x-auto text-slate-300 font-mono py-1 custom-scrollbar">
+                    <button onclick="navigateTo('')" class="hover:text-blue-400 flex items-center gap-1 font-bold">
+                        <i class="fa-solid fa-database text-blue-400"></i> database/bim-vdc
+                    </button>
+                </div>
+
+                <!-- Tìm kiếm nhanh trong thư mục -->
+                <div class="relative w-full sm:w-64">
+                    <input type="text" id="cdeSearchInput" onkeyup="filterCDEItems()" placeholder="Tìm kiếm file, thư mục..." class="w-full px-3 py-1.5 pr-8 bg-slate-900/80 border border-white/10 rounded-lg text-xs text-white placeholder-slate-500 focus:outline-none focus:border-blue-500">
+                    <i class="fa-solid fa-magnifying-glass absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                </div>
+            </div>
+
+            <!-- Nội dung danh sách tập tin -->
+            <div class="grow overflow-y-auto p-5 custom-scrollbar min-h-[300px] relative">
+                <!-- Loading indicator -->
+                <div id="cdeLoading" class="absolute inset-0 bg-slate-900/80 backdrop-blur-sm flex flex-col items-center justify-center gap-3 z-10 hidden">
+                    <i class="fa-solid fa-circle-notch fa-spin text-3xl text-blue-500"></i>
+                    <p class="text-xs text-slate-300 font-medium">Đang tải dữ liệu từ <code class="text-blue-400 font-mono">database/bim-vdc</code>...</p>
+                </div>
+
+                <!-- Dạng bảng danh sách -->
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="border-b border-white/10 text-[11px] font-semibold uppercase text-slate-400 tracking-wider">
+                                <th class="pb-3 px-3">Tên tập tin / Thư mục</th>
+                                <th class="pb-3 px-3">Loại</th>
+                                <th class="pb-3 px-3">Đường dẫn tương đối</th>
+                                <th class="pb-3 px-3 text-right">Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody id="cdeFileList" class="divide-y divide-white/5 text-xs text-slate-200">
+                            <!-- JS sẽ render items tại đây -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Lỗi không kết nối được Backend -->
+                <div id="cdeErrorState" class="hidden py-12 text-center space-y-3">
+                    <div class="w-12 h-12 rounded-full bg-rose-500/20 text-rose-400 flex items-center justify-center mx-auto text-xl border border-rose-500/30">
+                        <i class="fa-solid fa-plug-circle-xmark"></i>
+                    </div>
+                    <h4 class="text-sm font-bold text-white">Chưa kết nối tới Backend CDE Server</h4>
+                    <p class="text-xs text-slate-400 max-w-md mx-auto leading-relaxed">
+                        Không thể kết nối đến <code class="text-rose-300 font-mono" id="currentApiDisplay">http://localhost:3000</code>. Vui lòng kiểm tra Node.js Backend Server đang chạy.
+                    </p>
+                    <div class="pt-2">
+                        <button onclick="loadCDEFiles(currentPath)" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-lg text-xs transition-colors shadow-lg">
+                            <i class="fa-solid fa-rotate-right mr-1.5"></i> Thử lại kết nối
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Thư mục trống -->
+                <div id="cdeEmptyState" class="hidden py-12 text-center space-y-2">
+                    <i class="fa-regular fa-folder-open text-4xl text-slate-600 mb-2"></i>
+                    <p class="text-xs text-slate-400">Thư mục này hiện tại không có dữ liệu.</p>
+                </div>
+            </div>
+
+            <!-- Footer Modal -->
+            <div class="p-3 px-5 border-t border-white/10 bg-slate-900/60 flex items-center justify-between text-xs text-slate-400">
+                <div id="cdeSummaryText">Đã tải 0 mục dữ liệu</div>
+                <div class="flex items-center gap-2">
+                    <span class="inline-block w-2 h-2 rounded-full bg-emerald-500"></span> Trạng thái CDE: Sẵn sàng
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL ĐỔI MẬT KHẨU -->
+    <div id="passModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
+        <div class="glass-panel w-full max-w-md p-6 rounded-2xl shadow-xl">
+            <h3 class="text-base font-bold text-white mb-4 flex items-center gap-2">
+                <i class="fa-solid fa-key text-blue-400"></i> Đổi Mật Khẩu
+            </h3>
+            <div class="space-y-3">
+                <div>
+                    <label class="text-xs text-slate-300">Mật khẩu hiện tại</label>
+                    <div class="relative mt-1">
+                        <input type="password" id="oldPass" class="w-full px-3 py-2 pr-10 bg-slate-800/80 border border-white/10 rounded-lg text-xs text-white focus:outline-none focus:border-blue-500">
+                        <button type="button" onclick="togglePassVisibility('oldPass', 'eyeOld')" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white transition-colors">
+                            <i id="eyeOld" class="fa-solid fa-eye text-xs"></i>
+                        </button>
+                    </div>
+                </div>
+                <div>
+                    <label class="text-xs text-slate-300">Mật khẩu mới</label>
+                    <div class="relative mt-1">
+                        <input type="password" id="newPass" class="w-full px-3 py-2 pr-10 bg-slate-800/80 border border-white/10 rounded-lg text-xs text-white focus:outline-none focus:border-blue-500">
+                        <button type="button" onclick="togglePassVisibility('newPass', 'eyeNew')" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white transition-colors">
+                            <i id="eyeNew" class="fa-solid fa-eye text-xs"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FOOTER MODAL (CÓ BIỂU TƯỢNG LOADING) -->
+            <div class="mt-6 flex items-center justify-between">
+                <div id="passLoading" class="hidden flex items-center gap-2 text-xs text-blue-400 animate-pulse">
+                    <i class="fa-solid fa-circle-notch fa-spin text-sm"></i>
+                    <span>Đang cập nhật mật khẩu mới...</span>
+                </div>
+                <div class="flex items-center gap-2 ml-auto">
+                    <button id="btnCancelPass" onclick="togglePasswordModal(false)" class="px-3 py-2 bg-slate-700 hover:bg-slate-600 text-xs font-semibold text-white rounded-lg transition-colors">Hủy</button>
+                    <button id="btnSubmitPass" onclick="submitChangePassword()" class="px-3 py-2 bg-blue-600 hover:bg-blue-500 text-xs font-semibold text-white rounded-lg transition-colors">Cập nhật</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer
+        class="w-full max-w-6xl mx-auto pt-6 border-t border-white/10 flex justify-between items-center text-xs text-slate-400">
+        <div>&copy; 2026 PV INCONS Enterprise Workspace. CDE Engine.</div>
+        <div>BIM/VDC Standard v2.6.0</div>
+    </footer>
+
+    <script>
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzkIAJeJivQPmDEcKYKHpEjSFi_9mOLrS_nN-C6pSdyXD8i3CK7RPn8srwTgo7xeDKN/exec';
+
+        // --- CẤU HÌNH KẾT NỐI DATABASE BIM-VDC ---
+        let DATA_SERVER_API = localStorage.getItem('cde_api_url') || 'http://localhost:3000';
+        let currentPath = '';
+        let fetchedItems = [];
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const userSession = JSON.parse(localStorage.getItem('currentUser') || '{}');
+            if (userSession.username) {
+                document.getElementById('userInfo').innerText = `User: ${userSession.username}`;
+            }
+            document.getElementById('apiServerUrlInput').value = DATA_SERVER_API;
+            checkCDEServerStatus();
+        });
+
+        function logout() {
+            localStorage.removeItem('currentUser');
+            localStorage.removeItem('access_token');
+            window.location.href = '../../index.html';
+        }
+
+        function togglePasswordModal(show) {
+            const modal = document.getElementById('passModal');
+            if (show) {
+                modal.classList.remove('hidden');
+            } else {
+                modal.classList.add('hidden');
+                document.getElementById('passLoading').classList.add('hidden');
+                document.getElementById('oldPass').value = '';
+                document.getElementById('newPass').value = '';
+            }
+        }
+
+        function togglePassVisibility(inputId, eyeId) {
+            const input = document.getElementById(inputId);
+            const eye = document.getElementById(eyeId);
+            if (input.type === 'password') {
+                input.type = 'text';
+                eye.classList.remove('fa-eye');
+                eye.classList.add('fa-eye-slash');
+            } else {
+                input.type = 'password';
+                eye.classList.remove('fa-eye-slash');
+                eye.classList.add('fa-eye');
+            }
+        }
+
+        async function submitChangePassword() {
+            const oldPassword = document.getElementById('oldPass').value.trim();
+            const newPassword = document.getElementById('newPass').value.trim();
+            const userSession = JSON.parse(localStorage.getItem('currentUser') || '{}');
+
+            if (!oldPassword || !newPassword) {
+                alert('Vui lòng nhập đầy đủ thông tin mật khẩu!');
+                return;
+            }
+
+            const loadingEl = document.getElementById('passLoading');
+            const btnSubmit = document.getElementById('btnSubmitPass');
+            const btnCancel = document.getElementById('btnCancelPass');
+
+            // Bật Loading & Vô hiệu hóa nút bấm
+            loadingEl.classList.remove('hidden');
+            btnSubmit.disabled = true;
+            btnCancel.disabled = true;
+            btnSubmit.classList.add('opacity-50', 'cursor-not-allowed');
+            btnCancel.classList.add('opacity-50', 'cursor-not-allowed');
+
+            try {
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify({
+                        username: userSession.username,
+                        oldPassword: oldPassword,
+                        newPassword: newPassword
+                    })
+                });
+
+                const result = await response.text();
+                if (result === 'SUCCESS') {
+                    alert('Đổi mật khẩu thành công!');
+                    togglePasswordModal(false);
+                } else {
+                    alert('Mật khẩu cũ không chính xác!');
+                }
+            } catch (error) {
+                alert('Không thể kết nối đến cơ sở dữ liệu!');
+            } finally {
+                // Tắt Loading & Mở lại nút bấm
+                loadingEl.classList.add('hidden');
+                btnSubmit.disabled = false;
+                btnCancel.disabled = false;
+                btnSubmit.classList.remove('opacity-50', 'cursor-not-allowed');
+                btnCancel.classList.remove('opacity-50', 'cursor-not-allowed');
+            }
+        }
+
+        // ==========================================
+        // CÁC HÀM XỬ LÝ KẾT NỐI CDE (database/bim-vdc)
+        // ==========================================
+
+        function openCDEExplorer() {
+            document.getElementById('cdeModal').classList.remove('hidden');
+            loadCDEFiles(currentPath);
+        }
+
+        function closeCDEExplorer() {
+            document.getElementById('cdeModal').classList.add('hidden');
+        }
+
+        function toggleServerSettings() {
+            const panel = document.getElementById('serverConfigPanel');
+            panel.classList.toggle('hidden');
+        }
+
+        function saveServerUrl() {
+            const newUrl = document.getElementById('apiServerUrlInput').value.trim();
+            if (newUrl) {
+                DATA_SERVER_API = newUrl.replace(/\/$/, "");
+                localStorage.setItem('cde_api_url', DATA_SERVER_API);
+                alert('Đã cập nhật URL CDE Server: ' + DATA_SERVER_API);
+                toggleServerSettings();
+                loadCDEFiles(currentPath);
+            }
+        }
+
+        async function checkCDEServerStatus() {
+            const badge = document.getElementById('cdeServerBadge');
+            try {
+                const res = await fetch(`${DATA_SERVER_API}/api/projects`, { method: 'GET' });
+                if (res.ok) {
+                    badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-400"></span> database/bim-vdc (Online)`;
+                    badge.className = "text-[10px] px-2 py-1 rounded-full bg-emerald-950/80 text-emerald-300 border border-emerald-500/30 flex items-center gap-1.5";
+                } else {
+                    throw new Error();
+                }
+            } catch (e) {
+                badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-rose-400"></span> database/bim-vdc (Offline)`;
+                badge.className = "text-[10px] px-2 py-1 rounded-full bg-rose-950/80 text-rose-300 border border-rose-500/30 flex items-center gap-1.5";
+            }
+        }
+
+        async function loadCDEFiles(path = '') {
+            currentPath = path;
+            const loading = document.getElementById('cdeLoading');
+            const errorState = document.getElementById('cdeErrorState');
+            const emptyState = document.getElementById('cdeEmptyState');
+            const fileList = document.getElementById('cdeFileList');
+            const summaryText = document.getElementById('cdeSummaryText');
+
+            loading.classList.remove('hidden');
+            errorState.classList.add('hidden');
+            emptyState.classList.add('hidden');
+            fileList.innerHTML = '';
+
+            renderBreadcrumbs(path);
+
+            try {
+                // Gọi tới Endpoint /api/projects đã cấu hình ở server.js
+                const response = await fetch(`${DATA_SERVER_API}/api/projects`);
+                if (!response.ok) throw new Error('Không thể đọc thư mục');
+
+                fetchedItems = await response.json();
+                loading.classList.add('hidden');
+
+                if (fetchedItems.length === 0) {
+                    emptyState.classList.remove('hidden');
+                    summaryText.innerText = 'Thư mục trống';
+                    return;
+                }
+
+                summaryText.innerText = `Đã tải ${fetchedItems.length} dự án trong database/bim-vdc`;
+                renderFileList(fetchedItems);
+                checkCDEServerStatus();
+
+            } catch (error) {
+                console.error('Lỗi kết nối CDE Server:', error);
+                loading.classList.add('hidden');
+                document.getElementById('currentApiDisplay').innerText = DATA_SERVER_API;
+                errorState.classList.remove('hidden');
+                summaryText.innerText = 'Lỗi kết nối Server';
+                checkCDEServerStatus();
+            }
+        }
+
+        function renderFileList(items) {
+            const fileList = document.getElementById('cdeFileList');
+            fileList.innerHTML = '';
+
+            items.forEach(item => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-800/50 transition-colors group";
+
+                const isDir = true; // Mặc định trả về danh sách folder từ /api/projects
+                const icon = getItemIcon(item.name, isDir);
+                const fileUrl = `${DATA_SERVER_API}/files/${encodeURIComponent(item.name)}`;
+
+                let actionButton = `
+                    <button onclick="navigateTo('${item.name}')" class="px-2.5 py-1 bg-blue-600/20 hover:bg-blue-600 text-blue-300 hover:text-white rounded border border-blue-500/30 text-[11px] transition-all flex items-center gap-1 ml-auto">
+                        <i class="fa-solid fa-folder-open text-[10px]"></i> Mở dự án
+                    </button>`;
+
+                tr.innerHTML = `
+                    <td class="py-2.5 px-3">
+                        <div class="flex items-center gap-2.5 cursor-pointer" onclick="navigateTo('${item.name}')">
+                            <span class="text-base">${icon}</span>
+                            <span class="font-medium text-white group-hover:text-blue-400 transition-colors">${item.name}</span>
+                        </div>
+                    </td>
+                    <td class="py-2.5 px-3 text-slate-400 text-[11px]">
+                        <span class="text-amber-400 font-semibold">Folder</span>
+                    </td>
+                    <td class="py-2.5 px-3 font-mono text-[11px] text-slate-400 max-w-xs truncate">
+                        ${item.name}
+                    </td>
+                    <td class="py-2.5 px-3 text-right">
+                        ${actionButton}
+                    </td>
+                `;
+                fileList.appendChild(tr);
+            });
+        }
+
+        function getItemIcon(filename, isDirectory) {
+            if (isDirectory) return '<i class="fa-solid fa-folder text-amber-400"></i>';
+            return '<i class="fa-solid fa-file text-slate-400"></i>';
+        }
+
+        function navigateTo(path) {
+            loadCDEFiles(path);
+        }
+
+        function renderBreadcrumbs(path) {
+            const breadcrumbs = document.getElementById('cdeBreadcrumbs');
+            breadcrumbs.innerHTML = `
+                <button onclick="navigateTo('')" class="hover:text-blue-400 flex items-center gap-1 font-bold">
+                    <i class="fa-solid fa-database text-blue-400"></i> database/bim-vdc
+                </button>
+            `;
+
+            if (!path) return;
+
+            const parts = path.split('/');
+            let accumulatedPath = '';
+
+            parts.forEach((part, index) => {
+                if (!part) return;
+                accumulatedPath += (accumulatedPath ? '/' : '') + part;
+                const currentAccPath = accumulatedPath;
+
+                const span = document.createElement('span');
+                span.className = "text-slate-500";
+                span.innerText = "/";
+
+                const btn = document.createElement('button');
+                btn.className = index === parts.length - 1 ? "text-blue-400 font-semibold" : "hover:text-blue-400";
+                btn.innerText = part;
+                btn.onclick = () => navigateTo(currentAccPath);
+
+                breadcrumbs.appendChild(span);
+                breadcrumbs.appendChild(btn);
+            });
+        }
+
+        function filterCDEItems() {
+            const query = document.getElementById('cdeSearchInput').value.toLowerCase().trim();
+            if (!query) {
+                renderFileList(fetchedItems);
+                return;
+            }
+            const filtered = fetchedItems.filter(item => item.name.toLowerCase().includes(query));
+            renderFileList(filtered);
+        }
+    </script>
+</body>
+
+</html>

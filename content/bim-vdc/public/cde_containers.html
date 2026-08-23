@@ -1,0 +1,1628 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CDE Master Platform v2.0 - ISO 19650-2 PIM</title>
+    <style>
+        :root[data-theme="dark"] {
+            --primary: #38bdf8;
+            --primary-dark: #0284c7;
+            --bg-dark: #0b0f19;
+            --bg-sidebar: #0f172a;
+            --bg-main: #090d16;
+            --bg-card: #1e293b;
+            --bg-input: #0f172a;
+            --bg-hover: #1e293b;
+            --bg-tree-hover: rgba(255, 255, 255, 0.06);
+            --bg-tree-active: rgba(56, 189, 248, 0.18);
+            --text-main: #cbd5e1;
+            --text-heading: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-color: #334155;
+            --folder-yellow: #facc15;
+
+            --wip-color: #38bdf8;
+            --shared-color: #f59e0b;
+            --published-color: #22c55e;
+            --archive-color: #64748b;
+        }
+
+        :root[data-theme="light"] {
+            --primary: #0284c7;
+            --primary-dark: #0369a1;
+            --bg-dark: #f1f5f9;
+            --bg-sidebar: #ffffff;
+            --bg-main: #f8fafc;
+            --bg-card: #ffffff;
+            --bg-input: #f1f5f9;
+            --bg-hover: #e2e8f0;
+            --bg-tree-hover: rgba(0, 0, 0, 0.05);
+            --bg-tree-active: rgba(2, 132, 199, 0.15);
+            --text-main: #334155;
+            --text-heading: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #cbd5e1;
+            --folder-yellow: #eab308;
+
+            --wip-color: #0284c7;
+            --shared-color: #d97706;
+            --published-color: #16a34a;
+            --archive-color: #475569;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            transition: background-color 0.2s ease, color 0.2s ease;
+        }
+
+        body {
+            display: flex;
+            height: 100vh;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            overflow: hidden;
+        }
+
+        .sidebar {
+            width: 330px;
+            background-color: var(--bg-sidebar);
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid var(--border-color);
+            flex-shrink: 0;
+        }
+
+        .sidebar-header {
+            padding: 14px 16px;
+            background-color: var(--bg-dark);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .brand-logo {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .project-select-box {
+            width: 100%;
+            padding: 8px 10px;
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            color: var(--text-heading);
+            border-radius: 6px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .nav-section {
+            padding: 12px 10px;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .nav-section-title {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            font-weight: 700;
+            margin-bottom: 8px;
+            padding-left: 6px;
+        }
+
+        .tree-branch {
+            list-style: none;
+            padding-left: 14px;
+            margin: 2px 0 2px 4px;
+            border-left: 1px dashed var(--border-color);
+        }
+
+        .tree-node-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 4px 6px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .tree-node-item:hover { background-color: var(--bg-tree-hover); }
+
+        .tree-node-item.active {
+            background-color: var(--bg-tree-active);
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .node-title {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .toggle-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 14px;
+            height: 14px;
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            transition: transform 0.15s ease;
+        }
+
+        .toggle-icon.collapsed { transform: rotate(-90deg); }
+
+        .icon-folder { color: var(--folder-yellow); font-size: 0.95rem; }
+        .icon-file { color: var(--text-muted); font-size: 0.85rem; }
+
+        .folder-file-count {
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: var(--primary);
+            background: rgba(56, 189, 248, 0.12);
+            padding: 1px 5px;
+            border-radius: 10px;
+            margin-left: 4px;
+            border: 1px solid rgba(56, 189, 248, 0.25);
+        }
+
+        .node-actions { display: none; gap: 2px; }
+        .tree-node-item:hover .node-actions { display: flex; }
+
+        .btn-tree-action {
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            font-size: 0.72rem;
+            padding: 1px 4px;
+            border-radius: 3px;
+            color: var(--text-muted);
+        }
+
+        .btn-tree-action:hover { background: var(--bg-card); color: var(--text-heading); }
+
+        .main-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            background-color: var(--bg-main);
+        }
+
+        .top-navbar {
+            height: 60px;
+            background-color: var(--bg-card);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+        }
+
+        .search-bar {
+            display: flex;
+            align-items: center;
+            background-color: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 6px 12px;
+            width: 360px;
+        }
+
+        .search-bar input {
+            border: none;
+            background: transparent;
+            outline: none;
+            width: 100%;
+            margin-left: 8px;
+            font-size: 0.85rem;
+            color: var(--text-heading);
+        }
+
+        .top-actions { display: flex; align-items: center; gap: 10px; }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 14px;
+            border-radius: 6px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+        }
+
+        .btn-primary { background-color: var(--primary-dark); color: white; }
+        .btn-primary:hover { opacity: 0.9; }
+
+        .btn-dark { background-color: var(--border-color); color: var(--text-heading); }
+        .btn-dark:hover { background-color: var(--bg-hover); }
+
+        .btn-outline { background-color: var(--bg-input); border: 1px solid var(--border-color); color: var(--text-heading); }
+        .btn-outline:hover { background-color: var(--bg-hover); }
+
+        .theme-toggle-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            background-color: var(--bg-input);
+            border: 1px solid var(--border-color);
+            color: var(--text-heading);
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .content-area { flex: 1; overflow-y: auto; padding: 20px 24px; }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 14px;
+            margin-bottom: 18px;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 14px 16px;
+            border-left: 4px solid var(--primary);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .stat-card.wip { border-left-color: var(--wip-color); }
+        .stat-card.shared { border-left-color: var(--shared-color); }
+        .stat-card.published { border-left-color: var(--published-color); }
+        .stat-card.archive { border-left-color: var(--archive-color); }
+
+        .stat-title { font-size: 0.72rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700; }
+        .stat-value { font-size: 1.35rem; font-weight: 700; color: var(--text-heading); margin-top: 4px; }
+        .stat-desc { font-size: 0.72rem; color: var(--text-muted); margin-top: 2px; }
+
+        .naming-rule-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 14px 16px;
+            margin-bottom: 18px;
+        }
+
+        .naming-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .naming-title { font-size: 0.85rem; font-weight: 700; color: var(--text-heading); }
+        .naming-fields { display: flex; gap: 6px; flex-wrap: wrap; }
+
+        .field-chip {
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 6px 8px;
+            text-align: center;
+            flex: 1;
+            min-width: 85px;
+        }
+
+        .field-code { font-family: monospace; font-weight: 700; color: var(--primary); font-size: 0.82rem; }
+        .field-label { font-size: 0.68rem; color: var(--text-muted); margin-top: 2px; }
+
+        .table-container {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            overflow: visible;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+        }
+
+        .table-toolbar {
+            padding: 12px 16px;
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .filter-group { display: flex; gap: 8px; }
+
+        .select-filter {
+            padding: 6px 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 0.78rem;
+            color: var(--text-heading);
+            outline: none;
+            background-color: var(--bg-input);
+        }
+
+        .cde-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; text-align: left; }
+
+        .cde-table th {
+            background-color: var(--bg-input);
+            color: var(--text-muted);
+            font-weight: 700;
+            padding: 10px 12px;
+            border-bottom: 2px solid var(--border-color);
+            text-transform: uppercase;
+            font-size: 0.68rem;
+            letter-spacing: 0.03em;
+        }
+
+        .cde-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid var(--border-color);
+            vertical-align: middle;
+            color: var(--text-main);
+        }
+
+        .cde-table tr:hover { background-color: var(--bg-hover); }
+
+        .file-code { font-family: 'Consolas', monospace; font-weight: 700; color: var(--primary); font-size: 0.8rem; }
+
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-align: center;
+        }
+
+        .badge-prj { background: rgba(99, 102, 241, 0.15); color: #6366f1; border: 1px solid rgba(99, 102, 241, 0.3); }
+        .badge-wip { background: rgba(56, 189, 248, 0.15); color: #0284c7; border: 1px solid rgba(56, 189, 248, 0.3); }
+        .badge-shared { background: rgba(245, 158, 11, 0.15); color: #d97706; border: 1px solid rgba(245, 158, 11, 0.3); }
+        .badge-published { background: rgba(34, 197, 94, 0.15); color: #16a34a; border: 1px solid rgba(34, 197, 94, 0.3); }
+        .badge-archive { background: rgba(100, 116, 139, 0.15); color: #64748b; border: 1px solid rgba(100, 116, 139, 0.3); }
+        .badge-s0 { background: var(--bg-input); color: var(--text-muted); border: 1px solid var(--border-color); }
+        .badge-s1 { background: rgba(59, 130, 246, 0.15); color: #2563eb; }
+        .badge-s2 { background: rgba(99, 102, 241, 0.15); color: #4f46e5; }
+        .badge-s3 { background: rgba(168, 85, 247, 0.15); color: #9333ea; }
+        .badge-s4 { background: rgba(234, 179, 8, 0.15); color: #ca8a04; }
+        .badge-a1 { background: rgba(16, 185, 129, 0.15); color: #059669; }
+        .badge-a2 { background: rgba(217, 119, 6, 0.15); color: #b45309; }
+
+        .rev-tag {
+            font-family: monospace;
+            font-weight: 700;
+            color: var(--text-heading);
+            background: var(--bg-input);
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 0.75rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .action-btns { display: flex; gap: 4px; align-items: center; position: relative; }
+
+        .btn-icon {
+            padding: 4px 8px;
+            font-size: 0.75rem;
+            border-radius: 4px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-input);
+            color: var(--text-heading);
+            cursor: pointer;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .btn-icon:hover { background: var(--bg-hover); color: var(--primary); }
+
+        .dropdown { position: relative; display: inline-block; }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 100%;
+            background-color: var(--bg-card);
+            min-width: 180px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            z-index: 100;
+            overflow: hidden;
+            margin-top: 2px;
+        }
+
+        .dropdown-content button {
+            color: var(--text-heading);
+            padding: 8px 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
+            background: transparent;
+            border: none;
+            text-align: left;
+            font-size: 0.78rem;
+            cursor: pointer;
+            transition: background 0.15s ease;
+        }
+
+        .dropdown-content button:hover { background-color: var(--bg-hover); color: var(--primary); }
+        .dropdown.show .dropdown-content { display: block; }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.65);
+            backdrop-filter: blur(4px);
+            align-items: center; justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal.active { display: flex; }
+
+        .modal-content {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            width: 580px; max-width: 92%;
+            padding: 20px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            color: var(--text-main);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+            margin-bottom: 16px;
+        }
+
+        .modal-title { font-size: 0.95rem; font-weight: 700; color: var(--text-heading); }
+        .close-btn { cursor: pointer; font-size: 1.1rem; color: var(--text-muted); }
+
+        .val-result {
+            margin-top: 10px; padding: 10px;
+            border-radius: 6px; font-size: 0.8rem; font-weight: 600; display: none;
+        }
+
+        .val-success { background: rgba(34, 197, 94, 0.15); color: #16a34a; border: 1px solid rgba(34, 197, 94, 0.3); }
+        .val-error { background: rgba(239, 68, 68, 0.15); color: #dc2626; border: 1px solid rgba(239, 68, 68, 0.3); }
+
+        .preview-box {
+            width: 100%; height: 240px;
+            background: var(--bg-dark);
+            border: 1px dashed var(--border-color);
+            border-radius: 6px;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            margin-top: 10px; color: var(--text-muted);
+        }
+
+        /* STYLES CHO MODAL RENAME ISO 19650 */
+        .iso-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 12px;
+        }
+        .iso-full { grid-column: span 2; }
+        .iso-group { display: flex; flex-direction: column; gap: 4px; }
+        .iso-group label { font-size: 0.75rem; font-weight: 700; color: var(--text-heading); }
+        .iso-group select, .iso-group input {
+            padding: 7px 10px;
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            color: var(--text-heading);
+            border-radius: 6px;
+            font-size: 0.8rem;
+            outline: none;
+        }
+        .iso-group select:focus, .iso-group input:focus { border-color: var(--primary); }
+        .iso-preview-card {
+            background: var(--bg-input);
+            border: 1px dashed var(--primary);
+            padding: 12px;
+            border-radius: 6px;
+            text-align: center;
+            margin-top: 10px;
+        }
+        .iso-preview-name {
+            font-family: 'Consolas', monospace;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin: 4px 0;
+            letter-spacing: 0.5px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <div class="brand-logo">
+                <span>💻</span> Database CDE Explorer
+            </div>
+            <select id="projectSelect" class="project-select-box" onchange="applyFilters()">
+                <option value="ALL">🌐 Tất cả Dự án (All Projects)</option>
+                <option value="PRJ_001">🏢 PRJ_001</option>
+                <option value="PRJ_002">🏢 PRJ_002</option>
+            </select>
+
+            <button class="btn btn-primary" style="width: 100%; margin-top: 10px; font-size: 0.78rem; justify-content: center;" onclick="reloadDatabaseData()">
+                🔄 Làm mới Dữ liệu Database
+            </button>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-section-title" style="display: flex; justify-content: space-between; align-items: center;">
+                <span>CÂY THƯ MỤC & FILE CON</span>
+                <button class="btn-tree-action" style="font-size:0.75rem;" title="Tạo thư mục gốc" onclick="addNewFolder('ROOT')">➕ Thư mục mới</button>
+            </div>
+
+            <div id="dynamicTreeContainer">
+                <!-- Cây thư mục ảo render động -->
+            </div>
+        </div>
+
+        <div style="padding: 12px 16px; border-top: 1px solid var(--border-color); font-size: 0.75rem; color: var(--text-muted);">
+            <div>⚡ Mode: <span style="color:var(--published-color); font-weight:bold;">Database CDE Sync (bim-vdc)</span></div>
+            <div style="margin-top: 4px;">👤 Role: BIM Lead Manager</div>
+        </div>
+    </div>
+
+    <div class="main-wrapper">
+        <div class="top-navbar">
+            <div class="search-bar">
+                <span>🔍</span>
+                <input type="text" id="searchInput" onkeyup="applyFilters()" placeholder="Tìm kiếm thư mục, file ISO 19650...">
+            </div>
+
+            <div class="top-actions">
+                <button class="theme-toggle-btn" onclick="toggleTheme()" id="themeToggleBtn">
+                    <span id="themeIcon">🌙</span> <span id="themeText">Dark Mode</span>
+                </button>
+
+                <button class="btn btn-outline" onclick="openModal('namingModal')">🧪 Test ISO Naming</button>
+                <button class="btn btn-dark" onclick="openModal('uploadModal')">📤 Upload Container File</button>
+                <button class="btn btn-primary" onclick="exportCSV()">📥 Export Index (CSV)</button>
+            </div>
+        </div>
+
+        <div class="content-area">
+            <div class="stats-grid">
+                <div class="stat-card wip">
+                    <div class="stat-title">01_WIP (Nội bộ)</div>
+                    <div class="stat-value" id="card-wip">0 Files</div>
+                    <div class="stat-desc">Đang thiết kế & dựng hình</div>
+                </div>
+                <div class="stat-card shared">
+                    <div class="stat-title">02_SHARED (Phối hợp)</div>
+                    <div class="stat-value" id="card-shared">0 Files</div>
+                    <div class="stat-desc">Đã chia sẻ kiểm tra va chạm</div>
+                </div>
+                <div class="stat-card published">
+                    <div class="stat-title">03_PUBLISHED (Phát hành)</div>
+                    <div class="stat-value" id="card-pub">0 Files</div>
+                    <div class="stat-desc">Hồ sơ bản vẽ đã duyệt</div>
+                </div>
+                <div class="stat-card archive">
+                    <div class="stat-title">04_ARCHIVE (Lưu trữ)</div>
+                    <div class="stat-value" id="card-arc">0 Files</div>
+                    <div class="stat-desc">Lịch sử các phiên bản cũ</div>
+                </div>
+            </div>
+
+            <div class="naming-rule-card">
+                <div class="naming-header">
+                    <div class="naming-title">📌 Quy Chuẩn Định Danh File ISO 19650-2 (National Naming Standard)</div>
+                </div>
+                <div class="naming-fields">
+                    <div class="field-chip"><div class="field-code">PROJECT</div><div class="field-label">Dự án</div></div>
+                    <div style="align-self:center; font-weight:bold; color:var(--border-color);">-</div>
+                    <div class="field-chip"><div class="field-code">ORIGINATOR</div><div class="field-label">Tác giả</div></div>
+                    <div style="align-self:center; font-weight:bold; color:var(--border-color);">-</div>
+                    <div class="field-chip"><div class="field-code">VOLUME</div><div class="field-label">Khối công trình</div></div>
+                    <div style="align-self:center; font-weight:bold; color:var(--border-color);">-</div>
+                    <div class="field-chip"><div class="field-code">LEVEL</div><div class="field-label">Tầng/Cao độ</div></div>
+                    <div style="align-self:center; font-weight:bold; color:var(--border-color);">-</div>
+                    <div class="field-chip"><div class="field-code">TYPE</div><div class="field-label">Loại tài liệu</div></div>
+                    <div style="align-self:center; font-weight:bold; color:var(--border-color);">-</div>
+                    <div class="field-chip"><div class="field-code">ROLE</div><div class="field-label">Bộ môn</div></div>
+                    <div style="align-self:center; font-weight:bold; color:var(--border-color);">-</div>
+                    <div class="field-chip"><div class="field-code">NUMBER</div><div class="field-label">Số ID (4 số)</div></div>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <div class="table-toolbar">
+                    <div style="font-weight: 700; font-size: 0.88rem; color: var(--text-heading);">📋 Master Information Register (MIR) - ISO 19650</div>
+                    <div class="filter-group">
+                        <select class="select-filter" id="stateFilter" onchange="applyFilters()">
+                            <option value="ALL">Tất cả Containers</option>
+                            <option value="01_WIP">01_WIP</option>
+                            <option value="02_SHARED">02_SHARED</option>
+                            <option value="03_PUBLISHED">03_PUBLISHED</option>
+                            <option value="04_ARCHIVE">04_ARCHIVE</option>
+                        </select>
+
+                        <select class="select-filter" id="suitFilter" onchange="applyFilters()">
+                            <option value="ALL">Tất cả Suitability</option>
+                            <option value="S0">S0 - Draft / WIP</option>
+                            <option value="S1">S1 - Coordination</option>
+                            <option value="S2">S2 - Reference</option>
+                            <option value="S3">S3 - Review</option>
+                            <option value="S4">S4 - Approval</option>
+                            <option value="A1">A1 - Construction</option>
+                            <option value="A2">A2 - As-Built</option>
+                        </select>
+
+                        <button class="btn btn-outline" style="padding:4px 8px;" onclick="resetFilters()">🔄 Reset</button>
+                    </div>
+                </div>
+
+                <table class="cde-table" id="cdeMasterTable">
+                    <thead>
+                        <tr>
+                            <th>Dự Án</th>
+                            <th>Tên File ISO 19650</th>
+                            <th>Container CDE</th>
+                            <th>Suitability</th>
+                            <th>Revision</th>
+                            <th>Bộ Môn</th>
+                            <th>Thư Mục / Đường Dẫn File</th>
+                            <th>Thao Tác</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                        <!-- Dữ liệu render từ JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODALS -->
+    <!-- MODAL ĐỔI TÊN CHUẨN ISO 19650-2 -->
+    <div class="modal" id="isoRenameModal">
+        <div class="modal-content" style="width: 640px;">
+            <div class="modal-header">
+                <div class="modal-title">🏷️ Đổi Tên File Chuẩn ISO 19650-2</div>
+                <div class="close-btn" onclick="closeModal('isoRenameModal')">✕</div>
+            </div>
+            <div style="font-size: 0.82rem;">
+                <div class="iso-preview-card">
+                    <div style="font-size: 0.68rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">XEM TRƯỚC TÊN FILE MỚI:</div>
+                    <div id="isoLivePreview" class="iso-preview-name">PRJ_001-PVI-ZZ-01-DR-A-0001.pdf</div>
+                    <div style="font-size: 0.72rem; color: #16a34a; font-weight: 600;">✓ Đạt chuẩn cấu trúc ISO 19650-2</div>
+                </div>
+
+                <div class="iso-grid">
+                    <div class="iso-group">
+                        <label>1. PROJECT (Dự án)</label>
+                        <input type="text" id="iso_project" oninput="updateIsoName()" placeholder="PRJ_001">
+                    </div>
+                    <div class="iso-group">
+                        <label>2. ORIGINATOR (Tác giả)</label>
+                        <select id="iso_originator" onchange="updateIsoName()">
+                            <option value="PVI">PVI - Đơn vị Phát hành</option>
+                            <option value="ARC">ARC - Tư vấn Kiến trúc</option>
+                            <option value="STR">STR - Tư vấn Kết cấu</option>
+                            <option value="MEP">MEP - Tư vấn Cơ điện</option>
+                            <option value="CON">CON - Nhà thầu Thi công</option>
+                        </select>
+                    </div>
+                    <div class="iso-group">
+                        <label>3. VOLUME (Khối/Phân khu)</label>
+                        <select id="iso_volume" onchange="updateIsoName()">
+                            <option value="ZZ">ZZ - Toàn bộ công trình</option>
+                            <option value="BLK1">BLK1 - Khối nhà Block 1</option>
+                            <option value="BLK2">BLK2 - Khối nhà Block 2</option>
+                            <option value="POD">POD - Khối đế</option>
+                        </select>
+                    </div>
+                    <div class="iso-group">
+                        <label>4. LEVEL (Tầng/Cao độ)</label>
+                        <select id="iso_level" onchange="updateIsoName()">
+                            <option value="ZZ">ZZ - Tất cả các tầng</option>
+                            <option value="01">01 - Tầng 1</option>
+                            <option value="02">02 - Tầng 2</option>
+                            <option value="RF">RF - Tầng mái</option>
+                            <option value="B1">B1 - Tầng hầm 1</option>
+                        </select>
+                    </div>
+                    <div class="iso-group">
+                        <label>5. TYPE (Loại tài liệu)</label>
+                        <select id="iso_type" onchange="updateIsoName()">
+                            <option value="DR">DR - Bản vẽ 2D (Drawing)</option>
+                            <option value="M3">M3 - Mô hình 3D (BIM Model)</option>
+                            <option value="RP">RP - Báo cáo (Report)</option>
+                            <option value="VS">VS - Phối cảnh / Hình ảnh</option>
+                            <option value="BQ">BQ - Bảng khối lượng</option>
+                        </select>
+                    </div>
+                    <div class="iso-group">
+                        <label>6. ROLE (Bộ môn)</label>
+                        <select id="iso_role" onchange="updateIsoName()">
+                            <option value="A">A - Kiến trúc (Architecture)</option>
+                            <option value="S">S - Kết cấu (Structure)</option>
+                            <option value="M">M - Cơ điện (MEP)</option>
+                            <option value="G">G - Tương tác chung (General)</option>
+                            <option value="K">K - Sân vườn cảnh quan</option>
+                        </select>
+                    </div>
+                    <div class="iso-group iso-full">
+                        <label>7. NUMBER (Số ID định danh - 4 chữ số)</label>
+                        <input type="text" id="iso_number" value="0001" maxlength="4" oninput="formatNumberInput(this); updateIsoName()">
+                    </div>
+                </div>
+
+                <div style="margin-top: 16px; text-align: right; display: flex; justify-content: flex-end; gap: 8px;">
+                    <button class="btn btn-outline" onclick="closeModal('isoRenameModal')">Hủy bỏ</button>
+                    <button class="btn btn-primary" onclick="saveIsoRename()">💾 Lưu & Đổi Tên ISO</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="viewModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">👁️ ISO 19650 Document & Model Viewer</div>
+                <div class="close-btn" onclick="closeModal('viewModal')">✕</div>
+            </div>
+            <div style="font-size: 0.82rem; line-height: 1.5;">
+                <p><strong>Tên tài liệu:</strong> <span id="viewFileName" class="file-code">...</span></p>
+                <p style="margin-top:4px;"><strong>Đường dẫn:</strong> <span id="viewFilePath" style="font-family:monospace; color:var(--text-muted);">...</span></p>
+                <p style="margin-top:4px;"><strong>Trạng thái:</strong> <span id="viewFileState">...</span> | <strong>Phiên bản:</strong> <span id="viewFileRev">...</span></p>
+
+                <div class="preview-box">
+                    <span style="font-size: 2.5rem; margin-bottom: 8px;">🏗️</span>
+                    <p style="font-weight: 600; color: var(--text-heading);">Mô phỏng Trình xem 3D BIM / Bản vẽ PDF</p>
+                </div>
+
+                <div style="margin-top: 16px; text-align: right;">
+                    <button class="btn btn-primary" onclick="closeModal('viewModal')">Đóng Viewer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="gateModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">🚪 ISO 19650 Gate Approval & State Transition</div>
+                <div class="close-btn" onclick="closeModal('gateModal')">✕</div>
+            </div>
+            <div style="font-size: 0.85rem; line-height: 1.5;">
+                <p><strong>Tệp đang chọn:</strong> <span id="gateFileName" class="file-code">...</span></p>
+
+                <div style="margin-top: 12px; background: var(--bg-input); padding: 12px; border-radius: 6px; border: 1px solid var(--border-color);">
+                    <label style="font-weight: bold; font-size: 0.8rem; display: block; margin-bottom: 4px; color: var(--text-heading);">Chọn Cổng Phê Duyệt ISO 19650:</label>
+                    <select id="gateActionSelect" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-heading); font-size:0.82rem;">
+                        <option value="GATE1">GATE 1: WIP ➔ SHARED (S1 - Coordination | Rev: P01.00)</option>
+                        <option value="GATE2">GATE 2: SHARED ➔ PUBLISHED (A1 - Construction | Rev: C01.00)</option>
+                        <option value="GATE3">GATE 3: PUBLISHED ➔ ARCHIVED (Lưu trữ lịch sử)</option>
+                    </select>
+                </div>
+
+                <div style="margin-top: 12px;">
+                    <label style="font-weight: bold; font-size: 0.8rem; display: block; margin-bottom: 4px; color: var(--text-heading);">Ghi chú QA/QC:</label>
+                    <textarea id="gateNote" rows="3" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid var(--border-color); background: var(--bg-input); color: var(--text-heading); font-size: 0.8rem;" placeholder="Đã kiểm tra mô hình hợp lệ..."></textarea>
+                </div>
+
+                <div style="margin-top: 16px; text-align: right;">
+                    <button class="btn btn-outline" onclick="closeModal('gateModal')">Hủy</button>
+                    <button class="btn btn-primary" onclick="submitGateTransition()">Xác Nhận Cập Nhật</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="namingModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">🧪 ISO 19650 File Naming Convention Checker</div>
+                <div class="close-btn" onclick="closeModal('namingModal')">✕</div>
+            </div>
+            <div style="font-size: 0.85rem;">
+                <label style="font-weight:bold; font-size:0.8rem; display:block; margin-bottom:6px; color: var(--text-heading);">Nhập tên file để kiểm tra cấu trúc:</label>
+                <input type="text" id="testFileNameInput" style="width:100%; padding:8px 10px; border-radius:6px; border:1px solid var(--border-color); background:var(--bg-input); color:var(--text-heading); font-family:monospace; font-size:0.85rem;" placeholder="PRJ1-ARC-BL1-01-M3-A-0001.rvt">
+
+                <div style="margin-top:10px; text-align:right;">
+                    <button class="btn btn-primary" onclick="validateISOFileName()">Kiểm Tra Cấu Trúc</button>
+                </div>
+
+                <div id="valResultSuccess" class="val-result val-success">
+                    ✅ Tên file hợp lệ 100% theo chuẩn ISO 19650-2!
+                </div>
+                <div id="valResultError" class="val-result val-error">
+                    ❌ Tên file SAI định dạng ISO!
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="uploadModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">📤 Upload File Vào Container</div>
+                <div class="close-btn" onclick="closeModal('uploadModal')">✕</div>
+            </div>
+            <div style="font-size: 0.85rem;">
+                <div style="border: 2px dashed var(--primary); padding: 24px; text-align: center; border-radius: 6px; background: var(--bg-input); margin-bottom: 12px;">
+                    <span style="font-size: 2rem;">📁</span>
+                    <p style="font-weight: bold; margin-top: 6px; color: var(--text-heading);">Kéo thả tệp tin .RVT, .IFC, .PDF vào đây</p>
+                </div>
+                <div style="text-align: right;">
+                    <button class="btn btn-outline" onclick="closeModal('uploadModal')">Đóng</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentDiscipline = "ALL";
+        let currentRowElement = null;
+        let selectedFolderPathFilter = "";
+        let currentExt = "pdf";
+
+        // DỮ LIỆU CÂY THƯ MỤC NỘI BỘ (ĐÃ CHUYỂN TỪ Ổ E SANG DATABASE/BIM-VDC)
+        let virtualTreeData = {
+            id: "ROOT",
+            name: "database/bim-vdc",
+            path: "database/bim-vdc",
+            type: "folder",
+            expanded: true,
+            children: [
+                {
+                    id: "prj_001",
+                    name: "PRJ_001",
+                    path: "database/bim-vdc/PRJ_001",
+                    type: "folder",
+                    expanded: true,
+                    children: [
+                        {
+                            id: "wip_001",
+                            name: "01_WIP",
+                            path: "database/bim-vdc/PRJ_001/01_WIP",
+                            type: "folder",
+                            expanded: true,
+                            children: [
+                                { id: "f1", name: "NHA ANH SU 2PN.rvt", path: "database/bim-vdc/PRJ_001/01_WIP/NHA ANH SU 2PN.rvt", type: "file" }
+                            ]
+                        },
+                        {
+                            id: "shared_001",
+                            name: "02_SHARED",
+                            path: "database/bim-vdc/PRJ_001/02_SHARED",
+                            type: "folder",
+                            expanded: true,
+                            children: []
+                        },
+                        {
+                            id: "pub_001",
+                            name: "03_PUBLISHED",
+                            path: "database/bim-vdc/PRJ_001/03_PUBLISHED",
+                            type: "folder",
+                            expanded: true,
+                            children: [
+                                { id: "f2", name: "NHA ANH SU 3T_PA2.pdf", path: "database/bim-vdc/PRJ_001/03_PUBLISHED/NHA ANH SU 3T_PA2.pdf", type: "file" },
+                                { id: "f3", name: "SD0703_ANH SU.pdf", path: "database/bim-vdc/PRJ_001/03_PUBLISHED/SD0703_ANH SU.pdf", type: "file" },
+                                { id: "f4", name: "SD0703_ANH SU_3T.pdf", path: "database/bim-vdc/PRJ_001/03_PUBLISHED/SD0703_ANH SU_3T.pdf", type: "file" },
+                                { id: "f5", name: "SD0703_ANH SU_2PN.pdf", path: "database/bim-vdc/PRJ_001/03_PUBLISHED/SD0703_ANH SU_2PN.pdf", type: "file" }
+                            ]
+                        },
+                        {
+                            id: "arc_001",
+                            name: "04_ARCHIVE",
+                            path: "database/bim-vdc/PRJ_001/04_ARCHIVE",
+                            type: "folder",
+                            expanded: true,
+                            children: [
+                                { id: "f6", name: "OLD_NHA_ANH_SU.rvt", path: "database/bim-vdc/PRJ_001/04_ARCHIVE/OLD_NHA_ANH_SU.rvt", type: "file" }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    id: "prj_002",
+                    name: "PRJ_002",
+                    path: "database/bim-vdc/PRJ_002",
+                    type: "folder",
+                    expanded: false,
+                    children: [
+                        { id: "wip_002", name: "01_WIP", path: "database/bim-vdc/PRJ_002/01_WIP", type: "folder", expanded: false, children: [] },
+                        { id: "shared_002", name: "02_SHARED", path: "database/bim-vdc/PRJ_002/02_SHARED", type: "folder", expanded: false, children: [] },
+                        { id: "pub_002", name: "03_PUBLISHED", path: "database/bim-vdc/PRJ_002/03_PUBLISHED", type: "folder", expanded: false, children: [] },
+                        { id: "arc_002", name: "04_ARCHIVE", path: "database/bim-vdc/PRJ_002/04_ARCHIVE", type: "folder", expanded: false, children: [] }
+                    ]
+                }
+            ]
+        };
+
+        const ISO_CONTAINERS = ['01_WIP', '02_SHARED', '03_PUBLISHED', '04_ARCHIVE'];
+
+        function countFilesInFolder(node) {
+            if (node.type === 'file') return 1;
+            if (!node.children || node.children.length === 0) return 0;
+            return node.children.reduce((total, child) => total + countFilesInFolder(child), 0);
+        }
+
+        function moveFileInVirtualTree(filePath, targetContainerName) {
+            let removedFileNode = null;
+
+            function removeFileNode(parent) {
+                if (!parent.children) return false;
+                for (let i = 0; i < parent.children.length; i++) {
+                    let child = parent.children[i];
+                    if (child.type === 'file' && child.path === filePath) {
+                        removedFileNode = parent.children.splice(i, 1)[0];
+                        return true;
+                    }
+                    if (child.type === 'folder') {
+                        if (removeFileNode(child)) return true;
+                    }
+                }
+                return false;
+            }
+
+            removeFileNode(virtualTreeData);
+
+            if (removedFileNode) {
+                let pathParts = filePath.split('/');
+                let fileName = pathParts.pop();
+                let prjCode = pathParts.find(p => p.startsWith('PRJ')) || 'PRJ_001';
+
+                function findTargetFolder(parent) {
+                    if (parent.type === 'folder') {
+                        if (parent.name === targetContainerName && parent.path.includes(prjCode)) {
+                            return parent;
+                        }
+                        if (parent.children) {
+                            for (let child of parent.children) {
+                                let res = findTargetFolder(child);
+                                if (res) return res;
+                            }
+                        }
+                    }
+                    return null;
+                }
+
+                let targetFolder = findTargetFolder(virtualTreeData);
+                if (targetFolder) {
+                    let newPath = targetFolder.path + '/' + fileName;
+                    removedFileNode.path = newPath;
+                    targetFolder.children.push(removedFileNode);
+                    return newPath;
+                }
+            }
+            return null;
+        }
+
+        function submitGateTransition() {
+            if (!currentRowElement) return;
+
+            let action = document.getElementById('gateActionSelect').value;
+            let oldPath = currentRowElement.getAttribute('data-path');
+            let newState = "01_WIP";
+            let newSuit = "S0";
+            let newRev = "P01.00";
+
+            if (action === "GATE1") {
+                newState = "02_SHARED";
+                newSuit = "S1";
+                newRev = "P01.00";
+            } else if (action === "GATE2") {
+                newState = "03_PUBLISHED";
+                newSuit = "A1";
+                newRev = "C01.00";
+            } else if (action === "GATE3") {
+                newState = "04_ARCHIVE";
+                newSuit = "S0";
+                newRev = "P00.00";
+            }
+
+            let newPath = moveFileInVirtualTree(oldPath, newState);
+            if (!newPath) {
+                let parts = oldPath.split('/');
+                let filename = parts[parts.length - 1];
+                parts[parts.length - 2] = newState;
+                newPath = parts.join('/');
+            }
+
+            currentRowElement.setAttribute("data-state", newState);
+            currentRowElement.setAttribute("data-suitability", newSuit);
+            currentRowElement.setAttribute("data-path", newPath);
+
+            let badgeStateClass = "badge-wip";
+            let suitText = newSuit + " - Coordination";
+            if (newState === "02_SHARED") { badgeStateClass = "badge-shared"; suitText = "S1 - Coordination"; }
+            if (newState === "03_PUBLISHED") { badgeStateClass = "badge-published"; suitText = "A1 - Construction"; }
+            if (newState === "04_ARCHIVE") { badgeStateClass = "badge-archive"; suitText = "S0 - Archive"; }
+
+            currentRowElement.children[2].innerHTML = `<span class="badge ${badgeStateClass}">${newState}</span>`;
+            currentRowElement.children[3].innerHTML = `<span class="badge badge-${newSuit.toLowerCase()}">${suitText}</span>`;
+            currentRowElement.children[4].innerHTML = `<span class="rev-tag">${newRev}</span>`;
+            currentRowElement.children[6].innerText = newPath;
+            currentRowElement.children[7].innerHTML = getActionButtons(newState);
+
+            alert("Đã phê duyệt Gate & chuyển đổi vị trí file thành công!");
+            closeModal('gateModal');
+            
+            renderTreeUI();
+            applyFilters();
+        }
+
+        // TẢI LẠI DỮ LIỆU TỪ DATABASE
+        function reloadDatabaseData() {
+            document.getElementById('tableBody').innerHTML = '';
+            buildTableFromInitialTree(virtualTreeData);
+            renderTreeUI();
+            applyFilters();
+            alert("Đã làm mới dữ liệu từ Database (database/bim-vdc) thành công!");
+        }
+
+        function renderTreeUI() {
+            const container = document.getElementById('dynamicTreeContainer');
+            container.innerHTML = '';
+            if (!virtualTreeData.children || virtualTreeData.children.length === 0) {
+                container.innerHTML = `<div style="font-size:0.78rem; color:var(--text-muted); padding:8px;">Chưa có dữ liệu thư mục.</div>`;
+                return;
+            }
+            const ul = document.createElement('ul');
+            ul.className = 'tree-branch';
+            ul.style.paddingLeft = '0';
+            ul.style.borderLeft = 'none';
+            ul.appendChild(createTreeNodeElement(virtualTreeData));
+            container.appendChild(ul);
+        }
+
+        function createTreeNodeElement(node) {
+            const li = document.createElement('li');
+            li.style.listStyle = 'none';
+
+            const isFolder = node.type === 'folder';
+            const hasChildren = isFolder && node.children && node.children.length > 0;
+            const fileCount = isFolder ? countFilesInFolder(node) : 0;
+
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'tree-node-item';
+            if (selectedFolderPathFilter === node.path) itemDiv.classList.add('active');
+
+            itemDiv.onclick = (e) => {
+                e.stopPropagation();
+                selectTreeNode(node, itemDiv);
+            };
+
+            let iconHtml = isFolder ? `<span class="icon-folder">📁</span>` : `<span class="icon-file">📄</span>`;
+            let toggleHtml = isFolder
+                ? `<span class="toggle-icon ${node.expanded ? '' : 'collapsed'}" onclick="toggleFolderExpand(event, '${node.id}')">${hasChildren ? '▼' : '•'}</span>`
+                : `<span class="toggle-icon" style="opacity:0;">•</span>`;
+
+            let countBadgeHtml = isFolder ? `<span class="folder-file-count">${fileCount}</span>` : '';
+
+            itemDiv.innerHTML = `
+                <div class="node-title">
+                    ${toggleHtml}
+                    ${iconHtml}
+                    <span>${node.name}</span>
+                    ${countBadgeHtml}
+                </div>
+                ${isFolder ? `
+                <div class="node-actions" onclick="event.stopPropagation()">
+                    <button class="btn-tree-action" title="Thêm thư mục con" onclick="addNewFolder('${node.id}', event)">➕</button>
+                    <button class="btn-tree-action" title="Đổi tên" onclick="renameFolder('${node.id}', event)">✏️</button>
+                    <button class="btn-tree-action" title="Xóa" onclick="deleteFolder('${node.id}', event)">🗑️</button>
+                </div>` : ''}
+            `;
+
+            li.appendChild(itemDiv);
+
+            if (isFolder && hasChildren && node.expanded) {
+                const subUl = document.createElement('ul');
+                subUl.className = 'tree-branch';
+                node.children.forEach(childNode => {
+                    subUl.appendChild(createTreeNodeElement(childNode));
+                });
+                li.appendChild(subUl);
+            }
+
+            return li;
+        }
+
+        function toggleFolderExpand(e, nodeId) {
+            e.stopPropagation();
+            const node = findNodeById(virtualTreeData, nodeId);
+            if (node) {
+                node.expanded = !node.expanded;
+                renderTreeUI();
+            }
+        }
+
+        function selectTreeNode(node, element) {
+            document.querySelectorAll('.tree-node-item').forEach(el => el.classList.remove('active'));
+            element.classList.add('active');
+            selectedFolderPathFilter = node.path;
+            
+            if (ISO_CONTAINERS.includes(node.name)) {
+                document.getElementById('stateFilter').value = node.name;
+            } else {
+                document.getElementById('stateFilter').value = "ALL";
+            }
+            applyFilters();
+        }
+
+        function addNewFolder(parentId, e) {
+            if (e) e.stopPropagation();
+            const folderName = prompt("Nhập tên thư mục mới:");
+            if (!folderName || !folderName.trim()) return;
+
+            const parentNode = findNodeById(virtualTreeData, parentId) || virtualTreeData;
+            const newFolder = {
+                id: 'dir_' + Math.random().toString(36).substr(2, 9),
+                name: folderName.trim(),
+                path: parentNode.path + '/' + folderName.trim(),
+                type: "folder",
+                expanded: true,
+                children: []
+            };
+
+            parentNode.children.push(newFolder);
+            parentNode.expanded = true;
+            renderTreeUI();
+        }
+
+        function renameFolder(nodeId, e) {
+            if (e) e.stopPropagation();
+            const node = findNodeById(virtualTreeData, nodeId);
+            if (!node) return;
+            const newName = prompt("Nhập tên mới:", node.name);
+            if (newName && newName.trim() && newName !== node.name) {
+                node.name = newName.trim();
+                renderTreeUI();
+            }
+        }
+
+        function deleteFolder(nodeId, e) {
+            if (e) e.stopPropagation();
+            if (!confirm("Xóa thư mục này khỏi cây?")) return;
+            function removeRecursive(parent) {
+                if (!parent.children) return;
+                parent.children = parent.children.filter(child => child.id !== nodeId);
+                parent.children.forEach(child => removeRecursive(child));
+            }
+            removeRecursive(virtualTreeData);
+            renderTreeUI();
+        }
+
+        function findNodeById(parent, id) {
+            if (parent.id === id) return parent;
+            if (parent.children) {
+                for (let child of parent.children) {
+                    let found = findNodeById(child, id);
+                    if (found) return found;
+                }
+            }
+            return null;
+        }
+
+        function getActionButtons(state) {
+            let gateBtn = '';
+            if (state === '01_WIP') {
+                gateBtn = `<button class="btn-icon" onclick="openGateModal(this)" title="Chuyển Gate 1">🚪 Gate 1</button>`;
+            } else if (state === '02_SHARED') {
+                gateBtn = `<button class="btn-icon" onclick="openGateModal(this)" title="Chuyển Gate 2">🚪 Gate 2</button>`;
+            } else if (state === '03_PUBLISHED') {
+                gateBtn = `<button class="btn-icon" onclick="openGateModal(this)" title="Chuyển Gate 3">🚪 Gate 3</button>`;
+            } else {
+                gateBtn = `<button class="btn-icon" disabled style="opacity:0.5; cursor:not-allowed;" title="Đã khóa">🔒 Locked</button>`;
+            }
+
+            return `
+                <button class="btn-icon" onclick="previewFile(this)" title="Xem chi tiết / Viewer">👁️ View</button>
+                ${gateBtn}
+                <button class="btn-icon" onclick="downloadFile(this)" title="Tải về file">📥</button>
+                <div class="dropdown">
+                    <button class="btn-icon" onclick="toggleActionDropdown(event, this)">⋮</button>
+                    <div class="dropdown-content">
+                        <button onclick="openIsoRenameModal(this)">✏️ Đổi tên ISO 19650</button>
+                        <button onclick="uploadNewRevision(this)">🔄 Up phiên bản mới</button>
+                        <button onclick="viewVersionHistory(this)">📜 Lịch sử Version</button>
+                        <button onclick="editMetadata(this)">✏️ Sửa Metadata</button>
+                        <button onclick="shareFile(this)">🔗 Chia sẻ Link</button>
+                        <button onclick="createIssue(this)">💬 Tạo Issue / QA-QC</button>
+                        <button onclick="deleteRowFile(this)" style="color:#ef4444;">🗑️ Xóa file</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function openIsoRenameModal(btn) {
+            currentRowElement = btn.closest('tr');
+            let fullFileName = currentRowElement.querySelector('.file-code').innerText;
+            
+            let lastDotIndex = fullFileName.lastIndexOf('.');
+            let baseName = lastDotIndex !== -1 ? fullFileName.substring(0, lastDotIndex) : fullFileName;
+            currentExt = lastDotIndex !== -1 ? fullFileName.substring(lastDotIndex + 1) : "pdf";
+
+            let parts = baseName.split('-');
+            let prjCode = currentRowElement.getAttribute('data-project') || "PRJ_001";
+
+            if (parts.length === 7) {
+                document.getElementById('iso_project').value = parts[0];
+                setSelectValue('iso_originator', parts[1], 'PVI');
+                setSelectValue('iso_volume', parts[2], 'ZZ');
+                setSelectValue('iso_level', parts[3], 'ZZ');
+                setSelectValue('iso_type', parts[4], 'DR');
+                setSelectValue('iso_role', parts[5], 'A');
+                document.getElementById('iso_number').value = parts[6];
+            } else {
+                document.getElementById('iso_project').value = prjCode;
+                document.getElementById('iso_originator').value = 'PVI';
+                document.getElementById('iso_volume').value = 'ZZ';
+                document.getElementById('iso_level').value = 'ZZ';
+                document.getElementById('iso_type').value = (currentExt.toLowerCase() === 'rvt' || currentExt.toLowerCase() === 'ifc') ? 'M3' : 'DR';
+                document.getElementById('iso_role').value = currentRowElement.getAttribute('data-discipline') === 'STR' ? 'S' : (currentRowElement.getAttribute('data-discipline') === 'MEP' ? 'M' : 'A');
+                document.getElementById('iso_number').value = '0001';
+            }
+
+            updateIsoName();
+            openModal('isoRenameModal');
+        }
+
+        function setSelectValue(id, val, defaultVal) {
+            let sel = document.getElementById(id);
+            let exists = Array.from(sel.options).some(opt => opt.value === val);
+            sel.value = exists ? val : defaultVal;
+        }
+
+        function formatNumberInput(input) {
+            input.value = input.value.replace(/[^0-9]/g, '');
+        }
+
+        function updateIsoName() {
+            let prj = (document.getElementById('iso_project').value.trim() || 'PRJ_001').toUpperCase().replace(/[^A-Z0-9_]/g, '');
+            let orig = document.getElementById('iso_originator').value;
+            let vol = document.getElementById('iso_volume').value;
+            let lvl = document.getElementById('iso_level').value;
+            let type = document.getElementById('iso_type').value;
+            let role = document.getElementById('iso_role').value;
+            
+            let numInput = document.getElementById('iso_number').value;
+            let num = numInput.padStart(4, '0');
+
+            let newFullName = `${prj}-${orig}-${vol}-${lvl}-${type}-${role}-${num}.${currentExt}`;
+            document.getElementById('isoLivePreview').innerText = newFullName;
+        }
+
+        function saveIsoRename() {
+            if (!currentRowElement) return;
+
+            let newFileName = document.getElementById('isoLivePreview').innerText;
+            let oldPath = currentRowElement.getAttribute('data-path');
+            let pathParts = oldPath.split('/');
+            pathParts[pathParts.length - 1] = newFileName;
+            let newPath = pathParts.join('/');
+
+            currentRowElement.querySelector('.file-code').innerText = newFileName;
+            currentRowElement.querySelector('.file-code').title = newPath;
+            currentRowElement.setAttribute('data-path', newPath);
+            currentRowElement.children[6].innerText = newPath;
+
+            function updateNodeInTree(parent) {
+                if (!parent.children) return false;
+                for (let i = 0; i < parent.children.length; i++) {
+                    let child = parent.children[i];
+                    if (child.type === 'file' && child.path === oldPath) {
+                        child.name = newFileName;
+                        child.path = newPath;
+                        return true;
+                    }
+                    if (child.type === 'folder' && updateNodeInTree(child)) return true;
+                }
+                return false;
+            }
+            updateNodeInTree(virtualTreeData);
+
+            alert(`Đã đổi tên file thành công thành:\n${newFileName}`);
+            closeModal('isoRenameModal');
+            renderTreeUI();
+            applyFilters();
+        }
+
+        function toggleActionDropdown(event, btn) {
+            event.stopPropagation();
+            document.querySelectorAll('.dropdown.show').forEach(d => {
+                if (d !== btn.parentElement) d.classList.remove('show');
+            });
+            btn.parentElement.classList.toggle('show');
+        }
+
+        document.addEventListener('click', function () {
+            document.querySelectorAll('.dropdown.show').forEach(d => d.classList.remove('show'));
+        });
+
+        function previewFile(btn) {
+            let row = btn.closest('tr');
+            document.getElementById('viewFileName').innerText = row.querySelector('.file-code').innerText;
+            document.getElementById('viewFilePath').innerText = row.children[6].innerText;
+            document.getElementById('viewFileState').innerText = row.children[2].innerText;
+            document.getElementById('viewFileRev').innerText = row.children[4].innerText;
+            openModal('viewModal');
+        }
+
+        function downloadFile(btn) {
+            let row = btn.closest('tr');
+            let fileName = row.querySelector('.file-code').innerText;
+            let blob = new Blob([`Document: ${fileName}`], { type: "text/plain;charset=utf-8" });
+            let link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = fileName;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function uploadNewRevision(btn) {
+            let row = btn.closest('tr');
+            let newRev = prompt(`Nhập mã Revision mới:`, "P01.02");
+            if (newRev && newRev.trim()) {
+                row.querySelector('.rev-tag').innerText = newRev.trim();
+            }
+        }
+
+        function viewVersionHistory(btn) {
+            let row = btn.closest('tr');
+            alert(`[Nhật ký version - ISO 19650]\nFile: ${row.querySelector('.file-code').innerText}\n• Rev P01.01 (WIP)\n• Rev P01.00 (SHARED)\n• Rev C01.00 (PUBLISHED)`);
+        }
+
+        function editMetadata(btn) {
+            let row = btn.closest('tr');
+            let newSuit = prompt(`Chỉnh sửa Suitability (S0, S1, S2, S3, S4, A1, A2):`, row.getAttribute('data-suitability'));
+            if (newSuit && newSuit.trim()) {
+                let code = newSuit.trim().toUpperCase();
+                row.setAttribute('data-suitability', code);
+                row.children[3].innerHTML = `<span class="badge badge-${code.toLowerCase()}">${code}</span>`;
+            }
+        }
+
+        function shareFile(btn) {
+            let row = btn.closest('tr');
+            navigator.clipboard.writeText(window.location.href + "#" + row.querySelector('.file-code').innerText);
+            alert(`Đã sao chép liên kết file!`);
+        }
+
+        function createIssue(btn) {
+            let issue = prompt(`Tạo ghi chú Issue/QA-QC:`);
+            if (issue && issue.trim()) alert(`Đã tạo Issue thành công!`);
+        }
+
+        function deleteRowFile(btn) {
+            let row = btn.closest('tr');
+            let filePath = row.getAttribute('data-path');
+            if (confirm(`Bạn có chắc chắn muốn xóa tệp tin?`)) {
+                function removeFileNode(parent) {
+                    if (!parent.children) return false;
+                    for (let i = 0; i < parent.children.length; i++) {
+                        if (parent.children[i].type === 'file' && parent.children[i].path === filePath) {
+                            parent.children.splice(i, 1);
+                            return true;
+                        }
+                        if (parent.children[i].type === 'folder' && removeFileNode(parent.children[i])) return true;
+                    }
+                    return false;
+                }
+                removeFileNode(virtualTreeData);
+                row.remove();
+                renderTreeUI();
+                applyFilters();
+            }
+        }
+
+        function buildTableFromInitialTree(node) {
+            if (node.type === 'file') {
+                appendFileToTable(node.name, node.path);
+            } else if (node.children) {
+                node.children.forEach(child => buildTableFromInitialTree(child));
+            }
+        }
+
+        function appendFileToTable(fileName, relativePath) {
+            const tbody = document.getElementById('tableBody');
+            const upperPath = relativePath.toUpperCase();
+            const pathParts = relativePath.split('/');
+
+            let prjCode = pathParts.find(p => p.startsWith('PRJ')) || 'PRJ_001';
+            let state = '01_WIP';
+            let suit = 'S0';
+            let suitText = 'S0 - Draft';
+            let badgeClass = 'badge-wip';
+            let revText = 'P01.01';
+
+            if (upperPath.includes('02_SHARED')) {
+                state = '02_SHARED'; suit = 'S1'; suitText = 'S1 - Coordination'; badgeClass = 'badge-shared'; revText = 'P01.00';
+            } else if (upperPath.includes('03_PUBLISHED')) {
+                state = '03_PUBLISHED'; suit = 'A1'; suitText = 'A1 - Construction'; badgeClass = 'badge-published'; revText = 'C01.00';
+            } else if (upperPath.includes('04_ARCHIVE')) {
+                state = '04_ARCHIVE'; suit = 'S0'; suitText = 'S0 - Archive'; badgeClass = 'badge-archive'; revText = 'P00.00';
+            }
+
+            let disc = 'ARC';
+            if (fileName.includes('STR')) disc = 'STR';
+            else if (fileName.includes('MEP')) disc = 'MEP';
+
+            const tr = document.createElement('tr');
+            tr.setAttribute('data-project', prjCode);
+            tr.setAttribute('data-state', state);
+            tr.setAttribute('data-suitability', suit);
+            tr.setAttribute('data-discipline', disc);
+            tr.setAttribute('data-path', relativePath);
+
+            tr.innerHTML = `
+                <td><span class="badge badge-prj">${prjCode}</span></td>
+                <td class="file-code" title="${relativePath}">${fileName}</td>
+                <td><span class="badge ${badgeClass}">${state}</span></td>
+                <td><span class="badge badge-${suit.toLowerCase()}">${suitText}</span></td>
+                <td><span class="rev-tag">${revText}</span></td>
+                <td><b>${disc}</b></td>
+                <td style="font-size:0.75rem; color:var(--text-muted); font-family:monospace;">${relativePath}</td>
+                <td class="action-btns">${getActionButtons(state)}</td>
+            `;
+            tbody.appendChild(tr);
+        }
+
+        function toggleTheme() {
+            const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateThemeUI(newTheme);
+        }
+
+        function updateThemeUI(theme) {
+            const themeIcon = document.getElementById('themeIcon');
+            const themeText = document.getElementById('themeText');
+            if (themeIcon && themeText) {
+                themeIcon.innerText = theme === 'dark' ? '☀️' : '🌙';
+                themeText.innerText = theme === 'dark' ? 'Light Mode' : 'Dark Mode';
+            }
+        }
+
+        function openModal(id) { document.getElementById(id).classList.add('active'); }
+        function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
+        function openGateModal(btnBtn) {
+            currentRowElement = btnBtn.closest('tr');
+            document.getElementById('gateFileName').innerText = currentRowElement.querySelector('.file-code').innerText;
+            openModal('gateModal');
+        }
+
+        function validateISOFileName() {
+            let input = document.getElementById('testFileNameInput').value.trim();
+            if (!input) input = document.getElementById('testFileNameInput').placeholder;
+            let regex = /^[A-Z0-9]+-[A-Z0-9]+-[A-Z0-9]+-[A-Z0-9]+-[A-Z0-9]+-[A-Z0-9]+-[0-9]{4}\.[a-z0-9]+$/i;
+
+            document.getElementById('valResultSuccess').style.display = 'none';
+            document.getElementById('valResultError').style.display = 'none';
+
+            if (regex.test(input)) {
+                document.getElementById('valResultSuccess').style.display = 'block';
+            } else {
+                document.getElementById('valResultError').style.display = 'block';
+            }
+        }
+
+        function resetFilters() {
+            document.getElementById('projectSelect').value = "ALL";
+            document.getElementById('stateFilter').value = "ALL";
+            document.getElementById('suitFilter').value = "ALL";
+            document.getElementById('searchInput').value = "";
+            selectedFolderPathFilter = "";
+            applyFilters();
+        }
+
+        function applyFilters() {
+            let prjVal = document.getElementById("projectSelect").value;
+            let stateVal = document.getElementById("stateFilter").value;
+            let suitVal = document.getElementById("suitFilter").value;
+            let searchVal = document.getElementById("searchInput").value.toUpperCase();
+
+            let rows = document.querySelectorAll("#cdeMasterTable tbody tr");
+
+            rows.forEach(row => {
+                let rPrj = row.getAttribute("data-project");
+                let rState = row.getAttribute("data-state");
+                let rSuit = row.getAttribute("data-suitability");
+                let rPath = row.getAttribute("data-path");
+                let rText = row.innerText.toUpperCase();
+
+                let matchPrj = (prjVal === "ALL" || rPrj === prjVal);
+                let matchState = (stateVal === "ALL" || rState === stateVal);
+                let matchSuit = (suitVal === "ALL" || rSuit === suitVal);
+                let matchPath = (selectedFolderPathFilter === "" || rPath.includes(selectedFolderPathFilter));
+                let matchSearch = (searchVal === "" || rText.indexOf(searchVal) > -1);
+
+                row.style.display = (matchPrj && matchState && matchSuit && matchPath && matchSearch) ? "" : "none";
+            });
+
+            updateCounts();
+        }
+
+        function updateCounts() {
+            let prjVal = document.getElementById("projectSelect").value;
+            let rows = document.querySelectorAll("#cdeMasterTable tbody tr");
+
+            let wip = 0, shared = 0, pub = 0, arc = 0;
+
+            rows.forEach(row => {
+                let rPrj = row.getAttribute("data-project");
+                let rState = row.getAttribute("data-state");
+
+                if (prjVal === "ALL" || rPrj === prjVal) {
+                    if (rState === "01_WIP") wip++;
+                    if (rState === "02_SHARED") shared++;
+                    if (rState === "03_PUBLISHED") pub++;
+                    if (rState === "04_ARCHIVE") arc++;
+                }
+            });
+
+            document.getElementById("card-wip").innerText = wip + " Files";
+            document.getElementById("card-shared").innerText = shared + " Files";
+            document.getElementById("card-pub").innerText = pub + " Files";
+            document.getElementById("card-arc").innerText = arc + " Files";
+        }
+
+        function exportCSV() {
+            let csv = [];
+            let rows = document.querySelectorAll("#cdeMasterTable tr");
+            for (let i = 0; i < rows.length; i++) {
+                if (rows[i].style.display !== "none") {
+                    let row = [], cols = rows[i].querySelectorAll("td, th");
+                    for (let j = 0; j < cols.length - 1; j++) {
+                        row.push('"' + cols[j].innerText.replace(/"/g, '""') + '"');
+                    }
+                    csv.push(row.join(","));
+                }
+            }
+            let csvFile = new Blob(["\uFEFF" + csv.join("\n")], { type: "text/csv;charset=utf-8;" });
+            let downloadLink = document.createElement("a");
+            downloadLink.download = "Database_CDE_Master_Index.csv";
+            downloadLink.href = window.URL.createObjectURL(csvFile);
+            downloadLink.style.display = "none";
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
+        }
+
+        window.onload = function () {
+            buildTableFromInitialTree(virtualTreeData);
+            renderTreeUI();
+            applyFilters();
+            const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
+            updateThemeUI(currentTheme);
+        };
+    </script>
+</body>
+</html>

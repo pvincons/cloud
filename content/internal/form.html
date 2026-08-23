@@ -1,0 +1,2248 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <title>PV INCONS - Hệ Thống Biểu Mẫu Quản Lý Chất Lượng & An Toàn Xây Dựng (ISO PRO)</title>
+    <!-- AUTH GUARD ANTI-FOUC -->
+    <script src="../../assets/js/auth-guard.js"></script>
+    <script>protectRoute('INTERNAL_USER');</script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --primary: #003865;
+            --primary-light: #0056b3;
+            --primary-dark: #002244;
+            --secondary: #0f172a;
+            --accent: #f59e0b;
+            --accent-hover: #d97706;
+            --bg-body: #f1f5f9;
+            --bg-card: #ffffff;
+            --bg-header: linear-gradient(135deg, #002244 0%, #003865 50%, #0056b3 100%);
+            --border: #cbd5e1;
+            --border-light: #e2e8f0;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --text-light: #f8fafc;
+            --danger: #ef4444;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+            --radius-sm: 6px;
+            --radius-md: 10px;
+            --radius-lg: 16px;
+            --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Dark Theme Variables */
+        [data-theme="dark"] {
+            --bg-body: #0f172a;
+            --bg-card: #1e293b;
+            --border: #334155;
+            --border-light: #1e293b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            color: var(--text-main);
+            background-color: var(--bg-body);
+            line-height: 1.5;
+            font-size: 14px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            padding-bottom: 60px;
+        }
+
+        .container {
+            max-width: 1240px;
+            margin: 0 auto;
+            padding: 16px;
+        }
+
+        /* Top Notification / Toast */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            pointer-events: none;
+        }
+
+        .toast {
+            background: #1e293b;
+            color: #fff;
+            padding: 12px 20px;
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-lg);
+            font-size: 13px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: var(--transition);
+            pointer-events: auto;
+            border-left: 4px solid var(--accent);
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Header Section */
+        header.app-header {
+            background: var(--bg-header);
+            color: white;
+            padding: 24px 28px;
+            border-radius: var(--radius-lg);
+            margin-bottom: 20px;
+            box-shadow: var(--shadow-lg);
+            position: relative;
+            overflow: hidden;
+        }
+
+        header.app-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -10%;
+            width: 350px;
+            height: 350px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .brand-info {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .brand-logo-badge {
+            background: #ffffff;
+            color: var(--primary-dark);
+            font-weight: 900;
+            font-size: 20px;
+            padding: 10px 16px;
+            border-radius: var(--radius-md);
+            letter-spacing: 1px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .brand-text h1 {
+            font-size: 22px;
+            font-weight: 800;
+            letter-spacing: -0.3px;
+            line-height: 1.2;
+            margin-bottom: 4px;
+            text-transform: uppercase;
+        }
+
+        .brand-text p {
+            font-size: 13px;
+            opacity: 0.88;
+            font-weight: 400;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .theme-toggle-btn {
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            color: white;
+            padding: 8px 14px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            backdrop-filter: blur(5px);
+            transition: var(--transition);
+        }
+
+        .theme-toggle-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+        .pro-badge {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: #ffffff;
+            font-size: 11px;
+            font-weight: 800;
+            padding: 3px 10px;
+            border-radius: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            box-shadow: 0 2px 6px rgba(245, 158, 11, 0.4);
+        }
+
+        /* Metrics Bar */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 12px;
+            margin-top: 20px;
+            padding-top: 16px;
+            border-top: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .metric-item {
+            background: rgba(255, 255, 255, 0.08);
+            padding: 10px 14px;
+            border-radius: var(--radius-md);
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .metric-value {
+            font-size: 18px;
+            font-weight: 800;
+            color: #ffffff;
+        }
+
+        .metric-label {
+            font-size: 11px;
+            opacity: 0.8;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Filter & Controls Card */
+        .filter-card {
+            background: var(--bg-card);
+            padding: 16px 20px;
+            border-radius: var(--radius-lg);
+            margin-bottom: 20px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            transition: var(--transition);
+        }
+
+        .filter-main-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .search-wrapper {
+            position: relative;
+            flex: 1 1 280px;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            pointer-events: none;
+            font-size: 14px;
+        }
+
+        .filter-input {
+            width: 100%;
+            padding: 10px 12px 10px 36px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            font-size: 14px;
+            outline: none;
+            background: var(--bg-card);
+            color: var(--text-main);
+            transition: var(--transition);
+        }
+
+        .filter-input:focus {
+            border-color: var(--primary-light);
+            box-shadow: 0 0 0 3px rgba(0, 86, 179, 0.15);
+        }
+
+        .filter-select {
+            padding: 10px 14px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            font-size: 14px;
+            outline: none;
+            background: var(--bg-card);
+            color: var(--text-main);
+            cursor: pointer;
+            flex: 1 1 220px;
+            transition: var(--transition);
+        }
+
+        .filter-select:focus {
+            border-color: var(--primary-light);
+        }
+
+        .action-btns-group {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        /* ISO Filter Quick Pills */
+        .iso-pills {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding-bottom: 2px;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .iso-pill {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            background: var(--bg-body);
+            color: var(--text-muted);
+            border: 1px solid var(--border);
+            cursor: pointer;
+            white-space: nowrap;
+            transition: var(--transition);
+        }
+
+        .iso-pill.active,
+        .iso-pill:hover {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 10px 16px;
+            border: none;
+            border-radius: var(--radius-md);
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: var(--transition);
+            min-height: 42px;
+            white-space: nowrap;
+            user-select: none;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+            box-shadow: 0 2px 6px rgba(0, 56, 101, 0.25);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-light);
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background-color: #475569;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: #334155;
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-main);
+        }
+
+        .btn-outline:hover {
+            background-color: rgba(0, 0, 0, 0.04);
+            border-color: var(--primary-light);
+            color: var(--primary-light);
+        }
+
+        .btn-accent {
+            background-color: var(--accent);
+            color: #ffffff;
+            box-shadow: 0 2px 6px rgba(245, 158, 11, 0.25);
+        }
+
+        .btn-accent:hover {
+            background-color: var(--accent-hover);
+        }
+
+        /* Navigation Tabs */
+        .tab-bar {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 0;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .tab-btn {
+            padding: 12px 20px;
+            background: none;
+            border: none;
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--text-muted);
+            cursor: pointer;
+            position: relative;
+            white-space: nowrap;
+            transition: var(--transition);
+            border-radius: var(--radius-md) var(--radius-md) 0 0;
+        }
+
+        .tab-btn:hover {
+            color: var(--primary-light);
+            background: rgba(0, 56, 101, 0.04);
+        }
+
+        .tab-btn.active {
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        .tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background-color: var(--primary);
+            border-radius: 3px 3px 0 0;
+        }
+
+        /* Catalog Section */
+        .catalog-section {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border);
+            margin-bottom: 30px;
+        }
+
+        .catalog-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .catalog-title {
+            font-size: 17px;
+            font-weight: 700;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border);
+        }
+
+        table.catalog-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            min-width: 650px;
+        }
+
+        table.catalog-table th,
+        table.catalog-table td {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        table.catalog-table th {
+            background-color: rgba(0, 56, 101, 0.05);
+            color: var(--text-main);
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 11px;
+            letter-spacing: 0.6px;
+            position: sticky;
+            top: 0;
+        }
+
+        table.catalog-table tr:hover {
+            background-color: rgba(0, 56, 101, 0.02);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .badge-iso9001 {
+            background-color: #dbeafe;
+            color: #1e40af;
+        }
+
+        .badge-iso14001 {
+            background-color: #dcfce7;
+            color: #166534;
+        }
+
+        .badge-iso45001 {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+
+        .badge-core {
+            background-color: #f3e8ff;
+            color: #6b21a8;
+        }
+
+        /* Form Templates Section */
+        .template-card {
+            background: #ffffff;
+            color: #1e293b;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border);
+            margin-bottom: 30px;
+            padding: 28px;
+            box-shadow: var(--shadow-md);
+            position: relative;
+            transition: var(--transition);
+        }
+
+        .template-card:hover {
+            box-shadow: var(--shadow-lg);
+        }
+
+        /* Printable Form Layout Styles */
+        .form-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #000000;
+            padding-bottom: 14px;
+            margin-bottom: 20px;
+            gap: 16px;
+        }
+
+        .form-header-col {
+            flex: 1;
+        }
+
+        .form-header-col.logo {
+            flex: 0 0 28%;
+            font-weight: 800;
+            font-size: 15px;
+            color: var(--primary-dark);
+            line-height: 1.3;
+        }
+
+        .form-header-col.title {
+            flex: 1;
+            text-align: center;
+        }
+
+        .form-header-col.title h2 {
+            font-size: 18px;
+            font-weight: 800;
+            text-transform: uppercase;
+            color: #000;
+            margin-bottom: 4px;
+            letter-spacing: -0.2px;
+        }
+
+        .form-header-col.title p {
+            font-size: 12px;
+            color: #475569;
+            font-weight: 600;
+        }
+
+        .form-header-col.meta {
+            flex: 0 0 26%;
+            font-size: 11px;
+            text-align: right;
+            line-height: 1.5;
+            color: #334155;
+        }
+
+        /* Responsive Form Grids */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0;
+            margin-bottom: 16px;
+            border-top: 1px solid #000;
+            border-left: 1px solid #000;
+        }
+
+        .form-cell {
+            padding: 8px 12px;
+            border-right: 1px solid #000;
+            border-bottom: 1px solid #000;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            min-height: 38px;
+        }
+
+        .form-cell.bg-gray {
+            background-color: #f1f5f9;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        .col-span-1 {
+            grid-column: span 1;
+        }
+
+        .col-span-2 {
+            grid-column: span 2;
+        }
+
+        .col-span-3 {
+            grid-column: span 3;
+        }
+
+        .col-span-4 {
+            grid-column: span 4;
+        }
+
+        .form-section-title {
+            margin-top: 18px;
+            margin-bottom: 6px;
+            font-weight: 700;
+            font-size: 13px;
+            text-transform: uppercase;
+            color: var(--primary-dark);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .form-box {
+            border: 1px solid #000;
+            padding: 10px 14px;
+            min-height: 60px;
+            font-size: 13px;
+            margin-top: 4px;
+            margin-bottom: 14px;
+            background-color: #ffffff;
+            border-radius: 0;
+            line-height: 1.6;
+        }
+
+        .form-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 14px 0;
+        }
+
+        .form-table th,
+        .form-table td {
+            border: 1px solid #000;
+            padding: 8px 10px;
+            font-size: 12px;
+            vertical-align: middle;
+        }
+
+        .form-table th {
+            background-color: #f1f5f9;
+            text-align: center;
+            font-weight: 700;
+            color: #000;
+        }
+
+        .signature-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-top: 25px;
+            text-align: center;
+            page-break-inside: avoid;
+        }
+
+        .signature-grid.cols-2 {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .signature-grid.cols-3 {
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        .signature-col {
+            font-size: 12px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .signature-space {
+            height: 65px;
+        }
+
+        .form-actions {
+            margin-bottom: 18px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        /* Editable Live Preview Inputs */
+        [contenteditable="true"] {
+            outline: 2px dashed #3b82f6 !important;
+            background-color: rgba(59, 130, 246, 0.05) !important;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+
+        /* Mobile Responsive Adjustments */
+        @media screen and (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            header.app-header {
+                padding: 18px 16px;
+                margin-bottom: 15px;
+            }
+
+            .brand-info {
+                flex-direction: row;
+                gap: 10px;
+            }
+
+            .brand-logo-badge {
+                font-size: 16px;
+                padding: 8px 12px;
+            }
+
+            .brand-text h1 {
+                font-size: 17px;
+            }
+
+            .brand-text p {
+                font-size: 11px;
+            }
+
+            .metrics-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 8px;
+            }
+
+            .metric-value {
+                font-size: 16px;
+            }
+
+            .metric-label {
+                font-size: 10px;
+            }
+
+            .filter-card {
+                padding: 12px;
+                gap: 10px;
+            }
+
+            .filter-main-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .search-wrapper,
+            .filter-select {
+                width: 100%;
+                flex: 1 1 100%;
+            }
+
+            .action-btns-group {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .action-btns-group .btn {
+                flex: 1;
+            }
+
+            .template-card {
+                padding: 16px 12px;
+                margin-bottom: 20px;
+                border-radius: var(--radius-md);
+            }
+
+            /* Stack form header on mobile view */
+            .form-header {
+                flex-direction: column;
+                text-align: center;
+                gap: 8px;
+            }
+
+            .form-header-col.logo,
+            .form-header-col.title,
+            .form-header-col.meta {
+                flex: 1 1 100%;
+                text-align: center;
+                width: 100%;
+            }
+
+            .form-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .form-grid .col-span-1 {
+                grid-column: span 1;
+            }
+
+            .form-grid .col-span-2 {
+                grid-column: span 2;
+            }
+
+            .form-grid .col-span-3 {
+                grid-column: span 2;
+            }
+
+            .form-grid .col-span-4 {
+                grid-column: span 2;
+            }
+
+            .signature-grid,
+            .signature-grid.cols-3,
+            .signature-grid.cols-4 {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 16px;
+            }
+
+            .form-table {
+                font-size: 11px;
+            }
+
+            .form-table th,
+            .form-table td {
+                padding: 6px 4px;
+            }
+        }
+
+        @media screen and (max-width: 480px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-grid .col-span-1,
+            .form-grid .col-span-2,
+            .form-grid .col-span-3,
+            .form-grid .col-span-4 {
+                grid-column: span 1;
+            }
+
+            .signature-grid,
+            .signature-grid.cols-2,
+            .signature-grid.cols-3,
+            .signature-grid.cols-4 {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* STRICT A4 PRINT STYLES */
+        @media print {
+            @page {
+                size: A4 portrait;
+                margin: 12mm 10mm 12mm 10mm;
+            }
+
+            body {
+                background-color: #ffffff !important;
+                color: #000000 !important;
+                font-size: 11pt;
+                padding-bottom: 0;
+            }
+
+            .container {
+                max-width: 100% !important;
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+
+            .no-print,
+            header,
+            .filter-card,
+            .tab-bar,
+            .form-actions,
+            .toast-container,
+            .iso-pills {
+                display: none !important;
+            }
+
+            .tab-content {
+                display: block !important;
+            }
+
+            .template-card {
+                border: none !important;
+                box-shadow: none !important;
+                padding: 0 !important;
+                margin: 0 0 30px 0 !important;
+                page-break-after: always;
+                background: #ffffff !important;
+            }
+
+            .template-card:last-child {
+                page-break-after: auto;
+            }
+
+            .catalog-section {
+                box-shadow: none !important;
+                padding: 0 !important;
+                border: none !important;
+            }
+
+            .form-header {
+                display: flex !important;
+                flex-direction: row !important;
+                text-align: left !important;
+                border-bottom: 2px solid #000000 !important;
+            }
+
+            .form-header-col.logo {
+                flex: 0 0 28% !important;
+                text-align: left !important;
+            }
+
+            .form-header-col.title {
+                flex: 1 !important;
+                text-align: center !important;
+            }
+
+            .form-header-col.meta {
+                flex: 0 0 26% !important;
+                text-align: right !important;
+            }
+
+            .form-grid {
+                display: grid !important;
+                grid-template-columns: repeat(4, 1fr) !important;
+            }
+
+            .form-grid .col-span-1 {
+                grid-column: span 1 !important;
+            }
+
+            .form-grid .col-span-2 {
+                grid-column: span 2 !important;
+            }
+
+            .form-grid .col-span-3 {
+                grid-column: span 3 !important;
+            }
+
+            .form-grid .col-span-4 {
+                grid-column: span 4 !important;
+            }
+
+            .signature-grid {
+                display: grid !important;
+                grid-template-columns: repeat(4, 1fr) !important;
+            }
+
+            .signature-grid.cols-2 {
+                grid-template-columns: repeat(2, 1fr) !important;
+            }
+
+            .signature-grid.cols-3 {
+                grid-template-columns: repeat(3, 1fr) !important;
+            }
+
+            .form-cell,
+            .form-table th,
+            .form-table td,
+            .form-box {
+                border-color: #000000 !important;
+                color: #000000 !important;
+            }
+
+            .form-cell.bg-gray,
+            .form-table th {
+                background-color: #f1f5f9 !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            [contenteditable="true"] {
+                outline: none !important;
+                background-color: transparent !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <div class="container">
+        <!-- PRO HEADER -->
+        <header class="app-header no-print">
+            <div class="header-top">
+                <div class="brand-info">
+                    <div class="brand-logo-badge">PV INCONS</div>
+                    <div class="brand-text">
+                        <h1>Hệ Thống Biểu Mẫu ISO Xây Dựng <span class="pro-badge">PRO v3.5</span></h1>
+                        <p>Công ty Cổ phần PV INCONS • Quản lý Chất lượng & An toàn Lao động (ISO 9001 - 14001 - 45001)
+                        </p>
+                    </div>
+                </div>
+                <div class="header-actions">
+                    <button class="theme-toggle-btn" onclick="toggleTheme()" id="themeBtn">
+                        🌙 Chế độ tối
+                    </button>
+                </div>
+            </div>
+
+            <div class="metrics-grid">
+                <div class="metric-item">
+                    <div class="metric-value" id="countTotal">15</div>
+                    <div class="metric-label">Tổng biểu mẫu</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-value">04</div>
+                    <div class="metric-label">Bộ Tiêu Chuẩn ISO</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-value">100%</div>
+                    <div class="metric-label">Chuẩn hóa PDF / In</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-value">PV INCONS</div>
+                    <div class="metric-label">Phiên bản Bản quyền</div>
+                </div>
+            </div>
+        </header>
+
+        <!-- FILTER & CONTROLS -->
+        <div class="filter-card no-print">
+            <div class="filter-main-row">
+                <div class="search-wrapper">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" id="searchInput" class="filter-input"
+                        placeholder="Tìm theo mã BM, tên văn bản hoặc từ khóa..." onkeyup="filterForms()">
+                </div>
+
+                <select id="categorySelect" class="filter-select" onchange="filterForms()">
+                    <option value="ALL">📂 Tất cả nhóm chức năng (Full)</option>
+                    <option value="CORE">1. Quản lý Hệ thống & Hồ sơ (ISO Core)</option>
+                    <option value="DA">2. Đấu thầu & Chuẩn bị Dự án</option>
+                    <option value="VT">3. Vật tư, Thiết bị & Nhà thầu phụ</option>
+                    <option value="TC">4. Thi công & Kiểm soát Chất lượng</option>
+                    <option value="HSE">5. An toàn Lao động & Môi trường</option>
+                    <option value="BG">6. Nghiệm thu & Bàn giao</option>
+                </select>
+
+                <div class="action-btns-group">
+                    <button class="btn btn-outline" onclick="toggleEditMode()" id="editModeBtn">
+                        ✏️ Chế độ Sửa Pro
+                    </button>
+                    <button class="btn btn-secondary" onclick="resetFilters()">
+                        🗘 Đặt lại
+                    </button>
+                    <button class="btn btn-primary" onclick="window.print()">
+                        🖨 In / Export PDF
+                    </button>
+                </div>
+            </div>
+
+            <!-- Quick ISO Filter Pills -->
+            <div class="iso-pills">
+                <span class="iso-pill active" onclick="filterByIso('ALL', this)">Tất cả ISO</span>
+                <span class="iso-pill" onclick="filterByIso('ISO 9001', this)">ISO 9001 (Chất lượng)</span>
+                <span class="iso-pill" onclick="filterByIso('ISO 14001', this)">ISO 14001 (Môi trường)</span>
+                <span class="iso-pill" onclick="filterByIso('ISO 45001', this)">ISO 45001 (An toàn HSE)</span>
+                <span class="iso-pill" onclick="filterByIso('ISO Core', this)">ISO Core</span>
+            </div>
+        </div>
+
+        <!-- TABS SWITCHER -->
+        <div class="tab-bar no-print">
+            <button class="tab-btn active" onclick="switchTab('catalogView', this)">📋 Danh mục Tất cả Biểu mẫu</button>
+            <button class="tab-btn" onclick="switchTab('templatesView', this)">📄 Mẫu Biểu Mẫu Đính Kèm Chi
+                Tiết</button>
+        </div>
+
+        <!-- TAB 1: CATALOG VIEW -->
+        <div id="catalogView" class="tab-content">
+            <div class="catalog-section">
+                <div class="catalog-header">
+                    <div class="catalog-title">
+                        🏢 CÔNG TY CỔ PHẦN PV INCONS - DANH MỤC BIỂU MẪU CHUẨN ISO
+                    </div>
+                    <span style="font-size: 12px; color: var(--text-muted);" id="visibleCountText">Hiển thị 15/15 biểu
+                        mẫu</span>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="catalog-table" id="catalogTable">
+                        <thead>
+                            <tr>
+                                <th style="width: 120px;">Mã Biểu Mẫu</th>
+                                <th>Tên Biểu Mẫu / Văn Bản Chi Tiết</th>
+                                <th style="width: 200px;">Nhóm Chức Năng</th>
+                                <th style="width: 150px;">Tiêu Chuẩn ISO</th>
+                                <th style="width: 130px;" class="no-print">Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody id="catalogTbody">
+                            <!-- Group 1 -->
+                            <tr data-cat="CORE" data-iso="ISO Core">
+                                <td><b>BM-ISO-01</b></td>
+                                <td>Danh mục Tài liệu & Hồ sơ Nội bộ Hiện hành PV INCONS</td>
+                                <td>Quản lý Hệ thống & Hồ sơ</td>
+                                <td><span class="badge badge-core">ISO Core</span></td>
+                                <td class="no-print"><button class="btn btn-outline"
+                                        style="padding:4px 10px; font-size:11px; min-height:30px;"
+                                        onclick="scrollToTemplate('BM-ISO-01')">Xem chi tiết</button></td>
+                            </tr>
+                            <tr data-cat="CORE" data-iso="ISO Core">
+                                <td><b>BM-ISO-02</b></td>
+                                <td>Kế hoạch & Báo cáo Đánh giá Nội bộ (Internal Audit)</td>
+                                <td>Quản lý Hệ thống & Hồ sơ</td>
+                                <td><span class="badge badge-core">ISO Core</span></td>
+                                <td class="no-print"><button class="btn btn-outline"
+                                        style="padding:4px 10px; font-size:11px; min-height:30px;"
+                                        onclick="showToast('Mẫu BM-ISO-02 đã tích hợp sẵn trong hệ thống chuẩn PV INCONS!')">Xem
+                                        mẫu</button></td>
+                            </tr>
+                            <tr data-cat="CORE" data-iso="ISO Core">
+                                <td><b>BM-ISO-03</b></td>
+                                <td>Phiếu yêu cầu Hành động Khắc phục & Phòng ngừa (CAPA)</td>
+                                <td>Quản lý Hệ thống & Hồ sơ</td>
+                                <td><span class="badge badge-core">ISO Core</span></td>
+                                <td class="no-print"><button class="btn btn-outline"
+                                        style="padding:4px 10px; font-size:11px; min-height:30px;"
+                                        onclick="showToast('Mẫu BM-ISO-03 đã tích hợp sẵn trong hệ thống chuẩn PV INCONS!')">Xem
+                                        mẫu</button></td>
+                            </tr>
+
+                            <!-- Group 2 -->
+                            <tr data-cat="DA" data-iso="ISO 9001">
+                                <td><b>BM-DA-01</b></td>
+                                <td>Kế hoạch Quản lý Chất lượng Dự án (Project Quality Plan - PQP)</td>
+                                <td>Đấu thầu & Chuẩn bị Dự án</td>
+                                <td><span class="badge badge-iso9001">ISO 9001</span></td>
+                                <td class="no-print"><button class="btn btn-outline"
+                                        style="padding:4px 10px; font-size:11px; min-height:30px;"
+                                        onclick="scrollToTemplate('BM-DA-01')">Xem chi tiết</button></td>
+                            </tr>
+                            <tr data-cat="DA" data-iso="ISO 9001">
+                                <td><b>BM-DA-02</b></td>
+                                <td>Biện pháp Thi công & Bảng Tiến độ Tổng thể Dự án</td>
+                                <td>Đấu thầu & Chuẩn bị Dự án</td>
+                                <td><span class="badge badge-iso9001">ISO 9001</span></td>
+                                <td class="no-print"><button class="btn btn-outline"
+                                        style="padding:4px 10px; font-size:11px; min-height:30px;"
+                                        onclick="showToast('Mẫu BM-DA-02 đã tích hợp sẵn trong hệ thống chuẩn PV INCONS!')">Xem
+                                        mẫu</button></td>
+                            </tr>
+                            <tr data-cat="DA" data-iso="ISO 9001">
+                                <td><b>BM-DA-03</b></td>
+                                <td>Biên bản Bàn giao & Tiếp nhận Mặt bằng Thi công Công trình</td>
+                                <td>Đấu thầu & Chuẩn bị Dự án</td>
+                                <td><span class="badge badge-iso9001">ISO 9001</span></td>
+                                <td class="no-print"><button class="btn btn-outline"
+                                        style="padding:4px 10px; font-size:11px; min-height:30px;"
+                                        onclick="showToast('Mẫu BM-DA-03 đã tích hợp sẵn trong hệ thống chuẩn PV INCONS!')">Xem
+                                        mẫu</button></td>
+                            </tr>
+
+                            <!-- Group 3 -->
+                            <tr data-cat="VT" data-iso="ISO 9001">
+                                <td><b>BM-VT-01</b></td>
+                                <td>Bảng Đánh giá & Lựa chọn Nhà cung cấp / Nhà thầu phụ</td>
+                                <td>Vật tư & Nhà thầu phụ</td>
+                                <td><span class="badge badge-iso9001">ISO 9001</span></td>
+                                <td class="no-print"><button class="btn btn-outline"
+                                        style="padding:4px 10px; font-size:11px; min-height:30px;"
+                                        onclick="scrollToTemplate('BM-VT-01')">Xem chi tiết</button></td>
+                            </tr>
+                            <tr data-cat="VT" data-iso="ISO 9001">
+                                <td><b>BM-VT-04</b></td>
+                                <td>Biên bản Kiểm tra Vật tư / Thiết bị Đầu vào Công trường</td>
+                                <td>Vật tư & Nhà thầu phụ</td>
+                                <td><span class="badge badge-iso9001">ISO 9001</span></td>
+                                <td class="no-print"><button class="btn btn-outline"
+                                        style="padding:4px 10px; font-size:11px; min-height:30px;"
+                                        onclick="scrollToTemplate('BM-VT-04')">Xem chi tiết</button></td>
+                            </tr>
+
+                            <!-- Group 4 -->
+                            <tr data-cat="TC" data-iso="ISO 9001">
+                                <td><b>BM-TC-01</b></td>
+                                <td>Nhật ký Thi công Công trình Hàng ngày (Daily Construction Log)</td>
+                                <td>Thi công & Chất lượng</td>
+                                <td><span class="badge badge-iso9001">ISO 9001</span></td>
+                                <td class="no-print"><button class="btn btn-outline"
+                                        style="padding:4px 10px; font-size:11px; min-height:30px;"
+                                        onclick="scrollToTemplate('BM-TC-01')">Xem chi tiết</button></td>
+                            </tr>
+                            <tr data-cat="TC" data-iso="ISO 9001">
+                                <td><b>BM-TC-02</b></td>
+                                <td>Phiếu Yêu cầu Nghiệm thu Công việc Xây dựng (RFI)</td>
+                                <td>Thi công & Chất lượng</td>
+                                <td><span class="badge badge-iso9001">ISO 9001</span></td>
+                                <td class="no-print"><button class="btn btn-outline"
+                                        style="padding:4px 10px; font-size:11px; min-height:30px;"
+                                        onclick="scrollToTemplate('BM-TC-02')">Xem chi tiết</button></td>
+                            </tr>
+                            <tr data-cat="TC" data-iso="ISO 9001">
+                                <td><b>BM-TC-05</b></td>
+                                <td>Báo cáo Sản phẩm / Công việc Không phù hợp (NCR)</td>
+                                <td>Thi công & Chất lượng</td>
+                                <td><span class="badge badge-iso9001">ISO 9001</span></td>
+                                <td class="no-print"><button class="btn btn-outline"
+                                        style="padding:4px 10px; font-size:11px; min-height:30px;"
+                                        onclick="scrollToTemplate('BM-TC-05')">Xem chi tiết</button></td>
+                            </tr>
+
+                            <!-- Group 5 -->
+                            <tr data-cat="HSE" data-iso="ISO 45001 ISO 14001">
+                                <td><b>BM-HSE-01</b></td>
+                                <td>Bảng Đánh giá Rủi ro An toàn Lao động & Môi trường (JHA)</td>
+                                <td>An toàn Lao động (HSE)</td>
+                                <td><span class="badge badge-iso45001">ISO 45001</span> <span
+                                        class="badge badge-iso14001">14001</span></td>
+                                <td class="no-print"><button class="btn btn-outline"
+                                        style="padding:4px 10px; font-size:11px; min-height:30px;"
+                                        onclick="scrollToTemplate('BM-HSE-01')">Xem chi tiết</button></td>
+                            </tr>
+                            <tr data-cat="HSE" data-iso="ISO 45001">
+                                <td><b>BM-HSE-02</b></td>
+                                <td>Biên bản Huấn luyện An toàn Đầu giờ Hàng ngày (Toolbox Talk)</td>
+                                <td>An toàn Lao động (HSE)</td>
+                                <td><span class="badge badge-iso45001">ISO 45001</span></td>
+                                <td class="no-print"><button class="btn btn-outline"
+                                        style="padding:4px 10px; font-size:11px; min-height:30px;"
+                                        onclick="scrollToTemplate('BM-HSE-02')">Xem chi tiết</button></td>
+                            </tr>
+
+                            <!-- Group 6 -->
+                            <tr data-cat="BG" data-iso="ISO 9001">
+                                <td><b>BM-BG-01</b></td>
+                                <td>Danh mục Tồn đọng Cần Khắc phục Trước Bàn giao (Punch List)</td>
+                                <td>Nghiệm thu & Bàn giao</td>
+                                <td><span class="badge badge-iso9001">ISO 9001</span></td>
+                                <td class="no-print"><button class="btn btn-outline"
+                                        style="padding:4px 10px; font-size:11px; min-height:30px;"
+                                        onclick="scrollToTemplate('BM-BG-01')">Xem chi tiết</button></td>
+                            </tr>
+                            <tr data-cat="BG" data-iso="ISO 9001">
+                                <td><b>BM-BG-02</b></td>
+                                <td>Biên bản Nghiệm thu Hoàn thành Công trình Bàn giao Sử dụng</td>
+                                <td>Nghiệm thu & Bàn giao</td>
+                                <td><span class="badge badge-iso9001">ISO 9001</span></td>
+                                <td class="no-print"><button class="btn btn-outline"
+                                        style="padding:4px 10px; font-size:11px; min-height:30px;"
+                                        onclick="showToast('Mẫu BM-BG-02 đã tích hợp sẵn trong hệ thống chuẩn PV INCONS!')">Xem
+                                        mẫu</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 2: TEMPLATES DETAILED VIEW -->
+        <div id="templatesView" class="tab-content">
+
+            <!-- TEMPLATE 1: BM-TC-05 NCR -->
+            <div class="template-card" id="tpl-BM-TC-05" data-cat="TC" data-code="BM-TC-05" data-iso="ISO 9001">
+                <div class="form-actions no-print">
+                    <button class="btn btn-outline" onclick="copyFormContent('tpl-BM-TC-05')">📋 Sao chép Nổi
+                        bật</button>
+                    <button class="btn btn-primary" onclick="printSingleForm('tpl-BM-TC-05')">𖤂 In Mẫu NCR (PV
+                        INCONS)</button>
+                </div>
+
+                <div class="form-header">
+                    <div class="form-header-col logo">
+                        CÔNG TY CỔ PHẦN PV INCONS<br>
+                        <span style="font-size:10px; font-weight:normal; color:#555;">Hệ Thống Quản Lý ISO
+                            9001:2015</span>
+                    </div>
+                    <div class="form-header-col title">
+                        <h2>BÁO CÁO CÔNG VIỆC KHÔNG PHÙ HỢP</h2>
+                        <p>(NON-CONFORMANCE REPORT - NCR)</p>
+                    </div>
+                    <div class="form-header-col meta">
+                        <b>Mã số:</b> BM-TC-05<br>
+                        <b>Ngày ban hành:</b> 01/01/2026<br>
+                        <b>Lần sửa đổi:</b> 03 (Pro)<br>
+                        <b>Trang:</b> 1/1
+                    </div>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-cell bg-gray col-span-1">Dự án:</div>
+                    <div class="form-cell col-span-1" contenteditable="false">Tòa nhà Văn phòng PV INCONS Tower</div>
+                    <div class="form-cell bg-gray col-span-1">Số NCR:</div>
+                    <div class="form-cell col-span-1" contenteditable="false"><b>NCR-PVI-2026-018</b></div>
+
+                    <div class="form-cell bg-gray col-span-1">Hạng mục:</div>
+                    <div class="form-cell col-span-1" contenteditable="false">Thi công bê tông dầm sàn Tầng 8</div>
+                    <div class="form-cell bg-gray col-span-1">Ngày phát hiện:</div>
+                    <div class="form-cell col-span-1" contenteditable="false">20/08/2026</div>
+
+                    <div class="form-cell bg-gray col-span-1">Đơn vị vi phạm:</div>
+                    <div class="form-cell col-span-1" contenteditable="false">Đội Thi công Bê tông số 2 / NTP XYZ</div>
+                    <div class="form-cell bg-gray col-span-1">Người phát hiện:</div>
+                    <div class="form-cell col-span-1" contenteditable="false">Nguyễn Văn A (Kỹ sư QA/QC)</div>
+                </div>
+
+                <div class="form-section-title">1. MÔ TẢ SỰ KHÔNG PHÙ HỢP (QA/QC lập):</div>
+                <div class="form-box" contenteditable="false">
+                    Bề mặt bê tông dầm D2-T8 sau khi tháo cốp pha xuất hiện tình trạng rỗ tổ ong nặng tại khu vực nút
+                    giao cột C4 (diện tích rỗ khoảng 0.5m x 0.3m, lộ thép chủ). Vi phạm Quy trình Thi công bê tông PV
+                    INCONS - Mục 4.2.
+                </div>
+
+                <div class="form-section-title">2. NGUYÊN NHÂN GỐC RỄ (Đơn vị thi công phân tích):</div>
+                <div class="form-box" contenteditable="false">
+                    Mật độ cốt thép tại nút khung quá dày, đầm dùi không xuống được tới đáy dầm và công nhân chưa phối
+                    hợp gõ đầm dùi thành cốp pha trong quá trình đổ bê tông.
+                </div>
+
+                <div class="form-section-title">3. BIỆN PHÁP KHẮC PHỤC & PHÒNG NGỪA (Đề xuất):</div>
+                <div class="form-box" contenteditable="false">
+                    <b>Biện pháp khắc phục:</b> Đục bỏ toàn bộ phần bê tông rỗ xốp đến phần bê tông đặc chắc, vệ sinh
+                    lớp thép, Tô phủ phục hồi bề mặt bằng vữa sửa chữa chuyên dụng SikaGrout 214-11.<br>
+                    <b>Biện pháp phòng ngừa:</b> Tổ chức huấn luyện lại công tác đầm bê tông nút khung, chuẩn bị sẵn đầm
+                    kim đường kính nhỏ (D30). <i>Thời hạn hoàn thành: 25/08/2026.</i>
+                </div>
+
+                <div class="form-section-title">4. ĐÁNH GIÁ KẾT QUẢ KHẮC PHỤC (Chỉ huy trưởng & QA/QC xác nhận):</div>
+                <div class="form-box" contenteditable="false">
+                    [ X ] Đạt yêu cầu - Đóng báo cáo NCR &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; [
+                    &nbsp; ] Không đạt - Yêu cầu xử lý lại
+                </div>
+
+                <div class="signature-grid cols-4">
+                    <div class="signature-col">
+                        <b>NGƯỜI PHÁT HIỆN</b><br>
+                        <i>(Ký, ghi rõ họ tên)</i>
+                        <div class="signature-space"></div>
+                        Nguyễn Văn A
+                    </div>
+                    <div class="signature-col">
+                        <b>ĐƠN VỊ THI CÔNG</b><br>
+                        <i>(Ký, ghi rõ họ tên)</i>
+                        <div class="signature-space"></div>
+                        Trần Văn B
+                    </div>
+                    <div class="signature-col">
+                        <b>KĨ SƯ QA/QC</b><br>
+                        <i>(Ký, ghi rõ họ tên)</i>
+                        <div class="signature-space"></div>
+                        Lê Văn C
+                    </div>
+                    <div class="signature-col">
+                        <b>CHỈ HUY TRƯỜNG</b><br>
+                        <i>(Ký, ghi rõ họ tên)</i>
+                        <div class="signature-space"></div>
+                        Phạm Văn D
+                    </div>
+                </div>
+            </div>
+
+            <!-- TEMPLATE 2: BM-TC-02 RFI -->
+            <div class="template-card" id="tpl-BM-TC-02" data-cat="TC" data-code="BM-TC-02" data-iso="ISO 9001">
+                <div class="form-actions no-print">
+                    <button class="btn btn-outline" onclick="copyFormContent('tpl-BM-TC-02')">📋 Sao chép</button>
+                    <button class="btn btn-primary" onclick="printSingleForm('tpl-BM-TC-02')">🖨 In Mẫu RFI (PV
+                        INCONS)</button>
+                </div>
+
+                <div class="form-header">
+                    <div class="form-header-col logo">
+                        CÔNG TY CỔ PHẦN PV INCONS
+                    </div>
+                    <div class="form-header-col title">
+                        <h2>PHIẾU YÊU CẦU NGHIỆM THU</h2>
+                        <p>(REQUEST FOR INSPECTION - RFI)</p>
+                    </div>
+                    <div class="form-header-col meta">
+                        <b>Mã số:</b> BM-TC-02<br>
+                        <b>Số RFI:</b> RFI-PVI-102<br>
+                        <b>Ngày:</b> 20/08/2026
+                    </div>
+                </div>
+
+                <p style="font-size:13px; margin-bottom:12px;" contenteditable="false"><b>Kính gửi:</b> Ban Quản Lý Dự
+                    An / Tư Vấn Giám Sát Công Trình PV INCONS</p>
+
+                <div class="form-grid">
+                    <div class="form-cell bg-gray col-span-1">Hạng mục công việc:</div>
+                    <div class="form-cell col-span-3" contenteditable="false">Nghiệm thu công tác cốt thép, cốp pha dầm
+                        sàn Tầng 6 (Trục A-D / 1-5)</div>
+                    <div class="form-cell bg-gray col-span-1">Vị trí thi công:</div>
+                    <div class="form-cell col-span-3" contenteditable="false">Sàn Tầng 6 - Khối nhà A</div>
+                    <div class="form-cell bg-gray col-span-1">Thời gian yêu cầu:</div>
+                    <div class="form-cell col-span-3" contenteditable="false">15 giờ 30 phút, Ngày 21 tháng 08 năm 2026
+                    </div>
+                </div>
+
+                <table class="form-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 5%;">STT</th>
+                            <th>Hồ sơ / Tài liệu kiểm tra đính kèm</th>
+                            <th style="width: 25%;">Trạng thái chuẩn bị</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td style="text-align:center;">1</td>
+                            <td contenteditable="false">Bản vẽ thi công đã phê duyệt (Shopdrawing No: PVI-SD-STR-T06-02)
+                            </td>
+                            <td style="text-align:center;" contenteditable="false">Đã hoàn thành</td>
+                        </tr>
+                        <tr>
+                            <td style="text-align:center;">2</td>
+                            <td contenteditable="false">Kết quả thí nghiệm kéo thép đầu vào (C/O, C/Q)</td>
+                            <td style="text-align:center;" contenteditable="false">Đã đạt chuẩn</td>
+                        </tr>
+                        <tr>
+                            <td style="text-align:center;">3</td>
+                            <td contenteditable="false">Biên bản tự nghiệm thu nội bộ của PV INCONS</td>
+                            <td style="text-align:center;" contenteditable="false">Đã nghiệm thu đạt</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="form-section-title">Ý KIẾN CỦA TƯ VẤN GIÁM SÁT / CỦA CHỦ ĐẦU TƯ:</div>
+                <div class="form-box" contenteditable="false">
+                    [ X ] Chấp thuận nghiệm thu, cho phép chuyển bước thi công tiếp theo (Đổ bê tông).<br>
+                    [ &nbsp; ] Không chấp thuận. Yêu cầu sửa chữa các tồn tại trước khi mời nghiệm thu lại.<br>
+                    <i>Ghi chú: Đã kiểm tra trắc địa tim trục và tĩnh không dầm sàn đạt yêu cầu.</i>
+                </div>
+
+                <div class="signature-grid cols-2">
+                    <div class="signature-col">
+                        <b>ĐẠI DIỆN PV INCONS</b><br>
+                        <i>(Ký và ghi rõ họ tên)</i>
+                        <div class="signature-space"></div>
+                        Chỉ Huy Trưởng Dự Án
+                    </div>
+                    <div class="signature-col">
+                        <b>ĐẠI DIỆN TƯ VẤN GIÁM SÁT</b><br>
+                        <i>(Ký và ghi rõ họ tên)</i>
+                        <div class="signature-space"></div>
+                        Trưởng Đoàn Giám Sát
+                    </div>
+                </div>
+            </div>
+
+            <!-- TEMPLATE 3: BM-HSE-01 JHA -->
+            <div class="template-card" id="tpl-BM-HSE-01" data-cat="HSE" data-code="BM-HSE-01"
+                data-iso="ISO 45001 ISO 14001">
+                <div class="form-actions no-print">
+                    <button class="btn btn-outline" onclick="copyFormContent('tpl-BM-HSE-01')">📋 Sao chép</button>
+                    <button class="btn btn-primary" onclick="printSingleForm('tpl-BM-HSE-01')">𖤂 In Mẫu JHA (PV
+                        INCONS)</button>
+                </div>
+
+                <div class="form-header">
+                    <div class="form-header-col logo">
+                        CÔNG TY CỔ PHẦN PV INCONS
+                    </div>
+                    <div class="form-header-col title">
+                        <h2>ĐÁNH GIÁ RỦI RO AN TOÀN LAO ĐỘNG (JHA)</h2>
+                        <p>(JOB HAZARD ANALYSIS & RISK ASSESSMENT)</p>
+                    </div>
+                    <div class="form-header-col meta">
+                        <b>Mã số:</b> BM-HSE-01<br>
+                        <b>Tiêu chuẩn:</b> ISO 45001:2018<br>
+                        <b>Phiên bản:</b> PV INCONS Pro
+                    </div>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-cell bg-gray col-span-1">Công việc đánh giá:</div>
+                    <div class="form-cell col-span-3" contenteditable="false">Lắp dựng và tháo dỡ cốp pha ngoài nhà trên
+                        cao (Tầng 8-10)</div>
+                </div>
+
+                <table class="form-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 5%;">STT</th>
+                            <th style="width: 25%;">Các bước công việc</th>
+                            <th style="width: 25%;">Mối nguy hiểm tiềm ẩn</th>
+                            <th style="width: 12%;">Mức rủi ro</th>
+                            <th>Biện pháp kiểm soát an toàn bắt buộc (PV INCONS)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td style="text-align:center;">1</td>
+                            <td contenteditable="false">Vận chuyển vật tư cốp pha lên tầng cao bằng cẩu tháp</td>
+                            <td contenteditable="false">Rơi rớt vật tư, đứt cáp cẩu, va đập vào công trình</td>
+                            <td style="text-align:center; font-weight:bold; color:red;">CAO</td>
+                            <td contenteditable="false">Kiểm định cẩu tháp còn hiệu lực. Buộc dây định hướng kiện hàng.
+                                Rào chắn khu vực bán kính cẩu.</td>
+                        </tr>
+                        <tr>
+                            <td style="text-align:center;">2</td>
+                            <td contenteditable="false">Lắp đặt giáo đĩa, giáo treo bao che bên ngoài</td>
+                            <td contenteditable="false">Ngã từ trên cao xuống, gãy sàn thao tác</td>
+                            <td style="text-align:center; font-weight:bold; color:red;">RẤT CAO</td>
+                            <td contenteditable="false">Đeo dây an toàn toàn thân 2 móc (móc vào dây cứu sinh). Lắp lưới
+                                hứng vật rơi và lưới bao che đầy đủ.</td>
+                        </tr>
+                        <tr>
+                            <td style="text-align:center;">3</td>
+                            <td contenteditable="false">Căn chỉnh và cố định ty ren cốp pha thành</td>
+                            <td contenteditable="false">Rơi dụng cụ cầm tay (búa, cờ lê) xuống dưới</td>
+                            <td style="text-align:center; font-weight:bold; color:orange;">TRUNG BÌNH</td>
+                            <td contenteditable="false">Sử dụng dây buộc dụng cụ cầm tay vào cổ tay. Đội mũ bảo hộ gắn
+                                dây quai cằm.</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="signature-grid cols-3">
+                    <div class="signature-col">
+                        <b>CÁN BỘ AN TOÀN (HSE)</b><br>
+                        <div class="signature-space"></div>
+                        PV INCONS HSE Team
+                    </div>
+                    <div class="signature-col">
+                        <b>CÁN BỘ KỸ THUẬT</b><br>
+                        <div class="signature-space"></div>
+                        Kỹ Sư Trưởng
+                    </div>
+                    <div class="signature-col">
+                        <b>CHỈ HUY TRƯỜNG</b><br>
+                        <div class="signature-space"></div>
+                        Chỉ Huy Trưởng
+                    </div>
+                </div>
+            </div>
+
+            <!-- TEMPLATE 4: BM-VT-04 MATERIAL INSPECTION -->
+            <div class="template-card" id="tpl-BM-VT-04" data-cat="VT" data-code="BM-VT-04" data-iso="ISO 9001">
+                <div class="form-actions no-print">
+                    <button class="btn btn-outline" onclick="copyFormContent('tpl-BM-VT-04')">📋 Sao chép</button>
+                    <button class="btn btn-primary" onclick="printSingleForm('tpl-BM-VT-04')">🖨 In Kiểm Tra Vật Tư (PV
+                        INCONS)</button>
+                </div>
+
+                <div class="form-header">
+                    <div class="form-header-col logo">
+                        CÔNG TY CỔ PHẦN PV INCONS
+                    </div>
+                    <div class="form-header-col title">
+                        <h2>BIÊN BẢN KIỂM TRA VẬT TƯ ĐẦU VÀO</h2>
+                        <p>(INCOMING MATERIAL INSPECTION REPORT)</p>
+                    </div>
+                    <div class="form-header-col meta">
+                        <b>Mã số:</b> BM-VT-04<br>
+                        <b>Số phiếu:</b> VT-PVI-2026-089
+                    </div>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-cell bg-gray col-span-1">Nhà cung cấp:</div>
+                    <div class="form-cell col-span-1" contenteditable="false">Công ty TNHH Thép Hòa Phát</div>
+                    <div class="form-cell bg-gray col-span-1">Số phiếu xuất:</div>
+                    <div class="form-cell col-span-1" contenteditable="false">PXK-889102</div>
+
+                    <div class="form-cell bg-gray col-span-1">Loại vật tư:</div>
+                    <div class="form-cell col-span-1" contenteditable="false">Thép xây dựng CB400-V (D16, D18, D20)
+                    </div>
+                    <div class="form-cell bg-gray col-span-1">Thời gian nhập:</div>
+                    <div class="form-cell col-span-1" contenteditable="false">09:00 - 20/08/2026</div>
+                </div>
+
+                <table class="form-table">
+                    <thead>
+                        <tr>
+                            <th>Tên chủng loại</th>
+                            <th>Đơn vị</th>
+                            <th>Số lượng giao</th>
+                            <th>Chứng chỉ C/O, C/Q</th>
+                            <th>Kiểm tra ngoại quan / Kích thước</th>
+                            <th>Kết luận PV INCONS</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td contenteditable="false">Thép D16 CB400-V</td>
+                            <td style="text-align:center;">Tấn</td>
+                            <td style="text-align:center;" contenteditable="false">12.5</td>
+                            <td style="text-align:center;" contenteditable="false">Đầy đủ</td>
+                            <td contenteditable="false">Đường kính chuẩn, không gỉ sét</td>
+                            <td style="text-align:center; color:green; font-weight:bold;">ĐẠT NHẬP KHO</td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="false">Thép D20 CB400-V</td>
+                            <td style="text-align:center;">Tấn</td>
+                            <td style="text-align:center;" contenteditable="false">18.0</td>
+                            <td style="text-align:center;" contenteditable="false">Đầy đủ</td>
+                            <td contenteditable="false">Đường kính chuẩn, nhãn mác rõ ràng</td>
+                            <td style="text-align:center; color:green; font-weight:bold;">ĐẠT NHẬP KHO</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="signature-grid cols-4">
+                    <div class="signature-col">
+                        <b>THỦ KHO</b><br>
+                        <div class="signature-space"></div>
+                    </div>
+                    <div class="signature-col">
+                        <b>KĨ SƯ QA/QC</b><br>
+                        <div class="signature-space"></div>
+                    </div>
+                    <div class="signature-col">
+                        <b>TƯ VẤN GIÁM SÁT</b><br>
+                        <div class="signature-space"></div>
+                    </div>
+                    <div class="signature-col">
+                        <b>BÊN GIAO HÀNG</b><br>
+                        <div class="signature-space"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TEMPLATE 5: BM-TC-01 DAILY LOG -->
+            <div class="template-card" id="tpl-BM-TC-01" data-cat="TC" data-code="BM-TC-01" data-iso="ISO 9001">
+                <div class="form-actions no-print">
+                    <button class="btn btn-outline" onclick="copyFormContent('tpl-BM-TC-01')">📋 Sao chép</button>
+                    <button class="btn btn-primary" onclick="printSingleForm('tpl-BM-TC-01')">𖤂 In Nhật Ký Thi Công (PV
+                        INCONS)</button>
+                </div>
+
+                <div class="form-header">
+                    <div class="form-header-col logo">
+                        CÔNG TY CỔ PHẦN PV INCONS
+                    </div>
+                    <div class="form-header-col title">
+                        <h2>NHẬT KÝ THI CÔNG CÔNG TRÌNH HÀNG NGÀY</h2>
+                    </div>
+                    <div class="form-header-col meta">
+                        <b>Mã số:</b> BM-TC-01<br>
+                        <b>Ngày:</b> 20/08/2026
+                    </div>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-cell bg-gray col-span-1">Thời tiết:</div>
+                    <div class="form-cell col-span-1" contenteditable="false">Nắng nhẹ, chiều mưa rào (15h30 - 16h15)
+                    </div>
+                    <div class="form-cell bg-gray col-span-1">Tổng nhân công:</div>
+                    <div class="form-cell col-span-1" contenteditable="false">85 công nhân (Cốt thép: 30, Cốp pha: 35,
+                        M&E: 20)</div>
+                </div>
+
+                <div class="form-section-title">1. NỘI DUNG CÔNG VIỆC THI CÔNG TRONG NGÀY:</div>
+                <div class="form-box" contenteditable="false">
+                    - Thi công gia công & lắp dựng thép dầm sàn Tầng 6 khối A (đạt 90% khối lượng).<br>
+                    - Lắp đặt hệ thống ống âm sàn M&E Tầng 6.<br>
+                    - Đổ bê tông cột Tầng 6 trục C-D (khối lượng 45 m3).
+                </div>
+
+                <div class="form-section-title">2. THIẾT BỊ, MÁY MÓC HOẠT ĐỘNG TRÊN CÔNG TRƯỜNG:</div>
+                <div class="form-box" contenteditable="false">
+                    Cẩu tháp PV INCONS #1 (Hoạt động tốt), Bơm bê tông tĩnh (Hoạt động tốt), Máy phát điện dự phòng
+                    250kVA (Sẵn sàng).
+                </div>
+
+                <div class="form-section-title">3. ĐÁNH GIÁ AN TOÀN & VỆ SINH MÔI TRƯỜNG:</div>
+                <div class="form-box" contenteditable="false">
+                    Đã họp Toolbox talk đầu giờ. Duy trì dọn dẹp vệ sinh mặt bằng tầng 5 & tầng 6. Không xảy ra sự cố an
+                    toàn.
+                </div>
+
+                <div class="signature-grid cols-2">
+                    <div class="signature-col">
+                        <b>CÁN BỘ KĨ THUẬT LẬP SỔ</b><br>
+                        <div class="signature-space"></div>
+                    </div>
+                    <div class="signature-col">
+                        <b>CHỈ HUY TRƯỜNG DUYỆT</b><br>
+                        <div class="signature-space"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TEMPLATE 6: BM-BG-01 PUNCH LIST -->
+            <div class="template-card" id="tpl-BM-BG-01" data-cat="BG" data-code="BM-BG-01" data-iso="ISO 9001">
+                <div class="form-actions no-print">
+                    <button class="btn btn-outline" onclick="copyFormContent('tpl-BM-BG-01')">📋 Sao chép</button>
+                    <button class="btn btn-primary" onclick="printSingleForm('tpl-BM-BG-01')">🖨 In Punch List (PV
+                        INCONS)</button>
+                </div>
+
+                <div class="form-header">
+                    <div class="form-header-col logo">
+                        CÔNG TY CỔ PHẦN PV INCONS
+                    </div>
+                    <div class="form-header-col title">
+                        <h2>DANH MỤC TỒN ĐỌNG CẦN KHẮC PHỤC (PUNCH LIST)</h2>
+                    </div>
+                    <div class="form-header-col meta">
+                        <b>Mã số:</b> BM-BG-01<br>
+                        <b>Giai đoạn:</b> Tiền bàn giao Tầng 3
+                    </div>
+                </div>
+
+                <table class="form-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 5%;">STT</th>
+                            <th style="width: 18%;">Vị trí / Phân khu</th>
+                            <th>Mô tả khiếm khuyết / Tồn đọng</th>
+                            <th style="width: 18%;">Đơn vị chịu trách nhiệm</th>
+                            <th style="width: 12%;">Hạn hoàn thành</th>
+                            <th style="width: 12%;">Xác nhận TVGS</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td style="text-align:center;">1</td>
+                            <td contenteditable="false">Phòng 302 - Khối B</td>
+                            <td contenteditable="false">Sơn tường bị gợn sóng và ố màu chân tường góc trái</td>
+                            <td contenteditable="false">Đội Sơn nước</td>
+                            <td style="text-align:center;" contenteditable="false">24/08/2026</td>
+                            <td style="text-align:center;">[ &nbsp; ] Đã xong</td>
+                        </tr>
+                        <tr>
+                            <td style="text-align:center;">2</td>
+                            <td contenteditable="false">Hành lang Tầng 3</td>
+                            <td contenteditable="false">Gạch lát nền bị bộp 2 viên gần cửa thang máy số 2</td>
+                            <td contenteditable="false">Đội Ốp lát</td>
+                            <td style="text-align:center;" contenteditable="false">25/08/2026</td>
+                            <td style="text-align:center;">[ &nbsp; ] Đã xong</td>
+                        </tr>
+                        <tr>
+                            <td style="text-align:center;">3</td>
+                            <td contenteditable="false">Phòng WC Nữ Tầng 3</td>
+                            <td contenteditable="false">Rò rỉ nhẹ tại mối nối dây cấp nước lavabo số 1</td>
+                            <td contenteditable="false">Đội Điện nước M&E</td>
+                            <td style="text-align:center;" contenteditable="false">23/08/2026</td>
+                            <td style="text-align:center;">[ &nbsp; ] Đã xong</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="signature-grid cols-3">
+                    <div class="signature-col">
+                        <b>ĐẠI DIỆN CHỦ ĐẦU TƯ / TVGS</b><br>
+                        <div class="signature-space"></div>
+                    </div>
+                    <div class="signature-col">
+                        <b>CHỈ HUY TRƯỜNG PV INCONS</b><br>
+                        <div class="signature-space"></div>
+                    </div>
+                    <div class="signature-col">
+                        <b>BỘ PHẬN QA/QC</b><br>
+                        <div class="signature-space"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TEMPLATE 7: BM-ISO-01 DOC CATALOG -->
+            <div class="template-card" id="tpl-BM-ISO-01" data-cat="CORE" data-code="BM-ISO-01" data-iso="ISO Core">
+                <div class="form-actions no-print">
+                    <button class="btn btn-outline" onclick="copyFormContent('tpl-BM-ISO-01')">📋 Sao chép</button>
+                    <button class="btn btn-primary" onclick="printSingleForm('tpl-BM-ISO-01')">🖨 In Danh Mục Hồ Sơ (PV
+                        INCONS)</button>
+                </div>
+
+                <div class="form-header">
+                    <div class="form-header-col logo">
+                        CÔNG TY CỔ PHẦN PV INCONS
+                    </div>
+                    <div class="form-header-col title">
+                        <h2>DANH MỤC TÀI LIỆU & HỒ SƠ NỘI BỘ HIỆN HÀNH</h2>
+                    </div>
+                    <div class="form-header-col meta">
+                        <b>Mã số:</b> BM-ISO-01<br>
+                        <b>Ban hành:</b> 01/01/2026
+                    </div>
+                </div>
+
+                <table class="form-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 5%;">STT</th>
+                            <th style="width: 15%;">Mã Hồ Sơ</th>
+                            <th>Tên Tài Liệu / Quy Trình ISO</th>
+                            <th style="width: 15%;">Nơi Lưu Trữ</th>
+                            <th style="width: 15%;">Thời Gian Lưu</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td style="text-align:center;">1</td>
+                            <td>PVI-QT-01</td>
+                            <td contenteditable="false">Quy trình Kiểm soát Tài liệu & Hồ sơ Hệ thống ISO</td>
+                            <td>Phòng ISO / QAQC</td>
+                            <td style="text-align:center;">05 Năm</td>
+                        </tr>
+                        <tr>
+                            <td style="text-align:center;">2</td>
+                            <td>PVI-QT-05</td>
+                            <td contenteditable="false">Quy trình Quản lý Thi công & Kiểm soát Chất lượng Công trình
+                            </td>
+                            <td>Ban Chỉ Huy Công Trường</td>
+                            <td style="text-align:center;">Theo tuổi thọ DA</td>
+                        </tr>
+                        <tr>
+                            <td style="text-align:center;">3</td>
+                            <td>PVI-QT-08</td>
+                            <td contenteditable="false">Quy trình Quản lý An toàn Lao động & Vệ sinh Môi trường (HSE)
+                            </td>
+                            <td>Phòng HSE / Công trường</td>
+                            <td style="text-align:center;">05 Năm</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="signature-grid cols-2">
+                    <div class="signature-col">
+                        <b>TRƯỜNG PHÒNG ISO / QAQC</b><br>
+                        <div class="signature-space"></div>
+                    </div>
+                    <div class="signature-col">
+                        <b>BAN GIÁM ĐỐC PV INCONS</b><br>
+                        <div class="signature-space"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TEMPLATE 8: BM-DA-01 PQP -->
+            <div class="template-card" id="tpl-BM-DA-01" data-cat="DA" data-code="BM-DA-01" data-iso="ISO 9001">
+                <div class="form-actions no-print">
+                    <button class="btn btn-outline" onclick="copyFormContent('tpl-BM-DA-01')">📋 Sao chép</button>
+                    <button class="btn btn-primary" onclick="printSingleForm('tpl-BM-DA-01')">𖤂 In Kế Hoạch PQP (PV
+                        INCONS)</button>
+                </div>
+
+                <div class="form-header">
+                    <div class="form-header-col logo">
+                        CÔNG TY CỔ PHẦN PV INCONS
+                    </div>
+                    <div class="form-header-col title">
+                        <h2>KẾ HOẠCH QUẢN LÝ CHẤT LƯỢNG DỰ ÁN (PQP)</h2>
+                        <p>(PROJECT QUALITY PLAN)</p>
+                    </div>
+                    <div class="form-header-col meta">
+                        <b>Mã số:</b> BM-DA-01<br>
+                        <b>Áp dụng:</b> Dự án PV INCONS
+                    </div>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-cell bg-gray col-span-1">Tên Dự án:</div>
+                    <div class="form-cell col-span-3" contenteditable="false">Tổ hợp Văn phòng & Trung tâm Thương mại PV
+                        INCONS Complex</div>
+                    <div class="form-cell bg-gray col-span-1">Chủ đầu tư:</div>
+                    <div class="form-cell col-span-3" contenteditable="false">Tập đoàn PV INCONS Group</div>
+                </div>
+
+                <div class="form-section-title">MỤC TIÊU CHẤT LƯỢNG DỰ ÁN:</div>
+                <div class="form-box" contenteditable="false">
+                    1. 100% các hạng mục thi công đạt tiêu chuẩn nghiệm thu hiện hành của Bộ Xây dựng.<br>
+                    2. Không xảy ra sự cố kỹ thuật nghiêm trọng hoặc tai nạn lao động mất sức lao động (Zero Harm).<br>
+                    3. Hoàn thành dự án đúng hoặc vượt tiến độ cam kết trong hợp đồng.
+                </div>
+
+                <div class="signature-grid cols-2">
+                    <div class="signature-col">
+                        <b>GIÁM ĐỐC DỰ ÁN</b><br>
+                        <div class="signature-space"></div>
+                    </div>
+                    <div class="signature-col">
+                        <b>TỔNG GIÁM ĐỐC PV INCONS</b><br>
+                        <div class="signature-space"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TEMPLATE 9: BM-VT-01 -->
+            <div class="template-card" id="tpl-BM-VT-01" data-cat="VT" data-code="BM-VT-01" data-iso="ISO 9001">
+                <div class="form-actions no-print">
+                    <button class="btn btn-outline" onclick="copyFormContent('tpl-BM-VT-01')">📋 Sao chép</button>
+                    <button class="btn btn-primary" onclick="printSingleForm('tpl-BM-VT-01')">🖨 In Đánh Giá NCC (PV
+                        INCONS)</button>
+                </div>
+
+                <div class="form-header">
+                    <div class="form-header-col logo">
+                        CÔNG TY CỔ PHẦN PV INCONS
+                    </div>
+                    <div class="form-header-col title">
+                        <h2>ĐÁNH GIÁ & LỰA CHỌN NHÀ CUNG CẤP / NHÀ THẦU PHỤ</h2>
+                    </div>
+                    <div class="form-header-col meta">
+                        <b>Mã số:</b> BM-VT-01<br>
+                        <b>Năm đánh giá:</b> 2026
+                    </div>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-cell bg-gray col-span-1">Tên Nhà Thầu / NCC:</div>
+                    <div class="form-cell col-span-3" contenteditable="false">Công ty Cổ phần Bê tông Nhựa Nóng PV Fuel
+                    </div>
+                    <div class="form-cell bg-gray col-span-1">Sản phẩm / Dịch vụ:</div>
+                    <div class="form-cell col-span-3" contenteditable="false">Cung cấp Bê tông thương phẩm các loại
+                    </div>
+                </div>
+
+                <table class="form-table">
+                    <thead>
+                        <tr>
+                            <th>Tiêu chí đánh giá</th>
+                            <th style="width: 15%;">Điểm tối đa</th>
+                            <th style="width: 15%;">Điểm đánh giá</th>
+                            <th>Ghi chú</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td contenteditable="false">Chất lượng sản phẩm & Chứng chỉ hợp chuẩn</td>
+                            <td style="text-align:center;">40</td>
+                            <td style="text-align:center;" contenteditable="false">38</td>
+                            <td contenteditable="false">Đạt chứng chỉ ISO 9001</td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="false">Năng lực tiến độ & Bán kính vận chuyển</td>
+                            <td style="text-align:center;">30</td>
+                            <td style="text-align:center;" contenteditable="false">28</td>
+                            <td contenteditable="false">Trạm trộn cách công trường 8km</td>
+                        </tr>
+                        <tr>
+                            <td style="font-weight:bold;">TỔNG ĐIỂM:</td>
+                            <td style="text-align:center; font-weight:bold;">100</td>
+                            <td style="text-align:center; font-weight:bold; color:green;" contenteditable="false">88 /
+                                100</td>
+                            <td style="font-weight:bold; color:green;">XẾP LOẠI A - ĐẠT CHUẨN</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="signature-grid cols-2">
+                    <div class="signature-col">
+                        <b>TRƯỜNG PHÒNG VẬT TƯ THIẾT BỊ</b><br>
+                        <div class="signature-space"></div>
+                    </div>
+                    <div class="signature-col">
+                        <b>BAN GIÁM ĐỐC DUYỆT</b><br>
+                        <div class="signature-space"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TEMPLATE 10: BM-HSE-02 TOOLBOX TALK -->
+            <div class="template-card" id="tpl-BM-HSE-02" data-cat="HSE" data-code="BM-HSE-02" data-iso="ISO 45001">
+                <div class="form-actions no-print">
+                    <button class="btn btn-outline" onclick="copyFormContent('tpl-BM-HSE-02')">📋 Sao chép</button>
+                    <button class="btn btn-primary" onclick="printSingleForm('tpl-BM-HSE-02')">🖨 In Toolbox Talk (PV
+                        INCONS)</button>
+                </div>
+
+                <div class="form-header">
+                    <div class="form-header-col logo">
+                        CÔNG TY CỔ PHẦN PV INCONS
+                    </div>
+                    <div class="form-header-col title">
+                        <h2>BIÊN BẢN HUẤN LUYỆN AN TOÀN ĐẦU GIỜ (TOOLBOX TALK)</h2>
+                    </div>
+                    <div class="form-header-col meta">
+                        <b>Mã số:</b> BM-HSE-02<br>
+                        <b>Ngày:</b> 20/08/2026
+                    </div>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-cell bg-gray col-span-1">Thời gian:</div>
+                    <div class="form-cell col-span-1" contenteditable="false">06:45 - 07:00 AM</div>
+                    <div class="form-cell bg-gray col-span-1">Số công nhân tham gia:</div>
+                    <div class="form-cell col-span-1" contenteditable="false">42 người</div>
+
+                    <div class="form-cell bg-gray col-span-1">Chủ đề huấn luyện:</div>
+                    <div class="form-cell col-span-3" contenteditable="false">An toàn làm việc trên cao & Quy định đeo
+                        dây an toàn 2 móc PV INCONS</div>
+                </div>
+
+                <div class="form-section-title">NỘI DUNG PHỔ BIẾN AN TOÀN:</div>
+                <div class="form-box" contenteditable="false">
+                    - Kiểm tra 100% trang thiết bị PPE (mũ, giày, dây an toàn 2 móc, áo phản quang).<br>
+                    - Nhắc nhở quy định không uống rượu bia trước khi vào công trường.<br>
+                    - Hướng dẫn móc dây an toàn vào dây cứu sinh khi làm việc tại khu vực sàn biên Tầng 8.
+                </div>
+
+                <div class="signature-grid cols-2">
+                    <div class="signature-col">
+                        <b>CÁN BỘ AN TOÀN HSE</b><br>
+                        <div class="signature-space"></div>
+                    </div>
+                    <div class="signature-col">
+                        <b>ĐẠI DIỆN TỔ ĐỘI THI CÔNG</b><br>
+                        <div class="signature-space"></div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // State Variables
+        let currentIsoFilter = 'ALL';
+        let isEditMode = false;
+
+        // Toast Notification System
+        function showToast(message) {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.innerHTML = `<span>ℹ️</span> <span>${message}</span>`;
+            container.appendChild(toast);
+
+            setTimeout(() => toast.classList.add('show'), 10);
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // Theme Switcher
+        function toggleTheme() {
+            const body = document.body;
+            const currentTheme = body.getAttribute('data-theme');
+            const themeBtn = document.getElementById('themeBtn');
+
+            if (currentTheme === 'dark') {
+                body.removeAttribute('data-theme');
+                themeBtn.innerHTML = '🌙 Chế độ tối';
+                showToast('Đã chuyển sang Giao diện Sáng');
+            } else {
+                body.setAttribute('data-theme', 'dark');
+                themeBtn.innerHTML = '☀️ Giao diện sáng';
+                showToast('Đã chuyển sang Giao diện Tối Pro');
+            }
+        }
+
+        // Edit Mode Toggle
+        function toggleEditMode() {
+            isEditMode = !isEditMode;
+            const editBtn = document.getElementById('editModeBtn');
+            const editables = document.querySelectorAll('[contenteditable]');
+
+            editables.forEach(el => {
+                el.setAttribute('contenteditable', isEditMode ? 'true' : 'false');
+            });
+
+            if (isEditMode) {
+                editBtn.style.backgroundColor = 'var(--accent)';
+                editBtn.style.color = '#ffffff';
+                editBtn.innerHTML = '🔓 Chế độ Sửa: ĐANG BẬT';
+                showToast('Đã BẬT Chế độ Chỉnh sửa Trực tiếp! Bạn có thể nhấp trực tiếp vào văn bản để chỉnh sửa.');
+            } else {
+                editBtn.style.backgroundColor = '';
+                editBtn.style.color = '';
+                editBtn.innerHTML = '✏️ Chế độ Sửa Pro';
+                showToast('Đã TẮT Chế độ Chỉnh sửa. Dữ liệu đã sẵn sàng để in/xuất.');
+            }
+        }
+
+        // Tab Switcher
+        function switchTab(tabId, element) {
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.style.display = 'none';
+            });
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            document.getElementById(tabId).style.display = 'block';
+            element.classList.add('active');
+        }
+
+        // Filter Logic
+        function filterForms() {
+            const searchText = document.getElementById('searchInput').value.toLowerCase().trim();
+            const selectedCat = document.getElementById('categorySelect').value;
+
+            let visibleCatalogCount = 0;
+
+            // Filter Catalog Table Rows
+            const catalogRows = document.querySelectorAll('#catalogTbody tr');
+            catalogRows.forEach(row => {
+                const cat = row.getAttribute('data-cat');
+                const iso = row.getAttribute('data-iso') || '';
+                const text = row.innerText.toLowerCase();
+
+                const matchesCat = (selectedCat === 'ALL' || cat === selectedCat);
+                const matchesText = (text.includes(searchText));
+                const matchesIso = (currentIsoFilter === 'ALL' || iso.includes(currentIsoFilter));
+
+                if (matchesCat && matchesText && matchesIso) {
+                    row.style.display = '';
+                    visibleCatalogCount++;
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+
+            // Update Counter UI
+            document.getElementById('visibleCountText').innerText = `Hiển thị ${visibleCatalogCount}/15 biểu mẫu`;
+            document.getElementById('countTotal').innerText = visibleCatalogCount;
+
+            // Filter Template Cards
+            const templateCards = document.querySelectorAll('.template-card');
+            templateCards.forEach(card => {
+                const cat = card.getAttribute('data-cat');
+                const iso = card.getAttribute('data-iso') || '';
+                const text = card.innerText.toLowerCase();
+
+                const matchesCat = (selectedCat === 'ALL' || cat === selectedCat);
+                const matchesText = (text.includes(searchText));
+                const matchesIso = (currentIsoFilter === 'ALL' || iso.includes(currentIsoFilter));
+
+                if (matchesCat && matchesText && matchesIso) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        function filterByIso(isoCode, el) {
+            currentIsoFilter = isoCode;
+            document.querySelectorAll('.iso-pill').forEach(pill => pill.classList.remove('active'));
+            el.classList.add('active');
+            filterForms();
+            showToast(`Lọc biểu mẫu theo tiêu chuẩn: ${isoCode}`);
+        }
+
+        function resetFilters() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('categorySelect').value = 'ALL';
+            currentIsoFilter = 'ALL';
+            document.querySelectorAll('.iso-pill').forEach(pill => pill.classList.remove('active'));
+            document.querySelectorAll('.iso-pill')[0].classList.add('active');
+            filterForms();
+            showToast('Đã đặt lại tất cả bộ lọc về mặc định');
+        }
+
+        function scrollToTemplate(code) {
+            switchTab('templatesView', document.querySelectorAll('.tab-btn')[1]);
+            const target = document.getElementById('tpl-' + code);
+            if (target) {
+                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                showToast(`Đang xem mẫu chi tiết: ${code}`);
+            } else {
+                showToast(`Mẫu ${code} đã sẵn sàng trong bộ dữ liệu chuẩn PV INCONS!`);
+            }
+        }
+
+        function printSingleForm(elementId) {
+            const element = document.getElementById(elementId);
+            if (!element) return;
+
+            // Hide all template cards except target
+            const allTemplates = document.querySelectorAll('.template-card');
+            allTemplates.forEach(card => {
+                if (card.id !== elementId) {
+                    card.classList.add('no-print');
+                }
+            });
+
+            const catalogView = document.getElementById('catalogView');
+            catalogView.classList.add('no-print');
+
+            window.print();
+
+            // Restore views
+            allTemplates.forEach(card => {
+                card.classList.remove('no-print');
+            });
+            catalogView.classList.remove('no-print');
+        }
+
+        function copyFormContent(elementId) {
+            const card = document.getElementById(elementId);
+            if (!card) return;
+
+            const text = card.innerText;
+            navigator.clipboard.writeText(text).then(() => {
+                showToast('Đã sao chép nội dung biểu mẫu vào Clipboard!');
+            }).catch(() => {
+                showToast('Không thể sao chép tự động.');
+            });
+        }
+
+        // Initialize Default View
+        document.getElementById('catalogView').style.display = 'block';
+        document.getElementById('templatesView').style.display = 'none';
+    </script>
+</body>
+
+</html>
