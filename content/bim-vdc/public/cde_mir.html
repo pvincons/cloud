@@ -1080,23 +1080,26 @@
             applyFilters();
         }
 
-        // MỞ FILE BẰNG PHẦN MỀM CHUYÊN DỤNG TRÊN MÁY TÍNH
-        async function openWithLocalApp(itemPath) {
-            try {
-                const res = await fetch(`${DATA_SERVER_API}/api/open-local`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ path: itemPath })
-                });
-                const data = await res.json();
-                if (data.success) {
-                    showToast("📂 Đã mở tệp tin trên phần mềm máy tính thành công!");
-                } else {
-                    alert("Lỗi mở ứng dụng: " + (data.error || "Không thể khởi chạy ứng dụng"));
-                }
-            } catch (e) {
-                alert("Không thể kết nối đến CDE Server! Vui lòng kiểm tra Terminal đã khởi chạy 'node server.js' chưa.");
-            }
+        // MỞ FILE BẰNG CÁCH TẢI VỀ MÁY CỤC BỘ (TẬN DỤNG TÍNH NĂNG "LUÔN MỞ TỆP THUỘC LOẠI NÀY" CỦA TRÌNH DUYỆT)
+        function openWithLocalApp(itemPath) {
+            if (!itemPath) return;
+
+            // Mã hóa chuẩn hóa đường dẫn file với URL encoding (xử lý khoảng trắng, tiếng Việt)
+            let relFromBim = String(itemPath).replace(/^database\/bim-vdc\/?/, '');
+            let parts = relFromBim.split('/');
+            let encodedParts = parts.map(p => encodeURIComponent(p));
+            let fileUrl = `${DATA_SERVER_API}/files/${encodedParts.join('/')}`;
+            let fileName = parts[parts.length - 1] || 'file';
+
+            // Kích hoạt thẻ a tải về máy cục bộ
+            let link = document.createElement("a");
+            link.href = fileUrl;
+            link.download = fileName;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            showToast(`⚡ Đã mở tệp "${fileName}". Trình duyệt sẽ tự động kích hoạt ứng dụng cục bộ!`);
         }
 
         function countFilesInFolder(node) {
@@ -1549,7 +1552,9 @@
             let fileName = row.querySelector('.file-code').innerText;
             
             let relFromBim = filePath.replace(/^database\/bim-vdc\/?/, '');
-            let downloadUrl = `${DATA_SERVER_API}/files/${relFromBim}`;
+            let parts = relFromBim.split('/');
+            let encodedParts = parts.map(p => encodeURIComponent(p));
+            let downloadUrl = `${DATA_SERVER_API}/files/${encodedParts.join('/')}`;
 
             let link = document.createElement("a");
             link.href = downloadUrl;
