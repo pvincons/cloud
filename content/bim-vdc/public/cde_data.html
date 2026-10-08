@@ -193,6 +193,14 @@
             }
         }
 
+        // Hàm hỗ trợ tạo URL tĩnh của file trên Server với encode mã hóa chuẩn
+        function getFileUrl(relFromBim) {
+            if (!relFromBim) return '#';
+            const parts = String(relFromBim).split('/');
+            const encodedParts = parts.map(p => encodeURIComponent(p));
+            return `${DATA_SERVER_API}/files/${encodedParts.join('/')}`;
+        }
+
         async function loadCDEFiles(path = 'database/bim-vdc') {
             if (!path || path === '' || path === '/') path = 'database/bim-vdc';
             currentPath = path;
@@ -246,15 +254,20 @@
 
                 const isDir = item.type === 'folder';
                 const iconHtml = getItemIcon(item.name, isDir);
-                const fileDownloadUrl = `${DATA_SERVER_API}/files/${item.relFromBim || ''}`;
+                const fileUrl = getFileUrl(item.relFromBim);
 
                 // Chuẩn hóa chuỗi an toàn chống lỗi JS do ký tự đặc biệt/dấu nháy
                 const safePath = String(item.path || '').replace(/'/g, "\\'");
                 const safeName = String(item.name || '').replace(/'/g, "\\'");
 
+                // Xử lý sự kiện nhấp vào tên: Thư mục thì chuyển hướng, Tệp tin thì Xem trực tiếp trên tab mới
+                const clickHandler = isDir 
+                    ? `navigateTo('${safePath}')` 
+                    : `window.open('${fileUrl}', '_blank')`;
+
                 tr.innerHTML = `
                     <td class="py-2.5 px-3">
-                        <div class="flex items-center gap-2.5 ${isDir ? 'cursor-pointer' : ''}" onclick="${isDir ? `navigateTo('${safePath}')` : ''}">
+                        <div class="flex items-center gap-2.5 cursor-pointer" onclick="${clickHandler}">
                             <span class="text-base">${iconHtml}</span>
                             <span class="font-medium text-white group-hover:text-blue-400 transition-colors">${item.name}</span>
                         </div>
@@ -272,12 +285,15 @@
                                     <i class="fa-solid fa-folder-open text-[10px]"></i> Mở
                                 </button>
                             ` : `
-                                <button onclick="openWithApp('${safePath}')" title="Mở bằng ứng dụng máy tính (Revit, CAD...)" class="px-2 py-1 bg-indigo-600/30 hover:bg-indigo-600 text-indigo-300 hover:text-white rounded border border-indigo-500/30 text-[11px] transition-all flex items-center gap-1">
-                                    <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i> Mở App
-                                </button>
-                                <a href="${fileDownloadUrl}" target="_blank" title="Tải về tệp tin" class="px-2 py-1 bg-emerald-600/30 hover:bg-emerald-600 text-emerald-300 hover:text-white rounded border border-emerald-500/30 text-[11px] transition-all flex items-center gap-1">
+                                <a href="${fileUrl}" target="_blank" title="Xem trực tiếp trên trình duyệt" class="px-2 py-1 bg-blue-600/30 hover:bg-blue-600 text-blue-300 hover:text-white rounded border border-blue-500/30 text-[11px] transition-all flex items-center gap-1">
+                                    <i class="fa-solid fa-eye text-[10px]"></i> Xem
+                                </a>
+                                <a href="${fileUrl}" download title="Tải về tệp tin" class="px-2 py-1 bg-emerald-600/30 hover:bg-emerald-600 text-emerald-300 hover:text-white rounded border border-emerald-500/30 text-[11px] transition-all flex items-center gap-1">
                                     <i class="fa-solid fa-download text-[10px]"></i> Tải
                                 </a>
+                                <button onclick="openWithApp('${safePath}')" title="Mở bằng phần mềm trên máy chủ VPS Server" class="px-2 py-1 bg-indigo-600/30 hover:bg-indigo-600 text-indigo-300 hover:text-white rounded border border-indigo-500/30 text-[11px] transition-all flex items-center gap-1">
+                                    <i class="fa-solid fa-server text-[10px]"></i> App VPS
+                                </button>
                             `}
                             <button onclick="renameItem('${safePath}', '${safeName}')" title="Đổi tên" class="px-2 py-1 bg-slate-800 hover:bg-amber-600/80 text-amber-300 hover:text-white rounded border border-amber-500/30 text-[11px] transition-all">
                                 <i class="fa-solid fa-pen-to-square"></i>
@@ -398,6 +414,7 @@
         }
 
         async function openWithApp(itemPath) {
+            if (!confirm("Thao tác này sẽ kích hoạt phần mềm ứng dụng trực tiếp trên hệ thống máy chủ Viettel IDC Server. Bạn có muốn tiếp tục?")) return;
             try {
                 const res = await fetch(`${DATA_SERVER_API}/api/open-local`, {
                     method: 'POST',
@@ -406,12 +423,12 @@
                 });
                 const data = await res.json();
                 if (data.success) {
-                    alert("Đã gửi lệnh mở tệp tin. Ứng dụng chuyên dụng đang được kích hoạt trên hệ thống!");
+                    alert("Đã phát lệnh kích hoạt ứng dụng thành công trên máy chủ VPS!");
                 } else {
                     alert("Lỗi mở tệp: " + (data.error || "Không thể khởi chạy ứng dụng"));
                 }
             } catch (e) {
-                alert("Không thể kết nối đến CDE Server! Hãy kiểm tra Terminal đã chạy lệnh 'node server.js' chưa.");
+                alert("Không thể kết nối đến CDE Server!");
             }
         }
 
