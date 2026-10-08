@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trình duyệt dữ liệu CDE - PV INCONS</title>
+    <!-- AUTH GUARD ANTI-FOUC -->
+    <script src="../../../assets/js/auth-guard.js"></script>
+    <script>protectRoute('BIM_VDC');</script>
+     
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            color: #f8fafc;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #0f172a;
+        }
+
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.6);
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(59, 130, 246, 0.3);
+            border-radius: 3px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: rgba(59, 130, 246, 0.6);
+        }
+    </style>
+</head>
+
+<body class="min-h-screen p-4 md:p-8 flex flex-col justify-between">
+
+    <!-- HEADER NAVIGATION -->
+    <header class="w-full max-w-6xl mx-auto flex items-center justify-between pb-4 mb-6 border-b border-white/10">
+        <div class="flex items-center gap-3">
+            <a href="../index.html" class="w-9 h-9 rounded-xl bg-slate-800 hover:bg-slate-700 border border-white/10 text-slate-300 hover:text-white flex items-center justify-center transition-colors" title="Quay lại Dashboard">
+                <i class="fa-solid fa-arrow-left"></i>
+            </a>
+            <div>
+                <h1 class="font-bold text-white text-base tracking-wide flex items-center gap-2">
+                    Dữ liệu Tập trung CDE <span id="currentPathDisplay" class="text-xs font-mono text-blue-400 bg-blue-950/80 px-2 py-0.5 rounded border border-blue-500/30">database/bim-vdc</span>
+                </h1>
+                <p class="text-xs text-slate-400">Trình duyệt tập tin & mô hình BIM cho toàn bộ dự án</p>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-2">
+            <button onclick="createNewFolder()" title="Tạo thư mục mới" class="p-2 text-blue-300 hover:text-white bg-blue-600/30 hover:bg-blue-600 rounded-lg text-xs transition-colors border border-blue-500/30 flex items-center gap-1.5">
+                <i class="fa-solid fa-folder-plus"></i> <span class="hidden sm:inline">Thư mục mới</span>
+            </button>
+            <button id="btnPaste" onclick="pasteItem()" disabled title="Dán tệp/thư mục" class="p-2 text-slate-500 bg-slate-800/50 rounded-lg text-xs border border-white/10 flex items-center gap-1.5 cursor-not-allowed opacity-50 transition-all">
+                <i class="fa-solid fa-paste"></i> <span id="pasteBtnText" class="hidden sm:inline">Dán</span>
+            </button>
+            <label title="Upload tệp tin" class="p-2 text-emerald-300 hover:text-white bg-emerald-600/30 hover:bg-emerald-600 rounded-lg text-xs transition-colors border border-emerald-500/30 flex items-center gap-1.5 cursor-pointer">
+                <i class="fa-solid fa-cloud-arrow-up"></i> <span class="hidden sm:inline">Upload</span>
+                <input type="file" id="cdeFileInput" class="hidden" onchange="uploadSelectedFile(event)">
+            </label>
+            <button onclick="toggleServerSettings()" title="Cấu hình API URL" class="p-2 text-slate-400 hover:text-white bg-slate-800 hover:bg-slate-700 rounded-lg text-xs transition-colors border border-white/10 flex items-center gap-1.5">
+                <i class="fa-solid fa-sliders"></i> <span class="hidden sm:inline">URL</span>
+            </button>
+            <button onclick="loadCDEFiles(currentPath)" title="Tải lại" class="p-2 text-slate-400 hover:text-white bg-slate-800 hover:bg-slate-700 rounded-lg text-xs transition-colors border border-white/10">
+                <i class="fa-solid fa-arrows-rotate"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- PANEL CẤU HÌNH SERVER URL -->
+    <div id="serverConfigPanel" class="w-full max-w-6xl mx-auto hidden bg-slate-900/90 border border-white/10 p-3 px-5 mb-4 rounded-xl flex flex-wrap items-center justify-between gap-3 text-xs">
+        <div class="flex items-center gap-2 grow max-w-xl">
+            <label class="text-slate-300 font-medium shrink-0">Server API URL:</label>
+            <input type="text" id="apiServerUrlInput" value="http://localhost:3000" class="w-full px-3 py-1.5 bg-slate-800 border border-white/10 rounded text-white text-xs focus:outline-none focus:border-blue-500 font-mono">
+        </div>
+        <div class="flex items-center gap-2">
+            <button onclick="saveServerUrl()" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded font-medium transition-colors">Lưu kết nối</button>
+            <button onclick="toggleServerSettings()" class="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-slate-200 rounded font-medium transition-colors">Đóng</button>
+        </div>
+    </div>
+
+    <!-- MAIN EXPLORER CONTAINER -->
+    <main class="w-full max-w-6xl mx-auto glass-panel rounded-2xl shadow-2xl overflow-hidden grow flex flex-col border border-blue-500/30">
+        
+        <!-- BREADCRUMB & SEARCH -->
+        <div class="p-3 px-5 bg-slate-800/40 border-b border-white/10 flex flex-wrap items-center justify-between gap-3 text-xs">
+            <div id="cdeBreadcrumbs" class="flex items-center gap-1.5 overflow-x-auto text-slate-300 font-mono py-1 custom-scrollbar">
+                <button onclick="navigateTo('database/bim-vdc')" class="hover:text-blue-400 flex items-center gap-1 font-bold">
+                    <i class="fa-solid fa-database text-blue-400"></i> database/bim-vdc
+                </button>
+            </div>
+
+            <div class="relative w-full sm:w-64">
+                <input type="text" id="cdeSearchInput" onkeyup="filterCDEItems()" placeholder="Tìm kiếm file, thư mục..." class="w-full px-3 py-1.5 pr-8 bg-slate-900/80 border border-white/10 rounded-lg text-xs text-white placeholder-slate-500 focus:outline-none focus:border-blue-500">
+                <i class="fa-solid fa-magnifying-glass absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+            </div>
+        </div>
+
+        <!-- BẢNG DANH SÁCH FILE & FOLDER -->
+        <div class="grow overflow-y-auto p-5 custom-scrollbar min-h-[400px] relative">
+            <div id="cdeLoading" class="absolute inset-0 bg-slate-900/80 backdrop-blur-sm flex flex-col items-center justify-center gap-3 z-10 hidden">
+                <i class="fa-solid fa-circle-notch fa-spin text-3xl text-blue-500"></i>
+                <p class="text-xs text-slate-300 font-medium">Đang tải dữ liệu từ <code class="text-blue-400 font-mono">database/bim-vdc</code>...</p>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="border-b border-white/10 text-[11px] font-semibold uppercase text-slate-400 tracking-wider">
+                            <th class="pb-3 px-3">Tên tập tin / Thư mục</th>
+                            <th class="pb-3 px-3">Loại</th>
+                            <th class="pb-3 px-3">Đường dẫn tương đối</th>
+                            <th class="pb-3 px-3 text-right">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody id="cdeFileList" class="divide-y divide-white/5 text-xs text-slate-200">
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- LỖI KẾT NỐI -->
+            <div id="cdeErrorState" class="hidden py-16 text-center space-y-3">
+                <div class="w-12 h-12 rounded-full bg-rose-500/20 text-rose-400 flex items-center justify-center mx-auto text-xl border border-rose-500/30">
+                    <i class="fa-solid fa-plug-circle-xmark"></i>
+                </div>
+                <h4 class="text-sm font-bold text-white">Chưa kết nối tới Backend CDE Server</h4>
+                <p class="text-xs text-slate-400 max-w-md mx-auto leading-relaxed">
+                    Không thể kết nối đến <code class="text-rose-300 font-mono" id="currentApiDisplay">http://localhost:3000</code>. Vui lòng kiểm tra Node.js Backend Server đang chạy.
+                </p>
+                <div class="pt-2">
+                    <button onclick="loadCDEFiles(currentPath)" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-lg text-xs transition-colors shadow-lg">
+                        <i class="fa-solid fa-rotate-right mr-1.5"></i> Thử lại kết nối
+                    </button>
+                </div>
+            </div>
+
+            <!-- THƯ MỤC TRỐNG -->
+            <div id="cdeEmptyState" class="hidden py-16 text-center space-y-2">
+                <i class="fa-regular fa-folder-open text-4xl text-slate-600 mb-2"></i>
+                <p class="text-xs text-slate-400">Thư mục này hiện tại không có dữ liệu.</p>
+            </div>
+        </div>
+
+        <!-- FOOTER SUMMARY -->
+        <div class="p-3 px-5 border-t border-white/10 bg-slate-900/60 flex items-center justify-between text-xs text-slate-400">
+            <div id="cdeSummaryText">Đã tải 0 mục dữ liệu</div>
+            <div class="flex items-center gap-2">
+                <span class="inline-block w-2 h-2 rounded-full bg-emerald-500"></span> Trạng thái CDE: Sẵn sàng
+            </div>
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="w-full max-w-6xl mx-auto pt-4 mt-4 border-t border-white/10 flex justify-between items-center text-xs text-slate-400">
+        <div>&copy; 2026 PV INCONS Enterprise Workspace. CDE Data Engine.</div>
+        <div>BIM/VDC Standard v2.6.0</div>
+    </footer>
+
+    <!-- JAVASCRIPT XỬ LÝ -->
+    <script>
+        let DATA_SERVER_API = localStorage.getItem('cde_api_url') || 'http://localhost:3000';
+        let currentPath = 'database/bim-vdc';
+        let fetchedItems = [];
+        let clipboard = null;
+
+        document.addEventListener('DOMContentLoaded', function () {
+            document.getElementById('apiServerUrlInput').value = DATA_SERVER_API;
+            loadCDEFiles(currentPath);
+        });
+
+        function toggleServerSettings() {
+            document.getElementById('serverConfigPanel').classList.toggle('hidden');
+        }
+
+        function saveServerUrl() {
+            const newUrl = document.getElementById('apiServerUrlInput').value.trim();
+            if (newUrl) {
+                DATA_SERVER_API = newUrl.replace(/\/$/, "");
+                localStorage.setItem('cde_api_url', DATA_SERVER_API);
+                alert('Đã cập nhật URL CDE Server: ' + DATA_SERVER_API);
+                toggleServerSettings();
+                loadCDEFiles(currentPath);
+            }
+        }
+
+        async function loadCDEFiles(path = 'database/bim-vdc') {
+            if (!path || path === '' || path === '/') path = 'database/bim-vdc';
+            currentPath = path;
+
+            document.getElementById('currentPathDisplay').textContent = currentPath;
+            const loading = document.getElementById('cdeLoading');
+            const errorState = document.getElementById('cdeErrorState');
+            const emptyState = document.getElementById('cdeEmptyState');
+            const fileList = document.getElementById('cdeFileList');
+            const summaryText = document.getElementById('cdeSummaryText');
+
+            loading.classList.remove('hidden');
+            errorState.classList.add('hidden');
+            emptyState.classList.add('hidden');
+            fileList.innerHTML = '';
+
+            renderBreadcrumbs(currentPath);
+
+            try {
+                const response = await fetch(`${DATA_SERVER_API}/api/files?path=${encodeURIComponent(currentPath)}`);
+                if (!response.ok) throw new Error('Không thể đọc thư mục');
+
+                fetchedItems = await response.json();
+                loading.classList.add('hidden');
+
+                if (!fetchedItems || fetchedItems.length === 0) {
+                    emptyState.classList.remove('hidden');
+                    summaryText.innerText = 'Thư mục trống';
+                    return;
+                }
+
+                summaryText.innerText = `Đã tải ${fetchedItems.length} mục trong ${currentPath}`;
+                renderFileList(fetchedItems);
+
+            } catch (error) {
+                console.error('Lỗi kết nối CDE Server:', error);
+                loading.classList.add('hidden');
+                document.getElementById('currentApiDisplay').innerText = DATA_SERVER_API;
+                errorState.classList.remove('hidden');
+                summaryText.innerText = 'Lỗi kết nối Server';
+            }
+        }
+
+        function renderFileList(items) {
+            const fileList = document.getElementById('cdeFileList');
+            fileList.innerHTML = '';
+
+            items.forEach(item => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-800/50 transition-colors group";
+
+                const isDir = item.type === 'folder';
+                const iconHtml = getItemIcon(item.name, isDir);
+                const fileDownloadUrl = `${DATA_SERVER_API}/files/${item.relFromBim || ''}`;
+
+                // Chuẩn hóa chuỗi an toàn chống lỗi JS do ký tự đặc biệt/dấu nháy
+                const safePath = String(item.path || '').replace(/'/g, "\\'");
+                const safeName = String(item.name || '').replace(/'/g, "\\'");
+
+                tr.innerHTML = `
+                    <td class="py-2.5 px-3">
+                        <div class="flex items-center gap-2.5 ${isDir ? 'cursor-pointer' : ''}" onclick="${isDir ? `navigateTo('${safePath}')` : ''}">
+                            <span class="text-base">${iconHtml}</span>
+                            <span class="font-medium text-white group-hover:text-blue-400 transition-colors">${item.name}</span>
+                        </div>
+                    </td>
+                    <td class="py-2.5 px-3 text-slate-400 text-[11px]">
+                        <span class="font-semibold ${isDir ? 'text-amber-400' : 'text-blue-400'}">${item.loai || (isDir ? 'Folder' : 'File')}</span>
+                    </td>
+                    <td class="py-2.5 px-3 font-mono text-[11px] text-slate-400 max-w-xs truncate">
+                        ${item.path}
+                    </td>
+                    <td class="py-2.5 px-3 text-right">
+                        <div class="flex items-center justify-end gap-1">
+                            ${isDir ? `
+                                <button onclick="navigateTo('${safePath}')" class="px-2 py-1 bg-blue-600/30 hover:bg-blue-600 text-blue-300 hover:text-white rounded border border-blue-500/30 text-[11px] transition-all flex items-center gap-1">
+                                    <i class="fa-solid fa-folder-open text-[10px]"></i> Mở
+                                </button>
+                            ` : `
+                                <button onclick="openWithApp('${safePath}')" title="Mở bằng ứng dụng máy tính (Revit, CAD...)" class="px-2 py-1 bg-indigo-600/30 hover:bg-indigo-600 text-indigo-300 hover:text-white rounded border border-indigo-500/30 text-[11px] transition-all flex items-center gap-1">
+                                    <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i> Mở App
+                                </button>
+                                <a href="${fileDownloadUrl}" target="_blank" title="Tải về tệp tin" class="px-2 py-1 bg-emerald-600/30 hover:bg-emerald-600 text-emerald-300 hover:text-white rounded border border-emerald-500/30 text-[11px] transition-all flex items-center gap-1">
+                                    <i class="fa-solid fa-download text-[10px]"></i> Tải
+                                </a>
+                            `}
+                            <button onclick="renameItem('${safePath}', '${safeName}')" title="Đổi tên" class="px-2 py-1 bg-slate-800 hover:bg-amber-600/80 text-amber-300 hover:text-white rounded border border-amber-500/30 text-[11px] transition-all">
+                                <i class="fa-solid fa-pen-to-square"></i>
+                            </button>
+                            <button onclick="copyToClipboard('${safePath}', '${safeName}', 'copy')" title="Copy" class="px-2 py-1 bg-slate-800 hover:bg-cyan-600/80 text-cyan-300 hover:text-white rounded border border-cyan-500/30 text-[11px] transition-all">
+                                <i class="fa-solid fa-copy"></i>
+                            </button>
+                            <button onclick="copyToClipboard('${safePath}', '${safeName}', 'move')" title="Chuyển (Cut)" class="px-2 py-1 bg-slate-800 hover:bg-indigo-600/80 text-indigo-300 hover:text-white rounded border border-indigo-500/30 text-[11px] transition-all">
+                                <i class="fa-solid fa-scissors"></i>
+                            </button>
+                            <button onclick="deleteItem('${safePath}', '${safeName}')" title="Xóa" class="px-2 py-1 bg-slate-800 hover:bg-rose-600 text-rose-400 hover:text-white rounded border border-rose-500/30 text-[11px] transition-all">
+                                <i class="fa-solid fa-trash-can"></i>
+                            </button>
+                        </div>
+                    </td>
+                `;
+                fileList.appendChild(tr);
+            });
+        }
+
+        function getItemIcon(filename, isDirectory) {
+            if (isDirectory) return '<i class="fa-solid fa-folder text-amber-400"></i>';
+            const ext = filename.split('.').pop().toLowerCase();
+            if (['rvt', 'rfa', 'rte'].includes(ext)) return '<i class="fa-solid fa-cube text-blue-400"></i>';
+            if (['dwg', 'dxf'].includes(ext)) return '<i class="fa-solid fa-drafting-compass text-amber-400"></i>';
+            if (ext === 'pdf') return '<i class="fa-solid fa-file-pdf text-rose-400"></i>';
+            if (['doc', 'docx'].includes(ext)) return '<i class="fa-solid fa-file-word text-blue-500"></i>';
+            if (['xls', 'xlsx'].includes(ext)) return '<i class="fa-solid fa-file-excel text-emerald-500"></i>';
+            return '<i class="fa-solid fa-file text-slate-400"></i>';
+        }
+
+        function navigateTo(path) {
+            loadCDEFiles(path);
+        }
+
+        function renderBreadcrumbs(path) {
+            const breadcrumbs = document.getElementById('cdeBreadcrumbs');
+            let html = `
+                <button onclick="navigateTo('database/bim-vdc')" class="hover:text-blue-400 flex items-center gap-1 font-bold">
+                    <i class="fa-solid fa-database text-blue-400"></i> database/bim-vdc
+                </button>
+            `;
+
+            if (path && path !== 'database/bim-vdc') {
+                let relPath = path.replace(/^database\/bim-vdc\/?/, '');
+                const parts = relPath.split('/').filter(Boolean);
+                let accum = 'database/bim-vdc';
+
+                parts.forEach((part, index) => {
+                    accum += '/' + part;
+                    const target = accum.replace(/'/g, "\\'");
+                    html += ` <span class="text-slate-500">/</span> `;
+                    if (index === parts.length - 1) {
+                        html += `<span class="text-blue-400 font-semibold">${part}</span>`;
+                    } else {
+                        html += `<button onclick="navigateTo('${target}')" class="hover:text-blue-400">${part}</button>`;
+                    }
+                });
+            }
+            breadcrumbs.innerHTML = html;
+        }
+
+        function filterCDEItems() {
+            const query = document.getElementById('cdeSearchInput').value.toLowerCase().trim();
+            if (!query) {
+                renderFileList(fetchedItems);
+                return;
+            }
+            const filtered = fetchedItems.filter(item => item.name.toLowerCase().includes(query));
+            renderFileList(filtered);
+        }
+
+        function copyToClipboard(sourcePath, name, action) {
+            clipboard = { sourcePath, name, action };
+            updatePasteButtonState();
+            const actionText = action === 'copy' ? 'Sao chép' : 'Cắt (Di chuyển)';
+            alert(`Đã chọn ${actionText} "${name}". Hãy di chuyển tới thư mục đích và bấm nút "Dán"!`);
+        }
+
+        function updatePasteButtonState() {
+            const btn = document.getElementById('btnPaste');
+            const textEl = document.getElementById('pasteBtnText');
+            if (!btn) return;
+
+            if (clipboard) {
+                btn.disabled = false;
+                btn.className = "p-2 text-cyan-300 hover:text-white bg-cyan-600/40 hover:bg-cyan-600 rounded-lg text-xs transition-all border border-cyan-500/40 flex items-center gap-1.5 cursor-pointer shadow-lg animate-pulse";
+                textEl.innerText = `Dán (${clipboard.action === 'copy' ? 'Sao chép' : 'Chuyển'}: ${clipboard.name})`;
+            } else {
+                btn.disabled = true;
+                btn.className = "p-2 text-slate-500 bg-slate-800/50 rounded-lg text-xs border border-white/10 flex items-center gap-1.5 cursor-not-allowed opacity-50";
+                textEl.innerText = "Dán";
+            }
+        }
+
+        async function pasteItem() {
+            if (!clipboard) return;
+            const endpoint = clipboard.action === 'copy' ? `${DATA_SERVER_API}/api/copy` : `${DATA_SERVER_API}/api/move`;
+
+            try {
+                const res = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ sourcePath: clipboard.sourcePath, targetDir: currentPath })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    alert(`${clipboard.action === 'copy' ? 'Sao chép' : 'Di chuyển'} thành công!`);
+                    if (clipboard.action === 'move') {
+                        clipboard = null;
+                        updatePasteButtonState();
+                    }
+                    loadCDEFiles(currentPath);
+                } else alert("Lỗi: " + (data.error || "Thất bại"));
+            } catch (e) {
+                alert("Không thể kết nối đến CDE Server!");
+            }
+        }
+
+        async function openWithApp(itemPath) {
+            try {
+                const res = await fetch(`${DATA_SERVER_API}/api/open-local`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ path: itemPath })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    alert("Đã gửi lệnh mở tệp tin. Ứng dụng chuyên dụng đang được kích hoạt trên hệ thống!");
+                } else {
+                    alert("Lỗi mở tệp: " + (data.error || "Không thể khởi chạy ứng dụng"));
+                }
+            } catch (e) {
+                alert("Không thể kết nối đến CDE Server! Hãy kiểm tra Terminal đã chạy lệnh 'node server.js' chưa.");
+            }
+        }
+
+        async function createNewFolder() {
+            const folderName = prompt("Nhập tên thư mục mới cần tạo:");
+            if (!folderName) return;
+
+            try {
+                const res = await fetch(`${DATA_SERVER_API}/api/create-folder`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ parentPath: currentPath, folderName })
+                });
+                const data = await res.json();
+                if (data.success) loadCDEFiles(currentPath);
+                else alert("Lỗi: " + (data.error || "Không thể tạo thư mục"));
+            } catch (e) {
+                alert("Không thể kết nối đến CDE Server!");
+            }
+        }
+
+        async function uploadSelectedFile(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('targetPath', currentPath);
+
+            try {
+                const res = await fetch(`${DATA_SERVER_API}/api/upload`, {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await res.json();
+                if (data.success) {
+                    alert("Upload file thành công!");
+                    event.target.value = '';
+                    loadCDEFiles(currentPath);
+                } else alert("Lỗi upload: " + (data.error || "Thất bại"));
+            } catch (e) {
+                alert("Không thể kết nối đến CDE Server!");
+            }
+        }
+
+        async function renameItem(itemPath, currentName) {
+            const newName = prompt("Nhập tên mới:", currentName);
+            if (!newName || newName === currentName) return;
+
+            try {
+                const res = await fetch(`${DATA_SERVER_API}/api/rename`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ path: itemPath, newName })
+                });
+                const data = await res.json();
+                if (data.success) loadCDEFiles(currentPath);
+                else alert("Lỗi: " + (data.error || "Không thể đổi tên"));
+            } catch (e) {
+                alert("Không thể kết nối đến CDE Server!");
+            }
+        }
+
+        async function deleteItem(itemPath, itemName) {
+            if (!confirm(`Bạn có chắc chắn muốn xóa "${itemName}" không?`)) return;
+
+            try {
+                const res = await fetch(`${DATA_SERVER_API}/api/delete`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ path: itemPath })
+                });
+                const data = await res.json();
+                if (data.success) loadCDEFiles(currentPath);
+                else alert("Lỗi: " + (data.error || "Không thể xóa"));
+            } catch (e) {
+                alert("Không thể kết nối đến CDE Server!");
+            }
+        }
+    </script>
+</body>
+
+</html>
