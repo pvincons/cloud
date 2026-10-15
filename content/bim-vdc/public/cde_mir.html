@@ -458,10 +458,6 @@
             transform: translateY(-1px);
         }
 
-        .btn-open-file:active {
-            transform: translateY(0);
-        }
-
         .dropdown { position: relative; display: inline-block; }
 
         .dropdown-content {
@@ -619,7 +615,6 @@
             <div class="brand-logo">
                 <span>💻</span> Database CDE Explorer
             </div>
-            <!-- BỔ SUNG LẠI TÙY CHỌN ALL PROJECTS BÊN TRONG DROPDOWN -->
             <select id="projectSelect" class="project-select-box" onchange="onProjectSelectChange()">
             </select>
 
@@ -760,7 +755,6 @@
     <div class="toast-container" id="toastContainer"></div>
 
     <!-- MODALS -->
-    <!-- MODAL ĐỔI TÊN CHUẨN ISO 19650-2 -->
     <div class="modal" id="isoRenameModal">
         <div class="modal-content" style="width: 640px;">
             <div class="modal-header">
@@ -944,7 +938,7 @@
         </div>
     </div>
 
-    <!-- JAVASCRIPT XỬ LÝ ĐỘNG THỰC TẾ -->
+    <!-- JAVASCRIPT XỬ LÝ -->
     <script>
         let DATA_SERVER_API = localStorage.getItem('cde_api_url') || 'http://localhost:3000';
         let currentDiscipline = "ALL";
@@ -972,14 +966,12 @@
             setTimeout(() => toast.remove(), 3000);
         }
 
-        // TẢI DỮ LIỆU THỰC TỪ SERVER CDE (database/bim-vdc)
         async function reloadDatabaseData() {
             try {
                 const res = await fetch(`${DATA_SERVER_API}/api/cde-files`);
                 if (!res.ok) throw new Error("Không kết nối được server");
 
                 const flatItems = await res.json();
-                
                 virtualTreeData = buildTreeFromFlatList(flatItems);
                 
                 document.getElementById('tableBody').innerHTML = '';
@@ -1045,13 +1037,11 @@
             return root;
         }
 
-        // BỔ SUNG LẠI TÙY CHỌN ALL PROJECTS
         function populateProjectOptions() {
             const select = document.getElementById('projectSelect');
             let currentVal = select.value;
             select.innerHTML = '';
 
-            // Tùy chọn Tất cả Dự án
             let allOpt = document.createElement('option');
             allOpt.value = 'ALL';
             allOpt.innerText = '🏢 Tất cả Dự án (All Projects)';
@@ -1076,22 +1066,19 @@
         }
 
         function onProjectSelectChange() {
-            selectedFolderPathFilter = ""; // Xóa bộ lọc thư mục con cũ khi chuyển đổi dự án
+            selectedFolderPathFilter = "";
             applyFilters();
         }
 
-        // MỞ FILE BẰNG CÁCH TẢI VỀ MÁY CỤC BỘ (TẬN DỤNG TÍNH NĂNG "LUÔN MỞ TỆP THUỘC LOẠI NÀY" CỦA TRÌNH DUYỆT)
         function openWithLocalApp(itemPath) {
             if (!itemPath) return;
 
-            // Mã hóa chuẩn hóa đường dẫn file với URL encoding (xử lý khoảng trắng, tiếng Việt)
             let relFromBim = String(itemPath).replace(/^database\/bim-vdc\/?/, '');
             let parts = relFromBim.split('/');
             let encodedParts = parts.map(p => encodeURIComponent(p));
             let fileUrl = `${DATA_SERVER_API}/files/${encodedParts.join('/')}`;
             let fileName = parts[parts.length - 1] || 'file';
 
-            // Kích hoạt thẻ a tải về máy cục bộ
             let link = document.createElement("a");
             link.href = fileUrl;
             link.download = fileName;
@@ -1213,7 +1200,6 @@
             applyFilters();
         }
 
-        // BỎ THƯ MỤC CHA database/bim-vdc VÀ LỌC CÂY THƯ MỤC THEO DỰ ÁN ĐƯỢC CHỌN
         function renderTreeUI() {
             const container = document.getElementById('dynamicTreeContainer');
             container.innerHTML = '';
@@ -1224,7 +1210,6 @@
 
             let prjVal = document.getElementById('projectSelect') ? document.getElementById('projectSelect').value : "ALL";
 
-            // Lọc các nút thư mục cấp cao nhất theo Dự án được chọn
             let nodesToRender = virtualTreeData.children;
             if (prjVal && prjVal !== "ALL") {
                 nodesToRender = virtualTreeData.children.filter(child => child.name === prjVal);
@@ -1240,7 +1225,6 @@
             ul.style.paddingLeft = '0';
             ul.style.borderLeft = 'none';
 
-            // Render trực tiếp các thư mục dự án mà không bọc thư mục cha database/bim-vdc
             nodesToRender.forEach(childNode => {
                 ul.appendChild(createTreeNodeElement(childNode));
             });
@@ -1744,133 +1728,119 @@
                     }
                 }
             }
-            if (virtualTreeData.children) {
-                virtualTreeData.children.forEach(child => addFolders(child, 0));
+            if (virtualTreeData) {
+                addFolders(virtualTreeData);
             }
         }
 
         async function executeUploadFiles() {
-            const input = document.getElementById('fileUploadInput');
-            const targetPath = document.getElementById('uploadTargetFolderSelect').value;
-            const files = input.files;
-
-            if (!files || files.length === 0) {
-                alert("Vui lòng chọn ít nhất một tệp tin!");
+            const fileInput = document.getElementById('fileUploadInput');
+            const targetFolder = document.getElementById('uploadTargetFolderSelect').value;
+            if (!fileInput.files || fileInput.files.length === 0) {
+                alert("Vui lòng chọn tệp tin cần upload!");
                 return;
             }
 
-            for (let i = 0; i < files.length; i++) {
+            for (let i = 0; i < fileInput.files.length; i++) {
+                let file = fileInput.files[i];
                 let formData = new FormData();
-                formData.append('file', files[i]);
-                formData.append('targetPath', targetPath);
+                formData.append('file', file);
+                formData.append('targetPath', targetFolder);
 
                 try {
-                    await fetch(`${DATA_SERVER_API}/api/upload`, {
+                    const res = await fetch(`${DATA_SERVER_API}/api/upload`, {
                         method: 'POST',
                         body: formData
                     });
+                    const data = await res.json();
+                    if (!data.success) {
+                        alert(`Lỗi upload file ${file.name}: ${data.error || 'Thất bại'}`);
+                    }
                 } catch (e) {
-                    console.error("Lỗi upload:", e);
+                    alert(`Không thể kết nối đến CDE Server khi upload file ${file.name}!`);
                 }
             }
 
-            reloadDatabaseData();
-            showToast(`Đã tải lên ${files.length} tệp thành công!`);
+            showToast("Đã hoàn tất quá trình upload file!");
             closeModal('uploadModal');
-            input.value = '';
-        }
-
-        function resetFilters() {
-            const select = document.getElementById('projectSelect');
-            select.value = "ALL";
-            document.getElementById('stateFilter').value = "ALL";
-            document.getElementById('suitFilter').value = "ALL";
-            document.getElementById('searchInput').value = "";
-            selectedFolderPathFilter = "";
-            applyFilters();
+            reloadDatabaseData();
         }
 
         function applyFilters() {
-            let prjVal = document.getElementById("projectSelect").value;
-            let stateVal = document.getElementById("stateFilter").value;
-            let suitVal = document.getElementById("suitFilter").value;
-            let searchVal = document.getElementById("searchInput").value.toUpperCase();
+            const query = document.getElementById('searchInput').value.toLowerCase().trim();
+            const stateVal = document.getElementById('stateFilter').value;
+            const suitVal = document.getElementById('suitFilter').value;
+            const prjVal = document.getElementById('projectSelect').value;
 
-            // Cập nhật lại Cây thư mục tương ứng với Filter Dự án được chọn
-            renderTreeUI();
+            const tbody = document.getElementById('tableBody');
+            const rows = tbody.querySelectorAll('tr');
 
-            let rows = document.querySelectorAll("#cdeMasterTable tbody tr");
-
-            rows.forEach(row => {
-                let rPrj = row.getAttribute("data-project");
-                let rState = row.getAttribute("data-state");
-                let rSuit = row.getAttribute("data-suitability");
-                let rPath = row.getAttribute("data-path");
-                let rText = row.innerText.toUpperCase();
-
-                let matchPrj = (prjVal === "ALL" || !prjVal || rPrj === prjVal);
-                let matchState = (stateVal === "ALL" || rState === stateVal);
-                let matchSuit = (suitVal === "ALL" || rSuit === suitVal);
-                let matchPath = (selectedFolderPathFilter === "" || rPath.includes(selectedFolderPathFilter));
-                let matchSearch = (searchVal === "" || rText.indexOf(searchVal) > -1);
-
-                row.style.display = (matchPrj && matchState && matchSuit && matchPath && matchSearch) ? "" : "none";
-            });
-
-            updateCounts();
-        }
-
-        function updateCounts() {
-            let prjVal = document.getElementById("projectSelect").value;
-            let rows = document.querySelectorAll("#cdeMasterTable tbody tr");
-
-            let wip = 0, shared = 0, pub = 0, arc = 0;
+            let wipCount = 0;
+            let sharedCount = 0;
+            let pubCount = 0;
+            let arcCount = 0;
 
             rows.forEach(row => {
-                let rPrj = row.getAttribute("data-project");
-                let rState = row.getAttribute("data-state");
+                let prj = row.getAttribute('data-project');
+                let state = row.getAttribute('data-state');
+                let suit = row.getAttribute('data-suitability');
+                let path = row.getAttribute('data-path') || '';
+                let text = row.innerText.toLowerCase();
 
-                if (prjVal === "ALL" || !prjVal || rPrj === prjVal) {
-                    if (rState === "01_WIP") wip++;
-                    if (rState === "02_SHARED") shared++;
-                    if (rState === "03_PUBLISHED") pub++;
-                    if (rState === "04_ARCHIVE") arc++;
+                let matchPrj = (prjVal === 'ALL' || prj === prjVal);
+                let matchState = (stateVal === 'ALL' || state === stateVal);
+                let matchSuit = (suitVal === 'ALL' || suit === suitVal);
+                let matchFolder = (!selectedFolderPathFilter || path.startsWith(selectedFolderPathFilter));
+                let matchQuery = (!query || text.includes(query));
+
+                if (matchPrj && matchState && matchSuit && matchFolder && matchQuery) {
+                    row.style.display = '';
+                    if (state === '01_WIP') wipCount++;
+                    else if (state === '02_SHARED') sharedCount++;
+                    else if (state === '03_PUBLISHED') pubCount++;
+                    else if (state === '04_ARCHIVE') arcCount++;
+                } else {
+                    row.style.display = 'none';
                 }
             });
 
-            document.getElementById("card-wip").innerText = wip + " Files";
-            document.getElementById("card-shared").innerText = shared + " Files";
-            document.getElementById("card-pub").innerText = pub + " Files";
-            document.getElementById("card-arc").innerText = arc + " Files";
+            document.getElementById('card-wip').innerText = wipCount + ' Files';
+            document.getElementById('card-shared').innerText = sharedCount + ' Files';
+            document.getElementById('card-pub').innerText = pubCount + ' Files';
+            document.getElementById('card-arc').innerText = arcCount + ' Files';
+        }
+
+        function resetFilters() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('stateFilter').value = 'ALL';
+            document.getElementById('suitFilter').value = 'ALL';
+            document.getElementById('projectSelect').value = 'ALL';
+            selectedFolderPathFilter = '';
+            renderTreeUI();
+            applyFilters();
         }
 
         function exportCSV() {
             let csv = [];
-            let rows = document.querySelectorAll("#cdeMasterTable tr");
-            for (let i = 0; i < rows.length; i++) {
-                if (rows[i].style.display !== "none") {
-                    let row = [], cols = rows[i].querySelectorAll("td, th");
-                    for (let j = 0; j < cols.length - 1; j++) {
-                        row.push('"' + cols[j].innerText.replace(/"/g, '""') + '"');
-                    }
-                    csv.push(row.join(","));
-                }
-            }
-            let csvFile = new Blob(["\uFEFF" + csv.join("\n")], { type: "text/csv;charset=utf-8;" });
-            let downloadLink = document.createElement("a");
-            downloadLink.download = "Database_CDE_Master_Index.csv";
-            downloadLink.href = window.URL.createObjectURL(csvFile);
-            downloadLink.style.display = "none";
-            document.body.appendChild(downloadLink);
-            downloadLink.click();
-            showToast("Đã xuất danh mục Master Index ra tệp CSV!");
+            let rows = document.querySelectorAll('#cdeMasterTable tr');
+            rows.forEach(row => {
+                if (row.style.display === 'none') return;
+                let cols = row.querySelectorAll('td, th');
+                let data = [];
+                cols.forEach(col => data.push('"' + col.innerText.replace(/"/g, '""') + '"'));
+                csv.push(data.join(','));
+            });
+
+            let blob = new Blob(["\uFEFF" + csv.join('\n')], { type: 'text/csv;charset=utf-8;' });
+            let link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'CDE_Master_Information_Register.csv';
+            link.click();
+            showToast("Đã xuất file CSV thành công!");
         }
 
-        // KHI KHỞI TẠO TRANG: TẢI DỮ LIỆU TỪ BACKEND
-        window.onload = function () {
-            reloadDatabaseData();
-
-            const savedTheme = localStorage.getItem('cde_theme') || 'dark';
+        document.addEventListener('DOMContentLoaded', () => {
+            let savedTheme = localStorage.getItem('cde_theme') || 'dark';
             document.documentElement.setAttribute('data-theme', savedTheme);
             updateThemeUI(savedTheme);
 
@@ -1878,43 +1848,19 @@
             const fileInput = document.getElementById('fileUploadInput');
 
             dropZone.onclick = () => fileInput.click();
-
-            dropZone.addEventListener('dragover', (e) => {
-                e.preventDefault();
-                dropZone.style.borderColor = 'var(--published-color)';
-            });
-
-            dropZone.addEventListener('dragleave', () => {
-                dropZone.style.borderColor = 'var(--primary)';
-            });
-
-            dropZone.addEventListener('drop', (e) => {
+            dropZone.ondragover = (e) => { e.preventDefault(); dropZone.style.borderColor = 'var(--primary-dark)'; };
+            dropZone.ondragleave = () => { dropZone.style.borderColor = 'var(--primary)'; };
+            dropZone.ondrop = (e) => {
                 e.preventDefault();
                 dropZone.style.borderColor = 'var(--primary)';
-                if (e.dataTransfer.files.length > 0) {
+                if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
                     fileInput.files = e.dataTransfer.files;
-                    dropZone.querySelector('p').innerText = `Đã chọn ${e.dataTransfer.files.length} file sẵn sàng tải lên`;
-                }
-            });
-
-            fileInput.onchange = () => {
-                if (fileInput.files.length > 0) {
-                    dropZone.querySelector('p').innerText = `Đã chọn ${fileInput.files.length} file sẵn sàng tải lên`;
+                    showToast(`Đã chọn ${e.dataTransfer.files.length} tệp để upload.`);
                 }
             };
 
-            window.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape') {
-                    document.querySelectorAll('.modal.active').forEach(m => m.classList.remove('active'));
-                }
-            });
-
-            document.querySelectorAll('.modal').forEach(modal => {
-                modal.addEventListener('click', (e) => {
-                    if (e.target === modal) modal.classList.remove('active');
-                });
-            });
-        };
+            reloadDatabaseData();
+        });
     </script>
 </body>
 </html>

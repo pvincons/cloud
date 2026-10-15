@@ -168,8 +168,7 @@
 
     <!-- JAVASCRIPT XỬ LÝ -->
     <script>
-        let DATA_SERVER_API = localStorage.getItem('cde_api_url') || 'https://api.pvincons.cloud';
-        // let DATA_SERVER_API = localStorage.getItem('cde_api_url') || 'http://localhost:3000';
+        let DATA_SERVER_API = localStorage.getItem('cde_api_url') || 'http://localhost:3000';
         let currentPath = 'database/bim-vdc';
         let fetchedItems = [];
         let clipboard = null;
@@ -194,7 +193,6 @@
             }
         }
 
-        // Hàm hỗ trợ tạo URL tĩnh của file trên Server với encode mã hóa chuẩn
         function getFileUrl(relFromBim) {
             if (!relFromBim) return '#';
             const parts = String(relFromBim).split('/');
@@ -257,11 +255,9 @@
                 const iconHtml = getItemIcon(item.name, isDir);
                 const fileUrl = getFileUrl(item.relFromBim);
 
-                // Chuẩn hóa chuỗi an toàn chống lỗi JS do ký tự đặc biệt/dấu nháy
                 const safePath = String(item.path || '').replace(/'/g, "\\'");
                 const safeName = String(item.name || '').replace(/'/g, "\\'");
 
-                // Xử lý sự kiện nhấp vào tên: Thư mục thì chuyển hướng, Tệp tin thì Xem trực tiếp trên tab mới
                 const clickHandler = isDir 
                     ? `navigateTo('${safePath}')` 
                     : `window.open('${fileUrl}', '_blank')`;
