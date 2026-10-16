@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="vi" data-theme="dark">
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Trình duyệt dữ liệu CDE - PV INCONS</title>
     <!-- AUTH GUARD ANTI-FOUC -->
     <script src="../../../assets/js/auth-guard.js"></script>
@@ -12,16 +12,37 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        :root[data-theme="dark"] {
+            --bg-main: #0f172a;
+            --bg-card: rgba(15, 23, 42, 0.85);
+            --border-color: rgba(255, 255, 255, 0.1);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --header-bg: #0b1329;
+            --table-hover: rgba(51, 65, 85, 0.4);
+        }
+
+        :root[data-theme="light"] {
+            --bg-main: #f8fafc;
+            --bg-card: rgba(255, 255, 255, 0.95);
+            --border-color: rgba(0, 0, 0, 0.1);
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --header-bg: #ffffff;
+            --table-hover: rgba(226, 232, 240, 0.6);
+        }
+
         body {
-            color: #f8fafc;
+            color: var(--text-main);
             font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background-color: #0f172a;
+            background-color: var(--bg-main);
+            transition: background-color 0.2s ease, color 0.2s ease;
         }
 
         .glass-panel {
-            background: rgba(15, 23, 42, 0.85);
+            background: var(--bg-card);
             backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--border-color);
         }
 
         .custom-scrollbar::-webkit-scrollbar {
@@ -29,59 +50,78 @@
             height: 6px;
         }
         .custom-scrollbar::-webkit-scrollbar-track {
-            background: rgba(15, 23, 42, 0.6);
+            background: var(--border-color);
         }
         .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: rgba(59, 130, 246, 0.3);
+            background: rgba(59, 130, 246, 0.4);
             border-radius: 3px;
         }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-            background: rgba(59, 130, 246, 0.6);
+            background: rgba(59, 130, 246, 0.7);
         }
     </style>
+    <script>
+        // Khởi tạo theme chống nháy (Anti-FOUC)
+        (function() {
+            const savedTheme = localStorage.getItem('cde_data_theme') || 'dark';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+        })();
+    </script>
 </head>
 
-<body class="min-h-screen p-4 md:p-8 flex flex-col justify-between">
+<body class="min-h-screen p-3 sm:p-4 md:p-8 flex flex-col justify-between">
 
     <!-- HEADER NAVIGATION -->
-    <header class="w-full max-w-6xl mx-auto flex items-center justify-between pb-4 mb-6 border-b border-white/10">
-        <div class="flex items-center gap-3">
-            <a href="../index.html" class="w-9 h-9 rounded-xl bg-slate-800 hover:bg-slate-700 border border-white/10 text-slate-300 hover:text-white flex items-center justify-center transition-colors" title="Quay lại Dashboard">
-                <i class="fa-solid fa-arrow-left"></i>
-            </a>
-            <div>
-                <h1 class="font-bold text-white text-base tracking-wide flex items-center gap-2">
-                    Dữ liệu Tập trung CDE <span id="currentPathDisplay" class="text-xs font-mono text-blue-400 bg-blue-950/80 px-2 py-0.5 rounded border border-blue-500/30">database/bim-vdc</span>
-                </h1>
-                <p class="text-xs text-slate-400">Trình duyệt tập tin & mô hình BIM cho toàn bộ dự án</p>
+    <header class="w-full max-w-6xl mx-auto flex flex-col sm:flex-row items-start sm:items-center justify-between pb-4 mb-6 border-b border-[var(--border-color)] gap-4">
+        <div class="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-start">
+            <div class="flex items-center gap-3">
+                <a href="../index.html" class="w-9 h-9 rounded-xl bg-slate-800 hover:bg-slate-700 border border-[var(--border-color)] text-slate-300 hover:text-white flex items-center justify-center transition-colors shrink-0" title="Quay lại Dashboard">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </a>
+                <div>
+                    <h1 class="font-bold text-sm sm:text-base tracking-wide flex flex-wrap items-center gap-2">
+                        <span>Dữ liệu CDE Pro</span> 
+                        <span id="currentPathDisplay" class="text-[11px] font-mono text-blue-400 bg-blue-950/80 px-2 py-0.5 rounded border border-blue-500/30 break-all">database/bim-vdc</span>
+                    </h1>
+                    <p class="text-xs text-[var(--text-muted)]">Trình duyệt tập tin & mô hình BIM chuẩn ISO 19650</p>
+                </div>
             </div>
+
+            <!-- Nút đổi theme trên mobile nằm ngay trên header cho tiện -->
+            <button onclick="toggleTheme()" class="sm:hidden p-2 rounded-lg bg-slate-800/50 border border-[var(--border-color)] text-slate-300 hover:text-white text-xs shrink-0" id="mobileThemeBtn" title="Chuyển chế độ Sáng/Tối">
+                <i class="fa-solid fa-sun text-amber-400" id="mobileThemeIcon"></i>
+            </button>
         </div>
 
-        <div class="flex items-center gap-2">
+        <div class="flex items-center gap-1.5 sm:gap-2 flex-wrap w-full sm:w-auto justify-end">
             <button onclick="createNewFolder()" title="Tạo thư mục mới" class="p-2 text-blue-300 hover:text-white bg-blue-600/30 hover:bg-blue-600 rounded-lg text-xs transition-colors border border-blue-500/30 flex items-center gap-1.5">
-                <i class="fa-solid fa-folder-plus"></i> <span class="hidden sm:inline">Thư mục mới</span>
+                <i class="fa-solid fa-folder-plus"></i> <span class="hidden md:inline">Thư mục mới</span>
             </button>
-            <button id="btnPaste" onclick="pasteItem()" disabled title="Dán tệp/thư mục" class="p-2 text-slate-500 bg-slate-800/50 rounded-lg text-xs border border-white/10 flex items-center gap-1.5 cursor-not-allowed opacity-50 transition-all">
-                <i class="fa-solid fa-paste"></i> <span id="pasteBtnText" class="hidden sm:inline">Dán</span>
+            <button id="btnPaste" onclick="pasteItem()" disabled title="Dán tệp/thư mục" class="p-2 text-slate-500 bg-slate-800/50 rounded-lg text-xs border border-[var(--border-color)] flex items-center gap-1.5 cursor-not-allowed opacity-50 transition-all">
+                <i class="fa-solid fa-paste"></i> <span id="pasteBtnText" class="hidden md:inline">Dán</span>
             </button>
             <label title="Upload tệp tin" class="p-2 text-emerald-300 hover:text-white bg-emerald-600/30 hover:bg-emerald-600 rounded-lg text-xs transition-colors border border-emerald-500/30 flex items-center gap-1.5 cursor-pointer">
-                <i class="fa-solid fa-cloud-arrow-up"></i> <span class="hidden sm:inline">Upload</span>
+                <i class="fa-solid fa-cloud-arrow-up"></i> <span class="hidden md:inline">Upload</span>
                 <input type="file" id="cdeFileInput" class="hidden" onchange="uploadSelectedFile(event)">
             </label>
-            <button onclick="toggleServerSettings()" title="Cấu hình API URL" class="p-2 text-slate-400 hover:text-white bg-slate-800 hover:bg-slate-700 rounded-lg text-xs transition-colors border border-white/10 flex items-center gap-1.5">
-                <i class="fa-solid fa-sliders"></i> <span class="hidden sm:inline">URL</span>
+            <button onclick="toggleServerSettings()" title="Cấu hình API URL" class="p-2 text-slate-400 hover:text-white bg-slate-800 hover:bg-slate-700 rounded-lg text-xs transition-colors border border-[var(--border-color)] flex items-center gap-1.5">
+                <i class="fa-solid fa-sliders"></i> <span class="hidden md:inline">URL</span>
             </button>
-            <button onclick="loadCDEFiles(currentPath)" title="Tải lại" class="p-2 text-slate-400 hover:text-white bg-slate-800 hover:bg-slate-700 rounded-lg text-xs transition-colors border border-white/10">
+            <button onclick="loadCDEFiles(currentPath)" title="Tải lại" class="p-2 text-slate-400 hover:text-white bg-slate-800 hover:bg-slate-700 rounded-lg text-xs transition-colors border border-[var(--border-color)]">
                 <i class="fa-solid fa-arrows-rotate"></i>
+            </button>
+            <!-- Nút đổi theme desktop -->
+            <button onclick="toggleTheme()" class="hidden sm:flex items-center gap-1.5 px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 border border-[var(--border-color)] text-slate-300 hover:text-white text-xs transition-colors" title="Chuyển chế độ Sáng/Tối">
+                <i class="fa-solid fa-sun text-amber-400" id="desktopThemeIcon"></i> <span id="desktopThemeText" class="hidden lg:inline">Light Mode</span>
             </button>
         </div>
     </header>
 
     <!-- PANEL CẤU HÌNH SERVER URL -->
-    <div id="serverConfigPanel" class="w-full max-w-6xl mx-auto hidden bg-slate-900/90 border border-white/10 p-3 px-5 mb-4 rounded-xl flex flex-wrap items-center justify-between gap-3 text-xs">
+    <div id="serverConfigPanel" class="w-full max-w-6xl mx-auto hidden bg-slate-900/90 border border-[var(--border-color)] p-3 px-5 mb-4 rounded-xl flex flex-wrap items-center justify-between gap-3 text-xs shadow-xl">
         <div class="flex items-center gap-2 grow max-w-xl">
             <label class="text-slate-300 font-medium shrink-0">Server API URL:</label>
-            <input type="text" id="apiServerUrlInput" value="http://localhost:3000" class="w-full px-3 py-1.5 bg-slate-800 border border-white/10 rounded text-white text-xs focus:outline-none focus:border-blue-500 font-mono">
+            <input type="text" id="apiServerUrlInput" value="https://api.pvincons.cloud" class="w-full px-3 py-1.5 bg-slate-800 border border-[var(--border-color)] rounded text-white text-xs focus:outline-none focus:border-blue-500 font-mono">
         </div>
         <div class="flex items-center gap-2">
             <button onclick="saveServerUrl()" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded font-medium transition-colors">Lưu kết nối</button>
@@ -93,21 +133,21 @@
     <main class="w-full max-w-6xl mx-auto glass-panel rounded-2xl shadow-2xl overflow-hidden grow flex flex-col border border-blue-500/30">
         
         <!-- BREADCRUMB & SEARCH -->
-        <div class="p-3 px-5 bg-slate-800/40 border-b border-white/10 flex flex-wrap items-center justify-between gap-3 text-xs">
+        <div class="p-3 px-4 sm:px-5 bg-slate-800/40 border-b border-[var(--border-color)] flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 text-xs">
             <div id="cdeBreadcrumbs" class="flex items-center gap-1.5 overflow-x-auto text-slate-300 font-mono py-1 custom-scrollbar">
-                <button onclick="navigateTo('database/bim-vdc')" class="hover:text-blue-400 flex items-center gap-1 font-bold">
+                <button onclick="navigateTo('database/bim-vdc')" class="hover:text-blue-400 flex items-center gap-1 font-bold shrink-0">
                     <i class="fa-solid fa-database text-blue-400"></i> database/bim-vdc
                 </button>
             </div>
 
-            <div class="relative w-full sm:w-64">
-                <input type="text" id="cdeSearchInput" onkeyup="filterCDEItems()" placeholder="Tìm kiếm file, thư mục..." class="w-full px-3 py-1.5 pr-8 bg-slate-900/80 border border-white/10 rounded-lg text-xs text-white placeholder-slate-500 focus:outline-none focus:border-blue-500">
+            <div class="relative w-full sm:w-64 shrink-0">
+                <input type="text" id="cdeSearchInput" onkeyup="filterCDEItems()" placeholder="Tìm kiếm file, thư mục..." class="w-full px-3 py-1.5 pr-8 bg-slate-900/80 border border-[var(--border-color)] rounded-lg text-xs text-white placeholder-slate-400 focus:outline-none focus:border-blue-500">
                 <i class="fa-solid fa-magnifying-glass absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
             </div>
         </div>
 
         <!-- BẢNG DANH SÁCH FILE & FOLDER -->
-        <div class="grow overflow-y-auto p-5 custom-scrollbar min-h-[400px] relative">
+        <div class="grow overflow-y-auto p-3 sm:p-5 custom-scrollbar min-h-[400px] relative">
             <div id="cdeLoading" class="absolute inset-0 bg-slate-900/80 backdrop-blur-sm flex flex-col items-center justify-center gap-3 z-10 hidden">
                 <i class="fa-solid fa-circle-notch fa-spin text-3xl text-blue-500"></i>
                 <p class="text-xs text-slate-300 font-medium">Đang tải dữ liệu từ <code class="text-blue-400 font-mono">database/bim-vdc</code>...</p>
@@ -116,14 +156,14 @@
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse">
                     <thead>
-                        <tr class="border-b border-white/10 text-[11px] font-semibold uppercase text-slate-400 tracking-wider">
+                        <tr class="border-b border-[var(--border-color)] text-[11px] font-semibold uppercase text-[var(--text-muted)] tracking-wider">
                             <th class="pb-3 px-3">Tên tập tin / Thư mục</th>
                             <th class="pb-3 px-3">Loại</th>
-                            <th class="pb-3 px-3">Đường dẫn tương đối</th>
+                            <th class="pb-3 px-3 hidden md:table-cell">Đường dẫn tương đối</th>
                             <th class="pb-3 px-3 text-right">Thao tác</th>
                         </tr>
                     </thead>
-                    <tbody id="cdeFileList" class="divide-y divide-white/5 text-xs text-slate-200">
+                    <tbody id="cdeFileList" class="divide-y divide-white/5 text-xs">
                     </tbody>
                 </table>
             </div>
@@ -134,8 +174,8 @@
                     <i class="fa-solid fa-plug-circle-xmark"></i>
                 </div>
                 <h4 class="text-sm font-bold text-white">Chưa kết nối tới Backend CDE Server</h4>
-                <p class="text-xs text-slate-400 max-w-md mx-auto leading-relaxed">
-                    Không thể kết nối đến <code class="text-rose-300 font-mono" id="currentApiDisplay">http://localhost:3000</code>. Vui lòng kiểm tra Node.js Backend Server đang chạy.
+                <p class="text-xs text-[var(--text-muted)] max-w-md mx-auto leading-relaxed">
+                    Không thể kết nối đến <code class="text-rose-300 font-mono" id="currentApiDisplay">https://api.pvincons.cloud</code>. Vui lòng kiểm tra server.
                 </p>
                 <div class="pt-2">
                     <button onclick="loadCDEFiles(currentPath)" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-lg text-xs transition-colors shadow-lg">
@@ -146,13 +186,13 @@
 
             <!-- THƯ MỤC TRỐNG -->
             <div id="cdeEmptyState" class="hidden py-16 text-center space-y-2">
-                <i class="fa-regular fa-folder-open text-4xl text-slate-600 mb-2"></i>
-                <p class="text-xs text-slate-400">Thư mục này hiện tại không có dữ liệu.</p>
+                <i class="fa-regular fa-folder-open text-4xl text-slate-500 mb-2"></i>
+                <p class="text-xs text-[var(--text-muted)]">Thư mục này hiện tại không có dữ liệu.</p>
             </div>
         </div>
 
         <!-- FOOTER SUMMARY -->
-        <div class="p-3 px-5 border-t border-white/10 bg-slate-900/60 flex items-center justify-between text-xs text-slate-400">
+        <div class="p-3 px-5 border-t border-[var(--border-color)] bg-slate-900/60 flex items-center justify-between text-xs text-[var(--text-muted)]">
             <div id="cdeSummaryText">Đã tải 0 mục dữ liệu</div>
             <div class="flex items-center gap-2">
                 <span class="inline-block w-2 h-2 rounded-full bg-emerald-500"></span> Trạng thái CDE: Sẵn sàng
@@ -161,22 +201,49 @@
     </main>
 
     <!-- FOOTER -->
-    <footer class="w-full max-w-6xl mx-auto pt-4 mt-4 border-t border-white/10 flex justify-between items-center text-xs text-slate-400">
-        <div>&copy; 2026 PV INCONS Enterprise Workspace. CDE Data Engine.</div>
-        <div>BIM/VDC Standard v2.6.0</div>
+    <footer class="w-full max-w-6xl mx-auto pt-4 mt-4 border-t border-[var(--border-color)] flex flex-col sm:flex-row justify-between items-center gap-2 text-xs text-[var(--text-muted)] text-center sm:text-left">
+        <div>&copy; 2026 PV INCONS Enterprise Workspace. CDE Data Engine Pro.</div>
+        <div>BIM/VDC Standard v2.6.0 Pro</div>
     </footer>
 
     <!-- JAVASCRIPT XỬ LÝ -->
     <script>
-        let DATA_SERVER_API = localStorage.getItem('cde_api_url') || 'http://localhost:3000';
+        let DATA_SERVER_API = localStorage.getItem('cde_api_url') || 'https://api.pvincons.cloud';
         let currentPath = 'database/bim-vdc';
         let fetchedItems = [];
         let clipboard = null;
 
         document.addEventListener('DOMContentLoaded', function () {
             document.getElementById('apiServerUrlInput').value = DATA_SERVER_API;
+            initThemeUI();
             loadCDEFiles(currentPath);
         });
+
+        // Xử lý Chế độ Sáng / Tối (Light / Dark Mode)
+        function toggleTheme() {
+            const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('cde_data_theme', newTheme);
+            initThemeUI();
+        }
+
+        function initThemeUI() {
+            const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
+            const desktopIcon = document.getElementById('desktopThemeIcon');
+            const desktopText = document.getElementById('desktopThemeText');
+            const mobileIcon = document.getElementById('mobileThemeIcon');
+
+            if (currentTheme === 'light') {
+                if (desktopIcon) desktopIcon.className = "fa-solid fa-moon text-blue-600";
+                if (desktopText) desktopText.innerText = "Dark Mode";
+                if (mobileIcon) mobileIcon.className = "fa-solid fa-moon text-blue-600";
+            } else {
+                if (desktopIcon) desktopIcon.className = "fa-solid fa-sun text-amber-400";
+                if (desktopText) desktopText.innerText = "Light Mode";
+                if (mobileIcon) mobileIcon.className = "fa-solid fa-sun text-amber-400";
+            }
+        }
 
         function toggleServerSettings() {
             document.getElementById('serverConfigPanel').classList.toggle('hidden');
@@ -249,7 +316,7 @@
 
             items.forEach(item => {
                 const tr = document.createElement('tr');
-                tr.className = "hover:bg-slate-800/50 transition-colors group";
+                tr.className = "hover:bg-slate-800/40 transition-colors group";
 
                 const isDir = item.type === 'folder';
                 const iconHtml = getItemIcon(item.name, isDir);
@@ -263,45 +330,45 @@
                     : `window.open('${fileUrl}', '_blank')`;
 
                 tr.innerHTML = `
-                    <td class="py-2.5 px-3">
+                    <td class="py-3 px-3">
                         <div class="flex items-center gap-2.5 cursor-pointer" onclick="${clickHandler}">
-                            <span class="text-base">${iconHtml}</span>
-                            <span class="font-medium text-white group-hover:text-blue-400 transition-colors">${item.name}</span>
+                            <span class="text-base shrink-0">${iconHtml}</span>
+                            <span class="font-medium group-hover:text-blue-400 transition-colors break-all">${item.name}</span>
                         </div>
                     </td>
-                    <td class="py-2.5 px-3 text-slate-400 text-[11px]">
-                        <span class="font-semibold ${isDir ? 'text-amber-400' : 'text-blue-400'}">${item.loai || (isDir ? 'Folder' : 'File')}</span>
+                    <td class="py-3 px-3 text-[11px] shrink-0">
+                        <span class="font-semibold ${isDir ? 'text-amber-500' : 'text-blue-500'}">${item.loai || (isDir ? 'Folder' : 'File')}</span>
                     </td>
-                    <td class="py-2.5 px-3 font-mono text-[11px] text-slate-400 max-w-xs truncate">
+                    <td class="py-3 px-3 font-mono text-[11px] text-[var(--text-muted)] max-w-xs truncate hidden md:table-cell">
                         ${item.path}
                     </td>
-                    <td class="py-2.5 px-3 text-right">
-                        <div class="flex items-center justify-end gap-1">
+                    <td class="py-3 px-3 text-right">
+                        <div class="flex items-center justify-end gap-1 flex-wrap">
                             ${isDir ? `
-                                <button onclick="navigateTo('${safePath}')" class="px-2 py-1 bg-blue-600/30 hover:bg-blue-600 text-blue-300 hover:text-white rounded border border-blue-500/30 text-[11px] transition-all flex items-center gap-1">
-                                    <i class="fa-solid fa-folder-open text-[10px]"></i> Mở
+                                <button onclick="navigateTo('${safePath}')" class="px-2 py-1.5 bg-blue-600/30 hover:bg-blue-600 text-blue-300 hover:text-white rounded border border-blue-500/30 text-[11px] transition-all flex items-center gap-1">
+                                    <i class="fa-solid fa-folder-open text-[10px]"></i> <span class="hidden sm:inline">Mở</span>
                                 </button>
                             ` : `
-                                <a href="${fileUrl}" target="_blank" title="Xem trực tiếp trên trình duyệt" class="px-2 py-1 bg-blue-600/30 hover:bg-blue-600 text-blue-300 hover:text-white rounded border border-blue-500/30 text-[11px] transition-all flex items-center gap-1">
-                                    <i class="fa-solid fa-eye text-[10px]"></i> Xem
+                                <a href="${fileUrl}" target="_blank" title="Xem" class="px-2 py-1.5 bg-blue-600/30 hover:bg-blue-600 text-blue-300 hover:text-white rounded border border-blue-500/30 text-[11px] transition-all flex items-center gap-1">
+                                    <i class="fa-solid fa-eye text-[10px]"></i> <span class="hidden sm:inline">Xem</span>
                                 </a>
-                                <a href="${fileUrl}" download title="Tải về tệp tin" class="px-2 py-1 bg-emerald-600/30 hover:bg-emerald-600 text-emerald-300 hover:text-white rounded border border-emerald-500/30 text-[11px] transition-all flex items-center gap-1">
-                                    <i class="fa-solid fa-download text-[10px]"></i> Tải
+                                <a href="${fileUrl}" download title="Tải về" class="px-2 py-1.5 bg-emerald-600/30 hover:bg-emerald-600 text-emerald-300 hover:text-white rounded border border-emerald-500/30 text-[11px] transition-all flex items-center gap-1">
+                                    <i class="fa-solid fa-download text-[10px]"></i> <span class="hidden sm:inline">Tải</span>
                                 </a>
-                                <button onclick="openWithApp('${safePath}')" title="Mở bằng phần mềm trên máy chủ VPS Server" class="px-2 py-1 bg-indigo-600/30 hover:bg-indigo-600 text-indigo-300 hover:text-white rounded border border-indigo-500/30 text-[11px] transition-all flex items-center gap-1">
+                                <button onclick="openWithApp('${safePath}')" title="App VPS" class="px-2 py-1.5 bg-indigo-600/30 hover:bg-indigo-600 text-indigo-300 hover:text-white rounded border border-indigo-500/30 text-[11px] transition-all hidden lg:flex items-center gap-1">
                                     <i class="fa-solid fa-server text-[10px]"></i> App VPS
                                 </button>
                             `}
-                            <button onclick="renameItem('${safePath}', '${safeName}')" title="Đổi tên" class="px-2 py-1 bg-slate-800 hover:bg-amber-600/80 text-amber-300 hover:text-white rounded border border-amber-500/30 text-[11px] transition-all">
+                            <button onclick="renameItem('${safePath}', '${safeName}')" title="Đổi tên" class="p-1.5 sm:px-2 sm:py-1.5 bg-slate-800/80 hover:bg-amber-600/80 text-amber-300 hover:text-white rounded border border-amber-500/30 text-[11px] transition-all">
                                 <i class="fa-solid fa-pen-to-square"></i>
                             </button>
-                            <button onclick="copyToClipboard('${safePath}', '${safeName}', 'copy')" title="Copy" class="px-2 py-1 bg-slate-800 hover:bg-cyan-600/80 text-cyan-300 hover:text-white rounded border border-cyan-500/30 text-[11px] transition-all">
+                            <button onclick="copyToClipboard('${safePath}', '${safeName}', 'copy')" title="Copy" class="p-1.5 sm:px-2 sm:py-1.5 bg-slate-800/80 hover:bg-cyan-600/80 text-cyan-300 hover:text-white rounded border border-cyan-500/30 text-[11px] transition-all">
                                 <i class="fa-solid fa-copy"></i>
                             </button>
-                            <button onclick="copyToClipboard('${safePath}', '${safeName}', 'move')" title="Chuyển (Cut)" class="px-2 py-1 bg-slate-800 hover:bg-indigo-600/80 text-indigo-300 hover:text-white rounded border border-indigo-500/30 text-[11px] transition-all">
+                            <button onclick="copyToClipboard('${safePath}', '${safeName}', 'move')" title="Cut" class="p-1.5 sm:px-2 sm:py-1.5 bg-slate-800/80 hover:bg-indigo-600/80 text-indigo-300 hover:text-white rounded border border-indigo-500/30 text-[11px] transition-all">
                                 <i class="fa-solid fa-scissors"></i>
                             </button>
-                            <button onclick="deleteItem('${safePath}', '${safeName}')" title="Xóa" class="px-2 py-1 bg-slate-800 hover:bg-rose-600 text-rose-400 hover:text-white rounded border border-rose-500/30 text-[11px] transition-all">
+                            <button onclick="deleteItem('${safePath}', '${safeName}')" title="Xóa" class="p-1.5 sm:px-2 sm:py-1.5 bg-slate-800/80 hover:bg-rose-600 text-rose-400 hover:text-white rounded border border-rose-500/30 text-[11px] transition-all">
                                 <i class="fa-solid fa-trash-can"></i>
                             </button>
                         </div>
@@ -329,7 +396,7 @@
         function renderBreadcrumbs(path) {
             const breadcrumbs = document.getElementById('cdeBreadcrumbs');
             let html = `
-                <button onclick="navigateTo('database/bim-vdc')" class="hover:text-blue-400 flex items-center gap-1 font-bold">
+                <button onclick="navigateTo('database/bim-vdc')" class="hover:text-blue-400 flex items-center gap-1 font-bold shrink-0">
                     <i class="fa-solid fa-database text-blue-400"></i> database/bim-vdc
                 </button>
             `;
@@ -342,11 +409,11 @@
                 parts.forEach((part, index) => {
                     accum += '/' + part;
                     const target = accum.replace(/'/g, "\\'");
-                    html += ` <span class="text-slate-500">/</span> `;
+                    html += ` <span class="text-slate-500 shrink-0">/</span> `;
                     if (index === parts.length - 1) {
-                        html += `<span class="text-blue-400 font-semibold">${part}</span>`;
+                        html += `<span class="text-blue-400 font-semibold shrink-0">${part}</span>`;
                     } else {
-                        html += `<button onclick="navigateTo('${target}')" class="hover:text-blue-400">${part}</button>`;
+                        html += `<button onclick="navigateTo('${target}')" class="hover:text-blue-400 shrink-0">${part}</button>`;
                     }
                 });
             }
@@ -381,7 +448,7 @@
                 textEl.innerText = `Dán (${clipboard.action === 'copy' ? 'Sao chép' : 'Chuyển'}: ${clipboard.name})`;
             } else {
                 btn.disabled = true;
-                btn.className = "p-2 text-slate-500 bg-slate-800/50 rounded-lg text-xs border border-white/10 flex items-center gap-1.5 cursor-not-allowed opacity-50";
+                btn.className = "p-2 text-slate-500 bg-slate-800/50 rounded-lg text-xs border border-[var(--border-color)] flex items-center gap-1.5 cursor-not-allowed opacity-50";
                 textEl.innerText = "Dán";
             }
         }
@@ -411,7 +478,7 @@
         }
 
         async function openWithApp(itemPath) {
-            if (!confirm("Thao tác này sẽ kích hoạt phần mềm ứng dụng trực tiếp trên hệ thống máy chủ Viettel IDC Server. Bạn có muốn tiếp tục?")) return;
+            if (!confirm("Thao tác này sẽ kích hoạt phần mềm ứng dụng trực tiếp trên hệ thống máy chủ Server. Bạn có muốn tiếp tục?")) return;
             try {
                 const res = await fetch(`${DATA_SERVER_API}/api/open-local`, {
                     method: 'POST',

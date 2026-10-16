@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>CDE Master Platform v2.0 - ISO 19650-2 PIM</title>
     <!-- AUTH GUARD ANTI-FOUC -->
     <script src="../../../assets/js/auth-guard.js"></script>
@@ -13,14 +13,14 @@
         :root[data-theme="dark"] {
             --primary: #38bdf8;
             --primary-dark: #0284c7;
-            --bg-dark: #0b0f19;
-            --bg-sidebar: #0f172a;
-            --bg-main: #090d16;
+            --bg-dark: #0f172a;
+            --bg-sidebar: #0b1329;
+            --bg-main: #070a12;
             --bg-card: #1e293b;
             --bg-input: #0f172a;
-            --bg-hover: #1e293b;
-            --bg-tree-hover: rgba(255, 255, 255, 0.06);
-            --bg-tree-active: rgba(56, 189, 248, 0.18);
+            --bg-hover: #334155;
+            --bg-tree-hover: rgba(255, 255, 255, 0.08);
+            --bg-tree-active: rgba(56, 189, 248, 0.2);
             --text-main: #cbd5e1;
             --text-heading: #f8fafc;
             --text-muted: #94a3b8;
@@ -30,7 +30,9 @@
             --wip-color: #38bdf8;
             --shared-color: #f59e0b;
             --published-color: #22c55e;
-            --archive-color: #64748b;
+            --archive-color: #94a3b8;
+            --glass-bg: rgba(30, 41, 59, 0.7);
+            --shadow-pro: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
         }
 
         :root[data-theme="light"] {
@@ -54,82 +56,116 @@
             --shared-color: #d97706;
             --published-color: #16a34a;
             --archive-color: #475569;
+            --glass-bg: rgba(255, 255, 255, 0.8);
+            --shadow-pro: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            transition: background-color 0.2s ease, color 0.2s ease;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
             display: flex;
             height: 100vh;
+            height: -webkit-fill-available;
             background-color: var(--bg-main);
             color: var(--text-main);
             overflow: hidden;
+            position: relative;
         }
 
+        /* Overlay khi mở Sidebar trên Mobile */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            z-index: 90;
+            transition: opacity 0.3s ease;
+        }
+        .sidebar-overlay.active {
+            display: block;
+        }
+
+        /* Sidebar Styling */
         .sidebar {
-            width: 330px;
+            width: 320px;
             background-color: var(--bg-sidebar);
             color: var(--text-main);
             display: flex;
             flex-direction: column;
             border-right: 1px solid var(--border-color);
             flex-shrink: 0;
+            z-index: 100;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .sidebar-header {
-            padding: 14px 16px;
+            padding: 16px;
             background-color: var(--bg-dark);
             border-bottom: 1px solid var(--border-color);
         }
 
         .brand-logo {
-            font-size: 1.05rem;
-            font-weight: 700;
+            font-size: 1.1rem;
+            font-weight: 800;
             color: var(--primary);
             display: flex;
             align-items: center;
-            gap: 8px;
-            margin-bottom: 10px;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            letter-spacing: -0.02em;
+        }
+
+        .close-sidebar-btn {
+            display: none;
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1.2rem;
+            cursor: pointer;
         }
 
         .project-select-box {
             width: 100%;
-            padding: 8px 10px;
+            padding: 10px 12px;
             background-color: var(--bg-card);
             border: 1px solid var(--border-color);
             color: var(--text-heading);
-            border-radius: 6px;
-            font-size: 0.82rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
             font-weight: 600;
             outline: none;
             cursor: pointer;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
         }
 
         .nav-section {
-            padding: 12px 10px;
+            padding: 14px 12px;
             flex: 1;
             overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
         }
 
         .nav-section-title {
             font-size: 0.7rem;
             text-transform: uppercase;
-            letter-spacing: 0.05em;
+            letter-spacing: 0.08em;
             color: var(--text-muted);
             font-weight: 700;
-            margin-bottom: 8px;
+            margin-bottom: 10px;
             padding-left: 6px;
         }
 
         .tree-branch {
             list-style: none;
-            padding-left: 14px;
+            padding-left: 12px;
             margin: 2px 0 2px 4px;
             border-left: 1px dashed var(--border-color);
         }
@@ -138,11 +174,12 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 4px 6px;
-            border-radius: 4px;
-            font-size: 0.8rem;
+            padding: 6px 8px;
+            border-radius: 6px;
+            font-size: 0.82rem;
             cursor: pointer;
             user-select: none;
+            margin-bottom: 2px;
         }
 
         .tree-node-item:hover { background-color: var(--bg-tree-hover); }
@@ -150,13 +187,13 @@
         .tree-node-item.active {
             background-color: var(--bg-tree-active);
             color: var(--primary);
-            font-weight: 600;
+            font-weight: 700;
         }
 
         .node-title {
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
@@ -166,60 +203,75 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            width: 14px;
-            height: 14px;
-            font-size: 0.65rem;
+            width: 16px;
+            height: 16px;
+            font-size: 0.7rem;
             color: var(--text-muted);
-            transition: transform 0.15s ease;
+            transition: transform 0.2s ease;
         }
 
         .toggle-icon.collapsed { transform: rotate(-90deg); }
 
-        .icon-folder { color: var(--folder-yellow); font-size: 0.95rem; }
-        .icon-file { color: var(--text-muted); font-size: 0.85rem; }
+        .icon-folder { color: var(--folder-yellow); font-size: 1rem; }
+        .icon-file { color: var(--text-muted); font-size: 0.9rem; }
 
         .folder-file-count {
-            font-size: 0.72rem;
+            font-size: 0.7rem;
             font-weight: 700;
             color: var(--primary);
             background: rgba(56, 189, 248, 0.12);
-            padding: 1px 5px;
-            border-radius: 10px;
+            padding: 2px 6px;
+            border-radius: 12px;
             margin-left: 4px;
             border: 1px solid rgba(56, 189, 248, 0.25);
         }
 
-        .node-actions { display: none; gap: 2px; }
+        .node-actions { display: none; gap: 4px; }
         .tree-node-item:hover .node-actions { display: flex; }
 
         .btn-tree-action {
             background: transparent;
             border: none;
             cursor: pointer;
-            font-size: 0.72rem;
-            padding: 1px 4px;
-            border-radius: 3px;
+            font-size: 0.8rem;
+            padding: 2px 4px;
+            border-radius: 4px;
             color: var(--text-muted);
         }
 
         .btn-tree-action:hover { background: var(--bg-card); color: var(--text-heading); }
 
+        /* Main Area Styling */
         .main-wrapper {
             flex: 1;
             display: flex;
             flex-direction: column;
             overflow: hidden;
             background-color: var(--bg-main);
+            width: 100%;
         }
 
         .top-navbar {
-            height: 60px;
+            height: 64px;
             background-color: var(--bg-card);
             border-bottom: 1px solid var(--border-color);
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 24px;
+            padding: 0 20px;
+            gap: 12px;
+            flex-shrink: 0;
+        }
+
+        .mobile-toggle-btn {
+            display: none;
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            color: var(--text-heading);
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            cursor: pointer;
         }
 
         .search-bar {
@@ -227,9 +279,10 @@
             align-items: center;
             background-color: var(--bg-input);
             border: 1px solid var(--border-color);
-            border-radius: 6px;
-            padding: 6px 12px;
-            width: 360px;
+            border-radius: 8px;
+            padding: 8px 12px;
+            width: 320px;
+            max-width: 100%;
         }
 
         .search-bar input {
@@ -242,23 +295,29 @@
             color: var(--text-heading);
         }
 
-        .top-actions { display: flex; align-items: center; gap: 10px; }
+        .top-actions { display: flex; align-items: center; gap: 8px; flex-wrap: nowrap; }
 
         .btn {
             display: inline-flex;
             align-items: center;
+            justify-content: center;
             gap: 6px;
             padding: 8px 14px;
-            border-radius: 6px;
+            border-radius: 8px;
             font-size: 0.82rem;
             font-weight: 600;
             cursor: pointer;
             border: none;
             transition: all 0.2s;
+            white-space: nowrap;
         }
 
-        .btn-primary { background-color: var(--primary-dark); color: white; }
-        .btn-primary:hover { opacity: 0.9; }
+        .btn-primary {
+            background-color: var(--primary-dark);
+            color: white;
+            box-shadow: 0 2px 4px rgba(2, 132, 199, 0.25);
+        }
+        .btn-primary:hover { opacity: 0.92; transform: translateY(-1px); }
 
         .btn-dark { background-color: var(--border-color); color: var(--text-heading); }
         .btn-dark:hover { background-color: var(--bg-hover); }
@@ -269,8 +328,8 @@
         .theme-toggle-btn {
             display: inline-flex;
             align-items: center;
-            gap: 8px;
-            padding: 6px 12px;
+            gap: 6px;
+            padding: 8px 12px;
             border-radius: 20px;
             background-color: var(--bg-input);
             border: 1px solid var(--border-color);
@@ -281,8 +340,14 @@
             user-select: none;
         }
 
-        .content-area { flex: 1; overflow-y: auto; padding: 20px 24px; }
+        .content-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            -webkit-overflow-scrolling: touch;
+        }
 
+        /* Stats Grid */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -293,10 +358,10 @@
         .stat-card {
             background: var(--bg-card);
             border: 1px solid var(--border-color);
-            border-radius: 8px;
+            border-radius: 10px;
             padding: 14px 16px;
             border-left: 4px solid var(--primary);
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            box-shadow: var(--shadow-pro);
         }
 
         .stat-card.wip { border-left-color: var(--wip-color); }
@@ -304,16 +369,18 @@
         .stat-card.published { border-left-color: var(--published-color); }
         .stat-card.archive { border-left-color: var(--archive-color); }
 
-        .stat-title { font-size: 0.72rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700; }
-        .stat-value { font-size: 1.35rem; font-weight: 700; color: var(--text-heading); margin-top: 4px; }
+        .stat-title { font-size: 0.72rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700; letter-spacing: 0.05em; }
+        .stat-value { font-size: 1.4rem; font-weight: 800; color: var(--text-heading); margin-top: 4px; }
         .stat-desc { font-size: 0.72rem; color: var(--text-muted); margin-top: 2px; }
 
+        /* ISO Naming Rule Card */
         .naming-rule-card {
             background: var(--bg-card);
             border: 1px solid var(--border-color);
-            border-radius: 8px;
+            border-radius: 10px;
             padding: 14px 16px;
             margin-bottom: 18px;
+            box-shadow: var(--shadow-pro);
         }
 
         .naming-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
@@ -324,97 +391,108 @@
             background: var(--bg-input);
             border: 1px solid var(--border-color);
             border-radius: 6px;
-            padding: 6px 8px;
+            padding: 6px 10px;
             text-align: center;
             flex: 1;
-            min-width: 85px;
+            min-width: 90px;
         }
 
-        .field-code { font-family: monospace; font-weight: 700; color: var(--primary); font-size: 0.82rem; }
+        .field-code { font-family: 'Consolas', monospace; font-weight: 700; color: var(--primary); font-size: 0.82rem; }
         .field-label { font-size: 0.68rem; color: var(--text-muted); margin-top: 2px; }
 
+        /* Table Section */
         .table-container {
             background: var(--bg-card);
             border: 1px solid var(--border-color);
-            border-radius: 8px;
-            overflow: visible;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: var(--shadow-pro);
         }
 
         .table-toolbar {
-            padding: 12px 16px;
+            padding: 14px 16px;
             background: var(--bg-card);
             border-bottom: 1px solid var(--border-color);
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
         }
 
-        .filter-group { display: flex; gap: 8px; }
+        .filter-group { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
 
         .select-filter {
-            padding: 6px 10px;
+            padding: 8px 12px;
             border: 1px solid var(--border-color);
-            border-radius: 6px;
-            font-size: 0.78rem;
+            border-radius: 8px;
+            font-size: 0.8rem;
             color: var(--text-heading);
             outline: none;
             background-color: var(--bg-input);
         }
 
-        .cde-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; text-align: left; }
+        .table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .cde-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; text-align: left; }
 
         .cde-table th {
             background-color: var(--bg-input);
             color: var(--text-muted);
             font-weight: 700;
-            padding: 10px 12px;
+            padding: 12px;
             border-bottom: 2px solid var(--border-color);
             text-transform: uppercase;
-            font-size: 0.68rem;
-            letter-spacing: 0.03em;
+            font-size: 0.7rem;
+            letter-spacing: 0.05em;
+            white-space: nowrap;
         }
 
         .cde-table td {
-            padding: 10px 12px;
+            padding: 12px;
             border-bottom: 1px solid var(--border-color);
             vertical-align: middle;
             color: var(--text-main);
+            white-space: nowrap;
         }
 
         .cde-table tr:hover { background-color: var(--bg-hover); }
 
-        .file-code { font-family: 'Consolas', monospace; font-weight: 700; color: var(--primary); font-size: 0.8rem; }
+        .file-code { font-family: 'Consolas', monospace; font-weight: 700; color: var(--primary); font-size: 0.82rem; }
 
         .badge {
             display: inline-block;
             padding: 3px 8px;
-            border-radius: 4px;
-            font-size: 0.7rem;
+            border-radius: 6px;
+            font-size: 0.72rem;
             font-weight: 700;
             text-align: center;
         }
 
         .badge-prj { background: rgba(99, 102, 241, 0.15); color: #818cf8; border: 1px solid rgba(99, 102, 241, 0.35); }
-        .badge-wip { background: rgba(56, 189, 248, 0.15); color: #0284c7; border: 1px solid rgba(56, 189, 248, 0.3); }
-        .badge-shared { background: rgba(245, 158, 11, 0.15); color: #d97706; border: 1px solid rgba(245, 158, 11, 0.3); }
-        .badge-published { background: rgba(34, 197, 94, 0.15); color: #16a34a; border: 1px solid rgba(34, 197, 94, 0.3); }
-        .badge-archive { background: rgba(100, 116, 139, 0.15); color: #64748b; border: 1px solid rgba(100, 116, 139, 0.3); }
+        .badge-wip { background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3); }
+        .badge-shared { background: rgba(245, 158, 11, 0.15); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.3); }
+        .badge-published { background: rgba(34, 197, 94, 0.15); color: #22c55e; border: 1px solid rgba(34, 197, 94, 0.3); }
+        .badge-archive { background: rgba(148, 163, 184, 0.15); color: #94a3b8; border: 1px solid rgba(148, 163, 184, 0.3); }
         .badge-s0 { background: var(--bg-input); color: var(--text-muted); border: 1px solid var(--border-color); }
-        .badge-s1 { background: rgba(59, 130, 246, 0.15); color: #2563eb; }
-        .badge-s2 { background: rgba(99, 102, 241, 0.15); color: #4f46e5; }
-        .badge-s3 { background: rgba(168, 85, 247, 0.15); color: #9333ea; }
-        .badge-s4 { background: rgba(234, 179, 8, 0.15); color: #ca8a04; }
-        .badge-a1 { background: rgba(16, 185, 129, 0.15); color: #059669; }
-        .badge-a2 { background: rgba(217, 119, 6, 0.15); color: #b45309; }
+        .badge-s1 { background: rgba(59, 130, 246, 0.15); color: #3b82f6; }
+        .badge-s2 { background: rgba(99, 102, 241, 0.15); color: #6366f1; }
+        .badge-s3 { background: rgba(168, 85, 247, 0.15); color: #a855f7; }
+        .badge-s4 { background: rgba(234, 179, 8, 0.15); color: #eab308; }
+        .badge-a1 { background: rgba(34, 197, 94, 0.15); color: #22c55e; }
+        .badge-a2 { background: rgba(245, 158, 11, 0.15); color: #f59e0b; }
 
         .rev-tag {
-            font-family: monospace;
+            font-family: 'Consolas', monospace;
             font-weight: 700;
             color: var(--text-heading);
             background: var(--bg-input);
-            padding: 2px 6px;
-            border-radius: 3px;
+            padding: 3px 6px;
+            border-radius: 4px;
             font-size: 0.75rem;
             border: 1px solid var(--border-color);
         }
@@ -422,9 +500,9 @@
         .action-btns { display: flex; gap: 4px; align-items: center; position: relative; }
 
         .btn-icon {
-            padding: 4px 8px;
-            font-size: 0.75rem;
-            border-radius: 4px;
+            padding: 5px 9px;
+            font-size: 0.78rem;
+            border-radius: 6px;
             border: 1px solid var(--border-color);
             background: var(--bg-input);
             color: var(--text-heading);
@@ -439,8 +517,8 @@
             background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
             color: #ffffff !important;
             border: 1px solid #38bdf8;
-            padding: 4px 10px;
-            border-radius: 5px;
+            padding: 5px 10px;
+            border-radius: 6px;
             font-weight: 700;
             font-size: 0.75rem;
             display: inline-flex;
@@ -466,18 +544,18 @@
             right: 0;
             top: 100%;
             background-color: var(--bg-card);
-            min-width: 180px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            min-width: 190px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
             border: 1px solid var(--border-color);
-            border-radius: 6px;
+            border-radius: 8px;
             z-index: 100;
             overflow: hidden;
-            margin-top: 2px;
+            margin-top: 4px;
         }
 
         .dropdown-content button {
             color: var(--text-heading);
-            padding: 8px 12px;
+            padding: 10px 14px;
             display: flex;
             align-items: center;
             gap: 8px;
@@ -485,7 +563,7 @@
             background: transparent;
             border: none;
             text-align: left;
-            font-size: 0.78rem;
+            font-size: 0.8rem;
             cursor: pointer;
             transition: background 0.15s ease;
         }
@@ -493,15 +571,37 @@
         .dropdown-content button:hover { background-color: var(--bg-hover); color: var(--primary); }
         .dropdown.show .dropdown-content { display: block; }
 
+        /* Floating Action Button (FAB) cho Mobile */
+        .fab-btn {
+            display: none;
+            position: fixed;
+            bottom: 24px;
+            right: 20px;
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            background: var(--primary-dark);
+            color: #fff;
+            border: none;
+            box-shadow: 0 4px 15px rgba(2, 132, 199, 0.5);
+            font-size: 1.4rem;
+            align-items: center;
+            justify-content: center;
+            z-index: 80;
+            cursor: pointer;
+        }
+
+        /* Modal Styling */
         .modal {
             display: none;
             position: fixed;
             top: 0; left: 0;
             width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.65);
+            background: rgba(0, 0, 0, 0.7);
             backdrop-filter: blur(4px);
             align-items: center; justify-content: center;
             z-index: 1000;
+            padding: 16px;
         }
 
         .modal.active { display: flex; }
@@ -509,11 +609,14 @@
         .modal-content {
             background: var(--bg-card);
             border: 1px solid var(--border-color);
-            border-radius: 8px;
-            width: 580px; max-width: 92%;
+            border-radius: 12px;
+            width: 600px; max-width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
             padding: 20px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
             color: var(--text-main);
+            -webkit-overflow-scrolling: touch;
         }
 
         .modal-header {
@@ -521,29 +624,29 @@
             justify-content: space-between;
             align-items: center;
             border-bottom: 1px solid var(--border-color);
-            padding-bottom: 10px;
+            padding-bottom: 12px;
             margin-bottom: 16px;
         }
 
-        .modal-title { font-size: 0.95rem; font-weight: 700; color: var(--text-heading); }
-        .close-btn { cursor: pointer; font-size: 1.1rem; color: var(--text-muted); }
+        .modal-title { font-size: 1rem; font-weight: 700; color: var(--text-heading); }
+        .close-btn { cursor: pointer; font-size: 1.2rem; color: var(--text-muted); padding: 4px; }
 
         .val-result {
-            margin-top: 10px; padding: 10px;
-            border-radius: 6px; font-size: 0.8rem; font-weight: 600; display: none;
+            margin-top: 10px; padding: 12px;
+            border-radius: 8px; font-size: 0.82rem; font-weight: 600; display: none;
         }
 
-        .val-success { background: rgba(34, 197, 94, 0.15); color: #16a34a; border: 1px solid rgba(34, 197, 94, 0.3); }
-        .val-error { background: rgba(239, 68, 68, 0.15); color: #dc2626; border: 1px solid rgba(239, 68, 68, 0.3); }
+        .val-success { background: rgba(34, 197, 94, 0.15); color: #22c55e; border: 1px solid rgba(34, 197, 94, 0.3); }
+        .val-error { background: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); }
 
         .preview-box {
-            width: 100%; height: 240px;
+            width: 100%; height: 220px;
             background: var(--bg-dark);
             border: 1px dashed var(--border-color);
-            border-radius: 6px;
+            border-radius: 8px;
             display: flex; flex-direction: column;
             align-items: center; justify-content: center;
-            margin-top: 10px; color: var(--text-muted);
+            margin-top: 12px; color: var(--text-muted);
         }
 
         .iso-grid {
@@ -556,30 +659,40 @@
         .iso-group { display: flex; flex-direction: column; gap: 4px; }
         .iso-group label { font-size: 0.75rem; font-weight: 700; color: var(--text-heading); }
         .iso-group select, .iso-group input {
-            padding: 7px 10px;
+            padding: 8px 10px;
             background: var(--bg-input);
             border: 1px solid var(--border-color);
             color: var(--text-heading);
-            border-radius: 6px;
-            font-size: 0.8rem;
+            border-radius: 8px;
+            font-size: 0.82rem;
             outline: none;
         }
         .iso-group select:focus, .iso-group input:focus { border-color: var(--primary); }
+        .iso-custom-input {
+            margin-top: 6px;
+            background-color: var(--bg-input);
+            border: 1px solid var(--primary);
+            color: var(--text-heading);
+            padding: 8px 10px;
+            border-radius: 6px;
+            font-size: 0.82rem;
+            width: 100%;
+        }
         .iso-preview-card {
             background: var(--bg-input);
             border: 1px dashed var(--primary);
             padding: 12px;
-            border-radius: 6px;
+            border-radius: 8px;
             text-align: center;
             margin-top: 10px;
         }
         .iso-preview-name {
             font-family: 'Consolas', monospace;
-            font-size: 1.1rem;
+            font-size: 1.05rem;
             font-weight: 700;
             color: var(--primary);
-            margin: 4px 0;
-            letter-spacing: 0.5px;
+            margin: 6px 0;
+            word-break: break-all;
         }
 
         /* Toast notifications */
@@ -591,34 +704,89 @@
             flex-direction: column;
             gap: 8px;
             z-index: 2000;
+            max-width: calc(100vw - 40px);
         }
         .toast {
             background: var(--bg-card);
             color: var(--text-heading);
             border: 1px solid var(--border-color);
             border-left: 4px solid var(--primary);
-            padding: 10px 16px;
-            border-radius: 6px;
+            padding: 12px 16px;
+            border-radius: 8px;
             font-size: 0.82rem;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
             animation: slideIn 0.2s ease, fadeOut 0.3s ease 2.7s forwards;
         }
         @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
         @keyframes fadeOut { to { opacity: 0; transform: translateY(10px); } }
+
+        /* Media Queries Tối ưu Mobile & Tablet */
+        @media (max-width: 1024px) {
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .search-bar { width: 220px; }
+        }
+
+        @media (max-width: 768px) {
+            .mobile-toggle-btn { display: inline-flex; }
+            .close-sidebar-btn { display: block; }
+
+            .sidebar {
+                position: fixed;
+                top: 0; left: 0; bottom: 0;
+                transform: translateX(-100%);
+                box-shadow: 10px 0 25px rgba(0, 0, 0, 0.5);
+            }
+
+            .sidebar.mobile-open {
+                transform: translateX(0);
+            }
+
+            .top-navbar { padding: 0 12px; height: 56px; }
+
+            .search-bar { flex: 1; width: auto; }
+
+            .top-actions .btn-dark,
+            .top-actions .btn-outline,
+            .top-actions .theme-toggle-btn {
+                display: none;
+            }
+
+            .fab-btn { display: flex; }
+
+            .content-area { padding: 12px; }
+
+            .stats-grid { grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+            .stat-card { padding: 10px 12px; }
+            .stat-value { font-size: 1.2rem; }
+
+            .naming-rule-card { display: none; }
+
+            .iso-grid { grid-template-columns: 1fr; }
+            .iso-full { grid-column: span 1; }
+
+            .table-toolbar { flex-direction: column; align-items: stretch; gap: 8px; }
+            .filter-group { flex-direction: column; align-items: stretch; }
+            .select-filter { width: 100%; }
+
+            .toast-container { left: 20px; right: 20px; }
+        }
     </style>
 </head>
 
 <body>
 
-    <div class="sidebar">
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeMobileSidebar()"></div>
+
+    <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <div class="brand-logo">
-                <span>💻</span> Database CDE Explorer
+                <span>💻 CDE Master</span>
+                <button class="close-sidebar-btn" onclick="closeMobileSidebar()">✕</button>
             </div>
             <select id="projectSelect" class="project-select-box" onchange="onProjectSelectChange()">
             </select>
 
-            <button class="btn btn-primary" style="width: 100%; margin-top: 10px; font-size: 0.78rem; justify-content: center;" onclick="reloadDatabaseData()">
+            <button class="btn btn-primary" style="width: 100%; margin-top: 10px; font-size: 0.8rem; justify-content: center;" onclick="reloadDatabaseData()">
                 🔄 Làm mới Dữ liệu CDE
             </button>
         </div>
@@ -635,13 +803,15 @@
         </div>
 
         <div style="padding: 12px 16px; border-top: 1px solid var(--border-color); font-size: 0.75rem; color: var(--text-muted);">
-            <div>⚡ Mode: <span style="color:var(--published-color); font-weight:bold;">Database CDE Sync (bim-vdc)</span></div>
+            <div>⚡ Mode: <span style="color:var(--published-color); font-weight:bold;">Database CDE Sync</span></div>
             <div style="margin-top: 4px;">👤 Role: BIM Lead Manager</div>
         </div>
     </div>
 
     <div class="main-wrapper">
         <div class="top-navbar">
+            <button class="mobile-toggle-btn" onclick="openMobileSidebar()" title="Mở danh mục">☰</button>
+
             <div class="search-bar">
                 <span>🔍</span>
                 <input type="text" id="searchInput" onkeyup="applyFilters()" placeholder="Tìm kiếm thư mục, file ISO 19650...">
@@ -652,9 +822,9 @@
                     <span id="themeIcon">☀️</span> <span id="themeText">Light Mode</span>
                 </button>
 
-                <button class="btn btn-outline" onclick="openModal('namingModal')">🧪 Test ISO Naming</button>
-                <button class="btn btn-dark" onclick="openModal('uploadModal')">📤 Upload Container File</button>
-                <button class="btn btn-primary" onclick="exportCSV()">📥 Export Index (CSV)</button>
+                <button class="btn btn-outline" onclick="openModal('namingModal')">🧪 Test Naming</button>
+                <button class="btn btn-dark" onclick="openModal('uploadModal')">📤 Upload Container</button>
+                <button class="btn btn-primary" onclick="exportCSV()">📥 Export (CSV)</button>
             </div>
         </div>
 
@@ -726,37 +896,41 @@
                             <option value="A2">A2 - As-Built</option>
                         </select>
 
-                        <button class="btn btn-outline" style="padding:4px 8px;" onclick="resetFilters()">🔄 Reset</button>
+                        <button class="btn btn-outline" style="padding:6px 12px;" onclick="resetFilters()">🔄 Reset</button>
                     </div>
                 </div>
 
-                <table class="cde-table" id="cdeMasterTable">
-                    <thead>
-                        <tr>
-                            <th>Dự Án</th>
-                            <th>Tên File ISO 19650</th>
-                            <th>Container CDE</th>
-                            <th>Suitability</th>
-                            <th>Revision</th>
-                            <th>Bộ Môn</th>
-                            <th>Thư Mục / Đường Dẫn File</th>
-                            <th>Thao Tác</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tableBody">
-                        <!-- Dữ liệu render từ JS -->
-                    </tbody>
-                </table>
+                <div class="table-wrapper">
+                    <table class="cde-table" id="cdeMasterTable">
+                        <thead>
+                            <tr>
+                                <th>Dự Án</th>
+                                <th>Tên File ISO 19650</th>
+                                <th>Container CDE</th>
+                                <th>Suitability</th>
+                                <th>Revision</th>
+                                <th>Bộ Môn</th>
+                                <th>Thao Tác</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody">
+                            <!-- Dữ liệu render từ JS -->
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
+
+    <!-- Floating Action Button Mobile -->
+    <button class="fab-btn" onclick="openModal('uploadModal')" title="Tải lên File">📤</button>
 
     <!-- TOAST CONTAINER -->
     <div class="toast-container" id="toastContainer"></div>
 
     <!-- MODALS -->
     <div class="modal" id="isoRenameModal">
-        <div class="modal-content" style="width: 640px;">
+        <div class="modal-content">
             <div class="modal-header">
                 <div class="modal-title">🏷️ Đổi Tên File Chuẩn ISO 19650-2</div>
                 <div class="close-btn" onclick="closeModal('isoRenameModal')">✕</div>
@@ -765,7 +939,7 @@
                 <div class="iso-preview-card">
                     <div style="font-size: 0.68rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">XEM TRƯỚC TÊN FILE MỚI:</div>
                     <div id="isoLivePreview" class="iso-preview-name">PRJ_001-PVI-ZZ-01-DR-A-0001.pdf</div>
-                    <div style="font-size: 0.72rem; color: #16a34a; font-weight: 600;">✓ Đạt chuẩn cấu trúc ISO 19650-2</div>
+                    <div style="font-size: 0.72rem; color: #22c55e; font-weight: 600;">✓ Đạt chuẩn cấu trúc ISO 19650-2</div>
                 </div>
 
                 <div class="iso-grid">
@@ -775,52 +949,62 @@
                     </div>
                     <div class="iso-group">
                         <label>2. ORIGINATOR (Tác giả)</label>
-                        <select id="iso_originator" onchange="updateIsoName()">
+                        <select id="iso_originator" onchange="toggleCustomInput(this, 'iso_originator_custom')">
                             <option value="PVI">PVI - Đơn vị Phát hành</option>
                             <option value="ARC">ARC - Tư vấn Kiến trúc</option>
                             <option value="STR">STR - Tư vấn Kết cấu</option>
                             <option value="MEP">MEP - Tư vấn Cơ điện</option>
                             <option value="CON">CON - Nhà thầu Thi công</option>
+                            <option value="OTHER">-- Tùy chọn khác (Nhập tự do) --</option>
                         </select>
+                        <input type="text" id="iso_originator_custom" class="iso-custom-input" placeholder="Nhập mã tác giả tự do..." style="display: none;" oninput="updateIsoName()">
                     </div>
                     <div class="iso-group">
                         <label>3. VOLUME (Khối/Phân khu)</label>
-                        <select id="iso_volume" onchange="updateIsoName()">
+                        <select id="iso_volume" onchange="toggleCustomInput(this, 'iso_volume_custom')">
                             <option value="ZZ">ZZ - Toàn bộ công trình</option>
                             <option value="BLK1">BLK1 - Khối nhà Block 1</option>
                             <option value="BLK2">BLK2 - Khối nhà Block 2</option>
                             <option value="POD">POD - Khối đế</option>
+                            <option value="OTHER">-- Tùy chọn khác (Nhập tự do) --</option>
                         </select>
+                        <input type="text" id="iso_volume_custom" class="iso-custom-input" placeholder="Nhập mã volume tự do..." style="display: none;" oninput="updateIsoName()">
                     </div>
                     <div class="iso-group">
                         <label>4. LEVEL (Tầng/Cao độ)</label>
-                        <select id="iso_level" onchange="updateIsoName()">
+                        <select id="iso_level" onchange="toggleCustomInput(this, 'iso_level_custom')">
                             <option value="ZZ">ZZ - Tất cả các tầng</option>
                             <option value="01">01 - Tầng 1</option>
                             <option value="02">02 - Tầng 2</option>
                             <option value="RF">RF - Tầng mái</option>
                             <option value="B1">B1 - Tầng hầm 1</option>
+                            <option value="OTHER">-- Tùy chọn khác (Nhập tự do) --</option>
                         </select>
+                        <input type="text" id="iso_level_custom" class="iso-custom-input" placeholder="Nhập mã level tự do..." style="display: none;" oninput="updateIsoName()">
                     </div>
                     <div class="iso-group">
                         <label>5. TYPE (Loại tài liệu)</label>
-                        <select id="iso_type" onchange="updateIsoName()">
+                        <select id="iso_type" onchange="toggleCustomInput(this, 'iso_type_custom')">
                             <option value="DR">DR - Bản vẽ 2D (Drawing)</option>
                             <option value="M3">M3 - Mô hình 3D (BIM Model)</option>
                             <option value="RP">RP - Báo cáo (Report)</option>
                             <option value="VS">VS - Phối cảnh / Hình ảnh</option>
                             <option value="BQ">BQ - Bảng khối lượng</option>
+                            <option value="OTHER">-- Tùy chọn khác (Nhập tự do) --</option>
                         </select>
+                        <input type="text" id="iso_type_custom" class="iso-custom-input" placeholder="Nhập mã type tự do..." style="display: none;" oninput="updateIsoName()">
                     </div>
                     <div class="iso-group">
                         <label>6. ROLE (Bộ môn)</label>
-                        <select id="iso_role" onchange="updateIsoName()">
+                        <select id="iso_role" onchange="toggleCustomInput(this, 'iso_role_custom')">
                             <option value="A">A - Kiến trúc (Architecture)</option>
                             <option value="S">S - Kết cấu (Structure)</option>
                             <option value="M">M - Cơ điện (MEP)</option>
                             <option value="G">G - Tương tác chung (General)</option>
                             <option value="K">K - Sân vườn cảnh quan</option>
+                            <option value="OTHER">-- Tùy chọn khác (Nhập tự do) --</option>
                         </select>
+                        <input type="text" id="iso_role_custom" class="iso-custom-input" placeholder="Nhập mã role tự do..." style="display: none;" oninput="updateIsoName()">
                     </div>
                     <div class="iso-group iso-full">
                         <label>7. NUMBER (Số ID định danh - 4 chữ số)</label>
@@ -836,23 +1020,28 @@
         </div>
     </div>
 
+    <!-- MODAL VIEWER TÍCH HỢP XEM & COPY PATH -->
     <div class="modal" id="viewModal">
         <div class="modal-content">
             <div class="modal-header">
-                <div class="modal-title">👁️ ISO 19650 Document & Model Viewer</div>
+                <div class="modal-title">👁️ Document & Model Viewer</div>
                 <div class="close-btn" onclick="closeModal('viewModal')">✕</div>
             </div>
-            <div style="font-size: 0.82rem; line-height: 1.5;">
-                <p><strong>Tên tài liệu:</strong> <span id="viewFileName" class="file-code">...</span></p>
-                <p style="margin-top:4px;"><strong>Đường dẫn:</strong> <span id="viewFilePath" style="font-family:monospace; color:var(--text-muted);">...</span></p>
-                <p style="margin-top:4px;"><strong>Trạng thái:</strong> <span id="viewFileState">...</span> | <strong>Phiên bản:</strong> <span id="viewFileRev">...</span></p>
+            <div style="font-size: 0.82rem; line-height: 1.6;">
+                <p><strong>Tên tài liệu:</strong> <span id="viewFileName" class="file-code" style="word-break: break-all;">...</span></p>
+                <div style="margin-top: 6px; background: var(--bg-input); padding: 10px; border-radius: 8px; border: 1px solid var(--border-color);">
+                    <div style="font-size: 0.7rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 2px;">ĐƯỜNG DẪN TỆP TIN TRÊN KHO CDE:</div>
+                    <span id="viewFilePath" style="font-family: 'Consolas', monospace; color: var(--primary); word-break: break-all; font-weight: 600; font-size: 0.8rem;">...</span>
+                </div>
+                <p style="margin-top:8px;"><strong>Trạng thái:</strong> <span id="viewFileState">...</span> | <strong>Phiên bản:</strong> <span id="viewFileRev">...</span></p>
 
                 <div class="preview-box">
                     <span style="font-size: 2.5rem; margin-bottom: 8px;">🏗️</span>
-                    <p style="font-weight: 600; color: var(--text-heading);">Mô phỏng Trình xem 3D BIM / Bản vẽ PDF</p>
+                    <p style="font-weight: 600; color: var(--text-heading); text-align: center; padding: 0 10px;">Mô phỏng Trình xem 3D BIM / Bản vẽ PDF</p>
                 </div>
 
-                <div style="margin-top: 16px; text-align: right;">
+                <div style="margin-top: 16px; display: flex; justify-content: space-between; align-items: center;">
+                    <button class="btn btn-outline" onclick="copyViewPath()">📋 Copy Path</button>
                     <button class="btn btn-primary" onclick="closeModal('viewModal')">Đóng Viewer</button>
                 </div>
             </div>
@@ -862,15 +1051,15 @@
     <div class="modal" id="gateModal">
         <div class="modal-content">
             <div class="modal-header">
-                <div class="modal-title">🚪 ISO 19650 Gate Approval & State Transition</div>
+                <div class="modal-title">🚪 ISO 19650 Gate Approval</div>
                 <div class="close-btn" onclick="closeModal('gateModal')">✕</div>
             </div>
             <div style="font-size: 0.85rem; line-height: 1.5;">
-                <p><strong>Tệp đang chọn:</strong> <span id="gateFileName" class="file-code">...</span></p>
+                <p><strong>Tệp đang chọn:</strong> <span id="gateFileName" class="file-code" style="word-break: break-all;">...</span></p>
 
-                <div style="margin-top: 12px; background: var(--bg-input); padding: 12px; border-radius: 6px; border: 1px solid var(--border-color);">
-                    <label style="font-weight: bold; font-size: 0.8rem; display: block; margin-bottom: 4px; color: var(--text-heading);">Chọn Cổng Phê Duyệt ISO 19650:</label>
-                    <select id="gateActionSelect" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-heading); font-size:0.82rem;">
+                <div style="margin-top: 12px; background: var(--bg-input); padding: 12px; border-radius: 8px; border: 1px solid var(--border-color);">
+                    <label style="font-weight: bold; font-size: 0.8rem; display: block; margin-bottom: 6px; color: var(--text-heading);">Chọn Cổng Phê Duyệt ISO 19650:</label>
+                    <select id="gateActionSelect" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-heading); font-size:0.82rem;">
                         <option value="GATE1">GATE 1: WIP ➔ SHARED (S1 - Coordination | Rev: P01.00)</option>
                         <option value="GATE2">GATE 2: SHARED ➔ PUBLISHED (A1 - Construction | Rev: C01.00)</option>
                         <option value="GATE3">GATE 3: PUBLISHED ➔ ARCHIVED (Lưu trữ lịch sử)</option>
@@ -878,11 +1067,11 @@
                 </div>
 
                 <div style="margin-top: 12px;">
-                    <label style="font-weight: bold; font-size: 0.8rem; display: block; margin-bottom: 4px; color: var(--text-heading);">Ghi chú QA/QC:</label>
-                    <textarea id="gateNote" rows="3" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid var(--border-color); background: var(--bg-input); color: var(--text-heading); font-size: 0.8rem;" placeholder="Đã kiểm tra mô hình hợp lệ..."></textarea>
+                    <label style="font-weight: bold; font-size: 0.8rem; display: block; margin-bottom: 6px; color: var(--text-heading);">Ghi chú QA/QC:</label>
+                    <textarea id="gateNote" rows="3" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-input); color: var(--text-heading); font-size: 0.8rem;" placeholder="Đã kiểm tra mô hình hợp lệ..."></textarea>
                 </div>
 
-                <div style="margin-top: 16px; text-align: right;">
+                <div style="margin-top: 16px; text-align: right; display: flex; justify-content: flex-end; gap: 8px;">
                     <button class="btn btn-outline" onclick="closeModal('gateModal')">Hủy</button>
                     <button class="btn btn-primary" onclick="submitGateTransition()">Xác Nhận Cập Nhật</button>
                 </div>
@@ -893,22 +1082,22 @@
     <div class="modal" id="namingModal">
         <div class="modal-content">
             <div class="modal-header">
-                <div class="modal-title">🧪 ISO 19650 File Naming Convention Checker</div>
+                <div class="modal-title">🧪 ISO 19650 Naming Checker</div>
                 <div class="close-btn" onclick="closeModal('namingModal')">✕</div>
             </div>
             <div style="font-size: 0.85rem;">
                 <label style="font-weight:bold; font-size:0.8rem; display:block; margin-bottom:6px; color: var(--text-heading);">Nhập tên file để kiểm tra cấu trúc:</label>
-                <input type="text" id="testFileNameInput" style="width:100%; padding:8px 10px; border-radius:6px; border:1px solid var(--border-color); background:var(--bg-input); color:var(--text-heading); font-family:monospace; font-size:0.85rem;" placeholder="PRJ_001-PVI-ZZ-01-DR-A-0001.pdf">
+                <input type="text" id="testFileNameInput" style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border-color); background:var(--bg-input); color:var(--text-heading); font-family:monospace; font-size:0.85rem;" placeholder="PRJ_001-PVI-ZZ-01-DR-A-0001.pdf">
 
-                <div style="margin-top:10px; text-align:right;">
-                    <button class="btn btn-primary" onclick="validateISOFileName()">Kiểm Tra Cấu Trúc</button>
+                <div style="margin-top:12px; text-align:right;">
+                    <button class="btn btn-primary" style="width: 100%; justify-content: center;" onclick="validateISOFileName()">Kiểm Tra Cấu Trúc</button>
                 </div>
 
                 <div id="valResultSuccess" class="val-result val-success">
                     ✅ Tên file hợp lệ 100% theo chuẩn ISO 19650-2!
                 </div>
                 <div id="valResultError" class="val-result val-error">
-                    ❌ Tên file SAI định dạng ISO! Cấu trúc đúng phải gồm 7 trường: PROJECT-ORIGINATOR-VOLUME-LEVEL-TYPE-ROLE-NUMBER.ext
+                    ❌ Tên file SAI định dạng ISO! Cấu trúc đúng: PROJECT-ORIGINATOR-VOLUME-LEVEL-TYPE-ROLE-NUMBER.ext
                 </div>
             </div>
         </div>
@@ -921,7 +1110,7 @@
                 <div class="close-btn" onclick="closeModal('uploadModal')">✕</div>
             </div>
             <div style="font-size: 0.85rem;">
-                <div id="dropZone" style="border: 2px dashed var(--primary); padding: 24px; text-align: center; border-radius: 6px; background: var(--bg-input); margin-bottom: 12px; cursor: pointer;">
+                <div id="dropZone" style="border: 2px dashed var(--primary); padding: 20px; text-align: center; border-radius: 8px; background: var(--bg-input); margin-bottom: 12px; cursor: pointer;">
                     <span style="font-size: 2rem;">📁</span>
                     <p style="font-weight: bold; margin-top: 6px; color: var(--text-heading);">Kéo thả tệp tin .RVT, .IFC, .PDF vào đây hoặc bấm để chọn</p>
                     <input type="file" id="fileUploadInput" multiple style="display: none;">
@@ -940,7 +1129,7 @@
 
     <!-- JAVASCRIPT XỬ LÝ -->
     <script>
-        let DATA_SERVER_API = localStorage.getItem('cde_api_url') || 'http://localhost:3000';
+        let DATA_SERVER_API = localStorage.getItem('cde_api_url') || 'https://api.pvincons.cloud';
         let currentDiscipline = "ALL";
         let currentRowElement = null;
         let selectedFolderPathFilter = "";
@@ -956,6 +1145,17 @@
         };
 
         const ISO_CONTAINERS = ['01_WIP', '02_SHARED', '03_PUBLISHED', '04_ARCHIVE'];
+
+        /* Quản lý Responsive Mobile Sidebar */
+        function openMobileSidebar() {
+            document.getElementById('sidebar').classList.add('mobile-open');
+            document.getElementById('sidebarOverlay').classList.add('active');
+        }
+
+        function closeMobileSidebar() {
+            document.getElementById('sidebar').classList.remove('mobile-open');
+            document.getElementById('sidebarOverlay').classList.remove('active');
+        }
 
         function showToast(message) {
             const container = document.getElementById('toastContainer');
@@ -983,7 +1183,7 @@
                 showToast("Đã đồng bộ thành công dữ liệu từ kho CDE (database/bim-vdc)!");
             } catch (err) {
                 console.error("Lỗi lấy dữ liệu từ Backend CDE:", err);
-                showToast("⚠️ Không thể kết nối Server CDE (localhost:3000). Vui lòng bật 'node server.js'");
+                showToast("⚠️ Không thể kết nối Server CDE (https://api.pvincons.cloud). Vui lòng kiểm tra server.");
             }
         }
 
@@ -1068,6 +1268,7 @@
         function onProjectSelectChange() {
             selectedFolderPathFilter = "";
             applyFilters();
+            if (window.innerWidth <= 768) closeMobileSidebar();
         }
 
         function openWithLocalApp(itemPath) {
@@ -1190,8 +1391,7 @@
             currentRowElement.children[2].innerHTML = `<span class="badge ${badgeStateClass}">${newState}</span>`;
             currentRowElement.children[3].innerHTML = `<span class="badge badge-${newSuit.toLowerCase()}">${suitText}</span>`;
             currentRowElement.children[4].innerHTML = `<span class="rev-tag">${newRev}</span>`;
-            currentRowElement.children[6].innerText = newPath;
-            currentRowElement.children[7].innerHTML = getActionButtons(newState, newPath);
+            currentRowElement.children[6].innerHTML = getActionButtons(newState, newPath);
 
             showToast("Đã phê duyệt Gate & chuyển đổi vị trí file thành công!");
             closeModal('gateModal');
@@ -1305,6 +1505,7 @@
                 document.getElementById('stateFilter').value = "ALL";
             }
             applyFilters();
+            if (window.innerWidth <= 768) closeMobileSidebar();
         }
 
         async function addNewFolder(parentId, e) {
@@ -1407,8 +1608,8 @@
             const safePath = String(relativePath || '').replace(/'/g, "\\'");
 
             return `
-                <button class="btn-open-file" onclick="openWithLocalApp('${safePath}')" title="Mở trực tiếp tệp tin bằng ứng dụng trên máy tính (Revit, AutoCAD, PDF...)">📂 Mở File</button>
-                <button class="btn-icon" onclick="previewFile(this)" title="Xem chi tiết / Viewer">👁️ View</button>
+                <button class="btn-open-file" onclick="openWithLocalApp('${safePath}')" title="Mở trực tiếp tệp tin">📂 Mở File</button>
+                <button class="btn-icon" onclick="previewFile(this)" title="Xem chi tiết & Đường dẫn">👁️ View</button>
                 ${gateBtn}
                 <button class="btn-icon" onclick="downloadFile(this)" title="Tải về file">📥</button>
                 <div class="dropdown">
@@ -1426,6 +1627,31 @@
             `;
         }
 
+        function toggleCustomInput(selectEl, customInputId) {
+            const customInput = document.getElementById(customInputId);
+            if (!customInput) return;
+
+            if (selectEl.value === 'OTHER') {
+                customInput.style.display = 'block';
+                customInput.focus();
+            } else {
+                customInput.style.display = 'none';
+                customInput.value = '';
+            }
+            updateIsoName();
+        }
+
+        function getIsoFieldValue(selectId, customInputId, defaultVal) {
+            const selectEl = document.getElementById(selectId);
+            if (!selectEl) return defaultVal;
+
+            if (selectEl.value === 'OTHER') {
+                const customVal = document.getElementById(customInputId).value.trim();
+                return customVal !== '' ? customVal.toUpperCase() : 'XXX';
+            }
+            return selectEl.value;
+        }
+
         function openIsoRenameModal(btn) {
             currentRowElement = btn.closest('tr');
             let fullFileName = currentRowElement.querySelector('.file-code').innerText;
@@ -1437,13 +1663,22 @@
             let parts = baseName.split('-');
             let prjCode = currentRowElement.getAttribute('data-project') || "Project_01";
 
+            // Reset custom input states first
+            ['iso_originator', 'iso_volume', 'iso_level', 'iso_type', 'iso_role'].forEach(id => {
+                const customInput = document.getElementById(id + '_custom');
+                if (customInput) {
+                    customInput.style.display = 'none';
+                    customInput.value = '';
+                }
+            });
+
             if (parts.length === 7) {
                 document.getElementById('iso_project').value = parts[0];
-                setSelectValue('iso_originator', parts[1], 'PVI');
-                setSelectValue('iso_volume', parts[2], 'ZZ');
-                setSelectValue('iso_level', parts[3], 'ZZ');
-                setSelectValue('iso_type', parts[4], 'DR');
-                setSelectValue('iso_role', parts[5], 'A');
+                setSelectValueWithCustom('iso_originator', 'iso_originator_custom', parts[1], 'PVI');
+                setSelectValueWithCustom('iso_volume', 'iso_volume_custom', parts[2], 'ZZ');
+                setSelectValueWithCustom('iso_level', 'iso_level_custom', parts[3], 'ZZ');
+                setSelectValueWithCustom('iso_type', 'iso_type_custom', parts[4], 'DR');
+                setSelectValueWithCustom('iso_role', 'iso_role_custom', parts[5], 'A');
                 document.getElementById('iso_number').value = parts[6];
             } else {
                 document.getElementById('iso_project').value = prjCode;
@@ -1459,10 +1694,19 @@
             openModal('isoRenameModal');
         }
 
-        function setSelectValue(id, val, defaultVal) {
-            let sel = document.getElementById(id);
+        function setSelectValueWithCustom(selectId, customInputId, val, defaultVal) {
+            let sel = document.getElementById(selectId);
             let exists = Array.from(sel.options).some(opt => opt.value === val);
-            sel.value = exists ? val : defaultVal;
+            if (exists) {
+                sel.value = val;
+            } else {
+                sel.value = 'OTHER';
+                let customInput = document.getElementById(customInputId);
+                if (customInput) {
+                    customInput.style.display = 'block';
+                    customInput.value = val;
+                }
+            }
         }
 
         function formatNumberInput(input) {
@@ -1471,11 +1715,11 @@
 
         function updateIsoName() {
             let prj = (document.getElementById('iso_project').value.trim() || 'PRJ_001').toUpperCase().replace(/[^A-Z0-9_]/g, '');
-            let orig = document.getElementById('iso_originator').value;
-            let vol = document.getElementById('iso_volume').value;
-            let lvl = document.getElementById('iso_level').value;
-            let type = document.getElementById('iso_type').value;
-            let role = document.getElementById('iso_role').value;
+            let orig = getIsoFieldValue('iso_originator', 'iso_originator_custom', 'PVI');
+            let vol = getIsoFieldValue('iso_volume', 'iso_volume_custom', 'ZZ');
+            let lvl = getIsoFieldValue('iso_level', 'iso_level_custom', 'ZZ');
+            let type = getIsoFieldValue('iso_type', 'iso_type_custom', 'DR');
+            let role = getIsoFieldValue('iso_role', 'iso_role_custom', 'A');
             
             let numInput = document.getElementById('iso_number').value;
             let num = numInput.padStart(4, '0');
@@ -1524,10 +1768,16 @@
         function previewFile(btn) {
             let row = btn.closest('tr');
             document.getElementById('viewFileName').innerText = row.querySelector('.file-code').innerText;
-            document.getElementById('viewFilePath').innerText = row.children[6].innerText;
+            document.getElementById('viewFilePath').innerText = row.getAttribute('data-path');
             document.getElementById('viewFileState').innerText = row.children[2].innerText;
             document.getElementById('viewFileRev').innerText = row.children[4].innerText;
             openModal('viewModal');
+        }
+
+        function copyViewPath() {
+            let pathText = document.getElementById('viewFilePath').innerText;
+            navigator.clipboard.writeText(pathText);
+            showToast("Đã sao chép đường dẫn file vào clipboard!");
         }
 
         function downloadFile(btn) {
@@ -1662,7 +1912,6 @@
                 <td><span class="badge badge-${suit.toLowerCase()}">${suitText}</span></td>
                 <td><span class="rev-tag">${revText}</span></td>
                 <td><b>${disc}</b></td>
-                <td style="font-size:0.75rem; color:var(--text-muted); font-family:monospace;">${relativePath}</td>
                 <td class="action-btns">${getActionButtons(state, relativePath)}</td>
             `;
             tbody.appendChild(tr);
