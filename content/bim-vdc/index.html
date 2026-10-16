@@ -135,7 +135,7 @@
                 <span class="hidden sm:inline" id="themeText">Giao diện</span>
             </button>
 
-            <!-- NÚT ĐỔI MẬT KHẨU (ĐÃ CẬP NHẬT TÊN & GIAO DIỆN) -->
+            <!-- NÚT ĐỔI MẬT KHẨU -->
             <button onclick="togglePasswordModal(true)" class="p-2 sm:px-3.5 sm:py-2 bg-slate-200/80 dark:bg-slate-800/80 hover:bg-blue-600 hover:text-white dark:hover:bg-blue-600/90 text-slate-800 dark:text-slate-200 rounded-xl text-xs font-semibold border border-slate-300/60 dark:border-slate-700/60 backdrop-blur-md transition-all flex items-center gap-2 shadow-sm">
                 <i class="fa-solid fa-key text-blue-500 dark:text-blue-400 group-hover:text-white"></i>
                 <span class="hidden sm:inline">Đổi mật khẩu</span>
@@ -181,8 +181,8 @@
                         <!-- Thống kê thông số nhanh (Quick Stats) -->
                         <div class="grid grid-cols-3 gap-3 mb-5 relative z-10">
                             <div class="p-3 rounded-2xl bg-slate-100/80 dark:bg-slate-900/60 border border-slate-200/80 dark:border-slate-800/80 text-center backdrop-blur-md">
-                                <span class="block text-[9px] sm:text-[10px] text-slate-500 dark:text-slate-400 uppercase font-bold tracking-wider mb-0.5">Host IP</span>
-                                <span class="text-xs sm:text-sm font-mono font-bold text-blue-600 dark:text-blue-400">27.71.25.167</span>
+                                <span class="block text-[9px] sm:text-[10px] text-slate-500 dark:text-slate-400 uppercase font-bold tracking-wider mb-0.5">Host Domain</span>
+                                <span class="text-[10px] sm:text-xs font-mono font-bold text-blue-600 dark:text-blue-400 truncate block">revit.pvincons.cloud</span>
                             </div>
                             <div class="p-3 rounded-2xl bg-slate-100/80 dark:bg-slate-900/60 border border-slate-200/80 dark:border-slate-800/80 text-center backdrop-blur-md">
                                 <span class="block text-[9px] sm:text-[10px] text-slate-500 dark:text-slate-400 uppercase font-bold tracking-wider mb-0.5">Version</span>
@@ -215,9 +215,9 @@
                                     <i class="fa-solid fa-triangle-exclamation"></i> Quy trình kết nối cho Kỹ sư
                                 </h3>
                                 <ol class="list-decimal list-inside text-slate-600 dark:text-slate-400 space-y-1 pl-1 leading-relaxed text-[10px] sm:text-[11px]">
-                                    <li>Khởi chạy VPN Tailscale hoặc kết nối WiFi nội bộ Công ty.</li>
+                                    <li>Khởi chạy VPN Tailscale hoặc kết nối mạng nội bộ công ty.</li>
                                     <li>Mở <strong>Autodesk Revit 2027</strong> &gt; Chọn <strong>Open Project</strong> &gt; Chọn tab <strong>Revit Server</strong>.</li>
-                                    <li>Nhập Accelerator IP <code class="text-blue-600 dark:text-blue-300 bg-slate-200/80 dark:bg-slate-800 px-1.5 py-0.5 rounded font-mono">27.71.25.167</code> để tạo file Local.</li>
+                                    <li>Nhập Accelerator / Server <code class="text-blue-600 dark:text-blue-300 bg-slate-200/80 dark:bg-slate-800 px-1.5 py-0.5 rounded font-mono">revit.pvincons.cloud</code> để tạo file Local.</li>
                                 </ol>
                             </div>
                         </div>
@@ -225,7 +225,7 @@
 
                     <!-- NÚT MỞ REVIT SERVER NỔI BẬT TÂM ĐIỂM (HERO CTA BUTTON) -->
                     <div class="pt-5 relative z-10">
-                        <a href="http://27.71.25.167/RevitServerAdmin2027" target="_blank" class="btn-glow w-full py-4 px-6 rounded-2xl text-white font-bold text-xs sm:text-sm tracking-wider flex items-center justify-center gap-3 text-center group">
+                        <a href="https://revit.pvincons.cloud/RevitServerAdmin2027" target="_blank" class="btn-glow w-full py-4 px-6 rounded-2xl text-white font-bold text-xs sm:text-sm tracking-wider flex items-center justify-center gap-3 text-center group">
                             <i class="fa-solid fa-arrow-pointer text-base group-hover:scale-125 transition-transform"></i>
                             <span>TRUY CẬP REVIT SERVER ADMINISTRATOR 2027</span>
                             <i class="fa-solid fa-arrow-up-right-from-square text-xs opacity-70 group-hover:opacity-100 transition-all"></i>
@@ -302,7 +302,7 @@
         </div>
     </main>
 
-    <!-- MODAL ĐỔI MẬT KHẨU (GIAO DIỆN MỚI SANG TRỌNG) -->
+    <!-- MODAL ĐỔI MẬT KHẨU -->
     <div id="passModal" class="fixed inset-0 bg-slate-950/70 backdrop-blur-md hidden flex items-center justify-center p-4 z-50 transition-opacity">
         <div class="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 w-full max-w-md p-6 sm:p-7 rounded-3xl shadow-2xl relative overflow-hidden">
             <div class="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800 mb-5">
