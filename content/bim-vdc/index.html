@@ -319,20 +319,20 @@
 
             <div class="space-y-4">
                 <div>
-                    <label class="text-xs font-semibold text-slate-700 dark:text-slate-300">Mật khẩu hiện tại</label>
-                    <div class="relative mt-1.5">
-                        <input type="password" id="oldPass" placeholder="Nhập mật khẩu hiện tại" class="w-full px-3.5 py-2.5 pr-10 bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/80 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-blue-500 transition-colors">
-                        <button type="button" onclick="togglePassVisibility('oldPass', 'eyeOld')" class="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors">
-                            <i id="eyeOld" class="fa-solid fa-eye text-xs"></i>
-                        </button>
-                    </div>
-                </div>
-                <div>
                     <label class="text-xs font-semibold text-slate-700 dark:text-slate-300">Mật khẩu mới</label>
                     <div class="relative mt-1.5">
                         <input type="password" id="newPass" placeholder="Nhập mật khẩu mới" class="w-full px-3.5 py-2.5 pr-10 bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/80 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-blue-500 transition-colors">
                         <button type="button" onclick="togglePassVisibility('newPass', 'eyeNew')" class="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors">
                             <i id="eyeNew" class="fa-solid fa-eye text-xs"></i>
+                        </button>
+                    </div>
+                </div>
+                <div>
+                    <label class="text-xs font-semibold text-slate-700 dark:text-slate-300">Xác nhận lại mật khẩu</label>
+                    <div class="relative mt-1.5">
+                        <input type="password" id="confirmPass" placeholder="Xác nhận lại mật khẩu mới" class="w-full px-3.5 py-2.5 pr-10 bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/80 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-blue-500 transition-colors">
+                        <button type="button" onclick="togglePassVisibility('confirmPass', 'eyeConfirm')" class="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors">
+                            <i id="eyeConfirm" class="fa-solid fa-eye text-xs"></i>
                         </button>
                     </div>
                 </div>
@@ -412,8 +412,8 @@
             else {
                 modal.classList.add('hidden');
                 document.getElementById('passLoading').classList.add('hidden');
-                document.getElementById('oldPass').value = '';
                 document.getElementById('newPass').value = '';
+                document.getElementById('confirmPass').value = '';
             }
         }
 
@@ -432,12 +432,17 @@
         }
 
         async function submitChangePassword() {
-            const oldPassword = document.getElementById('oldPass').value.trim();
             const newPassword = document.getElementById('newPass').value.trim();
+            const confirmPassword = document.getElementById('confirmPass').value.trim();
             const userSession = JSON.parse(localStorage.getItem('currentUser') || '{}');
 
-            if (!oldPassword || !newPassword) {
+            if (!newPassword || !confirmPassword) {
                 alert('Vui lòng nhập đầy đủ thông tin mật khẩu!');
+                return;
+            }
+
+            if (newPassword !== confirmPassword) {
+                alert('Mật khẩu mới và xác nhận mật khẩu không khớp!');
                 return;
             }
 
@@ -453,14 +458,16 @@
                 const response = await fetch(SCRIPT_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                    body: JSON.stringify({ username: userSession.username, oldPassword, newPassword })
+                    body: JSON.stringify({ username: userSession.username, newPassword })
                 });
 
                 const result = await response.text();
                 if (result === 'SUCCESS') {
                     alert('Đổi mật khẩu thành công!');
                     togglePasswordModal(false);
-                } else alert('Mật khẩu cũ không chính xác!');
+                } else {
+                    alert('Đổi mật khẩu thất bại! Vui lòng thử lại.');
+                }
             } catch (error) {
                 alert('Không thể kết nối đến cơ sở dữ liệu!');
             } finally {
