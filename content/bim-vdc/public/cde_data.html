@@ -158,8 +158,6 @@
                     <thead>
                         <tr class="border-b border-[var(--border-color)] text-[11px] font-semibold uppercase text-[var(--text-muted)] tracking-wider">
                             <th class="pb-3 px-3">Tên tập tin / Thư mục</th>
-                            <th class="pb-3 px-3">Loại</th>
-                            <th class="pb-3 px-3 hidden md:table-cell">Đường dẫn tương đối</th>
                             <th class="pb-3 px-3 text-right">Thao tác</th>
                         </tr>
                     </thead>
@@ -324,6 +322,7 @@
 
                 const safePath = String(item.path || '').replace(/'/g, "\\'");
                 const safeName = String(item.name || '').replace(/'/g, "\\'");
+                const safeUrl = String(fileUrl || '').replace(/'/g, "\\'");
 
                 const clickHandler = isDir 
                     ? `navigateTo('${safePath}')` 
@@ -335,12 +334,6 @@
                             <span class="text-base shrink-0">${iconHtml}</span>
                             <span class="font-medium group-hover:text-blue-400 transition-colors break-all">${item.name}</span>
                         </div>
-                    </td>
-                    <td class="py-3 px-3 text-[11px] shrink-0">
-                        <span class="font-semibold ${isDir ? 'text-amber-500' : 'text-blue-500'}">${item.loai || (isDir ? 'Folder' : 'File')}</span>
-                    </td>
-                    <td class="py-3 px-3 font-mono text-[11px] text-[var(--text-muted)] max-w-xs truncate hidden md:table-cell">
-                        ${item.path}
                     </td>
                     <td class="py-3 px-3 text-right">
                         <div class="flex items-center justify-end gap-1 flex-wrap">
@@ -359,6 +352,9 @@
                                     <i class="fa-solid fa-server text-[10px]"></i> App VPS
                                 </button>
                             `}
+                            <button onclick="copyLink('${safeUrl}', '${safeName}')" title="Copy Link" class="p-1.5 sm:px-2 sm:py-1.5 bg-slate-800/80 hover:bg-teal-600/80 text-teal-300 hover:text-white rounded border border-teal-500/30 text-[11px] transition-all">
+                                <i class="fa-solid fa-link"></i>
+                            </button>
                             <button onclick="renameItem('${safePath}', '${safeName}')" title="Đổi tên" class="p-1.5 sm:px-2 sm:py-1.5 bg-slate-800/80 hover:bg-amber-600/80 text-amber-300 hover:text-white rounded border border-amber-500/30 text-[11px] transition-all">
                                 <i class="fa-solid fa-pen-to-square"></i>
                             </button>
@@ -428,6 +424,27 @@
             }
             const filtered = fetchedItems.filter(item => item.name.toLowerCase().includes(query));
             renderFileList(filtered);
+        }
+
+        function copyLink(url, name) {
+            navigator.clipboard.writeText(url).then(() => {
+                alert(`Đã sao chép đường dẫn của "${name}" vào bộ nhớ tạm!`);
+            }).catch(err => {
+                console.error('Lỗi sao chép:', err);
+                // Fallback cho trình duyệt cũ
+                const textArea = document.createElement("textarea");
+                textArea.value = url;
+                document.body.appendChild(textArea);
+                textArea.focus();
+                textArea.select();
+                try {
+                    document.execCommand('copy');
+                    alert(`Đã sao chép đường dẫn của "${name}"!`);
+                } catch (e) {
+                    alert("Không thể sao chép đường dẫn.");
+                }
+                document.body.removeChild(textArea);
+            });
         }
 
         function copyToClipboard(sourcePath, name, action) {

@@ -93,9 +93,12 @@
             display: block;
         }
 
-        /* Sidebar Styling */
+        /* Sidebar Styling Cố định Màn Hình */
         .sidebar {
             width: 320px;
+            height: 100vh;
+            position: sticky;
+            top: 0;
             background-color: var(--bg-sidebar);
             color: var(--text-main);
             display: flex;
@@ -110,6 +113,7 @@
             padding: 16px;
             background-color: var(--bg-dark);
             border-bottom: 1px solid var(--border-color);
+            flex-shrink: 0;
         }
 
         .brand-logo {
@@ -121,6 +125,26 @@
             justify-content: space-between;
             margin-bottom: 12px;
             letter-spacing: -0.02em;
+        }
+
+        .dashboard-link-btn {
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            color: var(--text-heading);
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.2s;
+        }
+        .dashboard-link-btn:hover {
+            background: var(--bg-hover);
+            color: var(--primary);
+            border-color: var(--primary);
         }
 
         .close-sidebar-btn {
@@ -149,6 +173,7 @@
         .nav-section {
             padding: 14px 12px;
             flex: 1;
+            min-height: 0;
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
         }
@@ -345,6 +370,8 @@
             overflow-y: auto;
             padding: 20px;
             -webkit-overflow-scrolling: touch;
+            display: flex;
+            flex-direction: column;
         }
 
         /* Stats Grid */
@@ -353,6 +380,7 @@
             grid-template-columns: repeat(4, 1fr);
             gap: 14px;
             margin-bottom: 18px;
+            flex-shrink: 0;
         }
 
         .stat-card {
@@ -381,6 +409,7 @@
             padding: 14px 16px;
             margin-bottom: 18px;
             box-shadow: var(--shadow-pro);
+            flex-shrink: 0;
         }
 
         .naming-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
@@ -405,8 +434,12 @@
             background: var(--bg-card);
             border: 1px solid var(--border-color);
             border-radius: 10px;
-            overflow: hidden;
             box-shadow: var(--shadow-pro);
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 350px;
+            overflow: hidden;
         }
 
         .table-toolbar {
@@ -418,6 +451,7 @@
             align-items: center;
             flex-wrap: wrap;
             gap: 12px;
+            flex-shrink: 0;
         }
 
         .filter-group { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
@@ -434,11 +468,21 @@
 
         .table-wrapper {
             width: 100%;
+            flex: 1;
             overflow-x: auto;
+            overflow-y: auto;
             -webkit-overflow-scrolling: touch;
+            padding-bottom: 100px;
+            direction: rtl; /* Đưa thanh trượt dọc sang phía bên trái */
         }
 
-        .cde-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; text-align: left; }
+        .cde-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.82rem;
+            text-align: left;
+            direction: ltr; /* Đảo hướng chữ về bình thường cho nội dung bảng */
+        }
 
         .cde-table th {
             background-color: var(--bg-input);
@@ -450,6 +494,9 @@
             font-size: 0.7rem;
             letter-spacing: 0.05em;
             white-space: nowrap;
+            position: sticky;
+            top: 0;
+            z-index: 10;
         }
 
         .cde-table td {
@@ -542,16 +589,17 @@
             display: none;
             position: absolute;
             right: 0;
-            top: 100%;
+            top: calc(100% + 4px);
             background-color: var(--bg-card);
-            min-width: 190px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+            min-width: 200px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
             border: 1px solid var(--border-color);
             border-radius: 8px;
-            z-index: 100;
+            z-index: 99999;
             overflow: hidden;
-            margin-top: 4px;
         }
+
+        .dropdown.show .dropdown-content { display: block; }
 
         .dropdown-content button {
             color: var(--text-heading);
@@ -569,7 +617,6 @@
         }
 
         .dropdown-content button:hover { background-color: var(--bg-hover); color: var(--primary); }
-        .dropdown.show .dropdown-content { display: block; }
 
         /* Floating Action Button (FAB) cho Mobile */
         .fab-btn {
@@ -600,7 +647,7 @@
             background: rgba(0, 0, 0, 0.7);
             backdrop-filter: blur(4px);
             align-items: center; justify-content: center;
-            z-index: 1000;
+            z-index: 100000;
             padding: 16px;
         }
 
@@ -703,7 +750,7 @@
             display: flex;
             flex-direction: column;
             gap: 8px;
-            z-index: 2000;
+            z-index: 200000;
             max-width: calc(100vw - 40px);
         }
         .toast {
@@ -732,7 +779,7 @@
 
             .sidebar {
                 position: fixed;
-                top: 0; left: 0; bottom: 0;
+                top: 0; left: 0; bottom: 0; height: 100vh;
                 transform: translateX(-100%);
                 box-shadow: 10px 0 25px rgba(0, 0, 0, 0.5);
             }
@@ -780,15 +827,22 @@
     <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <div class="brand-logo">
-                <span>💻 CDE Master</span>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <a href="../index.html" class="dashboard-link-btn" title="Trở về Dashboard">
+                        <span>← Dashboard</span>
+                    </a>
+                    <span>💻 CDE Master</span>
+                </div>
                 <button class="close-sidebar-btn" onclick="closeMobileSidebar()">✕</button>
             </div>
-            <select id="projectSelect" class="project-select-box" onchange="onProjectSelectChange()">
-            </select>
-
-            <button class="btn btn-primary" style="width: 100%; margin-top: 10px; font-size: 0.8rem; justify-content: center;" onclick="reloadDatabaseData()">
-                🔄 Làm mới Dữ liệu CDE
-            </button>
+            
+            <div style="display: flex; gap: 6px; align-items: center;">
+                <select id="projectSelect" class="project-select-box" onchange="onProjectSelectChange()" style="flex: 1;">
+                </select>
+                <button class="btn btn-primary" style="padding: 10px 12px; font-size: 0.9rem;" onclick="reloadDatabaseData()" title="Làm mới Dữ liệu CDE">
+                    🔄
+                </button>
+            </div>
         </div>
 
         <div class="nav-section">
@@ -802,7 +856,7 @@
             </div>
         </div>
 
-        <div style="padding: 12px 16px; border-top: 1px solid var(--border-color); font-size: 0.75rem; color: var(--text-muted);">
+        <div style="padding: 12px 16px; border-top: 1px solid var(--border-color); font-size: 0.75rem; color: var(--text-muted); flex-shrink: 0;">
             <div>⚡ Mode: <span style="color:var(--published-color); font-weight:bold;">Database CDE Sync</span></div>
             <div style="margin-top: 4px;">👤 Role: BIM Lead Manager</div>
         </div>
@@ -813,7 +867,7 @@
             <button class="mobile-toggle-btn" onclick="openMobileSidebar()" title="Mở danh mục">☰</button>
 
             <div class="search-bar">
-                <span>🔍</span>
+                <span style="font-size: 0.85rem; color: var(--text-muted);">🔍</span>
                 <input type="text" id="searchInput" onkeyup="applyFilters()" placeholder="Tìm kiếm thư mục, file ISO 19650...">
             </div>
 
@@ -1020,7 +1074,7 @@
         </div>
     </div>
 
-    <!-- MODAL VIEWER TÍCH HỢP XEM & COPY PATH -->
+    <!-- MODAL VIEWER -->
     <div class="modal" id="viewModal">
         <div class="modal-content">
             <div class="modal-header">
@@ -1287,7 +1341,7 @@
             link.click();
             document.body.removeChild(link);
 
-            showToast(`⚡ Đã mở tệp "${fileName}". Trình duyệt sẽ tự động kích hoạt ứng dụng cục bộ!`);
+            showToast(`⚡ Đã mở tệp "${fileName}". Trình duyệt kích hoạt ứng dụng cục bộ!`);
         }
 
         function countFilesInFolder(node) {
@@ -1526,10 +1580,10 @@
                     reloadDatabaseData();
                     showToast(`Tạo thư mục mới thành công: ${folderName.trim()}`);
                 } else {
-                    alert("Lỗi: " + (data.error || "Không thể tạo thư mục"));
+                    showToast("⚠️ Lỗi: " + (data.error || "Không thể tạo thư mục"));
                 }
             } catch (err) {
-                alert("Không kết nối được server CDE!");
+                showToast("⚠️ Không kết nối được server CDE!");
             }
         }
 
@@ -1551,10 +1605,10 @@
                     reloadDatabaseData();
                     showToast(`Đổi tên thư mục thành công: ${newName.trim()}`);
                 } else {
-                    alert("Lỗi: " + (data.error || "Không thể đổi tên"));
+                    showToast("⚠️ Lỗi: " + (data.error || "Không thể đổi tên"));
                 }
             } catch (err) {
-                alert("Không kết nối được server CDE!");
+                showToast("⚠️ Không kết nối được server CDE!");
             }
         }
 
@@ -1575,10 +1629,10 @@
                     reloadDatabaseData();
                     showToast("Đã xóa thư mục khỏi kho CDE!");
                 } else {
-                    alert("Lỗi: " + (data.error || "Không thể xóa"));
+                    showToast("⚠️ Lỗi: " + (data.error || "Không thể xóa"));
                 }
             } catch (err) {
-                alert("Không kết nối được server CDE!");
+                showToast("⚠️ Không kết nối được server CDE!");
             }
         }
 
@@ -1663,7 +1717,6 @@
             let parts = baseName.split('-');
             let prjCode = currentRowElement.getAttribute('data-project') || "Project_01";
 
-            // Reset custom input states first
             ['iso_originator', 'iso_volume', 'iso_level', 'iso_type', 'iso_role'].forEach(id => {
                 const customInput = document.getElementById(id + '_custom');
                 if (customInput) {
@@ -1746,10 +1799,10 @@
                     showToast(`Đổi tên file chuẩn ISO 19650 thành công: ${newFileName}`);
                     closeModal('isoRenameModal');
                 } else {
-                    alert("Lỗi: " + (data.error || "Không thể đổi tên"));
+                    showToast("⚠️ Lỗi: " + (data.error || "Không thể đổi tên"));
                 }
             } catch (err) {
-                alert("Không kết nối được server CDE!");
+                showToast("⚠️ Không kết nối được server CDE!");
             }
         }
 
@@ -1811,7 +1864,7 @@
 
         function viewVersionHistory(btn) {
             let row = btn.closest('tr');
-            alert(`[Nhật ký version - ISO 19650]\nFile: ${row.querySelector('.file-code').innerText}\n• Rev P01.01 (WIP)\n• Rev P01.00 (SHARED)\n• Rev C01.00 (PUBLISHED)`);
+            showToast(`📜 Phiên bản hiện tại của file: ${row.querySelector('.file-code').innerText}`);
         }
 
         function editMetadata(btn) {
@@ -1851,10 +1904,10 @@
                         reloadDatabaseData();
                         showToast(`Đã xóa tệp tin khỏi CDE thành công!`);
                     } else {
-                        alert("Lỗi: " + (data.error || "Không thể xóa"));
+                        showToast("⚠️ Lỗi: " + (data.error || "Không thể xóa"));
                     }
                 } catch (err) {
-                    alert("Không kết nối được server CDE!");
+                    showToast("⚠️ Không kết nối được server CDE!");
                 }
             }
         }
@@ -1986,7 +2039,7 @@
             const fileInput = document.getElementById('fileUploadInput');
             const targetFolder = document.getElementById('uploadTargetFolderSelect').value;
             if (!fileInput.files || fileInput.files.length === 0) {
-                alert("Vui lòng chọn tệp tin cần upload!");
+                showToast("⚠️ Vui lòng chọn tệp tin cần upload!");
                 return;
             }
 
@@ -2003,10 +2056,10 @@
                     });
                     const data = await res.json();
                     if (!data.success) {
-                        alert(`Lỗi upload file ${file.name}: ${data.error || 'Thất bại'}`);
+                        showToast(`⚠️ Lỗi upload file ${file.name}: ${data.error || 'Thất bại'}`);
                     }
                 } catch (e) {
-                    alert(`Không thể kết nối đến CDE Server khi upload file ${file.name}!`);
+                    showToast(`⚠️ Không thể kết nối đến CDE Server khi upload file ${file.name}!`);
                 }
             }
 
@@ -2087,6 +2140,15 @@
             link.click();
             showToast("Đã xuất file CSV thành công!");
         }
+
+        /* Hỗ trợ phím ESC để đóng Modal */
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                document.querySelectorAll('.modal.active').forEach(modal => {
+                    modal.classList.remove('active');
+                });
+            }
+        });
 
         document.addEventListener('DOMContentLoaded', () => {
             let savedTheme = localStorage.getItem('cde_theme') || 'dark';
