@@ -61,7 +61,6 @@
         }
     </style>
     <script>
-        // Khởi tạo theme chống nháy (Anti-FOUC)
         (function() {
             const savedTheme = localStorage.getItem('cde_data_theme') || 'dark';
             document.documentElement.setAttribute('data-theme', savedTheme);
@@ -87,7 +86,6 @@
                 </div>
             </div>
 
-            <!-- Nút đổi theme trên mobile nằm ngay trên header cho tiện -->
             <button onclick="toggleTheme()" class="sm:hidden p-2 rounded-lg bg-slate-800/50 border border-[var(--border-color)] text-slate-300 hover:text-white text-xs shrink-0" id="mobileThemeBtn" title="Chuyển chế độ Sáng/Tối">
                 <i class="fa-solid fa-sun text-amber-400" id="mobileThemeIcon"></i>
             </button>
@@ -110,7 +108,6 @@
             <button onclick="loadCDEFiles(currentPath)" title="Tải lại" class="p-2 text-slate-400 hover:text-white bg-slate-800 hover:bg-slate-700 rounded-lg text-xs transition-colors border border-[var(--border-color)]">
                 <i class="fa-solid fa-arrows-rotate"></i>
             </button>
-            <!-- Nút đổi theme desktop -->
             <button onclick="toggleTheme()" class="hidden sm:flex items-center gap-1.5 px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 border border-[var(--border-color)] text-slate-300 hover:text-white text-xs transition-colors" title="Chuyển chế độ Sáng/Tối">
                 <i class="fa-solid fa-sun text-amber-400" id="desktopThemeIcon"></i> <span id="desktopThemeText" class="hidden lg:inline">Light Mode</span>
             </button>
@@ -166,7 +163,6 @@
                 </table>
             </div>
 
-            <!-- LỖI KẾT NỐI -->
             <div id="cdeErrorState" class="hidden py-16 text-center space-y-3">
                 <div class="w-12 h-12 rounded-full bg-rose-500/20 text-rose-400 flex items-center justify-center mx-auto text-xl border border-rose-500/30">
                     <i class="fa-solid fa-plug-circle-xmark"></i>
@@ -182,23 +178,20 @@
                 </div>
             </div>
 
-            <!-- THƯ MỤC TRỐNG -->
             <div id="cdeEmptyState" class="hidden py-16 text-center space-y-2">
                 <i class="fa-regular fa-folder-open text-4xl text-slate-500 mb-2"></i>
                 <p class="text-xs text-[var(--text-muted)]">Thư mục này hiện tại không có dữ liệu.</p>
             </div>
         </div>
 
-        <!-- FOOTER SUMMARY -->
         <div class="p-3 px-5 border-t border-[var(--border-color)] bg-slate-900/60 flex items-center justify-between text-xs text-[var(--text-muted)]">
             <div id="cdeSummaryText">Đã tải 0 mục dữ liệu</div>
             <div class="flex items-center gap-2">
-                <span class="inline-block w-2 h-2 rounded-full bg-emerald-500"></span> Trạng thái CDE: Sẵn sàng
+                <span class="inline-block w-2 h-2 rounded-full bg-emerald-500"></span> Trạng thái CDE: Sẵn sàng (Real-time Sync Active)
             </div>
         </div>
     </main>
 
-    <!-- FOOTER -->
     <footer class="w-full max-w-6xl mx-auto pt-4 mt-4 border-t border-[var(--border-color)] flex flex-col sm:flex-row justify-between items-center gap-2 text-xs text-[var(--text-muted)] text-center sm:text-left">
         <div>&copy; 2026 PV INCONS Enterprise Workspace. CDE Data Engine Pro.</div>
         <div>BIM/VDC Standard v2.6.0 Pro</div>
@@ -211,13 +204,22 @@
         let fetchedItems = [];
         let clipboard = null;
 
+        // KÊNH ĐỒNG BỘ THỜI GIAN THỰC (BROADCAST CHANNEL)
+        const cdeSyncChannel = new BroadcastChannel('pvincons_cde_sync_channel');
+
+        cdeSyncChannel.onmessage = (event) => {
+            if (event.data && event.data.type === 'REFRESH_CDE_DATA') {
+                loadCDEFiles(currentPath);
+                console.log("[CDE Real-time] Đã tự động cập nhật dữ liệu mới từ cde_mir.html");
+            }
+        };
+
         document.addEventListener('DOMContentLoaded', function () {
             document.getElementById('apiServerUrlInput').value = DATA_SERVER_API;
             initThemeUI();
             loadCDEFiles(currentPath);
         });
 
-        // Xử lý Chế độ Sáng / Tối (Light / Dark Mode)
         function toggleTheme() {
             const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
             const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
@@ -430,8 +432,6 @@
             navigator.clipboard.writeText(url).then(() => {
                 alert(`Đã sao chép đường dẫn của "${name}" vào bộ nhớ tạm!`);
             }).catch(err => {
-                console.error('Lỗi sao chép:', err);
-                // Fallback cho trình duyệt cũ
                 const textArea = document.createElement("textarea");
                 textArea.value = url;
                 document.body.appendChild(textArea);
@@ -487,6 +487,8 @@
                         clipboard = null;
                         updatePasteButtonState();
                     }
+                    // PHÁT TÍN HIỆU ĐỒNG BỘ THỜI GIAN THỰC SANG CDE_MIR
+                    cdeSyncChannel.postMessage({ type: 'REFRESH_CDE_DATA' });
                     loadCDEFiles(currentPath);
                 } else alert("Lỗi: " + (data.error || "Thất bại"));
             } catch (e) {
@@ -524,8 +526,10 @@
                     body: JSON.stringify({ parentPath: currentPath, folderName })
                 });
                 const data = await res.json();
-                if (data.success) loadCDEFiles(currentPath);
-                else alert("Lỗi: " + (data.error || "Không thể tạo thư mục"));
+                if (data.success) {
+                    cdeSyncChannel.postMessage({ type: 'REFRESH_CDE_DATA' });
+                    loadCDEFiles(currentPath);
+                } else alert("Lỗi: " + (data.error || "Không thể tạo thư mục"));
             } catch (e) {
                 alert("Không thể kết nối đến CDE Server!");
             }
@@ -548,6 +552,7 @@
                 if (data.success) {
                     alert("Upload file thành công!");
                     event.target.value = '';
+                    cdeSyncChannel.postMessage({ type: 'REFRESH_CDE_DATA' });
                     loadCDEFiles(currentPath);
                 } else alert("Lỗi upload: " + (data.error || "Thất bại"));
             } catch (e) {
@@ -566,8 +571,10 @@
                     body: JSON.stringify({ path: itemPath, newName })
                 });
                 const data = await res.json();
-                if (data.success) loadCDEFiles(currentPath);
-                else alert("Lỗi: " + (data.error || "Không thể đổi tên"));
+                if (data.success) {
+                    cdeSyncChannel.postMessage({ type: 'REFRESH_CDE_DATA' });
+                    loadCDEFiles(currentPath);
+                } else alert("Lỗi: " + (data.error || "Không thể đổi tên"));
             } catch (e) {
                 alert("Không thể kết nối đến CDE Server!");
             }
@@ -583,8 +590,10 @@
                     body: JSON.stringify({ path: itemPath })
                 });
                 const data = await res.json();
-                if (data.success) loadCDEFiles(currentPath);
-                else alert("Lỗi: " + (data.error || "Không thể xóa"));
+                if (data.success) {
+                    cdeSyncChannel.postMessage({ type: 'REFRESH_CDE_DATA' });
+                    loadCDEFiles(currentPath);
+                } else alert("Lỗi: " + (data.error || "Không thể xóa"));
             } catch (e) {
                 alert("Không thể kết nối đến CDE Server!");
             }

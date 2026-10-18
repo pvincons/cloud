@@ -13,51 +13,49 @@
         :root[data-theme="dark"] {
             --primary: #38bdf8;
             --primary-dark: #0284c7;
-            --bg-dark: #0f172a;
-            --bg-sidebar: #0b1329;
-            --bg-main: #070a12;
-            --bg-card: #1e293b;
-            --bg-input: #0f172a;
-            --bg-hover: #334155;
-            --bg-tree-hover: rgba(255, 255, 255, 0.08);
-            --bg-tree-active: rgba(56, 189, 248, 0.2);
-            --text-main: #cbd5e1;
-            --text-heading: #f8fafc;
-            --text-muted: #94a3b8;
-            --border-color: #334155;
-            --folder-yellow: #facc15;
+            --bg-dark: #090d16;
+            --bg-sidebar: #070a12;
+            --bg-main: #05070c;
+            --bg-card: #0f172a;
+            --bg-input: #131b2e;
+            --bg-hover: #1e293b;
+            --bg-tree-hover: rgba(56, 189, 248, 0.08);
+            --bg-tree-active: rgba(56, 189, 248, 0.15);
+            --text-main: #94a3b8;
+            --text-heading: #f1f5f9;
+            --text-muted: #64748b;
+            --border-color: #1e293b;
+            --folder-yellow: #fbbf24;
 
             --wip-color: #38bdf8;
-            --shared-color: #f59e0b;
-            --published-color: #22c55e;
+            --shared-color: #fbbf24;
+            --published-color: #34d399;
             --archive-color: #94a3b8;
-            --glass-bg: rgba(30, 41, 59, 0.7);
-            --shadow-pro: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+            --shadow-pro: 0 4px 20px -2px rgba(0, 0, 0, 0.4);
         }
 
         :root[data-theme="light"] {
             --primary: #0284c7;
             --primary-dark: #0369a1;
-            --bg-dark: #f1f5f9;
+            --bg-dark: #f8fafc;
             --bg-sidebar: #ffffff;
-            --bg-main: #f8fafc;
+            --bg-main: #f1f5f9;
             --bg-card: #ffffff;
             --bg-input: #f1f5f9;
             --bg-hover: #e2e8f0;
-            --bg-tree-hover: rgba(0, 0, 0, 0.05);
-            --bg-tree-active: rgba(2, 132, 199, 0.15);
-            --text-main: #334155;
+            --bg-tree-hover: rgba(2, 132, 199, 0.05);
+            --bg-tree-active: rgba(2, 132, 199, 0.1);
+            --text-main: #64748b;
             --text-heading: #0f172a;
-            --text-muted: #64748b;
-            --border-color: #cbd5e1;
-            --folder-yellow: #eab308;
+            --text-muted: #94a3b8;
+            --border-color: #e2e8f0;
+            --folder-yellow: #f59e0b;
 
             --wip-color: #0284c7;
             --shared-color: #d97706;
-            --published-color: #16a34a;
+            --published-color: #059669;
             --archive-color: #475569;
-            --glass-bg: rgba(255, 255, 255, 0.8);
-            --shadow-pro: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+            --shadow-pro: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
         }
 
         * {
@@ -65,9 +63,15 @@
             margin: 0;
             padding: 0;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+            -webkit-font-smoothing: antialiased;
             -webkit-tap-highlight-color: transparent;
         }
+
+        ::-webkit-scrollbar { width: 5px; height: 5px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 10px; transition: background 0.2s; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+        * { scrollbar-width: thin; scrollbar-color: var(--border-color) transparent; }
 
         body {
             display: flex;
@@ -79,146 +83,132 @@
             position: relative;
         }
 
-        /* Overlay khi mở Sidebar trên Mobile */
         .sidebar-overlay {
             display: none;
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(4px);
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(2px);
             z-index: 90;
-            transition: opacity 0.3s ease;
         }
-        .sidebar-overlay.active {
-            display: block;
-        }
+        .sidebar-overlay.active { display: block; }
 
-        /* Sidebar Styling Cố định Màn Hình */
         .sidebar {
-            width: 320px;
+            width: 280px;
             height: 100vh;
             position: sticky;
             top: 0;
             background-color: var(--bg-sidebar);
-            color: var(--text-main);
             display: flex;
             flex-direction: column;
             border-right: 1px solid var(--border-color);
             flex-shrink: 0;
             z-index: 100;
-            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: transform 0.25s ease;
         }
 
         .sidebar-header {
-            padding: 16px;
-            background-color: var(--bg-dark);
+            padding: 12px 14px;
             border-bottom: 1px solid var(--border-color);
             flex-shrink: 0;
+            background: var(--bg-card);
         }
 
         .brand-logo {
-            font-size: 1.1rem;
-            font-weight: 800;
-            color: var(--primary);
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--text-heading);
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 12px;
-            letter-spacing: -0.02em;
+            margin-bottom: 8px;
         }
 
         .dashboard-link-btn {
-            background: var(--bg-input);
+            background: transparent;
             border: 1px solid var(--border-color);
-            color: var(--text-heading);
-            padding: 4px 10px;
-            border-radius: 6px;
-            font-size: 0.75rem;
-            font-weight: 600;
+            color: var(--text-muted);
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.68rem;
+            font-weight: 500;
             text-decoration: none;
             display: inline-flex;
             align-items: center;
             gap: 4px;
-            transition: all 0.2s;
         }
-        .dashboard-link-btn:hover {
-            background: var(--bg-hover);
-            color: var(--primary);
-            border-color: var(--primary);
-        }
+        .dashboard-link-btn:hover { border-color: var(--primary); color: var(--primary); }
 
         .close-sidebar-btn {
             display: none;
             background: transparent;
             border: none;
             color: var(--text-muted);
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             cursor: pointer;
         }
 
         .project-select-box {
             width: 100%;
-            padding: 10px 12px;
-            background-color: var(--bg-card);
+            padding: 7px 10px;
+            background-color: var(--bg-input);
             border: 1px solid var(--border-color);
             color: var(--text-heading);
-            border-radius: 8px;
-            font-size: 0.85rem;
-            font-weight: 600;
+            border-radius: 6px;
+            font-size: 0.78rem;
+            font-weight: 500;
             outline: none;
             cursor: pointer;
-            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+            transition: border-color 0.15s;
         }
+        .project-select-box:hover, .project-select-box:focus { border-color: var(--primary); }
 
         .nav-section {
-            padding: 14px 12px;
+            padding: 10px;
             flex: 1;
             min-height: 0;
             overflow-y: auto;
-            -webkit-overflow-scrolling: touch;
         }
 
         .nav-section-title {
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             text-transform: uppercase;
-            letter-spacing: 0.08em;
+            letter-spacing: 0.05em;
             color: var(--text-muted);
-            font-weight: 700;
-            margin-bottom: 10px;
-            padding-left: 6px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            padding-left: 4px;
         }
 
         .tree-branch {
             list-style: none;
-            padding-left: 12px;
-            margin: 2px 0 2px 4px;
-            border-left: 1px dashed var(--border-color);
+            padding-left: 10px;
+            margin: 2px 0;
+            border-left: 1px solid var(--border-color);
         }
 
         .tree-node-item {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 6px 8px;
-            border-radius: 6px;
-            font-size: 0.82rem;
+            padding: 5px 6px;
+            border-radius: 4px;
+            font-size: 0.78rem;
             cursor: pointer;
             user-select: none;
-            margin-bottom: 2px;
+            margin-bottom: 1px;
         }
-
-        .tree-node-item:hover { background-color: var(--bg-tree-hover); }
-
+        .tree-node-item:hover { background-color: var(--bg-tree-hover); color: var(--text-heading); }
         .tree-node-item.active {
             background-color: var(--bg-tree-active);
             color: var(--primary);
-            font-weight: 700;
+            font-weight: 600;
         }
 
         .node-title {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
@@ -228,45 +218,41 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            width: 16px;
-            height: 16px;
-            font-size: 0.7rem;
+            width: 14px;
+            height: 14px;
+            font-size: 0.6rem;
             color: var(--text-muted);
-            transition: transform 0.2s ease;
+            transition: transform 0.15s ease;
         }
-
         .toggle-icon.collapsed { transform: rotate(-90deg); }
 
-        .icon-folder { color: var(--folder-yellow); font-size: 1rem; }
-        .icon-file { color: var(--text-muted); font-size: 0.9rem; }
+        .icon-folder { color: var(--folder-yellow); font-size: 0.9rem; }
+        .icon-file { color: var(--text-muted); font-size: 0.8rem; }
 
         .folder-file-count {
-            font-size: 0.7rem;
-            font-weight: 700;
+            font-size: 0.65rem;
+            font-weight: 600;
             color: var(--primary);
-            background: rgba(56, 189, 248, 0.12);
-            padding: 2px 6px;
-            border-radius: 12px;
+            background: rgba(56, 189, 248, 0.1);
+            padding: 1px 5px;
+            border-radius: 10px;
             margin-left: 4px;
-            border: 1px solid rgba(56, 189, 248, 0.25);
         }
 
-        .node-actions { display: none; gap: 4px; }
+        .node-actions { display: none; gap: 2px; }
         .tree-node-item:hover .node-actions { display: flex; }
 
         .btn-tree-action {
             background: transparent;
             border: none;
             cursor: pointer;
-            font-size: 0.8rem;
-            padding: 2px 4px;
-            border-radius: 4px;
+            font-size: 0.75rem;
+            padding: 2px;
+            border-radius: 3px;
             color: var(--text-muted);
         }
+        .btn-tree-action:hover { color: var(--text-heading); }
 
-        .btn-tree-action:hover { background: var(--bg-card); color: var(--text-heading); }
-
-        /* Main Area Styling */
         .main-wrapper {
             flex: 1;
             display: flex;
@@ -277,14 +263,14 @@
         }
 
         .top-navbar {
-            height: 64px;
+            height: 54px;
             background-color: var(--bg-card);
             border-bottom: 1px solid var(--border-color);
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 20px;
-            gap: 12px;
+            padding: 0 16px;
+            gap: 10px;
             flex-shrink: 0;
         }
 
@@ -293,9 +279,9 @@
             background: var(--bg-input);
             border: 1px solid var(--border-color);
             color: var(--text-heading);
-            padding: 8px 12px;
-            border-radius: 8px;
-            font-size: 1.1rem;
+            padding: 5px 8px;
+            border-radius: 6px;
+            font-size: 0.95rem;
             cursor: pointer;
         }
 
@@ -304,366 +290,336 @@
             align-items: center;
             background-color: var(--bg-input);
             border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 8px 12px;
-            width: 320px;
+            border-radius: 6px;
+            padding: 5px 10px;
+            width: 260px;
             max-width: 100%;
+            transition: border-color 0.15s;
         }
-
+        .search-bar:focus-within { border-color: var(--primary); }
         .search-bar input {
             border: none;
             background: transparent;
             outline: none;
             width: 100%;
-            margin-left: 8px;
-            font-size: 0.85rem;
+            margin-left: 6px;
+            font-size: 0.78rem;
             color: var(--text-heading);
         }
 
-        .top-actions { display: flex; align-items: center; gap: 8px; flex-wrap: nowrap; }
+        .top-actions { display: flex; align-items: center; gap: 6px; flex-wrap: nowrap; }
 
         .btn {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 6px;
-            padding: 8px 14px;
-            border-radius: 8px;
-            font-size: 0.82rem;
-            font-weight: 600;
+            gap: 5px;
+            padding: 5px 10px;
+            border-radius: 6px;
+            font-size: 0.76rem;
+            font-weight: 500;
             cursor: pointer;
-            border: none;
-            transition: all 0.2s;
+            border: 1px solid var(--border-color);
+            transition: all 0.15s ease;
             white-space: nowrap;
         }
-
         .btn-primary {
-            background-color: var(--primary-dark);
-            color: white;
-            box-shadow: 0 2px 4px rgba(2, 132, 199, 0.25);
+            background-color: var(--primary);
+            color: #0f172a;
+            border-color: var(--primary);
+            font-weight: 600;
         }
-        .btn-primary:hover { opacity: 0.92; transform: translateY(-1px); }
+        .btn-primary:hover { opacity: 0.9; }
 
-        .btn-dark { background-color: var(--border-color); color: var(--text-heading); }
-        .btn-dark:hover { background-color: var(--bg-hover); }
+        .btn-dark { background-color: var(--bg-input); color: var(--text-heading); }
+        .btn-dark:hover { border-color: var(--text-muted); }
 
-        .btn-outline { background-color: var(--bg-input); border: 1px solid var(--border-color); color: var(--text-heading); }
-        .btn-outline:hover { background-color: var(--bg-hover); }
+        .btn-outline { background-color: transparent; color: var(--text-heading); }
+        .btn-outline:hover { background-color: var(--bg-hover); border-color: var(--text-muted); }
 
         .theme-toggle-btn {
             display: inline-flex;
             align-items: center;
-            gap: 6px;
-            padding: 8px 12px;
-            border-radius: 20px;
+            gap: 5px;
+            padding: 5px 9px;
+            border-radius: 6px;
             background-color: var(--bg-input);
             border: 1px solid var(--border-color);
             color: var(--text-heading);
-            font-size: 0.8rem;
-            font-weight: 600;
+            font-size: 0.76rem;
             cursor: pointer;
-            user-select: none;
         }
+        .theme-toggle-btn:hover { border-color: var(--text-muted); }
 
         .content-area {
             flex: 1;
             overflow-y: auto;
-            padding: 20px;
-            -webkit-overflow-scrolling: touch;
+            padding: 14px;
             display: flex;
             flex-direction: column;
+            gap: 12px;
+            max-height: calc(100vh - 54px);
         }
 
-        /* Stats Grid */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 14px;
-            margin-bottom: 18px;
+            gap: 10px;
             flex-shrink: 0;
         }
 
         .stat-card {
             background: var(--bg-card);
             border: 1px solid var(--border-color);
-            border-radius: 10px;
-            padding: 14px 16px;
-            border-left: 4px solid var(--primary);
-            box-shadow: var(--shadow-pro);
+            border-radius: 8px;
+            padding: 10px 12px;
         }
 
-        .stat-card.wip { border-left-color: var(--wip-color); }
-        .stat-card.shared { border-left-color: var(--shared-color); }
-        .stat-card.published { border-left-color: var(--published-color); }
-        .stat-card.archive { border-left-color: var(--archive-color); }
+        .stat-title { font-size: 0.65rem; text-transform: uppercase; color: var(--text-muted); font-weight: 600; letter-spacing: 0.03em; }
+        .stat-value { font-size: 1.1rem; font-weight: 700; color: var(--text-heading); margin-top: 2px; }
+        .stat-desc { font-size: 0.65rem; color: var(--text-muted); margin-top: 1px; }
 
-        .stat-title { font-size: 0.72rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700; letter-spacing: 0.05em; }
-        .stat-value { font-size: 1.4rem; font-weight: 800; color: var(--text-heading); margin-top: 4px; }
-        .stat-desc { font-size: 0.72rem; color: var(--text-muted); margin-top: 2px; }
-
-        /* ISO Naming Rule Card */
         .naming-rule-card {
             background: var(--bg-card);
             border: 1px solid var(--border-color);
-            border-radius: 10px;
-            padding: 14px 16px;
-            margin-bottom: 18px;
-            box-shadow: var(--shadow-pro);
+            border-radius: 8px;
+            padding: 10px 12px;
             flex-shrink: 0;
         }
-
-        .naming-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        .naming-title { font-size: 0.85rem; font-weight: 700; color: var(--text-heading); }
+        .naming-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+        .naming-title { font-size: 0.75rem; font-weight: 600; color: var(--text-heading); }
         .naming-fields { display: flex; gap: 6px; flex-wrap: wrap; }
 
         .field-chip {
             background: var(--bg-input);
             border: 1px solid var(--border-color);
-            border-radius: 6px;
-            padding: 6px 10px;
+            border-radius: 4px;
+            padding: 3px 6px;
             text-align: center;
             flex: 1;
-            min-width: 90px;
+            min-width: 75px;
         }
+        .field-code { font-family: 'Consolas', monospace; font-weight: 600; color: var(--primary); font-size: 0.72rem; }
+        .field-label { font-size: 0.6rem; color: var(--text-muted); margin-top: 1px; }
 
-        .field-code { font-family: 'Consolas', monospace; font-weight: 700; color: var(--primary); font-size: 0.82rem; }
-        .field-label { font-size: 0.68rem; color: var(--text-muted); margin-top: 2px; }
-
-        /* Table Section */
         .table-container {
             background: var(--bg-card);
             border: 1px solid var(--border-color);
-            border-radius: 10px;
-            box-shadow: var(--shadow-pro);
+            border-radius: 8px;
             flex: 1;
             display: flex;
             flex-direction: column;
-            min-height: 350px;
+            min-height: 320px;
             overflow: hidden;
         }
 
         .table-toolbar {
-            padding: 14px 16px;
+            padding: 10px 12px;
             background: var(--bg-card);
             border-bottom: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+
+        .toolbar-top {
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
-            gap: 12px;
-            flex-shrink: 0;
+            gap: 8px;
         }
 
-        .filter-group { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+        .filters-wrapper {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+            flex-wrap: nowrap;
+        }
 
         .select-filter {
-            padding: 8px 12px;
+            padding: 5px 8px;
             border: 1px solid var(--border-color);
-            border-radius: 8px;
-            font-size: 0.8rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
             color: var(--text-heading);
             outline: none;
             background-color: var(--bg-input);
+            cursor: pointer;
+            width: 140px;
+            text-overflow: ellipsis;
         }
+        .select-filter:hover { border-color: var(--primary); }
 
         .table-wrapper {
             width: 100%;
             flex: 1;
             overflow-x: auto;
             overflow-y: auto;
-            -webkit-overflow-scrolling: touch;
-            padding-bottom: 100px;
-            direction: rtl; /* Đưa thanh trượt dọc sang phía bên trái */
+            padding-bottom: 10px;
         }
 
         .cde-table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 0.82rem;
+            font-size: 0.76rem;
             text-align: left;
-            direction: ltr; /* Đảo hướng chữ về bình thường cho nội dung bảng */
         }
-
         .cde-table th {
             background-color: var(--bg-input);
             color: var(--text-muted);
-            font-weight: 700;
-            padding: 12px;
-            border-bottom: 2px solid var(--border-color);
+            font-weight: 600;
+            padding: 8px 10px;
+            border-bottom: 1px solid var(--border-color);
             text-transform: uppercase;
-            font-size: 0.7rem;
+            font-size: 0.63rem;
             letter-spacing: 0.05em;
             white-space: nowrap;
             position: sticky;
             top: 0;
             z-index: 10;
         }
-
         .cde-table td {
-            padding: 12px;
+            padding: 8px 10px;
             border-bottom: 1px solid var(--border-color);
             vertical-align: middle;
             color: var(--text-main);
             white-space: nowrap;
         }
-
         .cde-table tr:hover { background-color: var(--bg-hover); }
 
-        .file-code { font-family: 'Consolas', monospace; font-weight: 700; color: var(--primary); font-size: 0.82rem; }
+        .file-code { font-family: 'Consolas', monospace; font-weight: 600; color: var(--text-heading); font-size: 0.76rem; }
 
         .badge {
             display: inline-block;
-            padding: 3px 8px;
-            border-radius: 6px;
-            font-size: 0.72rem;
-            font-weight: 700;
+            padding: 2px 5px;
+            border-radius: 4px;
+            font-size: 0.65rem;
+            font-weight: 600;
             text-align: center;
         }
-
-        .badge-prj { background: rgba(99, 102, 241, 0.15); color: #818cf8; border: 1px solid rgba(99, 102, 241, 0.35); }
-        .badge-wip { background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3); }
-        .badge-shared { background: rgba(245, 158, 11, 0.15); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.3); }
-        .badge-published { background: rgba(34, 197, 94, 0.15); color: #22c55e; border: 1px solid rgba(34, 197, 94, 0.3); }
-        .badge-archive { background: rgba(148, 163, 184, 0.15); color: #94a3b8; border: 1px solid rgba(148, 163, 184, 0.3); }
-        .badge-s0 { background: var(--bg-input); color: var(--text-muted); border: 1px solid var(--border-color); }
-        .badge-s1 { background: rgba(59, 130, 246, 0.15); color: #3b82f6; }
-        .badge-s2 { background: rgba(99, 102, 241, 0.15); color: #6366f1; }
-        .badge-s3 { background: rgba(168, 85, 247, 0.15); color: #a855f7; }
-        .badge-s4 { background: rgba(234, 179, 8, 0.15); color: #eab308; }
-        .badge-a1 { background: rgba(34, 197, 94, 0.15); color: #22c55e; }
-        .badge-a2 { background: rgba(245, 158, 11, 0.15); color: #f59e0b; }
+        .badge-prj { background: rgba(99, 102, 241, 0.1); color: #818cf8; border: 1px solid rgba(99, 102, 241, 0.2); }
+        .badge-wip { background: rgba(56, 189, 248, 0.1); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.2); }
+        .badge-shared { background: rgba(251, 191, 36, 0.1); color: #fbbf24; border: 1px solid rgba(251, 191, 36, 0.2); }
+        .badge-published { background: rgba(52, 211, 153, 0.1); color: #34d399; border: 1px solid rgba(52, 211, 153, 0.2); }
+        .badge-archive { background: rgba(148, 163, 184, 0.1); color: #94a3b8; border: 1px solid rgba(148, 163, 184, 0.2); }
+        .badge-issue { background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.2); cursor: pointer; margin-left: 6px; }
 
         .rev-tag {
             font-family: 'Consolas', monospace;
-            font-weight: 700;
+            font-weight: 600;
             color: var(--text-heading);
             background: var(--bg-input);
-            padding: 3px 6px;
+            padding: 2px 5px;
             border-radius: 4px;
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             border: 1px solid var(--border-color);
         }
 
         .action-btns { display: flex; gap: 4px; align-items: center; position: relative; }
 
         .btn-icon {
-            padding: 5px 9px;
-            font-size: 0.78rem;
-            border-radius: 6px;
+            padding: 3px 7px;
+            font-size: 0.7rem;
+            border-radius: 4px;
             border: 1px solid var(--border-color);
             background: var(--bg-input);
             color: var(--text-heading);
             cursor: pointer;
-            font-weight: 600;
+            font-weight: 500;
             white-space: nowrap;
         }
-
-        .btn-icon:hover { background: var(--bg-hover); color: var(--primary); }
+        .btn-icon:hover { border-color: var(--primary); color: var(--primary); }
 
         .btn-open-file {
-            background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
-            color: #ffffff !important;
-            border: 1px solid #38bdf8;
-            padding: 5px 10px;
-            border-radius: 6px;
-            font-weight: 700;
-            font-size: 0.75rem;
+            background: var(--primary);
+            color: #0f172a !important;
+            border: none;
+            padding: 3px 7px;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 0.7rem;
             display: inline-flex;
             align-items: center;
-            gap: 4px;
-            box-shadow: 0 2px 6px rgba(2, 132, 199, 0.35);
-            transition: all 0.2s ease;
+            gap: 3px;
             cursor: pointer;
             white-space: nowrap;
         }
-
-        .btn-open-file:hover {
-            background: linear-gradient(135deg, #0369a1 0%, #0284c7 100%);
-            box-shadow: 0 4px 12px rgba(56, 189, 248, 0.5);
-            transform: translateY(-1px);
-        }
+        .btn-open-file:hover { opacity: 0.9; }
 
         .dropdown { position: relative; display: inline-block; }
-
         .dropdown-content {
             display: none;
             position: absolute;
             right: 0;
             top: calc(100% + 4px);
             background-color: var(--bg-card);
-            min-width: 200px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
+            min-width: 170px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
             border: 1px solid var(--border-color);
-            border-radius: 8px;
+            border-radius: 6px;
             z-index: 99999;
             overflow: hidden;
         }
-
         .dropdown.show .dropdown-content { display: block; }
-
         .dropdown-content button {
             color: var(--text-heading);
-            padding: 10px 14px;
+            padding: 7px 10px;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
             width: 100%;
             background: transparent;
             border: none;
             text-align: left;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             cursor: pointer;
-            transition: background 0.15s ease;
         }
-
         .dropdown-content button:hover { background-color: var(--bg-hover); color: var(--primary); }
 
-        /* Floating Action Button (FAB) cho Mobile */
         .fab-btn {
             display: none;
             position: fixed;
-            bottom: 24px;
-            right: 20px;
-            width: 52px;
-            height: 52px;
+            bottom: 20px;
+            right: 16px;
+            width: 44px;
+            height: 44px;
             border-radius: 50%;
-            background: var(--primary-dark);
-            color: #fff;
+            background: var(--primary);
+            color: #0f172a;
             border: none;
-            box-shadow: 0 4px 15px rgba(2, 132, 199, 0.5);
-            font-size: 1.4rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            font-size: 1.1rem;
             align-items: center;
             justify-content: center;
             z-index: 80;
             cursor: pointer;
         }
 
-        /* Modal Styling */
         .modal {
             display: none;
             position: fixed;
             top: 0; left: 0;
             width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(4px);
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(2px);
             align-items: center; justify-content: center;
             z-index: 100000;
             padding: 16px;
         }
-
         .modal.active { display: flex; }
 
         .modal-content {
             background: var(--bg-card);
             border: 1px solid var(--border-color);
-            border-radius: 12px;
-            width: 600px; max-width: 100%;
+            border-radius: 8px;
+            width: 520px; max-width: 100%;
             max-height: 90vh;
             overflow-y: auto;
-            padding: 20px;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+            padding: 16px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.4);
             color: var(--text-main);
-            -webkit-overflow-scrolling: touch;
         }
 
         .modal-header {
@@ -671,151 +627,83 @@
             justify-content: space-between;
             align-items: center;
             border-bottom: 1px solid var(--border-color);
-            padding-bottom: 12px;
-            margin-bottom: 16px;
+            padding-bottom: 8px;
+            margin-bottom: 12px;
         }
+        .modal-title { font-size: 0.85rem; font-weight: 700; color: var(--text-heading); }
+        .close-btn { cursor: pointer; font-size: 1rem; color: var(--text-muted); }
 
-        .modal-title { font-size: 1rem; font-weight: 700; color: var(--text-heading); }
-        .close-btn { cursor: pointer; font-size: 1.2rem; color: var(--text-muted); padding: 4px; }
-
-        .val-result {
-            margin-top: 10px; padding: 12px;
-            border-radius: 8px; font-size: 0.82rem; font-weight: 600; display: none;
-        }
-
-        .val-success { background: rgba(34, 197, 94, 0.15); color: #22c55e; border: 1px solid rgba(34, 197, 94, 0.3); }
-        .val-error { background: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); }
-
-        .preview-box {
-            width: 100%; height: 220px;
-            background: var(--bg-dark);
-            border: 1px dashed var(--border-color);
-            border-radius: 8px;
-            display: flex; flex-direction: column;
-            align-items: center; justify-content: center;
-            margin-top: 12px; color: var(--text-muted);
-        }
-
-        .iso-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-top: 12px;
-        }
-        .iso-full { grid-column: span 2; }
-        .iso-group { display: flex; flex-direction: column; gap: 4px; }
-        .iso-group label { font-size: 0.75rem; font-weight: 700; color: var(--text-heading); }
-        .iso-group select, .iso-group input {
-            padding: 8px 10px;
-            background: var(--bg-input);
-            border: 1px solid var(--border-color);
-            color: var(--text-heading);
-            border-radius: 8px;
-            font-size: 0.82rem;
-            outline: none;
-        }
-        .iso-group select:focus, .iso-group input:focus { border-color: var(--primary); }
-        .iso-custom-input {
-            margin-top: 6px;
-            background-color: var(--bg-input);
-            border: 1px solid var(--primary);
-            color: var(--text-heading);
-            padding: 8px 10px;
-            border-radius: 6px;
-            font-size: 0.82rem;
-            width: 100%;
-        }
-        .iso-preview-card {
-            background: var(--bg-input);
-            border: 1px dashed var(--primary);
-            padding: 12px;
-            border-radius: 8px;
-            text-align: center;
-            margin-top: 10px;
-        }
-        .iso-preview-name {
-            font-family: 'Consolas', monospace;
-            font-size: 1.05rem;
-            font-weight: 700;
-            color: var(--primary);
-            margin: 6px 0;
-            word-break: break-all;
-        }
-
-        /* Toast notifications */
         .toast-container {
             position: fixed;
-            bottom: 20px;
-            right: 20px;
+            bottom: 16px;
+            right: 16px;
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 6px;
             z-index: 200000;
-            max-width: calc(100vw - 40px);
+            max-width: calc(100vw - 32px);
         }
         .toast {
             background: var(--bg-card);
             color: var(--text-heading);
             border: 1px solid var(--border-color);
-            border-left: 4px solid var(--primary);
-            padding: 12px 16px;
-            border-radius: 8px;
-            font-size: 0.82rem;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
-            animation: slideIn 0.2s ease, fadeOut 0.3s ease 2.7s forwards;
+            border-left: 3px solid var(--primary);
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            animation: slideIn 0.15s ease, fadeOut 0.25s ease 2.7s forwards;
         }
         @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
-        @keyframes fadeOut { to { opacity: 0; transform: translateY(10px); } }
+        @keyframes fadeOut { to { opacity: 0; transform: translateY(6px); } }
 
-        /* Media Queries Tối ưu Mobile & Tablet */
         @media (max-width: 1024px) {
             .stats-grid { grid-template-columns: repeat(2, 1fr); }
-            .search-bar { width: 220px; }
+            .search-bar { width: 200px; }
         }
 
         @media (max-width: 768px) {
             .mobile-toggle-btn { display: inline-flex; }
             .close-sidebar-btn { display: block; }
-
             .sidebar {
                 position: fixed;
                 top: 0; left: 0; bottom: 0; height: 100vh;
                 transform: translateX(-100%);
-                box-shadow: 10px 0 25px rgba(0, 0, 0, 0.5);
+                box-shadow: 10px 0 25px rgba(0, 0, 0, 0.3);
             }
-
-            .sidebar.mobile-open {
-                transform: translateX(0);
-            }
-
-            .top-navbar { padding: 0 12px; height: 56px; }
-
+            .sidebar.mobile-open { transform: translateX(0); }
+            .top-navbar { padding: 0 10px; height: 48px; }
             .search-bar { flex: 1; width: auto; }
-
             .top-actions .btn-dark,
             .top-actions .btn-outline,
-            .top-actions .theme-toggle-btn {
-                display: none;
+            .top-actions .theme-toggle-btn { display: none; }
+            .fab-btn { display: flex; }
+            .content-area { padding: 8px; gap: 8px; }
+            .stats-grid { grid-template-columns: 1fr 1fr; gap: 6px; }
+            .stat-card { padding: 8px; }
+            .stat-value { font-size: 1rem; }
+            .naming-rule-card { display: none; }
+            
+            .toolbar-top {
+                display: flex;
+                flex-direction: column;
+                align-items: stretch;
+                gap: 8px;
             }
 
-            .fab-btn { display: flex; }
+            .filters-wrapper {
+                width: 100%;
+                display: flex;
+                gap: 4px;
+            }
 
-            .content-area { padding: 12px; }
-
-            .stats-grid { grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
-            .stat-card { padding: 10px 12px; }
-            .stat-value { font-size: 1.2rem; }
-
-            .naming-rule-card { display: none; }
-
-            .iso-grid { grid-template-columns: 1fr; }
-            .iso-full { grid-column: span 1; }
-
-            .table-toolbar { flex-direction: column; align-items: stretch; gap: 8px; }
-            .filter-group { flex-direction: column; align-items: stretch; }
-            .select-filter { width: 100%; }
-
-            .toast-container { left: 20px; right: 20px; }
+            .select-filter {
+                flex: 1;
+                width: 0;
+                min-width: 0;
+                font-size: 0.68rem;
+                padding: 5px 3px;
+            }
         }
     </style>
 </head>
@@ -827,11 +715,11 @@
     <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <div class="brand-logo">
-                <div style="display: flex; align-items: center; gap: 8px;">
+                <div style="display: flex; align-items: center; gap: 6px;">
                     <a href="../index.html" class="dashboard-link-btn" title="Trở về Dashboard">
                         <span>← Dashboard</span>
                     </a>
-                    <span>💻 CDE Master</span>
+                    <span style="color:var(--text-heading); font-weight:600;">CDE Master</span>
                 </div>
                 <button class="close-sidebar-btn" onclick="closeMobileSidebar()">✕</button>
             </div>
@@ -839,7 +727,7 @@
             <div style="display: flex; gap: 6px; align-items: center;">
                 <select id="projectSelect" class="project-select-box" onchange="onProjectSelectChange()" style="flex: 1;">
                 </select>
-                <button class="btn btn-primary" style="padding: 10px 12px; font-size: 0.9rem;" onclick="reloadDatabaseData()" title="Làm mới Dữ liệu CDE">
+                <button class="btn btn-dark" style="padding: 6px 9px;" onclick="reloadDatabaseData()" title="Làm mới Dữ liệu CDE">
                     🔄
                 </button>
             </div>
@@ -847,18 +735,17 @@
 
         <div class="nav-section">
             <div class="nav-section-title" style="display: flex; justify-content: space-between; align-items: center;">
-                <span>CÂY THƯ MỤC & FILE CON</span>
-                <button class="btn-tree-action" style="font-size:0.75rem;" title="Tạo thư mục gốc" onclick="addNewFolder('ROOT')">➕ Thư mục mới</button>
+                <span>CÂY THƯ MỤC & FILE</span>
+                <button class="btn-tree-action" title="Tạo thư mục gốc" onclick="addNewFolder('ROOT')">➕ Thư mục</button>
             </div>
 
             <div id="dynamicTreeContainer">
-                <!-- Cây thư mục ảo render động từ Database CDE -->
             </div>
         </div>
 
-        <div style="padding: 12px 16px; border-top: 1px solid var(--border-color); font-size: 0.75rem; color: var(--text-muted); flex-shrink: 0;">
-            <div>⚡ Mode: <span style="color:var(--published-color); font-weight:bold;">Database CDE Sync</span></div>
-            <div style="margin-top: 4px;">👤 Role: BIM Lead Manager</div>
+        <div style="padding: 10px 12px; border-top: 1px solid var(--border-color); font-size: 0.68rem; color: var(--text-muted); flex-shrink: 0;">
+            <div style="font-weight: 600; color: var(--text-heading); font-size: 0.72rem;">CÔNG TY TNHH TM & XD PV INCONS</div>
+            <div style="margin-top: 3px; font-size: 0.65rem;">© 2026 Bản quyền thuộc về PV INCONS</div>
         </div>
     </div>
 
@@ -867,90 +754,101 @@
             <button class="mobile-toggle-btn" onclick="openMobileSidebar()" title="Mở danh mục">☰</button>
 
             <div class="search-bar">
-                <span style="font-size: 0.85rem; color: var(--text-muted);">🔍</span>
-                <input type="text" id="searchInput" onkeyup="applyFilters()" placeholder="Tìm kiếm thư mục, file ISO 19650...">
+                <span style="font-size: 0.75rem; color: var(--text-muted);">🔍</span>
+                <input type="text" id="searchInput" onkeyup="applyFilters()" placeholder="Tìm kiếm file ISO 19650...">
             </div>
 
             <div class="top-actions">
                 <button class="theme-toggle-btn" onclick="toggleTheme()" id="themeToggleBtn">
-                    <span id="themeIcon">☀️</span> <span id="themeText">Light Mode</span>
+                    <span id="themeIcon">☀️</span> <span id="themeText">Light</span>
                 </button>
 
-                <button class="btn btn-outline" onclick="openModal('namingModal')">🧪 Test Naming</button>
-                <button class="btn btn-dark" onclick="openModal('uploadModal')">📤 Upload Container</button>
-                <button class="btn btn-primary" onclick="exportCSV()">📥 Export (CSV)</button>
+                <button class="btn btn-outline" onclick="openModal('namingModal')">🧪 Naming</button>
+                <button class="btn btn-dark" onclick="openModal('uploadModal')">📤 Upload</button>
+                <button class="btn btn-primary" onclick="exportCSV()">📥 Export</button>
             </div>
         </div>
 
         <div class="content-area">
             <div class="stats-grid">
-                <div class="stat-card wip">
-                    <div class="stat-title">01_WIP (Nội bộ)</div>
+                <div class="stat-card" style="border-left: 3px solid var(--wip-color);">
+                    <div class="stat-title">01_WIP</div>
                     <div class="stat-value" id="card-wip">0 Files</div>
-                    <div class="stat-desc">Đang thiết kế & dựng hình</div>
+                    <div class="stat-desc">Nội bộ thiết kế</div>
                 </div>
-                <div class="stat-card shared">
-                    <div class="stat-title">02_SHARED (Phối hợp)</div>
+                <div class="stat-card" style="border-left: 3px solid var(--shared-color);">
+                    <div class="stat-title">02_SHARED</div>
                     <div class="stat-value" id="card-shared">0 Files</div>
-                    <div class="stat-desc">Đã chia sẻ kiểm tra va chạm</div>
+                    <div class="stat-desc">Phối hợp bộ môn</div>
                 </div>
-                <div class="stat-card published">
-                    <div class="stat-title">03_PUBLISHED (Phát hành)</div>
+                <div class="stat-card" style="border-left: 3px solid var(--published-color);">
+                    <div class="stat-title">03_PUBLISHED</div>
                     <div class="stat-value" id="card-pub">0 Files</div>
-                    <div class="stat-desc">Hồ sơ bản vẽ đã duyệt</div>
+                    <div class="stat-desc">Bản vẽ phát hành</div>
                 </div>
-                <div class="stat-card archive">
-                    <div class="stat-title">04_ARCHIVE (Lưu trữ)</div>
+                <div class="stat-card" style="border-left: 3px solid var(--archive-color);">
+                    <div class="stat-title">04_ARCHIVE</div>
                     <div class="stat-value" id="card-arc">0 Files</div>
-                    <div class="stat-desc">Lịch sử các phiên bản cũ</div>
+                    <div class="stat-desc">Lưu trữ lịch sử</div>
                 </div>
             </div>
 
             <div class="naming-rule-card">
                 <div class="naming-header">
-                    <div class="naming-title">📌 Quy Chuẩn Định Danh File ISO 19650-2 (National Naming Standard)</div>
+                    <div class="naming-title">📌 Quy Chuẩn Định Danh ISO 19650-2</div>
                 </div>
                 <div class="naming-fields">
                     <div class="field-chip"><div class="field-code">PROJECT</div><div class="field-label">Dự án</div></div>
-                    <div style="align-self:center; font-weight:bold; color:var(--border-color);">-</div>
+                    <div style="align-self:center; font-weight:600; color:var(--border-color);">-</div>
                     <div class="field-chip"><div class="field-code">ORIGINATOR</div><div class="field-label">Tác giả</div></div>
-                    <div style="align-self:center; font-weight:bold; color:var(--border-color);">-</div>
-                    <div class="field-chip"><div class="field-code">VOLUME</div><div class="field-label">Khối công trình</div></div>
-                    <div style="align-self:center; font-weight:bold; color:var(--border-color);">-</div>
-                    <div class="field-chip"><div class="field-code">LEVEL</div><div class="field-label">Tầng/Cao độ</div></div>
-                    <div style="align-self:center; font-weight:bold; color:var(--border-color);">-</div>
-                    <div class="field-chip"><div class="field-code">TYPE</div><div class="field-label">Loại tài liệu</div></div>
-                    <div style="align-self:center; font-weight:bold; color:var(--border-color);">-</div>
+                    <div style="align-self:center; font-weight:600; color:var(--border-color);">-</div>
+                    <div class="field-chip"><div class="field-code">VOLUME</div><div class="field-label">Khối</div></div>
+                    <div style="align-self:center; font-weight:600; color:var(--border-color);">-</div>
+                    <div class="field-chip"><div class="field-code">LEVEL</div><div class="field-label">Tầng</div></div>
+                    <div style="align-self:center; font-weight:600; color:var(--border-color);">-</div>
+                    <div class="field-chip"><div class="field-code">TYPE</div><div class="field-label">Loại</div></div>
+                    <div style="align-self:center; font-weight:600; color:var(--border-color);">-</div>
                     <div class="field-chip"><div class="field-code">ROLE</div><div class="field-label">Bộ môn</div></div>
-                    <div style="align-self:center; font-weight:bold; color:var(--border-color);">-</div>
-                    <div class="field-chip"><div class="field-code">NUMBER</div><div class="field-label">Số ID (4 số)</div></div>
+                    <div style="align-self:center; font-weight:600; color:var(--border-color);">-</div>
+                    <div class="field-chip"><div class="field-code">NUMBER</div><div class="field-label">Số ID</div></div>
                 </div>
             </div>
 
             <div class="table-container">
                 <div class="table-toolbar">
-                    <div style="font-weight: 700; font-size: 0.88rem; color: var(--text-heading);">📋 Master Information Register (MIR) - ISO 19650</div>
-                    <div class="filter-group">
-                        <select class="select-filter" id="stateFilter" onchange="applyFilters()">
-                            <option value="ALL">Tất cả Containers</option>
-                            <option value="01_WIP">01_WIP</option>
-                            <option value="02_SHARED">02_SHARED</option>
-                            <option value="03_PUBLISHED">03_PUBLISHED</option>
-                            <option value="04_ARCHIVE">04_ARCHIVE</option>
-                        </select>
+                    <div class="toolbar-top">
+                        <div style="font-weight: 600; font-size: 0.78rem; color: var(--text-heading);">📋 Master Information Register (MIR)</div>
+                        <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                            <div class="filters-wrapper">
+                                <select class="select-filter" id="stateFilter" onchange="applyFilters()">
+                                    <option value="ALL">Tất cả Containers</option>
+                                    <option value="01_WIP">01_WIP</option>
+                                    <option value="02_SHARED">02_SHARED</option>
+                                    <option value="03_PUBLISHED">03_PUBLISHED</option>
+                                    <option value="04_ARCHIVE">04_ARCHIVE</option>
+                                </select>
 
-                        <select class="select-filter" id="suitFilter" onchange="applyFilters()">
-                            <option value="ALL">Tất cả Suitability</option>
-                            <option value="S0">S0 - Draft / WIP</option>
-                            <option value="S1">S1 - Coordination</option>
-                            <option value="S2">S2 - Reference</option>
-                            <option value="S3">S3 - Review</option>
-                            <option value="S4">S4 - Approval</option>
-                            <option value="A1">A1 - Construction</option>
-                            <option value="A2">A2 - As-Built</option>
-                        </select>
+                                <select class="select-filter" id="suitFilter" onchange="applyFilters()">
+                                    <option value="ALL">Tất cả Suitability</option>
+                                    <option value="S0">S0 - Draft / WIP</option>
+                                    <option value="S1">S1 - Coordination</option>
+                                    <option value="S2">S2 - Reference</option>
+                                    <option value="S3">S3 - Review</option>
+                                    <option value="S4">S4 - Approval</option>
+                                    <option value="A1">A1 - Construction</option>
+                                    <option value="A2">A2 - As-Built</option>
+                                </select>
 
-                        <button class="btn btn-outline" style="padding:6px 12px;" onclick="resetFilters()">🔄 Reset</button>
+                                <select class="select-filter" id="discFilter" onchange="applyFilters()">
+                                    <option value="ALL">Tất cả Bộ môn</option>
+                                    <option value="ARC">ARC - Kiến trúc</option>
+                                    <option value="STR">STR - Kết cấu</option>
+                                    <option value="MEP">MEP - Cơ điện</option>
+                                    <option value="HVAC">HVAC - Thông gió</option>
+                                </select>
+                            </div>
+                            <button class="btn btn-outline" style="padding: 5px 8px; font-size: 0.72rem;" onclick="resetFilters()">🔄 Reset</button>
+                        </div>
                     </div>
                 </div>
 
@@ -968,7 +866,6 @@
                             </tr>
                         </thead>
                         <tbody id="tableBody">
-                            <!-- Dữ liệu render từ JS -->
                         </tbody>
                     </table>
                 </div>
@@ -976,24 +873,37 @@
         </div>
     </div>
 
-    <!-- Floating Action Button Mobile -->
-    <button class="fab-btn" onclick="openModal('uploadModal')" title="Tải lên File">📤</button>
+    <!-- MODAL ISSUES LIST -->
+    <div class="modal" id="issuesModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">💬 Danh Sách Issue / QA-QC File</div>
+                <div class="close-btn" onclick="closeModal('issuesModal')">✕</div>
+            </div>
+            <div style="font-size: 0.78rem;">
+                <p><strong>File:</strong> <span id="issueFileName" class="file-code" style="word-break: break-all;">...</span></p>
+                <div id="issueListContainer" style="margin-top: 10px; max-height: 200px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px;">
+                </div>
+                <div style="margin-top: 12px; display: flex; gap: 6px;">
+                    <input type="text" id="newIssueInput" placeholder="Nhập thêm ghi chú/issue mới..." style="flex: 1; padding: 6px 8px; background: var(--bg-input); border: 1px solid var(--border-color); color: var(--text-heading); border-radius: 6px; font-size: 0.75rem;">
+                    <button class="btn btn-primary" onclick="addIssueToServer()">Thêm Issue</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
-    <!-- TOAST CONTAINER -->
-    <div class="toast-container" id="toastContainer"></div>
-
-    <!-- MODALS -->
+    <!-- MODALS KHÁC -->
     <div class="modal" id="isoRenameModal">
         <div class="modal-content">
             <div class="modal-header">
                 <div class="modal-title">🏷️ Đổi Tên File Chuẩn ISO 19650-2</div>
                 <div class="close-btn" onclick="closeModal('isoRenameModal')">✕</div>
             </div>
-            <div style="font-size: 0.82rem;">
+            <div style="font-size: 0.75rem;">
                 <div class="iso-preview-card">
-                    <div style="font-size: 0.68rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">XEM TRƯỚC TÊN FILE MỚI:</div>
+                    <div style="font-size: 0.62rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase;">XEM TRƯỚC TÊN FILE MỚI:</div>
                     <div id="isoLivePreview" class="iso-preview-name">PRJ_001-PVI-ZZ-01-DR-A-0001.pdf</div>
-                    <div style="font-size: 0.72rem; color: #22c55e; font-weight: 600;">✓ Đạt chuẩn cấu trúc ISO 19650-2</div>
+                    <div style="font-size: 0.65rem; color: #34d399; font-weight: 550;">✓ Đạt chuẩn cấu trúc ISO 19650-2</div>
                 </div>
 
                 <div class="iso-grid">
@@ -1066,9 +976,9 @@
                     </div>
                 </div>
 
-                <div style="margin-top: 16px; text-align: right; display: flex; justify-content: flex-end; gap: 8px;">
+                <div style="margin-top: 12px; text-align: right; display: flex; justify-content: flex-end; gap: 6px;">
                     <button class="btn btn-outline" onclick="closeModal('isoRenameModal')">Hủy bỏ</button>
-                    <button class="btn btn-primary" onclick="saveIsoRename()">💾 Lưu & Đổi Tên ISO</button>
+                    <button class="btn btn-primary" onclick="saveIsoRename()">Lưu & Đổi Tên ISO</button>
                 </div>
             </div>
         </div>
@@ -1081,21 +991,21 @@
                 <div class="modal-title">👁️ Document & Model Viewer</div>
                 <div class="close-btn" onclick="closeModal('viewModal')">✕</div>
             </div>
-            <div style="font-size: 0.82rem; line-height: 1.6;">
+            <div style="font-size: 0.75rem; line-height: 1.5;">
                 <p><strong>Tên tài liệu:</strong> <span id="viewFileName" class="file-code" style="word-break: break-all;">...</span></p>
-                <div style="margin-top: 6px; background: var(--bg-input); padding: 10px; border-radius: 8px; border: 1px solid var(--border-color);">
-                    <div style="font-size: 0.7rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 2px;">ĐƯỜNG DẪN TỆP TIN TRÊN KHO CDE:</div>
-                    <span id="viewFilePath" style="font-family: 'Consolas', monospace; color: var(--primary); word-break: break-all; font-weight: 600; font-size: 0.8rem;">...</span>
+                <div style="margin-top: 5px; background: var(--bg-input); padding: 7px; border-radius: 6px; border: 1px solid var(--border-color);">
+                    <div style="font-size: 0.62rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; margin-bottom: 2px;">ĐƯỜNG DẪN KHO CDE:</div>
+                    <span id="viewFilePath" style="font-family: 'Consolas', monospace; color: var(--primary); word-break: break-all; font-weight: 550; font-size: 0.72rem;">...</span>
                 </div>
-                <p style="margin-top:8px;"><strong>Trạng thái:</strong> <span id="viewFileState">...</span> | <strong>Phiên bản:</strong> <span id="viewFileRev">...</span></p>
+                <p style="margin-top:6px;"><strong>Trạng thái:</strong> <span id="viewFileState">...</span> | <strong>Phiên bản:</strong> <span id="viewFileRev">...</span></p>
 
                 <div class="preview-box">
-                    <span style="font-size: 2.5rem; margin-bottom: 8px;">🏗️</span>
-                    <p style="font-weight: 600; color: var(--text-heading); text-align: center; padding: 0 10px;">Mô phỏng Trình xem 3D BIM / Bản vẽ PDF</p>
+                    <span style="font-size: 1.8rem; margin-bottom: 4px;">🏗️</span>
+                    <p style="font-weight: 550; color: var(--text-heading); text-align: center; padding: 0 10px;">Mô phỏng Trình xem 3D BIM / Bản vẽ PDF</p>
                 </div>
 
-                <div style="margin-top: 16px; display: flex; justify-content: space-between; align-items: center;">
-                    <button class="btn btn-outline" onclick="copyViewPath()">📋 Copy Path</button>
+                <div style="margin-top: 12px; display: flex; justify-content: space-between; align-items: center;">
+                    <button class="btn btn-outline" onclick="copyViewPath()">Copy Path</button>
                     <button class="btn btn-primary" onclick="closeModal('viewModal')">Đóng Viewer</button>
                 </div>
             </div>
@@ -1108,24 +1018,24 @@
                 <div class="modal-title">🚪 ISO 19650 Gate Approval</div>
                 <div class="close-btn" onclick="closeModal('gateModal')">✕</div>
             </div>
-            <div style="font-size: 0.85rem; line-height: 1.5;">
+            <div style="font-size: 0.78rem; line-height: 1.4;">
                 <p><strong>Tệp đang chọn:</strong> <span id="gateFileName" class="file-code" style="word-break: break-all;">...</span></p>
 
-                <div style="margin-top: 12px; background: var(--bg-input); padding: 12px; border-radius: 8px; border: 1px solid var(--border-color);">
-                    <label style="font-weight: bold; font-size: 0.8rem; display: block; margin-bottom: 6px; color: var(--text-heading);">Chọn Cổng Phê Duyệt ISO 19650:</label>
-                    <select id="gateActionSelect" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-heading); font-size:0.82rem;">
+                <div style="margin-top: 8px; background: var(--bg-input); padding: 8px; border-radius: 6px; border: 1px solid var(--border-color);">
+                    <label style="font-weight: 600; font-size: 0.72rem; display: block; margin-bottom: 4px; color: var(--text-heading);">Chọn Cổng Phê Duyệt:</label>
+                    <select id="gateActionSelect" style="width: 100%; padding: 6px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-heading); font-size:0.75rem;">
                         <option value="GATE1">GATE 1: WIP ➔ SHARED (S1 - Coordination | Rev: P01.00)</option>
                         <option value="GATE2">GATE 2: SHARED ➔ PUBLISHED (A1 - Construction | Rev: C01.00)</option>
                         <option value="GATE3">GATE 3: PUBLISHED ➔ ARCHIVED (Lưu trữ lịch sử)</option>
                     </select>
                 </div>
 
-                <div style="margin-top: 12px;">
-                    <label style="font-weight: bold; font-size: 0.8rem; display: block; margin-bottom: 6px; color: var(--text-heading);">Ghi chú QA/QC:</label>
-                    <textarea id="gateNote" rows="3" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-input); color: var(--text-heading); font-size: 0.8rem;" placeholder="Đã kiểm tra mô hình hợp lệ..."></textarea>
+                <div style="margin-top: 8px;">
+                    <label style="font-weight: 600; font-size: 0.72rem; display: block; margin-bottom: 4px; color: var(--text-heading);">Ghi chú QA/QC:</label>
+                    <textarea id="gateNote" rows="2" style="width: 100%; padding: 6px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-input); color: var(--text-heading); font-size: 0.75rem;" placeholder="Đã kiểm tra mô hình hợp lệ..."></textarea>
                 </div>
 
-                <div style="margin-top: 16px; text-align: right; display: flex; justify-content: flex-end; gap: 8px;">
+                <div style="margin-top: 12px; text-align: right; display: flex; justify-content: flex-end; gap: 6px;">
                     <button class="btn btn-outline" onclick="closeModal('gateModal')">Hủy</button>
                     <button class="btn btn-primary" onclick="submitGateTransition()">Xác Nhận Cập Nhật</button>
                 </div>
@@ -1139,11 +1049,11 @@
                 <div class="modal-title">🧪 ISO 19650 Naming Checker</div>
                 <div class="close-btn" onclick="closeModal('namingModal')">✕</div>
             </div>
-            <div style="font-size: 0.85rem;">
-                <label style="font-weight:bold; font-size:0.8rem; display:block; margin-bottom:6px; color: var(--text-heading);">Nhập tên file để kiểm tra cấu trúc:</label>
-                <input type="text" id="testFileNameInput" style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border-color); background:var(--bg-input); color:var(--text-heading); font-family:monospace; font-size:0.85rem;" placeholder="PRJ_001-PVI-ZZ-01-DR-A-0001.pdf">
+            <div style="font-size: 0.78rem;">
+                <label style="font-weight:600; font-size:0.72rem; display:block; margin-bottom:4px; color: var(--text-heading);">Nhập tên file kiểm tra cấu trúc:</label>
+                <input type="text" id="testFileNameInput" style="width:100%; padding:7px; border-radius:6px; border:1px solid var(--border-color); background:var(--bg-input); color:var(--text-heading); font-family:monospace; font-size:0.78rem;" placeholder="PRJ_001-PVI-ZZ-01-DR-A-0001.pdf">
 
-                <div style="margin-top:12px; text-align:right;">
+                <div style="margin-top:8px; text-align:right;">
                     <button class="btn btn-primary" style="width: 100%; justify-content: center;" onclick="validateISOFileName()">Kiểm Tra Cấu Trúc</button>
                 </div>
 
@@ -1163,17 +1073,17 @@
                 <div class="modal-title">📤 Upload File Vào Container CDE</div>
                 <div class="close-btn" onclick="closeModal('uploadModal')">✕</div>
             </div>
-            <div style="font-size: 0.85rem;">
-                <div id="dropZone" style="border: 2px dashed var(--primary); padding: 20px; text-align: center; border-radius: 8px; background: var(--bg-input); margin-bottom: 12px; cursor: pointer;">
-                    <span style="font-size: 2rem;">📁</span>
-                    <p style="font-weight: bold; margin-top: 6px; color: var(--text-heading);">Kéo thả tệp tin .RVT, .IFC, .PDF vào đây hoặc bấm để chọn</p>
+            <div style="font-size: 0.78rem;">
+                <div id="dropZone" style="border: 2px dashed var(--border-color); padding: 14px; text-align: center; border-radius: 6px; background: var(--bg-input); margin-bottom: 8px; cursor: pointer;">
+                    <span style="font-size: 1.6rem;">📁</span>
+                    <p style="font-weight: 600; margin-top: 4px; color: var(--text-heading);">Kéo thả tệp tin .RVT, .IFC, .PDF vào đây hoặc bấm để chọn</p>
                     <input type="file" id="fileUploadInput" multiple style="display: none;">
                 </div>
-                <div style="margin-bottom: 12px;">
-                    <label style="font-size: 0.78rem; font-weight: bold; color: var(--text-heading);">Chọn Thư mục đích:</label>
-                    <select id="uploadTargetFolderSelect" class="project-select-box" style="margin-top: 4px;"></select>
+                <div style="margin-bottom: 8px;">
+                    <label style="font-size: 0.72rem; font-weight: 600; color: var(--text-heading);">Chọn Thư mục đích:</label>
+                    <select id="uploadTargetFolderSelect" class="project-select-box" style="margin-top: 3px;"></select>
                 </div>
-                <div style="text-align: right; display: flex; justify-content: flex-end; gap: 8px;">
+                <div style="text-align: right; display: flex; justify-content: flex-end; gap: 6px;">
                     <button class="btn btn-outline" onclick="closeModal('uploadModal')">Đóng</button>
                     <button class="btn btn-primary" onclick="executeUploadFiles()">Tải Lên CDE</button>
                 </div>
@@ -1181,13 +1091,23 @@
         </div>
     </div>
 
+    <button class="fab-btn" onclick="openModal('uploadModal')" title="Tải lên File">📤</button>
+    <div class="toast-container" id="toastContainer"></div>
+
     <!-- JAVASCRIPT XỬ LÝ -->
     <script>
-        let DATA_SERVER_API = localStorage.getItem('cde_api_url') || 'https://api.pvincons.cloud';
+        let DATA_SERVER_API = localStorage.getItem('cde_api_url') || (
+            window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+                ? 'http://localhost:3000'
+                : 'https://api.pvincons.cloud'
+        );
+
         let currentDiscipline = "ALL";
         let currentRowElement = null;
         let selectedFolderPathFilter = "";
         let currentExt = "pdf";
+        let currentActiveFilePath = "";
+        let serverIssuesDB = {};
 
         let virtualTreeData = {
             id: "ROOT",
@@ -1200,7 +1120,15 @@
 
         const ISO_CONTAINERS = ['01_WIP', '02_SHARED', '03_PUBLISHED', '04_ARCHIVE'];
 
-        /* Quản lý Responsive Mobile Sidebar */
+        const cdeSyncChannel = new BroadcastChannel('pvincons_cde_sync_channel');
+
+        cdeSyncChannel.onmessage = (event) => {
+            if (event.data && event.data.type === 'REFRESH_CDE_DATA') {
+                reloadDatabaseData();
+                showToast("🔄 Dữ liệu đã được đồng bộ tự động từ hệ thống!");
+            }
+        };
+
         function openMobileSidebar() {
             document.getElementById('sidebar').classList.add('mobile-open');
             document.getElementById('sidebarOverlay').classList.add('active');
@@ -1222,10 +1150,19 @@
 
         async function reloadDatabaseData() {
             try {
-                const res = await fetch(`${DATA_SERVER_API}/api/cde-files`);
-                if (!res.ok) throw new Error("Không kết nối được server");
+                // Tải song song danh sách file và danh sách issues từ server
+                const [filesRes, issuesRes] = await Promise.all([
+                    fetch(`${DATA_SERVER_API}/api/cde-files`),
+                    fetch(`${DATA_SERVER_API}/api/issues`)
+                ]);
 
-                const flatItems = await res.json();
+                if (!filesRes.ok) throw new Error("Không kết nối được server file");
+                
+                const flatItems = await filesRes.json();
+                if (issuesRes.ok) {
+                    serverIssuesDB = await issuesRes.json();
+                }
+
                 virtualTreeData = buildTreeFromFlatList(flatItems);
                 
                 document.getElementById('tableBody').innerHTML = '';
@@ -1233,11 +1170,9 @@
                 populateProjectOptions();
                 renderTreeUI();
                 applyFilters();
-
-                showToast("Đã đồng bộ thành công dữ liệu từ kho CDE (database/bim-vdc)!");
             } catch (err) {
                 console.error("Lỗi lấy dữ liệu từ Backend CDE:", err);
-                showToast("⚠️ Không thể kết nối Server CDE (https://api.pvincons.cloud). Vui lòng kiểm tra server.");
+                showToast(`⚠️ Không thể kết nối Server CDE (${DATA_SERVER_API}). Vui lòng kiểm tra Node.js server!`);
             }
         }
 
@@ -1321,6 +1256,7 @@
 
         function onProjectSelectChange() {
             selectedFolderPathFilter = "";
+            renderTreeUI();
             applyFilters();
             if (window.innerWidth <= 768) closeMobileSidebar();
         }
@@ -1341,7 +1277,7 @@
             link.click();
             document.body.removeChild(link);
 
-            showToast(`⚡ Đã mở tệp "${fileName}". Trình duyệt kích hoạt ứng dụng cục bộ!`);
+            showToast(`⚡ Đã mở tệp "${fileName}".`);
         }
 
         function countFilesInFolder(node) {
@@ -1350,127 +1286,59 @@
             return node.children.reduce((total, child) => total + countFilesInFolder(child), 0);
         }
 
-        function moveFileInVirtualTree(filePath, targetContainerName) {
-            let removedFileNode = null;
-
-            function removeFileNode(parent) {
-                if (!parent.children) return false;
-                for (let i = 0; i < parent.children.length; i++) {
-                    let child = parent.children[i];
-                    if (child.type === 'file' && child.path === filePath) {
-                        removedFileNode = parent.children.splice(i, 1)[0];
-                        return true;
-                    }
-                    if (child.type === 'folder') {
-                        if (removeFileNode(child)) return true;
-                    }
-                }
-                return false;
-            }
-
-            removeFileNode(virtualTreeData);
-
-            if (removedFileNode) {
-                let pathParts = filePath.split('/');
-                let fileName = pathParts.pop();
-                let prjCode = pathParts[2] || 'Project_01';
-
-                function findTargetFolder(parent) {
-                    if (parent.type === 'folder') {
-                        if (parent.name === targetContainerName && parent.path.includes(prjCode)) {
-                            return parent;
-                        }
-                        if (parent.children) {
-                            for (let child of parent.children) {
-                                let res = findTargetFolder(child);
-                                if (res) return res;
-                            }
-                        }
-                    }
-                    return null;
-                }
-
-                let targetFolder = findTargetFolder(virtualTreeData);
-                if (targetFolder) {
-                    let newPath = targetFolder.path + '/' + fileName;
-                    removedFileNode.path = newPath;
-                    targetFolder.children.push(removedFileNode);
-                    return newPath;
-                }
-            }
-            return null;
-        }
-
-        function submitGateTransition() {
+        async function submitGateTransition() {
             if (!currentRowElement) return;
 
             let action = document.getElementById('gateActionSelect').value;
             let oldPath = currentRowElement.getAttribute('data-path');
-            let newState = "01_WIP";
-            let newSuit = "S0";
-            let newRev = "P01.00";
+            let targetContainer = "01_WIP";
 
-            if (action === "GATE1") {
-                newState = "02_SHARED";
-                newSuit = "S1";
-                newRev = "P01.00";
-            } else if (action === "GATE2") {
-                newState = "03_PUBLISHED";
-                newSuit = "A1";
-                newRev = "C01.00";
-            } else if (action === "GATE3") {
-                newState = "04_ARCHIVE";
-                newSuit = "S0";
-                newRev = "P00.00";
+            if (action === "GATE1") targetContainer = "02_SHARED";
+            else if (action === "GATE2") targetContainer = "03_PUBLISHED";
+            else if (action === "GATE3") targetContainer = "04_ARCHIVE";
+
+            let pathParts = oldPath.split('/');
+            let projectFolder = pathParts[2] || 'Project_01';
+            let targetDir = `database/bim-vdc/${projectFolder}/${targetContainer}`;
+
+            try {
+                const res = await fetch(`${DATA_SERVER_API}/api/move`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ sourcePath: oldPath, targetDir: targetDir })
+                });
+                const data = await res.json();
+
+                if (data.success) {
+                    showToast("✅ Đã phê duyệt Gate & di chuyển file trên hệ thống thành công!");
+                    closeModal('gateModal');
+                    cdeSyncChannel.postMessage({ type: 'REFRESH_CDE_DATA' });
+                    reloadDatabaseData();
+                } else {
+                    showToast("⚠️ Lỗi chuyển Gate: " + (data.error || "Thất bại"));
+                }
+            } catch (err) {
+                console.error("Lỗi kết nối CDE Server:", err);
+                showToast(`⚠️ Không thể kết nối tới CDE Server tại (${DATA_SERVER_API})!`);
             }
-
-            let newPath = moveFileInVirtualTree(oldPath, newState);
-            if (!newPath) {
-                let parts = oldPath.split('/');
-                let filename = parts[parts.length - 1];
-                parts[parts.length - 2] = newState;
-                newPath = parts.join('/');
-            }
-
-            currentRowElement.setAttribute("data-state", newState);
-            currentRowElement.setAttribute("data-suitability", newSuit);
-            currentRowElement.setAttribute("data-path", newPath);
-
-            let badgeStateClass = "badge-wip";
-            let suitText = newSuit + " - Coordination";
-            if (newState === "02_SHARED") { badgeStateClass = "badge-shared"; suitText = "S1 - Coordination"; }
-            if (newState === "03_PUBLISHED") { badgeStateClass = "badge-published"; suitText = "A1 - Construction"; }
-            if (newState === "04_ARCHIVE") { badgeStateClass = "badge-archive"; suitText = "S0 - Archive"; }
-
-            currentRowElement.children[2].innerHTML = `<span class="badge ${badgeStateClass}">${newState}</span>`;
-            currentRowElement.children[3].innerHTML = `<span class="badge badge-${newSuit.toLowerCase()}">${suitText}</span>`;
-            currentRowElement.children[4].innerHTML = `<span class="rev-tag">${newRev}</span>`;
-            currentRowElement.children[6].innerHTML = getActionButtons(newState, newPath);
-
-            showToast("Đã phê duyệt Gate & chuyển đổi vị trí file thành công!");
-            closeModal('gateModal');
-            
-            renderTreeUI();
-            applyFilters();
         }
 
         function renderTreeUI() {
             const container = document.getElementById('dynamicTreeContainer');
             container.innerHTML = '';
             if (!virtualTreeData.children || virtualTreeData.children.length === 0) {
-                container.innerHTML = `<div style="font-size:0.78rem; color:var(--text-muted); padding:8px;">Chưa có dữ liệu thư mục.</div>`;
+                container.innerHTML = `<div style="font-size:0.72rem; color:var(--text-muted); padding:6px;">Chưa có dữ liệu.</div>`;
                 return;
             }
 
             let prjVal = document.getElementById('projectSelect') ? document.getElementById('projectSelect').value : "ALL";
-
             let nodesToRender = virtualTreeData.children;
             if (prjVal && prjVal !== "ALL") {
                 nodesToRender = virtualTreeData.children.filter(child => child.name === prjVal);
             }
 
             if (nodesToRender.length === 0) {
-                container.innerHTML = `<div style="font-size:0.78rem; color:var(--text-muted); padding:8px;">Không có thư mục phù hợp.</div>`;
+                container.innerHTML = `<div style="font-size:0.72rem; color:var(--text-muted); padding:6px;">Không có thư mục phù hợp.</div>`;
                 return;
             }
 
@@ -1577,8 +1445,9 @@
                 });
                 const data = await res.json();
                 if (data.success) {
+                    cdeSyncChannel.postMessage({ type: 'REFRESH_CDE_DATA' });
                     reloadDatabaseData();
-                    showToast(`Tạo thư mục mới thành công: ${folderName.trim()}`);
+                    showToast(`Tạo thư mục thành công: ${folderName.trim()}`);
                 } else {
                     showToast("⚠️ Lỗi: " + (data.error || "Không thể tạo thư mục"));
                 }
@@ -1602,6 +1471,7 @@
                 });
                 const data = await res.json();
                 if (data.success) {
+                    cdeSyncChannel.postMessage({ type: 'REFRESH_CDE_DATA' });
                     reloadDatabaseData();
                     showToast(`Đổi tên thư mục thành công: ${newName.trim()}`);
                 } else {
@@ -1626,6 +1496,7 @@
                 });
                 const data = await res.json();
                 if (data.success) {
+                    cdeSyncChannel.postMessage({ type: 'REFRESH_CDE_DATA' });
                     reloadDatabaseData();
                     showToast("Đã xóa thư mục khỏi kho CDE!");
                 } else {
@@ -1650,20 +1521,25 @@
         function getActionButtons(state, relativePath) {
             let gateBtn = '';
             if (state === '01_WIP') {
-                gateBtn = `<button class="btn-icon" onclick="openGateModal(this)" title="Chuyển Gate 1">🚪 Gate 1</button>`;
+                gateBtn = `<button class="btn-icon" onclick="openGateModal(this)" title="Chuyển Gate 1">Gate 1</button>`;
             } else if (state === '02_SHARED') {
-                gateBtn = `<button class="btn-icon" onclick="openGateModal(this)" title="Chuyển Gate 2">🚪 Gate 2</button>`;
+                gateBtn = `<button class="btn-icon" onclick="openGateModal(this)" title="Chuyển Gate 2">Gate 2</button>`;
             } else if (state === '03_PUBLISHED') {
-                gateBtn = `<button class="btn-icon" onclick="openGateModal(this)" title="Chuyển Gate 3">🚪 Gate 3</button>`;
+                gateBtn = `<button class="btn-icon" onclick="openGateModal(this)" title="Chuyển Gate 3">Gate 3</button>`;
             } else {
-                gateBtn = `<button class="btn-icon" disabled style="opacity:0.5; cursor:not-allowed;" title="Đã khóa">🔒 Locked</button>`;
+                gateBtn = `<button class="btn-icon" disabled style="opacity:0.4; cursor:not-allowed;">Locked</button>`;
             }
 
             const safePath = String(relativePath || '').replace(/'/g, "\\'");
+            let fileIssues = serverIssuesDB[relativePath] || [];
+            let issueBadge = fileIssues.length > 0 
+                ? `<span class="badge badge-issue" onclick="openIssuesModal('${safePath}')" title="Xem danh sách Issue">💬 ${fileIssues.length} Issue</span>` 
+                : '';
 
             return `
-                <button class="btn-open-file" onclick="openWithLocalApp('${safePath}')" title="Mở trực tiếp tệp tin">📂 Mở File</button>
-                <button class="btn-icon" onclick="previewFile(this)" title="Xem chi tiết & Đường dẫn">👁️ View</button>
+                <button class="btn-open-file" onclick="openWithLocalApp('${safePath}')" title="Mở trực tiếp tệp tin">Mở</button>
+                <button class="btn-icon" onclick="previewFile(this)" title="Xem chi tiết & Đường dẫn">View</button>
+                ${issueBadge}
                 ${gateBtn}
                 <button class="btn-icon" onclick="downloadFile(this)" title="Tải về file">📥</button>
                 <div class="dropdown">
@@ -1674,11 +1550,114 @@
                         <button onclick="viewVersionHistory(this)">📜 Lịch sử Version</button>
                         <button onclick="editMetadata(this)">✏️ Sửa Metadata</button>
                         <button onclick="shareFile(this)">🔗 Chia sẻ Link</button>
-                        <button onclick="createIssue(this)">💬 Tạo Issue / QA-QC</button>
+                        <button onclick="createIssuePrompt('${safePath}')">💬 Tạo Issue / QA-QC</button>
                         <button onclick="deleteRowFile(this)" style="color:#ef4444;">🗑️ Xóa file</button>
                     </div>
                 </div>
             `;
+        }
+
+        function createIssuePrompt(filePath) {
+            let note = prompt("Nhập nội dung ghi chú Issue / QA-QC:");
+            if (!note || !note.trim()) return;
+
+            fetch(`${DATA_SERVER_API}/api/issues/add`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ filePath: filePath, text: note.trim(), author: "Phương Vy" })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    showToast("✅ Đã lưu Issue lên server thành công!");
+                    cdeSyncChannel.postMessage({ type: 'REFRESH_CDE_DATA' });
+                    reloadDatabaseData();
+                } else {
+                    showToast("⚠️ Lỗi lưu Issue: " + data.error);
+                }
+            })
+            .catch(err => showToast("⚠️ Không kết nối được server CDE!"));
+        }
+
+        function openIssuesModal(filePath) {
+            currentActiveFilePath = filePath;
+            document.getElementById('issueFileName').innerText = filePath.split('/').pop();
+            renderIssueListModal(filePath);
+            openModal('issuesModal');
+        }
+
+        function renderIssueListModal(filePath) {
+            const container = document.getElementById('issueListContainer');
+            container.innerHTML = '';
+            let issues = serverIssuesDB[filePath] || [];
+
+            if (issues.length === 0) {
+                container.innerHTML = `<div style="color:var(--text-muted); font-size:0.75rem;">Chưa có issue nào cho file này trên server.</div>`;
+                return;
+            }
+
+            issues.forEach((iss, index) => {
+                let div = document.createElement('div');
+                div.style.background = 'var(--bg-input)';
+                div.style.padding = '6px 8px';
+                div.style.borderRadius = '6px';
+                div.style.border = '1px solid var(--border-color)';
+                div.innerHTML = `
+                    <div style="display:flex; justify-content:space-between; font-size:0.65rem; color:var(--text-muted);">
+                        <span>👤 ${iss.author} • ${iss.time}</span>
+                        <span style="cursor:pointer; color:#ef4444;" onclick="deleteIssueFromServer('${filePath}', ${index})">Xóa</span>
+                    </div>
+                    <div style="margin-top:2px; font-weight:500; color:var(--text-heading);">${iss.text}</div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function addIssueToServer() {
+            let input = document.getElementById('newIssueInput');
+            let text = input.value.trim();
+            if (!text || !currentActiveFilePath) return;
+
+            fetch(`${DATA_SERVER_API}/api/issues/add`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ filePath: currentActiveFilePath, text: text, author: "Phương Vy" })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    serverIssuesDB[currentActiveFilePath] = data.issues;
+                    input.value = '';
+                    renderIssueListModal(currentActiveFilePath);
+                    cdeSyncChannel.postMessage({ type: 'REFRESH_CDE_DATA' });
+                    reloadDatabaseData();
+                    showToast("✅ Đã thêm Issue lên server!");
+                }
+            })
+            .catch(err => showToast("⚠️ Không kết nối được server CDE!"));
+        }
+
+        function deleteIssueFromServer(filePath, index) {
+            fetch(`${DATA_SERVER_API}/api/issues/delete`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ filePath: filePath, index: index })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    if (data.issues.length > 0) {
+                        serverIssuesDB[filePath] = data.issues;
+                    } else {
+                        delete serverIssuesDB[filePath];
+                    }
+                    renderIssueListModal(filePath);
+                    cdeSyncChannel.postMessage({ type: 'REFRESH_CDE_DATA' });
+                    reloadDatabaseData();
+                    showToast("🗑️ Đã xóa Issue trên server!");
+                }
+            })
+            .catch(err => showToast("⚠️ Không kết nối được server CDE!"));
         }
 
         function toggleCustomInput(selectEl, customInputId) {
@@ -1795,8 +1774,9 @@
                 });
                 const data = await res.json();
                 if (data.success) {
+                    cdeSyncChannel.postMessage({ type: 'REFRESH_CDE_DATA' });
                     reloadDatabaseData();
-                    showToast(`Đổi tên file chuẩn ISO 19650 thành công: ${newFileName}`);
+                    showToast(`Đổi tên file chuẩn ISO thành công: ${newFileName}`);
                     closeModal('isoRenameModal');
                 } else {
                     showToast("⚠️ Lỗi: " + (data.error || "Không thể đổi tên"));
@@ -1884,11 +1864,6 @@
             showToast(`Đã sao chép liên kết tệp!`);
         }
 
-        function createIssue(btn) {
-            let issue = prompt(`Tạo ghi chú Issue/QA-QC:`);
-            if (issue && issue.trim()) showToast(`Đã ghi nhận Issue thành công!`);
-        }
-
         async function deleteRowFile(btn) {
             let row = btn.closest('tr');
             let filePath = row.getAttribute('data-path');
@@ -1901,6 +1876,7 @@
                     });
                     const data = await res.json();
                     if (data.success) {
+                        cdeSyncChannel.postMessage({ type: 'REFRESH_CDE_DATA' });
                         reloadDatabaseData();
                         showToast(`Đã xóa tệp tin khỏi CDE thành công!`);
                     } else {
@@ -1949,7 +1925,7 @@
             let disc = 'ARC';
             if (fileName.includes('STR') || fileName.includes('KETCAU')) disc = 'STR';
             else if (fileName.includes('MEP') || fileName.includes('CODIEN')) disc = 'MEP';
-            else if (fileName.toLowerCase().endsWith('.dwg')) disc = 'CAD';
+            else if (fileName.includes('HVAC') || fileName.includes('THONGGIO')) disc = 'HVAC';
 
             const tr = document.createElement('tr');
             tr.setAttribute('data-project', prjCode);
@@ -1983,7 +1959,7 @@
             const themeText = document.getElementById('themeText');
             if (themeIcon && themeText) {
                 themeIcon.innerText = theme === 'dark' ? '☀️' : '🌙';
-                themeText.innerText = theme === 'dark' ? 'Light Mode' : 'Dark Mode';
+                themeText.innerText = theme === 'dark' ? 'Light' : 'Dark';
             }
         }
 
@@ -2065,6 +2041,7 @@
 
             showToast("Đã hoàn tất quá trình upload file!");
             closeModal('uploadModal');
+            cdeSyncChannel.postMessage({ type: 'REFRESH_CDE_DATA' });
             reloadDatabaseData();
         }
 
@@ -2072,6 +2049,7 @@
             const query = document.getElementById('searchInput').value.toLowerCase().trim();
             const stateVal = document.getElementById('stateFilter').value;
             const suitVal = document.getElementById('suitFilter').value;
+            const discVal = document.getElementById('discFilter').value;
             const prjVal = document.getElementById('projectSelect').value;
 
             const tbody = document.getElementById('tableBody');
@@ -2086,16 +2064,18 @@
                 let prj = row.getAttribute('data-project');
                 let state = row.getAttribute('data-state');
                 let suit = row.getAttribute('data-suitability');
+                let disc = row.getAttribute('data-discipline');
                 let path = row.getAttribute('data-path') || '';
                 let text = row.innerText.toLowerCase();
 
                 let matchPrj = (prjVal === 'ALL' || prj === prjVal);
                 let matchState = (stateVal === 'ALL' || state === stateVal);
                 let matchSuit = (suitVal === 'ALL' || suit === suitVal);
+                let matchDisc = (discVal === 'ALL' || disc === discVal);
                 let matchFolder = (!selectedFolderPathFilter || path.startsWith(selectedFolderPathFilter));
                 let matchQuery = (!query || text.includes(query));
 
-                if (matchPrj && matchState && matchSuit && matchFolder && matchQuery) {
+                if (matchPrj && matchState && matchSuit && matchDisc && matchFolder && matchQuery) {
                     row.style.display = '';
                     if (state === '01_WIP') wipCount++;
                     else if (state === '02_SHARED') sharedCount++;
@@ -2116,6 +2096,7 @@
             document.getElementById('searchInput').value = '';
             document.getElementById('stateFilter').value = 'ALL';
             document.getElementById('suitFilter').value = 'ALL';
+            document.getElementById('discFilter').value = 'ALL';
             document.getElementById('projectSelect').value = 'ALL';
             selectedFolderPathFilter = '';
             renderTreeUI();
@@ -2141,7 +2122,6 @@
             showToast("Đã xuất file CSV thành công!");
         }
 
-        /* Hỗ trợ phím ESC để đóng Modal */
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
                 document.querySelectorAll('.modal.active').forEach(modal => {
@@ -2159,11 +2139,11 @@
             const fileInput = document.getElementById('fileUploadInput');
 
             dropZone.onclick = () => fileInput.click();
-            dropZone.ondragover = (e) => { e.preventDefault(); dropZone.style.borderColor = 'var(--primary-dark)'; };
-            dropZone.ondragleave = () => { dropZone.style.borderColor = 'var(--primary)'; };
+            dropZone.ondragover = (e) => { e.preventDefault(); dropZone.style.borderColor = 'var(--primary)'; };
+            dropZone.ondragleave = () => { dropZone.style.borderColor = 'var(--border-color)'; };
             dropZone.ondrop = (e) => {
                 e.preventDefault();
-                dropZone.style.borderColor = 'var(--primary)';
+                dropZone.style.borderColor = 'var(--border-color)';
                 if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
                     fileInput.files = e.dataTransfer.files;
                     showToast(`Đã chọn ${e.dataTransfer.files.length} tệp để upload.`);
