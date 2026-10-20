@@ -7,7 +7,7 @@
     <title>BIM - VDC CDE Workspace - PV INCONS</title>
     <!-- AUTH GUARD ANTI-FOUC -->
     <script src="../../assets/js/auth-guard.js"></script>
-    <script>protectRoute('BIM_VDC');</script>
+    <script>protectRoute(['ADMIN','MASTER', 'DESIGNER', 'MANAGEMENT', 'CONTRACTOR']);</script>
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -197,12 +197,26 @@
             </div>
         </div>
 
-        <div class="hidden md:flex items-center gap-2.5">
-            <div class="text-right hidden md:block mr-1">
-                <p id="userInfo" class="text-xs font-bold text-slate-800 dark:text-slate-100">User: --</p>
-                <span
-                    class="text-[10px] bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20 px-2 py-0.5 rounded-full font-mono">BIM_CDE_USER</span>
-            </div>
+        <div class="hidden md:flex items-center gap-2">
+            <!-- NÚT TÀI KHOẢN TRÊN HEADER (CÓ AVATAR) -->
+            <button onclick="closeAllModals(); toggleAccountModal(true);"
+                class="p-2 px-3 py-2 bg-slate-200/80 dark:bg-slate-800/80 hover:bg-blue-600 hover:text-white dark:hover:bg-blue-600/90 text-slate-800 dark:text-slate-200 rounded-xl text-xs font-semibold border border-slate-300/60 dark:border-slate-700/60 backdrop-blur-md transition-all flex items-center gap-2 shadow-sm"
+                title="Quản lý tài khoản">
+                <div class="w-6 h-6 rounded-full bg-gradient-to-tr from-blue-500 to-cyan-400 flex items-center justify-center text-white text-[10px] font-bold shadow-sm shrink-0">
+                    <i class="fa-solid fa-user"></i>
+                </div>
+                <span class="hidden lg:inline">Tài khoản</span>
+            </button>
+
+            <!-- NÚT THÔNG BÁO TRÊN HEADER -->
+            <button onclick="closeAllModals(); toggleNotificationModal(true);"
+                class="p-2 px-3 py-2 bg-slate-200/80 dark:bg-slate-800/80 hover:bg-amber-500 hover:text-white dark:hover:bg-amber-500 text-slate-800 dark:text-slate-200 rounded-xl text-xs font-semibold border border-slate-300/60 dark:border-slate-700/60 backdrop-blur-md transition-all flex items-center gap-2 shadow-sm relative"
+                title="Xem thông báo">
+                <i class="fa-solid fa-bell text-amber-500 dark:text-amber-400"></i>
+                <span class="hidden lg:inline">Thông báo</span>
+                <span class="absolute -top-1 -right-1 w-2.5 h-2.5 bg-rose-500 rounded-full animate-ping"></span>
+                <span class="absolute -top-1 -right-1 w-2.5 h-2.5 bg-rose-500 rounded-full"></span>
+            </button>
 
             <!-- NÚT CHUYỂN ĐỔI DARK / LIGHT MODE -->
             <button onclick="toggleTheme()"
@@ -215,14 +229,14 @@
             <!-- NÚT ĐỔI MẬT KHẨU -->
             <button onclick="closeAllModals(); togglePasswordModal(true);"
                 class="p-2 sm:px-3.5 sm:py-2 bg-slate-200/80 dark:bg-slate-800/80 hover:bg-blue-600 hover:text-white dark:hover:bg-blue-600/90 text-slate-800 dark:text-slate-200 rounded-xl text-xs font-semibold border border-slate-300/60 dark:border-slate-700/60 backdrop-blur-md transition-all flex items-center gap-2 shadow-sm">
-                <i class="fa-solid fa-key text-blue-500 dark:text-blue-400 group-hover:text-white"></i>
+                <i class="fa-solid fa-key text-blue-500 dark:text-blue-400"></i>
                 <span class="hidden sm:inline">Đổi mật khẩu</span>
             </button>
 
             <!-- NÚT THOÁT -->
             <button onclick="logout()"
                 class="p-2 sm:px-3.5 sm:py-2 bg-slate-200/80 dark:bg-slate-800/80 hover:bg-rose-600 hover:text-white dark:hover:bg-rose-600/90 text-slate-800 dark:text-slate-200 rounded-xl text-xs font-semibold border border-slate-300/60 dark:border-slate-700/60 backdrop-blur-md transition-all flex items-center gap-2 shadow-sm">
-                <i class="fa-solid fa-right-from-bracket text-rose-500 group-hover:text-white"></i>
+                <i class="fa-solid fa-right-from-bracket text-rose-500"></i>
                 <span class="hidden sm:inline">Thoát</span>
             </button>
         </div>
@@ -245,8 +259,9 @@
                     </div>
 
                     <div>
+                        <!-- HEADER THẺ DỮ LIỆU HỆ THỐNG: CÂN CHỈNH RESPONSIVE CHO DI ĐỘNG & MÁY TÍNH -->
                         <div
-                            class="flex items-center justify-between pb-4 border-b border-slate-200/60 dark:border-slate-800/80 mb-5 relative z-10 gap-2">
+                            class="pb-4 border-b border-slate-200/60 dark:border-slate-800/80 mb-5 relative z-10 space-y-3 sm:space-y-0 sm:flex sm:items-center sm:justify-between">
                             <div class="flex items-center gap-3">
                                 <div
                                     class="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white flex items-center justify-center text-xl sm:text-2xl shadow-lg shadow-blue-500/30 shrink-0">
@@ -254,16 +269,20 @@
                                 </div>
                                 <div>
                                     <h2
-                                        class="font-extrabold text-base sm:text-lg text-slate-900 dark:text-white tracking-wide">
+                                        class="font-extrabold text-sm sm:text-lg text-slate-900 dark:text-white tracking-wide">
                                         DỮ LIỆU HỆ THỐNG</h2>
                                     <p class="text-[11px] sm:text-xs text-blue-600 dark:text-blue-400 font-medium">Trung
                                         tâm quản lý mô hình Central Model</p>
                                 </div>
                             </div>
-                            <span
-                                class="text-[10px] sm:text-[11px] px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 flex items-center gap-2 font-semibold shrink-0 backdrop-blur-md">
-                                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span> 2027 Active
-                            </span>
+                            <!-- THỜI GIAN & NGÀY HIỆN TẠI (TỰ ĐỘNG XUỐNG DƯỚI TRÊN MOBILE) -->
+                            <div class="flex justify-start sm:justify-end">
+                                <span id="currentTimeBadge"
+                                    class="text-[10px] sm:text-[11px] px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 inline-flex items-center gap-2 font-mono font-semibold backdrop-blur-md">
+                                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+                                    <span id="clockText">--:--:-- - --/--/----</span>
+                                </span>
+                            </div>
                         </div>
 
                         <div class="grid grid-cols-3 gap-3 mb-5 relative z-10">
@@ -334,21 +353,18 @@
 
                     <div class="pt-5 relative z-10">
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                            <a href="http://revit.pvincons.cloud/RevitServerAdmin2027" target="_blank"
+                            <a href="http://revit.pvincons.cloud/RevitServerAdmin2027" target="_blank" id="btnRevitServer"
                                 class="btn-glow py-3.5 px-4 rounded-2xl text-white font-bold text-xs tracking-wider flex items-center justify-center gap-2 text-center group">
                                 <i class="fa-solid fa-server text-sm group-hover:scale-110 transition-transform"></i>
                                 <span>REVIT SERVER ADMIN</span>
-                                <i
-                                    class="fa-solid fa-arrow-up-right-from-square text-[10px] opacity-70 group-hover:opacity-100 transition-all"></i>
+                                <i class="fa-solid fa-arrow-up-right-from-square text-[10px] opacity-70 group-hover:opacity-100 transition-all" id="iconRevitServer"></i>
                             </a>
 
-                            <a href="#"
+                            <a href="00-wait.html" id="btnClashDetection"
                                 class="btn-glow py-3.5 px-4 rounded-2xl text-white font-bold text-xs tracking-wider flex items-center justify-center gap-2 text-center group">
-                                <i
-                                    class="fa-solid fa-object-group text-sm group-hover:scale-110 transition-transform"></i>
+                                <i class="fa-solid fa-object-group text-sm group-hover:scale-110 transition-transform"></i>
                                 <span>CLASH DETECTION</span>
-                                <i
-                                    class="fa-solid fa-arrow-up-right-from-square text-[10px] opacity-70 group-hover:opacity-100 transition-all"></i>
+                                <i class="fa-solid fa-arrow-up-right-from-square text-[10px] opacity-70 group-hover:opacity-100 transition-all" id="iconClashDetection"></i>
                             </a>
                         </div>
                         <p class="text-[10px] sm:text-[11px] text-slate-500 dark:text-slate-400 text-center mt-2.5">
@@ -363,7 +379,7 @@
             <!-- CỘT BÊN TRÁI: CÁC TAB CHỨC NĂNG CƠ BẢN -->
             <div class="lg:col-span-5 flex flex-col justify-between gap-4 order-2 lg:order-1">
 
-                <a href="public/cde_data.html"
+                <a href="01-data.html" id="cardDataDoc"
                     class="card-item p-5 rounded-3xl flex-1 flex flex-col justify-between cursor-pointer group">
                     <div>
                         <div class="flex items-center justify-between mb-3">
@@ -376,23 +392,22 @@
                                 <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span> database/bim-vdc
                             </span>
                         </div>
-                        <h2
-                            class="font-bold text-sm sm:text-base text-slate-900 dark:text-white mb-1.5 group-hover:text-blue-500 dark:group-hover:text-blue-400 transition-colors">
-                            HỒ SƠ & MÔ HÌNH - Document
+                        <h2 id="titleDataDoc"
+                            class="font-bold text-sm sm:text-base uppercase text-slate-900 dark:text-white mb-1.5 group-hover:text-blue-500 dark:group-hover:text-blue-400 transition-colors">
+                            Kho lưu trữ dữ liệu CDE
                         </h2>
                         <p class="text-[11px] sm:text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-                            Kho tài liệu lưu trữ mô hình và quản lý bản vẽ theo
-                            từng lần ban hành.
+                            Kho tài liệu lưu trữ mô hình và quản lý bản vẽ.
                         </p>
                     </div>
-                    <div
+                    <div id="footerDataDoc"
                         class="mt-4 pt-3 border-t border-slate-200/60 dark:border-slate-800/80 flex justify-between items-center text-xs text-blue-600 dark:text-blue-400 font-semibold">
                         <span>Mở kho dữ liệu Database</span>
-                        <i class="fa-solid fa-arrow-right group-hover:translate-x-1.5 transition-transform"></i>
+                        <i id="iconDataDoc" class="fa-solid fa-arrow-right group-hover:translate-x-1.5 transition-transform"></i>
                     </div>
                 </a>
 
-                <a href="public/cde_mir.html"
+                <a href="02-mir.html" id="cardWorkflow"
                     class="card-item p-5 rounded-3xl flex-1 flex flex-col justify-between cursor-pointer group">
                     <div>
                         <div class="flex items-center justify-between mb-3">
@@ -404,21 +419,21 @@
                                 class="text-[10px] px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 font-mono border border-slate-200 dark:border-slate-700">ISO
                                 19650</span>
                         </div>
-                        <h2
-                            class="font-bold text-sm sm:text-base text-slate-900 dark:text-white mb-1.5 group-hover:text-blue-500 dark:group-hover:text-blue-400 transition-colors">
-                            PHỐI HỢP & PHÊ DUYỆT - Workflow</h2>
+                        <h2 id="titleWorkflow"
+                            class="font-bold text-sm sm:text-base uppercase text-slate-900 dark:text-white mb-1.5 group-hover:text-blue-500 dark:group-hover:text-blue-400 transition-colors">
+                            Quy Trình Phối Hợp CDE</h2>
                         <p class="text-[11px] sm:text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-                            Số hóa quy trình luân chuyển, kiểm duyệt và làm rõ kỹ thuật giữa các bên.
+                            Số hóa quy trình luân chuyển, kiểm duyệt giữa các bên.
                         </p>
                     </div>
-                    <div
+                    <div id="footerWorkflow"
                         class="mt-4 pt-3 border-t border-slate-200/60 dark:border-slate-800/80 flex justify-between items-center text-xs text-blue-600 dark:text-blue-400 font-semibold">
                         <span>Mở bảng danh mục ISO 19650</span>
-                        <i class="fa-solid fa-arrow-right group-hover:translate-x-1.5 transition-transform"></i>
+                        <i id="iconWorkflow" class="fa-solid fa-arrow-right group-hover:translate-x-1.5 transition-transform"></i>
                     </div>
                 </a>
 
-                <a href="public/cde_site.html"
+                <a href="03-site.html" id="cardManagement"
                     class="card-item p-5 rounded-3xl flex-1 flex flex-col justify-between cursor-pointer group">
                     <div>
                         <div class="flex items-center justify-between mb-3">
@@ -430,17 +445,18 @@
                                 class="text-[10px] px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 font-mono border border-slate-200 dark:border-slate-700">
                                 CONSTRUCTION</span>
                         </div>
-                        <h2
-                            class="font-bold text-sm sm:text-base text-slate-900 dark:text-white mb-1.5 group-hover:text-blue-500 dark:group-hover:text-blue-400 transition-colors">
-                            QUẢN LÝ HIỆN TRƯỜNG - Management</h2>
+                        <h2 id="titleManagement"
+                            class="font-bold text-sm sm:text-base uppercase text-slate-900 dark:text-white mb-1.5 group-hover:text-blue-500 dark:group-hover:text-blue-400 transition-colors">
+                            Dữ Liệu Giai Đoạn Thi Công
+                        </h2>
                         <p class="text-[11px] sm:text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-                            Hình ảnh, video tại công trình theo mốc thời gian và vị trí thực.
+                            Hình ảnh, video tại công trình theo tiến độ thực tế.
                         </p>
                     </div>
-                    <div
+                    <div id="footerManagement"
                         class="mt-4 pt-3 border-t border-slate-200/60 dark:border-slate-800/80 flex justify-between items-center text-xs text-blue-600 dark:text-blue-400 font-semibold">
                         <span>Xem dữ liệu thực tế thi công</span>
-                        <i class="fa-solid fa-arrow-right group-hover:translate-x-1.5 transition-transform"></i>
+                        <i id="iconManagement" class="fa-solid fa-arrow-right group-hover:translate-x-1.5 transition-transform"></i>
                     </div>
                 </a>
 
@@ -538,92 +554,6 @@
         </div>
     </div>
 
-    <!-- POPUP 1: POPUP THÔNG TIN TÀI KHOẢN -->
-    <div id="accountModal"
-        class="fixed inset-0 bg-slate-950/80 backdrop-blur-md hidden flex-col justify-end sm:justify-center items-center z-[100] transition-all">
-        <div
-            class="bg-white dark:bg-slate-900 border-0 sm:border border-slate-200/80 dark:border-slate-800/80 w-full h-full sm:h-auto sm:max-w-lg p-6 sm:p-7 pb-24 sm:pb-7 rounded-none sm:rounded-3xl shadow-2xl relative flex flex-col justify-between transform translate-y-full transition-transform duration-300 ease-out overflow-y-auto no-scrollbar max-h-screen" id="accountModalContent">
-            
-            <div>
-                <div class="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800 mb-6">
-                    <h3 class="text-base font-extrabold text-slate-900 dark:text-white flex items-center gap-2.5">
-                        <div class="w-8 h-8 rounded-xl bg-blue-500/10 text-blue-500 flex items-center justify-center text-sm">
-                            <i class="fa-solid fa-user-shield"></i>
-                        </div>
-                        Thông Tin Tài Khoản Doanh Nghiệp
-                    </h3>
-                </div>
-
-                <div class="space-y-4 text-xs">
-                    <!-- AVATAR & HỌ TÊN -->
-                    <div class="flex items-center gap-4 p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/80">
-                        <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-blue-600 to-cyan-500 text-white flex items-center justify-center text-2xl font-bold shadow-lg shadow-blue-500/25 shrink-0" id="accAvatar">
-                            TP
-                        </div>
-                        <div class="overflow-hidden">
-                            <p class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Họ và tên / Full Name</p>
-                            <p class="text-sm font-extrabold text-slate-900 dark:text-white mt-0.5 truncate" id="accFullName">Trần Hoàng Phước</p>
-                        </div>
-                    </div>
-
-                    <!-- THÔNG TIN CHI TIẾT -->
-                    <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700/60 space-y-3">
-                        <div class="flex justify-between items-center text-slate-600 dark:text-slate-300">
-                            <span class="font-medium">Tên đăng nhập (User):</span>
-                            <span class="font-bold font-mono text-slate-900 dark:text-white" id="accUsername">-vdc</span>
-                        </div>
-                        <div class="flex justify-between items-center text-slate-600 dark:text-slate-300">
-                            <span class="font-medium">Chức vụ / Vị trí:</span>
-                            <span class="font-bold text-blue-500" id="accPosition">Chief Executive Officer</span>
-                        </div>
-                        <div class="flex justify-between items-center text-slate-600 dark:text-slate-300">
-                            <span class="font-medium">Chuyên môn:</span>
-                            <span class="font-bold text-slate-900 dark:text-white" id="accSpecialty">BIM / VDC Engineering & Management</span>
-                        </div>
-                        <div class="flex justify-between items-center text-slate-600 dark:text-slate-300">
-                            <span class="font-medium">Công ty:</span>
-                            <span class="font-bold text-slate-900 dark:text-white" id="accCompany">PV INCONS Co., Ltd</span>
-                        </div>
-                        <div class="flex justify-between items-center text-slate-600 dark:text-slate-300">
-                            <span class="font-medium">Phân quyền truy cập (ISO 19650):</span>
-                            <span class="font-bold font-mono text-emerald-500 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20" id="accRole">BIM_VDC</span>
-                        </div>
-                    </div>
-
-                    <!-- MA TRẬN PHÂN QUYỀN ISO 19650 -->
-                    <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700/60 space-y-2">
-                        <p class="font-bold text-slate-800 dark:text-slate-200 mb-2 flex items-center gap-2">
-                            <i class="fa-solid fa-shield-halved text-blue-500"></i> Ma trận phân quyền CDE theo chuẩn ISO 19650:
-                        </p>
-                        <div class="grid grid-cols-2 gap-2 text-[11px]">
-                            <div class="p-2 rounded bg-slate-200/60 dark:bg-slate-800 border border-slate-300/50 dark:border-slate-700">
-                                <span class="block text-slate-400 font-mono text-[9px]">01_WIP (Work in Progress)</span>
-                                <span class="font-bold text-blue-500" id="permWIP">Full Control</span>
-                            </div>
-                            <div class="p-2 rounded bg-slate-200/60 dark:bg-slate-800 border border-slate-300/50 dark:border-slate-700">
-                                <span class="block text-slate-400 font-mono text-[9px]">02_SHARED (Co-ordination)</span>
-                                <span class="font-bold text-blue-500" id="permShared">Full Control</span>
-                            </div>
-                            <div class="p-2 rounded bg-slate-200/60 dark:bg-slate-800 border border-slate-300/50 dark:border-slate-700">
-                                <span class="block text-slate-400 font-mono text-[9px]">03_PUBLISHED (Client/Approval)</span>
-                                <span class="font-bold text-blue-500" id="permPublished">Full Control</span>
-                            </div>
-                            <div class="p-2 rounded bg-slate-200/80 dark:bg-slate-800 border border-slate-300/50 dark:border-slate-700">
-                                <span class="block text-slate-400 font-mono text-[9px]">04_ARCHIVE (Historical Record)</span>
-                                <span class="font-bold text-blue-500" id="permArchive">Full Control (Archive)</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="mt-6 pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-end">
-                <button onclick="toggleAccountModal(false)"
-                    class="w-full py-3.5 bg-blue-600 hover:bg-blue-500 text-xs font-bold text-white rounded-xl shadow-lg shadow-blue-500/25 transition-all">Đóng thông tin</button>
-            </div>
-        </div>
-    </div>
-
     <!-- POPUP 2: POPUP THÔNG BÁO TRƯỢT LÊN -->
     <div id="notificationModal"
         class="fixed inset-0 bg-slate-950/80 backdrop-blur-md hidden flex-col justify-end sm:justify-center items-center z-[100] transition-all">
@@ -679,9 +609,12 @@
     <!-- FOOTER -->
     <footer
         class="w-full max-w-6xl mx-auto pt-6 border-t border-slate-200/80 dark:border-slate-800/80 flex flex-col sm:flex-row justify-between items-center text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 gap-2">
-        <div>&copy; 2026 PV INCONS Enterprise Workspace. CDE Engine.</div>
-        <div class="font-mono">BIM/VDC Standard v2.6.0</div>
+        <div>&copy; Bản quyền thuộc về: Công ty PV INCONS</div>
+        <div class="font-mono">Enterprise Workspace. CDE Engine v1.0.0</div>
     </footer>
+
+    <!-- LIÊN KẾT FILE JAVASCRIPT RIÊNG CHO POPUP TÀI KHOẢN -->
+    <script src="../../assets/js/account-modal.js"></script>
 
     <script>
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwFZMhbWIaW4omRGgGTLv9g8YeYDOsRUc7Cw_7hZdKgYTC9cxVlrSnE8YHVQ8BJwP09/exec';
@@ -692,11 +625,101 @@
             setTheme(savedTheme);
 
             const userSession = JSON.parse(localStorage.getItem('currentUser') || '{}');
-            if (userSession.username) {
-                document.getElementById('userInfo').innerText = `User: ${userSession.username}`;
-            }
+            // Đã lược bỏ khối hiển thị text User thừa trên header desktop theo yêu cầu
+
+            // Đồng hồ thời gian thực
+            updateLiveClock();
+            setInterval(updateLiveClock, 1000);
+
+            // ==========================================
+            // LOGIC KHÓA MỜ VÀ VÔ HIỆU HÓA THEO MA TRẬN PHÂN QUYỀN
+            // ==========================================
+            applyRolePermissionsUI(userSession.role ? userSession.role.toUpperCase() : '');
+
             checkCDEServerStatus();
         });
+
+        // Hàm cập nhật Giờ và Ngày hiện tại
+        function updateLiveClock() {
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const year = now.getFullYear();
+
+            const clockTextEl = document.getElementById('clockText');
+            if (clockTextEl) {
+                clockTextEl.innerText = `${hours}:${minutes}:${seconds} - ${day}/${month}/${year}`;
+            }
+        }
+
+        function applyRolePermissionsUI(userRole) {
+            // 1. ADMIN / MASTER: Toàn quyền truy cập (mở tất cả các mục)
+            if (userRole === 'ADMIN' || userRole === 'MASTER') return;
+
+            // 2. DESIGNER: 
+            // - 01-data: Khóa | 02-mir: Mở | 03-site: Khóa | Revit Server: Khóa | Clash Detection: Mở
+            if (userRole === 'DESIGNER') {
+                lockCardItem('cardDataDoc', 'footerDataDoc', 'iconDataDoc');
+                lockCardItem('cardManagement', 'footerManagement', 'iconManagement');
+                lockButtonItem('btnRevitServer', 'iconRevitServer');
+            }
+
+            // 3. MANAGEMENT: 
+            // - 01-data: Khóa | 02-mir: Mở | 03-site: Mở | Revit Server: Khóa | Clash Detection: Mở
+            if (userRole === 'MANAGEMENT') {
+                lockCardItem('cardDataDoc', 'footerDataDoc', 'iconDataDoc');
+                lockButtonItem('btnRevitServer', 'iconRevitServer');
+            }
+
+            // 4. CONTRACTOR: 
+            // - 01-data: Khóa | 02-mir: Mở | 03-site: Mở | Revit Server: Khóa | Clash Detection: Khóa
+            if (userRole === 'CONTRACTOR') {
+                lockCardItem('cardDataDoc', 'footerDataDoc', 'iconDataDoc');
+                lockButtonItem('btnRevitServer', 'iconRevitServer');
+                lockButtonItem('btnClashDetection', 'iconClashDetection');
+            }
+        }
+
+        function lockCardItem(cardId, footerId, iconId) {
+            const card = document.getElementById(cardId);
+            const icon = document.getElementById(iconId);
+
+            if (card) {
+                card.style.opacity = '0.75';
+                card.style.border = '1px dashed rgba(245, 158, 11, 0.4)';
+                card.style.pointerEvents = 'none';
+                card.style.cursor = 'not-allowed';
+                card.removeAttribute('href');
+                card.setAttribute('title', 'Khu vực giới hạn theo phân quyền dự án ISO 19650');
+            }
+
+            if (icon) {
+                icon.className = 'fa-solid fa-lock text-sm text-amber-400 animate-pulse';
+            }
+        }
+
+        function lockButtonItem(btnId, iconId) {
+            const btn = document.getElementById(btnId);
+            const icon = document.getElementById(iconId);
+
+            if (btn) {
+                btn.style.opacity = '0.75';
+                btn.style.background = 'rgba(15, 23, 42, 0.8)';
+                btn.style.border = '1px dashed rgba(245, 158, 11, 0.4)';
+                btn.style.boxShadow = 'none';
+                btn.style.pointerEvents = 'none';
+                btn.style.cursor = 'not-allowed';
+                btn.removeAttribute('href');
+                btn.setAttribute('title', 'Khu vực giới hạn theo phân quyền dự án ISO 19650');
+            }
+
+            if (icon) {
+                icon.className = 'fa-solid fa-lock text-[10px] text-amber-400 animate-pulse';
+            }
+        }
 
         function handleBottomNavClick(btn) {
             document.querySelectorAll('.bottom-nav-item').forEach(el => el.classList.remove('active'));
@@ -705,59 +728,17 @@
 
         // HÀM TỰ ĐỘNG ĐÓNG TẤT CẢ CÁC POPUP/MODAL ĐANG MỞ
         function closeAllModals() {
-            // Đóng popup tài khoản nếu đang mở
             const accountModal = document.getElementById('accountModal');
             if (accountModal && !accountModal.classList.contains('hidden')) {
                 toggleAccountModal(false);
             }
-            // Đóng popup thông báo nếu đang mở
             const notificationModal = document.getElementById('notificationModal');
             if (notificationModal && !notificationModal.classList.contains('hidden')) {
                 toggleNotificationModal(false);
             }
-            // Đóng popup đổi mật khẩu nếu đang mở
             togglePasswordModal(false);
         }
 
-        // Mở/đóng popup tài khoản
-        function toggleAccountModal(show) {
-            const modal = document.getElementById('accountModal');
-            const content = document.getElementById('accountModalContent');
-            
-            const userSession = JSON.parse(localStorage.getItem('currentUser') || '{}');
-            const username = userSession.username || '-vdc';
-            document.getElementById('accUsername').innerText = username;
-            
-            const fullName = userSession.fullName || 'Trần Hoàng Phước';
-            document.getElementById('accFullName').innerText = fullName;
-
-            document.getElementById('accPosition').innerText = userSession.position || 'Chief Executive Officer';
-            document.getElementById('accSpecialty').innerText = userSession.specialty || 'BIM / VDC Engineering & Management';
-            document.getElementById('accCompany').innerText = userSession.company || 'PV INCONS Co., Ltd';
-            
-            if (fullName) {
-                const initials = fullName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
-                document.getElementById('accAvatar').innerText = initials;
-            }
-
-            if (show) {
-                modal.classList.remove('hidden');
-                modal.classList.add('flex');
-                setTimeout(() => {
-                    content.classList.remove('translate-y-full');
-                    content.classList.add('translate-y-0');
-                }, 10);
-            } else {
-                content.classList.remove('translate-y-0');
-                content.classList.add('translate-y-full');
-                setTimeout(() => {
-                    modal.classList.remove('flex');
-                    modal.classList.add('hidden');
-                }, 300);
-            }
-        }
-
-        // Mở/đóng Popup Thông báo trượt từ dưới lên
         function toggleNotificationModal(show) {
             const modal = document.getElementById('notificationModal');
             const content = document.getElementById('notificationModalContent');

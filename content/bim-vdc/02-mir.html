@@ -7,7 +7,7 @@
     <title>CDE Master Platform v2.0 - ISO 19650-2 PIM</title>
     <!-- AUTH GUARD ANTI-FOUC -->
     <script src="../../../assets/js/auth-guard.js"></script>
-    <script>protectRoute('BIM_VDC');</script>
+    <script>protectRoute(['ADMIN','MASTER', 'DESIGNER', 'MANAGEMENT', 'CONTRACTOR']);</script>
 
     <style>
         :root[data-theme="dark"] {
