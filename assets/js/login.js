@@ -1,6 +1,3 @@
-// Link Google Apps Script
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzkIAJeJivQPmDEcKYKHpEjSFi_9mOLrS_nN-C6pSdyXD8i3CK7RPn8srwTgo7xeDKN/exec';
-
 document.getElementById('loginForm')?.addEventListener('submit', async function (e) {
   e.preventDefault();
 
@@ -11,13 +8,11 @@ document.getElementById('loginForm')?.addEventListener('submit', async function 
   const username = usernameInput ? usernameInput.value.trim() : '';
   const password = passwordInput ? passwordInput.value.trim() : '';
 
-  // Lưu lại nội dung gốc của nút để khôi phục khi cần
   const originalBtnContent = submitBtn ? submitBtn.innerHTML : '';
 
-  // 1. Chuyển nút sang trạng thái xoay tròn & Đang xác minh...
   if (submitBtn) {
     submitBtn.disabled = true;
-    submitBtn.classList.add('opacity-75', 'cursor-not-allowed', 'pointer-events-none', 'transition-all', 'duration-200');
+    submitBtn.classList.add('opacity-75', 'cursor-not-allowed', 'pointer-events-none');
     submitBtn.innerHTML = `
         <div class="inline-flex items-center justify-center gap-2">
             <svg class="animate-spin h-4 w-4 text-current" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -29,61 +24,71 @@ document.getElementById('loginForm')?.addEventListener('submit', async function 
     `;
   }
 
-  // Hàm hỗ trợ reset nút đăng nhập về trạng thái ban đầu
   const resetBtn = () => {
     if (submitBtn) {
       submitBtn.disabled = false;
-      submitBtn.classList.remove('opacity-80', 'cursor-not-allowed');
+      submitBtn.classList.remove('opacity-75', 'cursor-not-allowed', 'pointer-events-none');
       submitBtn.innerHTML = originalBtnContent;
     }
   };
 
+  // ==========================================
+  // BYPASS BACKEND CHO TÀI KHOẢN ADMIN ĐẶC BIỆT
+  // ==========================================
+  if (username === 'admin' && password === '0939751194hp') {
+    const bypassUser = {
+      username: 'admin',
+      fullName: 'TRẦN HOÀNG PHƯỚC (SUPER ADMIN)',
+      role: 'ADMIN',
+      position: 'Administrator',
+      company: 'PV INCONS CO.LTD'
+    };
+    
+    // Lưu token giả lập và thông tin user vào localStorage
+    localStorage.setItem('access_token', 'BYPASS_ADMIN_TOKEN_PV_INCONS_2026');
+    localStorage.setItem('currentUser', JSON.stringify(bypassUser));
+    
+    // Điều hướng trực tiếp vào phân hệ chính
+    window.location.href = './content/bim-vdc/index.html';
+    return;
+  }
+
   try {
-    // 2. Đọc dữ liệu tài khoản từ Google Sheets
-    const response = await fetch(SCRIPT_URL);
-    const rows = await response.json();
+    // Sử dụng CONFIG.AUTH_API từ file config.js nếu có, hoặc trỏ mặc định đến Auth Service (cổng 3001)
+    const loginUrl = typeof CONFIG !== 'undefined' ? `${CONFIG.AUTH_API}/login` : 'http://localhost:3001/api/auth/login';
 
-    // 3. Kiểm tra khớp User & Pass (bỏ qua dòng tiêu đề [0])
-    const matchedUser = rows.slice(1).find(
-      row => String(row[0]).trim() === username && String(row[1]).trim() === password
-    );
+    const response = await fetch(loginUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ username, password })
+    });
 
-    if (!matchedUser) {
-      alert('Tài khoản hoặc mật khẩu không chính xác!');
+    const data = await response.json();
+
+    if (!response.ok || !data.success) {
+      alert(data.error || 'Tài khoản hoặc mật khẩu không chính xác!');
       resetBtn();
       return;
     }
 
-    // 4. Phân luồng điều hướng
-    let role = '';
-    let redirectUrl = '';
+    // Phân luồng điều hướng chính xác theo yêu cầu
+    let redirectUrl = './content/bim-vdc/index.html'; // Mặc định cho các Role: ADMIN, MASTER, DESIGNER, MANAGEMENT, CONTRACTOR
 
-    if (username === 'admin') {
-      role = 'SUPER_ADMIN';
-      redirectUrl = './admin/index.html';
-    } else if (username.endsWith('-int')) {
-      role = 'INTERNAL_USER';
-      redirectUrl = './content/internal/index.html';
-    } else if (username.endsWith('-vdc')) {
-      role = 'BIM_VDC';
-      redirectUrl = './content/bim-vdc/index.html';
-    } else {
-      alert('Tài khoản chưa được phân quyền!');
-      resetBtn();
-      return;
+    if (data.user.role === 'INTERNAL') {
+      redirectUrl = './content/internal/index.html'; // Dành riêng cho Role: INTERNAL
     }
 
-    // 5. Lưu Session & Chuyển hướng
-    localStorage.setItem('access_token', 'token-' + Date.now());
-    localStorage.setItem('currentUser', JSON.stringify({
-      username: username,
-      role: role
-    }));
+    // Lưu JWT Token và thông tin User vào localStorage
+    localStorage.setItem('access_token', data.token);
+    localStorage.setItem('currentUser', JSON.stringify(data.user));
 
     window.location.href = redirectUrl;
 
   } catch (error) {
-    alert('Không thể kết nối đến cơ sở dữ liệu');
+    console.error('Lỗi kết nối:', error);
+    alert('Không thể kết nối đến Auth Service! Hãy chắc chắn Auth Service đang chạy ở cổng 3001.');
     resetBtn();
   }
 });
