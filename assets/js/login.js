@@ -44,51 +44,95 @@ document.getElementById('loginForm')?.addEventListener('submit', async function 
       company: 'PV INCONS CO.LTD'
     };
     
-    // Lưu token giả lập và thông tin user vào localStorage
     localStorage.setItem('access_token', 'BYPASS_ADMIN_TOKEN_PV_INCONS_2026');
     localStorage.setItem('currentUser', JSON.stringify(bypassUser));
-    
-    // Điều hướng trực tiếp vào phân hệ chính
     window.location.href = './content/bim-vdc/index.html';
     return;
   }
 
+  // Định nghĩa SCRIPT_URL Google Sheets dự phòng
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwnudZdtcWdcNaBX-y_f_9KO15drju3bOC9aiK1Pr1YdIKs2FJZDE15g46QPPkIvrD0/exec';
+
+  let loginSuccess = false;
+  let userData = null;
+  let tokenData = 'FALLBACK_SHEETS_TOKEN_2026';
+
   try {
-    // Sử dụng CONFIG.AUTH_API từ file config.js nếu có, hoặc trỏ mặc định đến Auth Service (cổng 3001)
+    // 1. THỬ KẾT NỐI AUTH SERVICE CHÍNH TRƯỚC
     const loginUrl = typeof CONFIG !== 'undefined' ? `${CONFIG.AUTH_API}/login` : 'http://localhost:3001/api/auth/login';
 
     const response = await fetch(loginUrl, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ username, password })
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password }),
+      signal: AbortSignal.timeout(5000) // Timeout sau 5 giây nếu server treo
     });
 
     const data = await response.json();
 
-    if (!response.ok || !data.success) {
+    if (response.ok && data.success) {
+      loginSuccess = true;
+      userData = data.user;
+      tokenData = data.token;
+    } else {
+      // Nếu server chính trả về lỗi (sai mật khẩu, tài khoản không tồn tại), thông báo thẳng luôn
       alert(data.error || 'Tài khoản hoặc mật khẩu không chính xác!');
       resetBtn();
       return;
     }
 
-    // Phân luồng điều hướng chính xác theo yêu cầu
-    let redirectUrl = './content/bim-vdc/index.html'; // Mặc định cho các Role: ADMIN, MASTER, DESIGNER, MANAGEMENT, CONTRACTOR
+  } catch (primaryError) {
+    console.warn('⚠️ Auth Service chính không phản hồi, đang chuyển hướng xác thực sang Google Sheets...', primaryError);
 
-    if (data.user.role === 'INTERNAL') {
-      redirectUrl = './content/internal/index.html'; // Dành riêng cho Role: INTERNAL
+    try {
+      // 2. KHI SERVER CHÍNH LỖI -> FALLBACK SANG GOOGLE APPS SCRIPT (GOOGLE SHEETS)
+      const scriptResponse = await fetch(SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ action: 'login', username, password })
+      });
+
+      const textResult = await scriptResponse.text();
+      let result;
+      try {
+        result = JSON.parse(textResult);
+      } catch (e) {
+        result = { success: false, error: textResult };
+      }
+
+      if (result.success) {
+        loginSuccess = true;
+        userData = result.user || {
+          username: username,
+          fullName: result.fullName || username,
+          role: result.role || 'DESIGNER',
+          company: 'PV INCONS CO.LTD'
+        };
+      } else {
+        alert(result.error || 'Xác thực qua Google Sheets thất bại: Sai tài khoản hoặc mật khẩu!');
+        resetBtn();
+        return;
+      }
+
+    } catch (fallbackError) {
+      console.error('❌ Cả Auth Service và Google Sheets đều không thể kết nối:', fallbackError);
+      alert('Không thể kết nối đến hệ thống xác thực (Cả Server chính và Google Sheets đều ngoại tuyến)!');
+      resetBtn();
+      return;
+    }
+  }
+
+  // NẾU ĐĂNG NHẬP THÀNH CÔNG (TỪ BẤT KỲ NGUỒN NÀO)
+  if (loginSuccess && userData) {
+    let redirectUrl = './content/bim-vdc/index.html';
+
+    if (userData.role === 'INTERNAL') {
+      redirectUrl = './content/internal/index.html';
     }
 
-    // Lưu JWT Token và thông tin User vào localStorage
-    localStorage.setItem('access_token', data.token);
-    localStorage.setItem('currentUser', JSON.stringify(data.user));
+    localStorage.setItem('access_token', tokenData);
+    localStorage.setItem('currentUser', JSON.stringify(userData));
 
     window.location.href = redirectUrl;
-
-  } catch (error) {
-    console.error('Lỗi kết nối:', error);
-    alert('Không thể kết nối đến Auth Service! Hãy chắc chắn Auth Service đang chạy ở cổng 3001.');
-    resetBtn();
   }
 });
