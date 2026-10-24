@@ -231,7 +231,6 @@
                 'MANAGEMENT':{ wip: 'No Access',    shared: 'Full Control', published: 'Full Control', archive: 'Read & Write' },
                 'DESIGNER':  { wip: 'Full Control', shared: 'Read & Write', published: 'Read-Only',  archive: 'No Access' },
                 'CONTRACTOR':{ wip: 'No Access',    shared: 'Read-Only',  published: 'Read & Write',archive: 'No Access' },
-                'INTERNAL':  { wip: 'Read-Only',    shared: 'Read-Only',  published: 'Read-Only',  archive: 'No Access' }
             };
 
             const permissions = matrixMapping[role] || matrixMapping['MASTER'];

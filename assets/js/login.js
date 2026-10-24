@@ -32,24 +32,6 @@ document.getElementById('loginForm')?.addEventListener('submit', async function 
     }
   };
 
-  // ==========================================
-  // BYPASS BACKEND CHO TÀI KHOẢN ADMIN ĐẶC BIỆT
-  // ==========================================
-  if (username === 'admin' && password === '0939751194hp') {
-    const bypassUser = {
-      username: 'admin',
-      fullName: 'TRẦN HOÀNG PHƯỚC (SUPER ADMIN)',
-      role: 'ADMIN',
-      position: 'Administrator',
-      company: 'PV INCONS CO.LTD'
-    };
-    
-    localStorage.setItem('access_token', 'BYPASS_ADMIN_TOKEN_PV_INCONS_2026');
-    localStorage.setItem('currentUser', JSON.stringify(bypassUser));
-    window.location.href = './content/bim-vdc/index.html';
-    return;
-  }
-
   // Định nghĩa SCRIPT_URL Google Sheets dự phòng
   const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwnudZdtcWdcNaBX-y_f_9KO15drju3bOC9aiK1Pr1YdIKs2FJZDE15g46QPPkIvrD0/exec';
 
