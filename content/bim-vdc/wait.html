@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nội dung đang cập nhật</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f8fafc;
+            color: #334155;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 480px;
+            width: 100%;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 32px 24px;
+            text-align: center;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            background: #e0e7ff;
+            color: #3730a3;
+            border-radius: 16px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        h1 {
+            font-size: 22px;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 12px;
+        }
+
+        p {
+            font-size: 14px;
+            color: #64748b;
+            line-height: 1.6;
+            margin-bottom: 24px;
+        }
+  
+        .subscribe-form {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .subscribe-input {
+            flex: 1;
+            padding: 10px 12px;
+            background: #ffffff;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            color: #0f172a;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .subscribe-input:focus {
+            border-color: #2563eb;
+        }
+
+        .subscribe-btn {
+            padding: 10px 16px;
+            background: #2563eb;
+            color: #ffffff;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .subscribe-btn:hover {
+            background: #1d4ed8;
+        }
+
+        .actions {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .btn-outline {
+            padding: 8px 14px;
+            background: #ffffff;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            color: #475569;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .btn-outline:hover {
+            background: #f8fafc;
+            color: #0f172a;
+        }
+
+        footer {
+            margin-top: 24px;
+            font-size: 12px;
+            color: #94a3b8;
+        }
+
+        @media (max-width: 480px) {
+            .subscribe-form {
+                flex-direction: column;
+            }
+            .actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="badge">Thông Tin</div>
+        
+        <h1>Đang Cập Nhật ...</h1>
+        
+        <p>
+            Chúng tôi đang tiến hành cập nhật nội dung để cải thiện trải nghiệm của bạn. Vui lòng quay lại sau hoặc đăng ký nhận thông báo qua email.
+        </p>
+
+        <form class="subscribe-form" onsubmit="event.preventDefault(); alert('Cảm ơn bạn! Chúng tôi sẽ gửi thông báo sớm nhất.');">
+            <input type="email" class="subscribe-input" placeholder="Nhập địa chỉ email..." required>
+            <button type="submit" class="subscribe-btn">Nhận thông báo</button>
+        </form>
+
+        <div class="actions">
+            <a href="/" class="btn-outline">Quay lại trang chủ</a>
+            <a href="mailto:support@example.com" class="btn-outline">Liên hệ hỗ trợ</a>
+        </div>
+
+        <footer>
+            &copy; 2026 Bản quyền thuộc về PV INCONS.
+        </footer>
+    </div>
+</body>
+</html>
