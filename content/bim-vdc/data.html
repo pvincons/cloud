@@ -118,7 +118,7 @@
     <div id="serverConfigPanel" class="w-full max-w-6xl mx-auto hidden bg-slate-900/90 border border-[var(--border-color)] p-3 px-5 mb-4 rounded-xl flex flex-wrap items-center justify-between gap-3 text-xs shadow-xl">
         <div class="flex items-center gap-2 grow max-w-xl">
             <label class="text-slate-300 font-medium shrink-0">Server API URL:</label>
-            <input type="text" id="apiServerUrlInput" value="https://api.pvincons.cloud" class="w-full px-3 py-1.5 bg-slate-800 border border-[var(--border-color)] rounded text-white text-xs focus:outline-none focus:border-blue-500 font-mono">
+            <input type="text" id="apiServerUrlInput" value="https://pvincons-backend.onrender.com" class="w-full px-3 py-1.5 bg-slate-800 border border-[var(--border-color)] rounded text-white text-xs focus:outline-none focus:border-blue-500 font-mono">
         </div>
         <div class="flex items-center gap-2">
             <button onclick="saveServerUrl()" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded font-medium transition-colors">Lưu kết nối</button>
@@ -169,7 +169,7 @@
                 </div>
                 <h4 class="text-sm font-bold text-white">Chưa kết nối tới Backend CDE Server</h4>
                 <p class="text-xs text-[var(--text-muted)] max-w-md mx-auto leading-relaxed">
-                    Không thể kết nối đến <code class="text-rose-300 font-mono" id="currentApiDisplay">https://api.pvincons.cloud</code>. Vui lòng kiểm tra server.
+                    Không thể kết nối đến <code class="text-rose-300 font-mono" id="currentApiDisplay">https://pvincons-backend.onrender.com</code>. Vui lòng kiểm tra server.
                 </p>
                 <div class="pt-2">
                     <button onclick="loadCDEFiles(currentPath)" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-lg text-xs transition-colors shadow-lg">
@@ -199,7 +199,7 @@
 
     <!-- JAVASCRIPT XỬ LÝ -->
     <script>
-        let DATA_SERVER_API = localStorage.getItem('cde_api_url') || 'https://api.pvincons.cloud' || 'https://pvincons-backend.onrender.com';
+        let DATA_SERVER_API = localStorage.getItem('cde_api_url') || 'https://pvincons-backend.onrender.com';
         let currentPath = 'database/bim-vdc';
         let fetchedItems = [];
         let clipboard = null;
