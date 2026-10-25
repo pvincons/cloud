@@ -199,7 +199,7 @@
 
     <!-- JAVASCRIPT XỬ LÝ -->
     <script>
-        let DATA_SERVER_API = 'https://api.pvincons.cloud';
+        let DATA_SERVER_API = localStorage.getItem('cde_api_url') || 'https://api.pvincons.cloud';
         let currentPath = 'database/bim-vdc';
         let fetchedItems = [];
         let clipboard = null;
@@ -214,28 +214,10 @@
             }
         };
 
-        // TỰ ĐỘNG TẢI CẤU HÌNH CHUNG TỪ SERVER
-        async function loadSystemConfig() {
-            try {
-                const response = await fetch(`${DATA_SERVER_API}/api/config`);
-                const data = await response.json();
-                if (data && data.apiUrl) {
-                    DATA_SERVER_API = data.apiUrl.replace(/\/$/, "");
-                }
-            } catch (error) {
-                console.warn('Không thể tải cấu hình từ server, sử dụng mặc định:', DATA_SERVER_API);
-            }
-            
-            const apiInput = document.getElementById('apiServerUrlInput');
-            if (apiInput) {
-                apiInput.value = DATA_SERVER_API;
-            }
+        document.addEventListener('DOMContentLoaded', function () {
+            document.getElementById('apiServerUrlInput').value = DATA_SERVER_API;
             initThemeUI();
             loadCDEFiles(currentPath);
-        }
-
-        document.addEventListener('DOMContentLoaded', function () {
-            loadSystemConfig();
         });
 
         function toggleTheme() {
@@ -267,34 +249,14 @@
             document.getElementById('serverConfigPanel').classList.toggle('hidden');
         }
 
-        async function saveServerUrl() {
+        function saveServerUrl() {
             const newUrl = document.getElementById('apiServerUrlInput').value.trim();
-            if (!newUrl) {
-                alert('Vui lòng nhập đường dẫn API hợp lệ!');
-                return;
-            }
-
-            const cleanUrl = newUrl.replace(/\/$/, "");
-
-            try {
-                // Gửi yêu cầu lưu lên Server để cập nhật cho toàn bộ hệ thống
-                const res = await fetch(`${DATA_SERVER_API}/api/config`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ apiUrl: cleanUrl })
-                });
-                const result = await res.json();
-
-                if (result.success) {
-                    DATA_SERVER_API = cleanUrl;
-                    alert('Đã cập nhật cấu hình API cho toàn hệ thống thành công!');
-                    toggleServerSettings();
-                    loadCDEFiles(currentPath);
-                } else {
-                    alert('Lỗi: ' + (result.error || 'Không thể lưu cấu hình'));
-                }
-            } catch (err) {
-                alert('Không thể kết nối đến Server để lưu cấu hình!');
+            if (newUrl) {
+                DATA_SERVER_API = newUrl.replace(/\/$/, "");
+                localStorage.setItem('cde_api_url', DATA_SERVER_API);
+                alert('Đã cập nhật URL CDE Server: ' + DATA_SERVER_API);
+                toggleServerSettings();
+                loadCDEFiles(currentPath);
             }
         }
 
