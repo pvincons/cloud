@@ -118,7 +118,7 @@
     <div id="serverConfigPanel" class="w-full max-w-6xl mx-auto hidden bg-slate-900/90 border border-[var(--border-color)] p-3 px-5 mb-4 rounded-xl flex flex-wrap items-center justify-between gap-3 text-xs shadow-xl">
         <div class="flex items-center gap-2 grow max-w-xl">
             <label class="text-slate-300 font-medium shrink-0">Server API URL:</label>
-            <input type="text" id="apiServerUrlInput" value="https://pvincons-backend.onrender.com" class="w-full px-3 py-1.5 bg-slate-800 border border-[var(--border-color)] rounded text-white text-xs focus:outline-none focus:border-blue-500 font-mono">
+            <input type="text" id="apiServerUrlInput" value="https://api.pvincons.cloud" class="w-full px-3 py-1.5 bg-slate-800 border border-[var(--border-color)] rounded text-white text-xs focus:outline-none focus:border-blue-500 font-mono">
         </div>
         <div class="flex items-center gap-2">
             <button onclick="saveServerUrl()" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded font-medium transition-colors">Lưu kết nối</button>
@@ -169,7 +169,7 @@
                 </div>
                 <h4 class="text-sm font-bold text-white">Chưa kết nối tới Backend CDE Server</h4>
                 <p class="text-xs text-[var(--text-muted)] max-w-md mx-auto leading-relaxed">
-                    Không thể kết nối đến <code class="text-rose-300 font-mono" id="currentApiDisplay">https://pvincons-backend.onrender.com</code>. Vui lòng kiểm tra server.
+                    Không thể kết nối đến <code class="text-rose-300 font-mono" id="currentApiDisplay">https://api.pvincons.cloud</code>. Vui lòng kiểm tra server.
                 </p>
                 <div class="pt-2">
                     <button onclick="loadCDEFiles(currentPath)" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-lg text-xs transition-colors shadow-lg">
@@ -199,7 +199,7 @@
 
     <!-- JAVASCRIPT XỬ LÝ -->
     <script>
-        let DATA_SERVER_API = localStorage.getItem('cde_api_url') || 'https://pvincons-backend.onrender.com';
+        let DATA_SERVER_API = 'https://api.pvincons.cloud';
         let currentPath = 'database/bim-vdc';
         let fetchedItems = [];
         let clipboard = null;
@@ -214,10 +214,28 @@
             }
         };
 
-        document.addEventListener('DOMContentLoaded', function () {
-            document.getElementById('apiServerUrlInput').value = DATA_SERVER_API;
+        // TỰ ĐỘNG TẢI CẤU HÌNH CHUNG TỪ SERVER
+        async function loadSystemConfig() {
+            try {
+                const response = await fetch(`${DATA_SERVER_API}/api/config`);
+                const data = await response.json();
+                if (data && data.apiUrl) {
+                    DATA_SERVER_API = data.apiUrl.replace(/\/$/, "");
+                }
+            } catch (error) {
+                console.warn('Không thể tải cấu hình từ server, sử dụng mặc định:', DATA_SERVER_API);
+            }
+            
+            const apiInput = document.getElementById('apiServerUrlInput');
+            if (apiInput) {
+                apiInput.value = DATA_SERVER_API;
+            }
             initThemeUI();
             loadCDEFiles(currentPath);
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            loadSystemConfig();
         });
 
         function toggleTheme() {
@@ -249,14 +267,34 @@
             document.getElementById('serverConfigPanel').classList.toggle('hidden');
         }
 
-        function saveServerUrl() {
+        async function saveServerUrl() {
             const newUrl = document.getElementById('apiServerUrlInput').value.trim();
-            if (newUrl) {
-                DATA_SERVER_API = newUrl.replace(/\/$/, "");
-                localStorage.setItem('cde_api_url', DATA_SERVER_API);
-                alert('Đã cập nhật URL CDE Server: ' + DATA_SERVER_API);
-                toggleServerSettings();
-                loadCDEFiles(currentPath);
+            if (!newUrl) {
+                alert('Vui lòng nhập đường dẫn API hợp lệ!');
+                return;
+            }
+
+            const cleanUrl = newUrl.replace(/\/$/, "");
+
+            try {
+                // Gửi yêu cầu lưu lên Server để cập nhật cho toàn bộ hệ thống
+                const res = await fetch(`${DATA_SERVER_API}/api/config`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ apiUrl: cleanUrl })
+                });
+                const result = await res.json();
+
+                if (result.success) {
+                    DATA_SERVER_API = cleanUrl;
+                    alert('Đã cập nhật cấu hình API cho toàn hệ thống thành công!');
+                    toggleServerSettings();
+                    loadCDEFiles(currentPath);
+                } else {
+                    alert('Lỗi: ' + (result.error || 'Không thể lưu cấu hình'));
+                }
+            } catch (err) {
+                alert('Không thể kết nối đến Server để lưu cấu hình!');
             }
         }
 
@@ -487,7 +525,6 @@
                         clipboard = null;
                         updatePasteButtonState();
                     }
-                    // PHÁT TÍN HIỆU ĐỒNG BỘ THỜI GIAN THỰC SANG CDE_MIR
                     cdeSyncChannel.postMessage({ type: 'REFRESH_CDE_DATA' });
                     loadCDEFiles(currentPath);
                 } else alert("Lỗi: " + (data.error || "Thất bại"));
