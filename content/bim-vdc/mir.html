@@ -18,1169 +18,16 @@
         }
     </script>
     <script src="/assets/js/account-modal.js"></script>
+    <script src="/assets/js/chat-client.js"></script>
 
     <!-- Custom Style Sheet -->
+    <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
         rel="stylesheet">
 
-    <!-- Custom style -->
-    <style>
-        :root[data-theme="dark"] {
-            --primary: #38bdf8;
-            --primary-dark: #0284c7;
-            --bg-dark: #090d16;
-            --bg-sidebar: #070a12;
-            --bg-main: #05070c;
-            --bg-card: #0f172a;
-            --bg-input: #131b2e;
-            --bg-hover: #1e293b;
-            --bg-tree-hover: rgba(56, 189, 248, 0.08);
-            --bg-tree-active: rgba(56, 189, 248, 0.15);
-            --text-main: #94a3b8;
-            --text-heading: #f1f5f9;
-            --text-muted: #64748b;
-            --border-color: #1e293b;
-            --folder-yellow: #fbbf24;
-
-            --wip-color: #38bdf8;
-            --shared-color: #fbbf24;
-            --published-color: #34d399;
-            --archive-color: #94a3b8;
-            --shadow-pro: 0 4px 20px -2px rgba(0, 0, 0, 0.4);
-        }
-
-        :root[data-theme="light"] {
-            --primary: #0284c7;
-            --primary-dark: #0369a1;
-            --bg-dark: #f8fafc;
-            --bg-sidebar: #ffffff;
-            --bg-main: #f1f5f9;
-            --bg-card: #ffffff;
-            --bg-input: #f1f5f9;
-            --bg-hover: #e2e8f0;
-            --bg-tree-hover: rgba(2, 132, 199, 0.05);
-            --bg-tree-active: rgba(2, 132, 199, 0.1);
-            --text-main: #64748b;
-            --text-heading: #0f172a;
-            --text-muted: #94a3b8;
-            --border-color: #e2e8f0;
-            --folder-yellow: #f59e0b;
-
-            --wip-color: #0284c7;
-            --shared-color: #d97706;
-            --published-color: #059669;
-            --archive-color: #475569;
-            --shadow-pro: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            -webkit-font-smoothing: antialiased;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        ::-webkit-scrollbar {
-            width: 5px;
-            height: 5px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: var(--border-color);
-            border-radius: 10px;
-            transition: background 0.2s;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--text-muted);
-        }
-
-        * {
-            scrollbar-width: thin;
-            scrollbar-color: var(--border-color) transparent;
-        }
-
-        /* BỘ ẨN THANH CUỘN (HIDE SCROLLBAR) CHO POPUP TRƯỢT LÊN */
-        .no-scrollbar::-webkit-scrollbar {
-            display: none;
-        }
-
-        .no-scrollbar {
-            -ms-overflow-style: none;
-            /* IE and Edge */
-            scrollbar-width: none;
-            /* Firefox */
-        }
-
-        body {
-            display: flex;
-            height: 100vh;
-            height: -webkit-fill-available;
-            background-color: var(--bg-main);
-            color: var(--text-main);
-            overflow: hidden;
-            position: relative;
-        }
-
-        .svg-icon,
-        .svg-icon-sm,
-        .svg-icon-lg {
-            fill: currentColor;
-            color: var(--text-muted);
-            display: inline-block;
-            vertical-align: middle;
-            flex-shrink: 0;
-        }
-
-        .svg-icon {
-            width: 15px;
-            height: 15px;
-        }
-
-        .svg-icon-sm {
-            width: 13px;
-            height: 13px;
-        }
-
-        .svg-icon-lg {
-            width: 18px;
-            height: 18px;
-        }
-
-        .icon-folder,
-        .icon-folder svg {
-            color: var(--folder-yellow) !important;
-            fill: var(--folder-yellow) !important;
-            display: inline-flex;
-            align-items: center;
-        }
-
-        .icon-file {
-            color: var(--text-muted);
-            display: inline-flex;
-            align-items: center;
-        }
-
-        .dropdown-content button svg,
-        .btn-tree-action svg,
-        .btn-icon svg,
-        .top-actions .btn svg,
-        .toolbar-title svg,
-        .modal-title svg {
-            color: var(--text-muted);
-            fill: currentColor;
-        }
-
-        .sidebar-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(2px);
-            z-index: 90;
-        }
-
-        .sidebar-overlay.active {
-            display: block;
-        }
-
-        .sidebar {
-            width: 280px;
-            height: 100vh;
-            position: sticky;
-            top: 0;
-            background-color: var(--bg-sidebar);
-            display: flex;
-            flex-direction: column;
-            border-right: 1px solid var(--border-color);
-            flex-shrink: 0;
-            z-index: 100;
-            transition: transform 0.25s ease;
-        }
-
-        .sidebar-header {
-            padding: 12px 14px;
-            border-bottom: 1px solid var(--border-color);
-            flex-shrink: 0;
-            background: var(--bg-card);
-        }
-
-        .brand-logo {
-            font-size: 0.9rem;
-            font-weight: 700;
-            color: var(--text-heading);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 8px;
-        }
-
-        .dashboard-link-btn {
-            background: transparent;
-            border: 1px solid var(--border-color);
-            color: var(--text-muted);
-            padding: 3px 8px;
-            border-radius: 4px;
-            font-size: 0.68rem;
-            font-weight: 500;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .dashboard-link-btn:hover {
-            border-color: var(--primary);
-            color: var(--primary);
-        }
-
-        .close-sidebar-btn {
-            display: none;
-            background: transparent;
-            border: none;
-            color: var(--text-muted);
-            font-size: 1.1rem;
-            cursor: pointer;
-        }
-
-        .project-select-box {
-            width: 100%;
-            padding: 7px 10px;
-            background-color: var(--bg-input);
-            border: 1px solid var(--border-color);
-            color: var(--text-heading);
-            border-radius: 6px;
-            font-size: 0.78rem;
-            font-weight: 500;
-            outline: none;
-            cursor: pointer;
-            transition: border-color 0.15s;
-        }
-
-        .project-select-box:hover,
-        .project-select-box:focus {
-            border-color: var(--primary);
-        }
-
-        .nav-section {
-            padding: 10px;
-            flex: 1;
-            min-height: 0;
-            overflow-y: auto;
-        }
-
-        .nav-section-title {
-            font-size: 0.65rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: var(--text-muted);
-            font-weight: 600;
-            margin-bottom: 8px;
-            padding-left: 4px;
-        }
-
-        .tree-branch {
-            list-style: none;
-            padding-left: 10px;
-            margin: 2px 0;
-            border-left: 1px solid var(--border-color);
-        }
-
-        .tree-node-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 5px 6px;
-            border-radius: 4px;
-            font-size: 0.78rem;
-            cursor: pointer;
-            user-select: none;
-            margin-bottom: 1px;
-        }
-
-        .tree-node-item:hover {
-            background-color: var(--bg-tree-hover);
-            color: var(--text-heading);
-        }
-
-        .tree-node-item.active {
-            background-color: var(--bg-tree-active);
-            color: var(--primary);
-            font-weight: 600;
-        }
-
-        .node-title {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-
-        .toggle-icon {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 14px;
-            height: 14px;
-            font-size: 0.6rem;
-            color: var(--text-muted);
-            transition: transform 0.15s ease;
-        }
-
-        .toggle-icon.collapsed {
-            transform: rotate(-90deg);
-        }
-
-        .folder-file-count {
-            font-size: 0.65rem;
-            font-weight: 600;
-            color: var(--primary);
-            background: rgba(56, 189, 248, 0.1);
-            padding: 1px 5px;
-            border-radius: 10px;
-            margin-left: 4px;
-        }
-
-        .node-actions {
-            display: none;
-            gap: 2px;
-        }
-
-        .tree-node-item:hover .node-actions {
-            display: flex;
-        }
-
-        .btn-tree-action {
-            background: transparent;
-            border: none;
-            cursor: pointer;
-            font-size: 0.75rem;
-            padding: 2px 4px;
-            border-radius: 3px;
-            color: var(--text-muted);
-            display: inline-flex;
-            align-items: center;
-        }
-
-        .btn-tree-action:hover {
-            color: var(--text-heading);
-        }
-
-        .main-wrapper {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            background-color: var(--bg-main);
-            width: 100%;
-        }
-
-        .top-navbar {
-            height: 54px;
-            background-color: var(--bg-card);
-            border-bottom: 1px solid var(--border-color);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 16px;
-            gap: 10px;
-            flex-shrink: 0;
-        }
-
-        .mobile-toggle-btn {
-            display: none;
-            background: var(--bg-input);
-            border: 1px solid var(--border-color);
-            color: var(--text-heading);
-            padding: 5px 8px;
-            border-radius: 6px;
-            cursor: pointer;
-            align-items: center;
-        }
-
-        .search-bar {
-            display: flex;
-            align-items: center;
-            background-color: var(--bg-input);
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            padding: 5px 10px;
-            width: 260px;
-            max-width: 100%;
-            transition: border-color 0.15s;
-        }
-
-        .search-bar:focus-within {
-            border-color: var(--primary);
-        }
-
-        .search-bar input {
-            border: none;
-            background: transparent;
-            outline: none;
-            width: 100%;
-            margin-left: 6px;
-            font-size: 0.78rem;
-            color: var(--text-heading);
-        }
-
-        .top-actions {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            flex-wrap: nowrap;
-        }
-
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 5px;
-            padding: 5px 10px;
-            border-radius: 6px;
-            font-size: 0.76rem;
-            font-weight: 500;
-            cursor: pointer;
-            border: 1px solid var(--border-color);
-            transition: all 0.15s ease;
-            white-space: nowrap;
-        }
-
-        .btn-primary {
-            background-color: var(--primary);
-            color: #0f172a;
-            border-color: var(--primary);
-            font-weight: 600;
-        }
-
-        .btn-primary:hover {
-            opacity: 0.9;
-        }
-
-        .btn-dark {
-            background-color: var(--bg-input);
-            color: var(--text-heading);
-        }
-
-        .btn-dark:hover {
-            border-color: var(--text-muted);
-        }
-
-        .btn-outline {
-            background-color: transparent;
-            color: var(--text-heading);
-        }
-
-        .btn-outline:hover {
-            background-color: var(--bg-hover);
-            border-color: var(--text-muted);
-        }
-
-        .theme-toggle-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            padding: 5px 9px;
-            border-radius: 6px;
-            background-color: var(--bg-input);
-            border: 1px solid var(--border-color);
-            color: var(--text-heading);
-            font-size: 0.76rem;
-            cursor: pointer;
-        }
-
-        .theme-toggle-btn:hover {
-            border-color: var(--text-muted);
-        }
-
-        .content-area {
-            flex: 1;
-            overflow-y: auto;
-            padding: 14px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            max-height: calc(100vh - 54px);
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
-            flex-shrink: 0;
-        }
-
-        .stat-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 10px 12px;
-        }
-
-        .stat-title {
-            font-size: 0.65rem;
-            text-transform: uppercase;
-            color: var(--text-muted);
-            font-weight: 600;
-            letter-spacing: 0.03em;
-        }
-
-        .stat-value {
-            font-size: 1.1rem;
-            font-weight: 700;
-            color: var(--text-heading);
-            margin-top: 2px;
-        }
-
-        .stat-desc {
-            font-size: 0.65rem;
-            color: var(--text-muted);
-            margin-top: 1px;
-        }
-
-        .naming-rule-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 10px 12px;
-            flex-shrink: 0;
-        }
-
-        .naming-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 6px;
-        }
-
-        .naming-title {
-            font-size: 0.75rem;
-            font-weight: 600;
-            color: var(--text-heading);
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .naming-fields {
-            display: flex;
-            gap: 6px;
-            flex-wrap: wrap;
-        }
-
-        .field-chip {
-            background: var(--bg-input);
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-            padding: 3px 6px;
-            text-align: center;
-            flex: 1;
-            min-width: 75px;
-        }
-
-        .field-code {
-            font-family: 'Consolas', monospace;
-            font-weight: 600;
-            color: var(--primary);
-            font-size: 0.72rem;
-        }
-
-        .field-label {
-            font-size: 0.6rem;
-            color: var(--text-muted);
-            margin-top: 1px;
-        }
-
-        .table-container {
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            min-height: 640px;
-            overflow: hidden;
-        }
-
-        .table-toolbar {
-            padding: 10px 12px;
-            background: var(--bg-card);
-            border-bottom: 1px solid var(--border-color);
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            flex-shrink: 0;
-        }
-
-        .toolbar-top {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            width: 100%;
-            gap: 12px;
-        }
-
-        .toolbar-title {
-            font-weight: 600;
-            font-size: 0.78rem;
-            color: var(--text-heading);
-            white-space: nowrap;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .toolbar-right-group {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .filters-wrapper {
-            display: flex;
-            gap: 6px;
-            align-items: center;
-            flex-wrap: nowrap;
-        }
-
-        .select-filter {
-            padding: 5px 8px;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            font-size: 0.75rem;
-            color: var(--text-heading);
-            outline: none;
-            background-color: var(--bg-input);
-            cursor: pointer;
-            width: 140px;
-            text-overflow: ellipsis;
-        }
-
-        .select-filter:hover {
-            border-color: var(--primary);
-        }
-
-        .table-wrapper {
-            width: 100%;
-            flex: 1;
-            overflow-x: auto;
-            overflow-y: auto;
-            padding-bottom: 10px;
-        }
-
-        .cde-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.76rem;
-            text-align: left;
-        }
-
-        .cde-table th {
-            background-color: var(--bg-input);
-            color: var(--text-muted);
-            font-weight: 600;
-            padding: 8px 10px;
-            border-bottom: 1px solid var(--border-color);
-            text-transform: uppercase;
-            font-size: 0.63rem;
-            letter-spacing: 0.05em;
-            white-space: nowrap;
-            position: sticky;
-            top: 0;
-            z-index: 10;
-        }
-
-        .cde-table td {
-            padding: 8px 10px;
-            border-bottom: 1px solid var(--border-color);
-            vertical-align: middle;
-            color: var(--text-main);
-            white-space: nowrap;
-        }
-
-        .cde-table tr:hover {
-            background-color: var(--bg-hover);
-        }
-
-        .file-code {
-            font-family: 'Consolas', monospace;
-            font-weight: 600;
-            color: var(--text-heading);
-            font-size: 0.76rem;
-        }
-
-        .badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 3px;
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-size: 0.65rem;
-            font-weight: 600;
-            text-align: center;
-        }
-
-        .badge-prj {
-            background: rgba(99, 102, 241, 0.1);
-            color: #818cf8;
-            border: 1px solid rgba(99, 102, 241, 0.2);
-        }
-
-        .badge-wip {
-            background: rgba(56, 189, 248, 0.1);
-            color: #38bdf8;
-            border: 1px solid rgba(56, 189, 248, 0.2);
-        }
-
-        .badge-shared {
-            background: rgba(251, 191, 36, 0.1);
-            color: #fbbf24;
-            border: 1px solid rgba(251, 191, 36, 0.2);
-        }
-
-        .badge-published {
-            background: rgba(52, 211, 153, 0.1);
-            color: #34d399;
-            border: 1px solid rgba(52, 211, 153, 0.2);
-        }
-
-        .badge-archive {
-            background: rgba(148, 163, 184, 0.1);
-            color: #94a3b8;
-            border: 1px solid rgba(148, 163, 184, 0.2);
-        }
-
-        .badge-issue {
-            background: rgba(239, 68, 68, 0.1);
-            color: #ef4444;
-            border: 1px solid rgba(239, 68, 68, 0.2);
-            cursor: pointer;
-        }
-
-        .rev-tag {
-            font-family: 'Consolas', monospace;
-            font-weight: 600;
-            color: var(--text-heading);
-            background: var(--bg-input);
-            padding: 2px 5px;
-            border-radius: 4px;
-            font-size: 0.7rem;
-            border: 1px solid var(--border-color);
-        }
-
-        .action-btns {
-            display: flex;
-            gap: 4px;
-            align-items: center;
-            position: relative;
-        }
-
-        .btn-icon {
-            padding: 3px 7px;
-            font-size: 0.7rem;
-            border-radius: 4px;
-            border: 1px solid var(--border-color);
-            background: var(--bg-input);
-            color: var(--text-heading);
-            cursor: pointer;
-            font-weight: 500;
-            white-space: nowrap;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .btn-icon:hover {
-            border-color: var(--primary);
-            color: var(--primary);
-        }
-
-        .btn-open-file {
-            background: var(--primary);
-            color: #0f172a !important;
-            border: none;
-            padding: 3px 7px;
-            border-radius: 4px;
-            font-weight: 600;
-            font-size: 0.7rem;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            cursor: pointer;
-            white-space: nowrap;
-        }
-
-        .btn-open-file:hover {
-            opacity: 0.9;
-        }
-
-        .dropdown {
-            position: relative;
-            display: inline-block;
-        }
-
-        .dropdown-content {
-            display: none;
-            position: absolute;
-            right: 0;
-            top: calc(100% + 4px);
-            background-color: var(--bg-card);
-            min-width: 185px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            z-index: 99999;
-            overflow: hidden;
-        }
-
-        .dropdown.show .dropdown-content {
-            display: block;
-        }
-
-        .dropdown-content button {
-            color: var(--text-heading);
-            padding: 8px 10px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            width: 100%;
-            background: transparent;
-            border: none;
-            text-align: left;
-            font-size: 0.75rem;
-            cursor: pointer;
-        }
-
-        .dropdown-content button:hover {
-            background-color: var(--bg-hover);
-            color: var(--primary);
-        }
-
-        .fab-btn {
-            display: none !important;
-        }
-
-        .bottom-nav {
-            display: none;
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 56px;
-            background-color: var(--bg-card);
-            border-top: 1px solid var(--border-color);
-            z-index: 110;
-            justify-content: space-around;
-            align-items: center;
-            padding: 0 4px;
-        }
-
-        .bottom-nav-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            background: transparent;
-            border: none;
-            text-decoration: none;
-            color: #64748b;
-            font-size: 0.64rem;
-            gap: 3px;
-            cursor: pointer;
-            flex: 1;
-            height: 100%;
-            transition: color 0.15s;
-        }
-
-        .bottom-nav-item svg {
-            width: 22px;
-            height: 22px;
-            fill: currentColor;
-        }
-
-        .bottom-nav-item:hover,
-        .bottom-nav-item.active {
-            color: var(--primary);
-        }
-
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(2px);
-            align-items: center;
-            justify-content: center;
-            z-index: 100000;
-            padding: 16px;
-        }
-
-        .modal.active {
-            display: flex;
-        }
-
-        .modal-content {
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            width: 520px;
-            max-width: 100%;
-            max-height: 90vh;
-            overflow-y: auto;
-            padding: 16px;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.4);
-            color: var(--text-main);
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 8px;
-            margin-bottom: 12px;
-        }
-
-        .modal-title {
-            font-size: 0.85rem;
-            font-weight: 700;
-            color: var(--text-heading);
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .close-btn {
-            cursor: pointer;
-            font-size: 1rem;
-            color: var(--text-muted);
-        }
-
-        .toast-container {
-            position: fixed;
-            bottom: 66px;
-            right: 16px;
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-            z-index: 200000;
-            max-width: calc(100vw - 32px);
-        }
-
-        .toast {
-            background: var(--bg-card);
-            color: var(--text-heading);
-            border: 1px solid var(--border-color);
-            border-left: 3px solid var(--primary);
-            padding: 8px 12px;
-            border-radius: 6px;
-            font-size: 0.75rem;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-            animation: slideIn 0.15s ease, fadeOut 0.25s ease 2.7s forwards;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        @keyframes slideIn {
-            from {
-                transform: translateX(100%);
-            }
-
-            to {
-                transform: translateX(0);
-            }
-        }
-
-        @keyframes fadeOut {
-            to {
-                opacity: 0;
-                transform: translateY(6px);
-            }
-        }
-
-        @media (max-width: 1024px) {
-            .search-bar {
-                width: 200px;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .mobile-toggle-btn {
-                display: inline-flex;
-            }
-
-            .close-sidebar-btn {
-                display: block;
-            }
-
-            .sidebar {
-                position: fixed;
-                top: 0;
-                left: 0;
-                bottom: 0;
-                height: 100vh;
-                transform: translateX(-100%);
-                box-shadow: 10px 0 25px rgba(0, 0, 0, 0.3);
-            }
-
-            .sidebar.mobile-open {
-                transform: translateX(0);
-            }
-
-            .top-navbar {
-                padding: 0 10px;
-                height: 48px;
-            }
-
-            .search-bar {
-                flex: 1;
-                width: auto;
-            }
-
-            .top-actions .btn-dark,
-            .top-actions .btn-outline {
-                display: none;
-            }
-
-            .theme-toggle-btn {
-                display: inline-flex;
-            }
-
-            .content-area {
-                padding: 8px;
-                gap: 8px;
-                padding-bottom: 64px;
-            }
-
-            .stats-grid {
-                grid-template-columns: repeat(4, 1fr);
-                gap: 5px;
-                overflow-x: auto;
-                padding-bottom: 2px;
-            }
-
-            .stat-card {
-                padding: 6px 8px;
-                min-width: 85px;
-            }
-
-            .stat-title {
-                font-size: 0.55rem;
-            }
-
-            .stat-value {
-                font-size: 0.9rem;
-            }
-
-            .stat-desc {
-                display: none;
-            }
-
-            .naming-rule-card {
-                display: none;
-            }
-
-            .toolbar-top {
-                flex-direction: column;
-                align-items: stretch;
-                gap: 6px;
-            }
-
-            .toolbar-title {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                width: 100%;
-            }
-
-            .toolbar-right-group {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                width: 100%;
-                gap: 6px;
-            }
-
-            .filters-wrapper {
-                width: 100%;
-                display: flex;
-                gap: 4px;
-            }
-
-            .select-filter {
-                flex: 1;
-                width: 0;
-                min-width: 0;
-                font-size: 0.68rem;
-                padding: 5px 3px;
-            }
-
-            .bottom-nav {
-                display: flex;
-            }
-
-            /* Tùy chỉnh bổ sung cho modal đổi tên ISO gọn gàng và đẹp mắt */
-            #isoRenameModal .modal-content {
-                max-width: 650px;
-                width: 92%;
-            }
-
-            .iso-grid-custom {
-                display: grid;
-                grid-template-columns: repeat(2, minmax(0, 1fr));
-                gap: 12px;
-                margin-top: 12px;
-            }
-
-            .iso-group-custom {
-                display: flex;
-                flex-direction: column;
-                gap: 4px;
-            }
-
-            .iso-group-custom.full-span {
-                grid-column: span 2;
-            }
-
-            .iso-group-custom label {
-                font-size: 0.72rem;
-                font-weight: 600;
-                color: var(--text-heading);
-            }
-
-            .iso-group-custom input,
-            .iso-group-custom select {
-                width: 100%;
-                padding: 7px 10px;
-                background: var(--bg-input);
-                border: 1px solid var(--border-color);
-                color: var(--text-heading);
-                border-radius: 6px;
-                font-size: 0.75rem;
-            }
-
-        }
-
-        /* Add your custom styles for this page here */
-    </style>
 </head>
 
 <body>
@@ -1191,7 +38,7 @@
         <div class="sidebar-header">
             <div class="brand-logo">
                 <div style="display: flex; align-items: center; gap: 6px;">
-                    <a href="/index.html" class="dashboard-link-btn" title="Trở về Dashboard">
+                    <a href="index.html" class="dashboard-link-btn" title="Trở về Dashboard">
                         <svg class="svg-icon-sm" viewBox="0 0 24 24">
                             <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" />
                         </svg>
@@ -1248,17 +95,19 @@
             </div>
 
             <div class="top-actions">
+                <!-- 3 NÚT MỚI BỔ SUNG THEO YÊU CẦU -->
+
                 <button class="btn btn-outline" onclick="navBottomAction('profile', this)" title="Thông tin tài khoản">
                     <svg class="svg-icon-sm" viewBox="0 0 24 24">
                         <path
                             d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
                     </svg> Tài khoản
                 </button>
-
-                <button class="btn btn-outline" onclick="navBottomAction('chat', this)" title="Chat nhóm online">
+                
+                <button class="btn btn-outline" data-chat-trigger onclick="navBottomAction('chat', this)" title="Chat nhóm online">
                     <svg class="svg-icon-sm" viewBox="0 0 24 24">
                         <path
-                            d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z" />
+                            d="M21 6h-2v9H6v2c0 .55.45 1 1 1h11l4 4V7c0-.55-.45-1-1-1zm-4 6V3c0-.55-.45-1-1-1H3c-.55 0-1 .45-1 1v14l4-4h10c.55 0 1-.45 1-1z" />
                     </svg> Chat
                 </button>
 
@@ -1292,6 +141,8 @@
                             d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z" />
                     </svg> Đăng xuất
                 </button>
+
+
             </div>
         </div>
 
@@ -1443,10 +294,10 @@
             </svg>
             <span>Tải lên</span>
         </button>
-        <button class="bottom-nav-item" onclick="navBottomAction('chat', this)">
+        <button class="bottom-nav-item" data-chat-trigger onclick="navBottomAction('chat', this)">
             <svg viewBox="0 0 24 24">
                 <path
-                    d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z" />
+                    d="M21 6h-2v9H6v2c0 .55.45 1 1 1h11l4 4V7c0-.55-.45-1-1-1zm-4 6V3c0-.55-.45-1-1-1H3c-.55 0-1 .45-1 1v14l4-4h10c.55 0 1-.45 1-1z" />
             </svg>
             <span>Chat</span>
         </button>
@@ -1466,7 +317,7 @@
                 <div class="modal-title">
                     <svg class="svg-icon" viewBox="0 0 24 24">
                         <path
-                            d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z" />
+                            d="M21 6h-2v9H6v2c0 .55.45 1 1 1h11l4 4V7c0-.55-.45-1-1-1zm-4 6V3c0-.55-.45-1-1-1H3c-.55 0-1 .45-1 1v14l4-4h10c.55 0 1-.45 1-1z" />
                     </svg>
                     Danh Sách Issue / QA-QC File
                 </div>
@@ -1487,46 +338,7 @@
         </div>
     </div>
 
-    <!-- MODAL CHỈNH SỬA METADATA (SUITABILITY) -->
-    <div class="modal" id="metadataModal">
-        <div class="modal-content" style="max-width: 450px;">
-            <div class="modal-header">
-                <div class="modal-title">
-                    <svg class="svg-icon" viewBox="0 0 24 24">
-                        <path
-                            d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z" />
-                    </svg>
-                    Chỉnh Sửa Metadata (Suitability)
-                </div>
-                <div class="close-btn" onclick="closeModal('metadataModal')">✕</div>
-            </div>
-            <div style="font-size: 0.78rem;">
-                <p><strong>Tệp tin:</strong> <span id="metaFileName" class="file-code"
-                        style="word-break: break-all;">...</span></p>
-                <div style="margin-top: 10px;">
-                    <label
-                        style="font-weight: 600; font-size: 0.72rem; display: block; margin-bottom: 4px; color: var(--text-heading);">Chọn
-                        Suitability:</label>
-                    <select id="metaSuitSelect"
-                        style="width: 100%; padding: 7px 10px; background: var(--bg-input); border: 1px solid var(--border-color); color: var(--text-heading); border-radius: 6px; font-size: 0.75rem;">
-                        <option value="S0">S0 - Draft / WIP</option>
-                        <option value="S1">S1 - Coordination</option>
-                        <option value="S2">S2 - Reference</option>
-                        <option value="S3">S3 - Review</option>
-                        <option value="S4">S4 - Approval</option>
-                        <option value="A1">A1 - Construction</option>
-                        <option value="A2">A2 - As-Built</option>
-                    </select>
-                </div>
-                <div style="margin-top: 16px; text-align: right; display: flex; justify-content: flex-end; gap: 8px;">
-                    <button class="btn btn-outline" onclick="closeModal('metadataModal')">Hủy bỏ</button>
-                    <button class="btn btn-primary" onclick="saveMetadata()">Lưu Metadata</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL ĐỔI TÊN FILE ISO -->
+    <!-- MODAL ĐỔI TÊN FILE ISO (ĐÃ CẢI TIẾN BỐ CỤC GỌN GÀNG, HIỆN ĐẠI) -->
     <div class="modal" id="isoRenameModal">
         <div class="modal-content">
             <div class="modal-header">
@@ -1628,7 +440,7 @@
                             <option value="OTHER">-- Tùy chọn khác --</option>
                         </select>
                         <input type="text" id="iso_role_custom" class="iso-custom-input"
-                            placeholder="Nhập mã Discipline tự do..." style="display: none; margin-top: 4px;"
+                            placeholder="Nhập mã role tự do..." style="display: none; margin-top: 4px;"
                             oninput="updateIsoName()">
                     </div>
                     <div class="iso-group-custom full-span">
@@ -1641,6 +453,41 @@
                 <div style="margin-top: 16px; text-align: right; display: flex; justify-content: flex-end; gap: 8px;">
                     <button class="btn btn-outline" onclick="closeModal('isoRenameModal')">Hủy bỏ</button>
                     <button class="btn btn-primary" onclick="saveIsoRename()">Lưu & Đổi Tên ISO</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL SỬA METADATA (DROPDOWN SUITABILITY) -->
+    <div class="modal" id="metadataModal">
+        <div class="modal-content" style="max-width: 420px; width: 92%;">
+            <div class="modal-header">
+                <div class="modal-title">
+                    <svg class="svg-icon" viewBox="0 0 24 24">
+                        <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z" />
+                    </svg>
+                    Sửa Metadata
+                </div>
+                <div class="close-btn" onclick="closeModal('metadataModal')">✕</div>
+            </div>
+            <div style="font-size: 0.75rem;">
+                <div style="font-size: 0.68rem; color: var(--text-muted); font-family: monospace; word-break: break-all; margin-bottom: 12px;"
+                    id="metaFileName"></div>
+                <div class="iso-group-custom">
+                    <label for="metaSuitability">Suitability (Mức độ phù hợp sử dụng)</label>
+                    <select id="metaSuitability">
+                        <option value="S0">S0 - Draft / WIP</option>
+                        <option value="S1">S1 - Coordination</option>
+                        <option value="S2">S2 - Reference</option>
+                        <option value="S3">S3 - Review</option>
+                        <option value="S4">S4 - Approval</option>
+                        <option value="A1">A1 - Construction</option>
+                        <option value="A2">A2 - As-Built</option>
+                    </select>
+                </div>
+                <div style="margin-top: 16px; display: flex; justify-content: flex-end; gap: 8px;">
+                    <button class="btn btn-outline" onclick="closeModal('metadataModal')">Hủy</button>
+                    <button class="btn btn-primary" onclick="saveMetadata()">Lưu</button>
                 </div>
             </div>
         </div>
@@ -1878,7 +725,7 @@
             if (accountModal && !accountModal.classList.contains('hidden')) {
                 toggleAccountModal(false);
             }
-            ['issuesModal', 'isoRenameModal', 'viewModal', 'gateModal', 'namingModal', 'uploadModal', 'metadataModal'].forEach(id => {
+            ['issuesModal', 'isoRenameModal', 'metadataModal', 'viewModal', 'gateModal', 'namingModal', 'uploadModal'].forEach(id => {
                 closeModal(id);
             });
         }
@@ -1897,12 +744,21 @@
             document.querySelectorAll('.bottom-nav-item').forEach(el => el.classList.remove('active'));
             if (btn) btn.classList.add('active');
 
+            // Các thao tác khác sẽ đóng khung chat để không bị che
+            if (action !== 'chat' && window.CdeChat) CdeChat.close();
+
             if (action === 'tree') {
                 openMobileSidebar();
             } else if (action === 'upload') {
                 openModal('uploadModal');
             } else if (action === 'chat') {
-                showToast("Đang kết nối đến hệ thống Chat nhóm online...");
+                if (window.CdeChat) {
+                    CdeChat.toggle();
+                    // Chỉ giữ highlight "Chat" khi khung chat đang mở
+                    if (btn && !document.getElementById('cdeChatPanel').classList.contains('open')) btn.classList.remove('active');
+                } else {
+                    showToast("Chat chưa sẵn sàng, vui lòng tải lại trang!");
+                }
             } else if (action === 'profile') {
                 closeAllModals();
                 toggleAccountModal(true);
@@ -2857,33 +1713,29 @@
             showToast(`Phiên bản hiện tại của file: ${row.querySelector('.file-code').innerText}`);
         }
 
+        let metadataEditingRow = null;
+
         function editMetadata(btn) {
-            currentRowElement = btn.closest('tr');
-            let currentSuit = currentRowElement.getAttribute('data-suitability') || 'S0';
-            let fileName = currentRowElement.querySelector('.file-code').innerText;
-            document.getElementById('metaFileName').innerText = fileName;
-            document.getElementById('metaSuitSelect').value = currentSuit;
+            const row = btn.closest('tr');
+            metadataEditingRow = row;
+            document.getElementById('metaFileName').innerText = row.querySelector('.file-code').innerText;
+            document.getElementById('metaSuitability').value = row.getAttribute('data-suitability') || 'S0';
             openModal('metadataModal');
         }
 
         function saveMetadata() {
-            if (!currentRowElement) return;
-            let newSuit = document.getElementById('metaSuitSelect').value;
-            let suitMap = {
-                'S0': 'S0 - Draft / WIP',
-                'S1': 'S1 - Coordination',
-                'S2': 'S2 - Reference',
-                'S3': 'S3 - Review',
-                'S4': 'S4 - Approval',
-                'A1': 'A1 - Construction',
-                'A2': 'A2 - As-Built'
-            };
-            let suitText = suitMap[newSuit] || newSuit;
+            if (!metadataEditingRow) return;
+            const select = document.getElementById('metaSuitability');
+            const code = select.value;
+            const label = select.options[select.selectedIndex].text;
 
-            currentRowElement.setAttribute('data-suitability', newSuit);
-            currentRowElement.children[3].innerHTML = `<span class="badge badge-${newSuit.toLowerCase()}">${suitText}</span>`;
-            showToast(`Cập nhật Suitability thành công: ${newSuit}`);
+            metadataEditingRow.setAttribute('data-suitability', code);
+            metadataEditingRow.children[3].innerHTML = `<span class="badge badge-${code.toLowerCase()}">${label}</span>`;
+
             closeModal('metadataModal');
+            metadataEditingRow = null;
+            applyFilters();
+            showToast(`Cập nhật Suitability: ${label}`);
         }
 
         function shareFile(btn) {
@@ -2952,28 +1804,16 @@
 
             let state = '01_WIP';
             let suit = 'S0';
-            let suitText = 'S0 - Draft / WIP';
+            let suitText = 'S0 - Draft';
             let badgeClass = 'badge-wip';
             let revText = 'P01.01';
 
-            let suitMap = {
-                'S0': 'S0 - Draft / WIP',
-                'S1': 'S1 - Coordination',
-                'S2': 'S2 - Reference',
-                'S3': 'S3 - Review',
-                'S4': 'S4 - Approval',
-                'A1': 'A1 - Construction',
-                'A2': 'A2 - As-Built'
-            };
-
             if (upperPath.includes('02_SHARED')) {
-                state = '02_SHARED'; suit = 'S1'; suitText = suitMap['S1']; badgeClass = 'badge-shared'; revText = 'P01.00';
+                state = '02_SHARED'; suit = 'S1'; suitText = 'S1 - Coordination'; badgeClass = 'badge-shared'; revText = 'P01.00';
             } else if (upperPath.includes('03_PUBLISHED')) {
-                state = '03_PUBLISHED'; suit = 'A1'; suitText = suitMap['A1']; badgeClass = 'badge-published'; revText = 'C01.00';
+                state = '03_PUBLISHED'; suit = 'A1'; suitText = 'A1 - Construction'; badgeClass = 'badge-published'; revText = 'C01.00';
             } else if (upperPath.includes('04_ARCHIVE')) {
-                state = '04_ARCHIVE'; suit = 'S0'; suitText = suitMap['S0']; badgeClass = 'badge-archive'; revText = 'P00.00';
-            } else {
-                suitText = suitMap[suit] || 'S0 - Draft / WIP';
+                state = '04_ARCHIVE'; suit = 'S0'; suitText = 'S0 - Archive'; badgeClass = 'badge-archive'; revText = 'P00.00';
             }
 
             let disc = 'ARC';
@@ -3231,6 +2071,14 @@
             };
 
             reloadDatabaseData();
+
+            // Khởi động Chat nhóm realtime cho tài khoản đang đăng nhập
+            if (window.CdeChat) {
+                CdeChat.init({
+                    apiBase: () => DATA_SERVER_API,
+                    getUser: () => JSON.parse(localStorage.getItem('currentUser') || '{}')
+                });
+            }
         });
     </script>
 </body>

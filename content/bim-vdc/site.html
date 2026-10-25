@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="dark" class="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Dữ liệu giai đoạn thi công - CDE ISO 19650</title>
+<script>try{document.documentElement.setAttribute('data-theme',localStorage.getItem('cde_theme')||'dark')}catch(e){}</script>
+<!-- AUTH GUARD ANTI-FOUC (giống mir.html) -->
+<script src="/assets/js/auth-guard.js"></script>
+<script src="/assets/js/permission.js"></script>
+<script>protectMirRoute(['ADMIN', 'MASTER', 'DESIGNER', 'MANAGEMENT', 'CONTRACTOR', 'INTERNAL']);</script>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>tailwind.config = { darkMode: ['selector', '[data-theme="dark"]'] }</script>
+<script src="/assets/js/account-modal.js"></script>
+<script src="/assets/js/chat-client.js"></script>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:focus-visible{outline:2px solid var(--primary);outline-offset:1px}
+.table-container{min-height:360px}
+.live{display:inline-flex;align-items:center;gap:6px;font-size:.7rem;color:var(--text-muted);white-space:nowrap}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--text-muted)}
+.live.on .dot{background:var(--published-color);animation:pulse 2s infinite}
+.live.off .dot{background:#ef4444}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(52,211,153,.6)}70%,100%{box-shadow:0 0 0 7px transparent}}
+@keyframes flash{from{background:var(--bg-tree-active)}}
+tr.flash{animation:flash 2.5s ease-out}
+.action-btns{flex-wrap:nowrap}
+.form{display:grid;gap:10px}
+.form label{display:grid;gap:3px;font-size:.7rem;color:var(--text-muted)}
+.inp{width:100%;padding:6px 8px;border:1px solid var(--border-color);border-radius:6px;background:var(--bg-input);color:var(--text-heading);font-size:.78rem}
+.inp:disabled,.form option:disabled{opacity:.5}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.code-preview{display:block;text-align:center;padding:6px;border:1px dashed var(--border-color);border-radius:6px;word-break:break-all}
+.log{list-style:none;display:grid;gap:6px;margin:8px 0;font-size:.75rem}
+.log li{padding:6px 8px;border:1px solid var(--border-color);border-radius:6px;background:var(--bg-input);color:var(--text-heading)}
+.log small{display:block;color:var(--text-muted)}
+.note{font-size:.72rem;color:var(--text-muted)}
+.empty{text-align:center;padding:28px 12px!important;white-space:normal!important}
+@media(max-width:768px){.live .t{display:none}.two{grid-template-columns:1fr}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+ <symbol id="i-back" viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></symbol>
+ <symbol id="i-menu" viewBox="0 0 24 24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></symbol>
+ <symbol id="i-folder" viewBox="0 0 24 24"><path d="M10 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/></symbol>
+ <symbol id="i-up" viewBox="0 0 24 24"><path d="M9 16h6v-6h4l-7-7-7 7h4zm-4 2h14v2H5z"/></symbol>
+ <symbol id="i-search" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></symbol>
+</svg>
+
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeMobileSidebar()"></div>
+
+<div class="sidebar" id="sidebar">
+ <div class="sidebar-header">
+  <div class="brand-logo">
+   <div style="display:flex;align-items:center;gap:6px;">
+    <a href="index.html" class="dashboard-link-btn" title="Trở về Dashboard"><svg class="svg-icon-sm"><use href="#i-back"/></svg><span>Dashboard</span></a>
+    <span style="color:var(--text-heading);font-weight:600;">Dữ liệu thi công</span>
+   </div>
+   <button class="close-sidebar-btn" onclick="closeMobileSidebar()">✕</button>
+  </div>
+  <select id="projectSelect" class="project-select-box" aria-label="Dự án"></select>
+ </div>
+ <div class="nav-section">
+  <div class="nav-section-title">Khu vực / Tầng</div>
+  <div id="tree"></div>
+ </div>
+ <div style="padding:10px 12px;border-top:1px solid var(--border-color);font-size:.68rem;color:var(--text-muted);flex-shrink:0;">
+  <div style="font-weight:600;color:var(--text-heading);font-size:.72rem;">CÔNG TY TNHH TM &amp; XD PV INCONS</div>
+  <div style="margin-top:3px;font-size:.65rem;">© 2026 Bản quyền thuộc về PV INCONS</div>
+ </div>
+</div>
+
+<div class="main-wrapper">
+ <div class="top-navbar">
+  <button class="mobile-toggle-btn" onclick="openMobileSidebar()" title="Mở danh mục"><svg class="svg-icon"><use href="#i-menu"/></svg></button>
+  <label class="search-bar"><svg class="svg-icon-sm"><use href="#i-search"/></svg><input id="q" type="search" placeholder="Tìm file thi công ISO 19650..." aria-label="Tìm kiếm"></label>
+  <div class="top-actions">
+   <span class="live" id="live" role="status"><i class="dot"></i><span class="t" id="liveTxt">Đang kết nối</span></span>
+   <button class="btn btn-outline" onclick="navBottomAction('profile', this)" title="Thông tin tài khoản"><svg class="svg-icon-sm" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg> Tài khoản</button>
+   <button class="btn btn-outline" data-chat-trigger onclick="navBottomAction('chat', this)" title="Chat nhóm Site"><svg class="svg-icon-sm" viewBox="0 0 24 24"><path d="M21 6h-2v9H6v2c0 .55.45 1 1 1h11l4 4V7c0-.55-.45-1-1-1zm-4 6V3c0-.55-.45-1-1-1H3c-.55 0-1 .45-1 1v14l4-4h10c.55 0 1-.45 1-1z"/></svg> Chat</button>
+   <button class="theme-toggle-btn" onclick="toggleTheme()" id="themeToggleBtn"><span id="themeIcon" style="display:inline-flex;align-items:center;"><svg class="svg-icon-sm" viewBox="0 0 24 24"><path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM2 13h2c.55 0 1-.45 1-1s-.45-1-1-1H2c-.55 0-1 .45-1 1s.45 1 1 1zm18 0h2c.55 0 1-.45 1-1s-.45-1-1-1h-2c-.55 0-1 .45-1 1s.45 1 1 1zM11 2v2c0 .55.45 1 1 1s1-.45 1-1V2c0-.55-.45-1-1-1s-1 .45-1 1zm0 18v2c0 .55.45 1 1 1s1-.45 1-1v-2c0-.55-.45-1-1-1s-1 .45-1 1z"/></svg></span><span id="themeText">Light</span></button>
+   <button class="btn btn-primary" id="addBtn"><svg class="svg-icon-sm" style="color:inherit" viewBox="0 0 24 24"><path d="M9 16h6v-6h4l-7-7-7 7h4zm-4 2h14v2H5z"/></svg>Tải lên</button>
+  </div>
+ </div>
+
+ <div class="content-area">
+  <div class="stats-grid" id="stats"></div>
+
+  <div class="naming-rule-card">
+   <div class="naming-header"><div class="naming-title">Quy tắc đặt tên file thi công</div><span class="badge badge-prj">ISO 19650</span></div>
+   <div class="naming-fields">
+    <div class="field-chip"><div class="field-code">PRJ</div><div class="field-label">Dự án</div></div>
+    <div class="field-chip"><div class="field-code">PVI</div><div class="field-label">Đơn vị lập</div></div>
+    <div class="field-chip"><div class="field-code">Z1</div><div class="field-label">Khu vực</div></div>
+    <div class="field-chip"><div class="field-code">L05</div><div class="field-label">Tầng</div></div>
+    <div class="field-chip"><div class="field-code">PH</div><div class="field-label">Loại</div></div>
+    <div class="field-chip"><div class="field-code">S</div><div class="field-label">Vai trò</div></div>
+    <div class="field-chip"><div class="field-code">0012</div><div class="field-label">Số thứ tự</div></div>
+   </div>
+  </div>
+
+  <div class="table-container">
+   <div class="table-toolbar">
+    <div class="toolbar-top">
+     <div class="toolbar-title">Dòng dữ liệu công trường <span class="folder-file-count" id="cnt">0</span></div>
+     <div class="toolbar-right-group"><div class="filters-wrapper">
+      <select class="select-filter" id="fs" aria-label="Lọc trạng thái">
+       <option value="ALL">Mọi trạng thái</option><option value="01_WIP">01_WIP</option><option value="02_SHARED">02_SHARED</option><option value="03_PUBLISHED">03_PUBLISHED</option><option value="04_ARCHIVE">04_ARCHIVE</option>
+      </select>
+      <select class="select-filter" id="ft" aria-label="Lọc loại"></select>
+     </div></div>
+    </div>
+   </div>
+   <div class="table-wrapper">
+    <table class="cde-table">
+     <thead><tr><th>Dự án</th><th>Tên file</th><th>Trạng thái</th><th>Suitability</th><th>Rev</th><th>Loại</th><th>Khu vực / Tầng</th><th>Thao tác</th></tr></thead>
+     <tbody id="rows"></tbody>
+    </table>
+   </div>
+  </div>
+ </div>
+</div>
+
+<nav class="bottom-nav">
+    <a href="index.html" class="bottom-nav-item">
+        <svg viewBox="0 0 24 24">
+            <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
+        </svg>
+        <span>Trang chủ</span>
+    </a>
+    <button class="bottom-nav-item" onclick="navBottomAction('tree', this)">
+        <svg viewBox="0 0 24 24">
+            <path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z" />
+        </svg>
+        <span>Thư mục</span>
+    </button>
+    <button class="bottom-nav-item" onclick="navBottomAction('upload', this)">
+        <svg viewBox="0 0 24 24">
+            <path d="M9 16h6v-6h4l-7-7-7 7h4zm-4 2h14v2H5z" />
+        </svg>
+        <span>Tải lên</span>
+    </button>
+    <button class="bottom-nav-item" data-chat-trigger onclick="navBottomAction('chat', this)">
+        <svg viewBox="0 0 24 24">
+            <path
+                d="M21 6h-2v9H6v2c0 .55.45 1 1 1h11l4 4V7c0-.55-.45-1-1-1zm-4 6V3c0-.55-.45-1-1-1H3c-.55 0-1 .45-1 1v14l4-4h10c.55 0 1-.45 1-1z" />
+        </svg>
+        <span>Chat</span>
+    </button>
+    <button class="bottom-nav-item active" onclick="navBottomAction('profile', this)">
+        <svg viewBox="0 0 24 24">
+            <path
+                d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+        </svg>
+        <span>Tài khoản</span>
+    </button>
+</nav>
+
+<div class="modal" id="md" role="dialog" aria-modal="true" aria-labelledby="mdT">
+ <div class="modal-content">
+  <div class="modal-header"><div class="modal-title" id="mdT"></div><span class="close-btn" onclick="closeMd()" role="button" tabindex="0" aria-label="Đóng">✕</span></div>
+  <div id="mdB"></div>
+ </div>
+</div>
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+/* ===== Cấu hình: dùng chung máy chủ CDE với mir.html ===== */
+let DATA_SERVER_API = localStorage.getItem('cde_api_url') || (
+    window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+        ? 'http://localhost:3000' : 'https://api.pvincons.cloud');
+const SITE_FOLDER = 'THI_CONG';          // thư mục con chứa dữ liệu thi công trong mỗi container
+const POLL_MS = 8000;                    // server chưa có SSE cho file → đồng bộ định kỳ + BroadcastChannel
+const TYPES = { PH: 'Hình ảnh', VD: 'Video', RP: 'Nhật ký / báo cáo', IN: 'Nghiệm thu' };
+const ROLES = { A: 'Kiến trúc', S: 'Kết cấu', M: 'Cơ điện', E: 'Điện', C: 'Xây dựng' };
+const ISO_CONTAINERS = ['01_WIP', '02_SHARED', '03_PUBLISHED', '04_ARCHIVE'];
+// [badge, suitability, nhãn, revision] — đúng bảng trong mir.html
+const STATES = {
+  '01_WIP': ['badge-wip', 'S0', 'S0 - Draft', 'P01.01'], '02_SHARED': ['badge-shared', 'S1', 'S1 - Coordination', 'P01.00'],
+  '03_PUBLISHED': ['badge-published', 'A1', 'A1 - Construction', 'C01.00'], '04_ARCHIVE': ['badge-archive', 'S0', 'S0 - Archive', 'P00.00'] };
+const GATES = { '01_WIP': ['02_SHARED', 'GATE 1'], '02_SHARED': ['03_PUBLISHED', 'GATE 2'], '03_PUBLISHED': ['04_ARCHIVE', 'GATE 3'] };
+const MATRIX = { // dự phòng khi permission.js chưa có getIso19650Permissions (giống mir.html)
+  MASTER: 'FFFF', ADMIN: 'FFFF', MANAGEMENT: 'NFFW', DESIGNER: 'FWRN', CONTRACTOR: 'NRWN', INTERNAL: 'NRRN' };
+const PERM_TXT = { F: 'Full Control', W: 'Read & Write', R: 'Read-Only', N: 'No Access' };
+
+const S = { flat: [], rec: [], issues: {}, prev: null, sig: '', flash: new Set(), projects: [], admin: false, role: '', permKey: '',
+            assigned: [], name: 'Người dùng', f: { prj: 'ALL', vol: '', lvl: '', state: 'ALL', type: 'ALL', q: '' } };
+const sync = new BroadcastChannel('pvincons_cde_sync_channel');
+sync.onmessage = e => { if (e.data && e.data.type === 'REFRESH_CDE_DATA') load(); };
+
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const clean = s => String(s || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+const hm = () => new Date().toLocaleTimeString('vi-VN');
+
+function openMobileSidebar() { $('#sidebar').classList.add('mobile-open'); $('#sidebarOverlay').classList.add('active'); }
+function closeMobileSidebar() { $('#sidebar').classList.remove('mobile-open'); $('#sidebarOverlay').classList.remove('active'); }
+function showToast(message) {
+    const container = document.getElementById('toastContainer');
+    const toast = document.createElement('div');
+    toast.className = 'toast';
+    toast.innerHTML = `<svg class="svg-icon-sm" viewBox="0 0 24 24" style="color:var(--primary);"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg> <span>${esc(message)}</span>`;
+    container.appendChild(toast);
+    setTimeout(() => toast.remove(), 3000);
+}
+const openMd = (t, h) => { $('#mdT').textContent = t; $('#mdB').innerHTML = h; $('#md').classList.add('active'); };
+const closeMd = () => $('#md').classList.remove('active');
+function closeAllModals() {
+    closeMd();
+    const am = document.getElementById('accountModal');
+    if (am && !am.classList.contains('hidden') && typeof toggleAccountModal === 'function') toggleAccountModal(false);
+}
+function handleLogout() {
+    if (confirm("Bạn có chắc chắn muốn đăng xuất khỏi hệ thống không?")) {
+        localStorage.removeItem('currentUser'); showToast("Đang đăng xuất...");
+        setTimeout(() => { window.location.href = '../../../index.html'; }, 600);
+    }
+}
+function toggleTheme(){const t=(document.documentElement.getAttribute('data-theme')||'dark')==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',t);try{localStorage.setItem('cde_theme',t)}catch(e){}updateThemeUI(t)}
+function updateThemeUI(t){document.documentElement.classList.toggle('dark',t==='dark');const i=$('#themeIcon'),x=$('#themeText');if(i&&x){i.innerHTML=t==='dark'?SUN:MOON;x.innerText=t==='dark'?'Light':'Dark'}}
+const SUN=`<svg class="svg-icon-sm" viewBox="0 0 24 24"><path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM2 13h2c.55 0 1-.45 1-1s-.45-1-1-1H2c-.55 0-1 .45-1 1s.45 1 1 1zm18 0h2c.55 0 1-.45 1-1s-.45-1-1-1h-2c-.55 0-1 .45-1 1s.45 1 1 1zM11 2v2c0 .55.45 1 1 1s1-.45 1-1V2c0-.55-.45-1-1-1s-1 .45-1 1zm0 18v2c0 .55.45 1 1 1s1-.45 1-1v-2c0-.55-.45-1-1-1s-1 .45-1 1z"/></svg>`,MOON=`<svg class="svg-icon-sm" viewBox="0 0 24 24"><path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9c0-.46-.04-.92-.1-1.36-.98 1.37-2.58 2.26-4.4 2.26-2.98 0-5.4-2.42-5.4-5.4 0-1.81.89-3.42 2.26-4.4-.44-.06-.9-.1-1.36-.1z"/></svg>`;
+
+/* Thanh bottom bar: cùng cấu trúc và hành vi với mir.html */
+function navBottomAction(action, btn) {
+    document.querySelectorAll('.bottom-nav-item').forEach(el => el.classList.remove('active'));
+    if (btn) btn.classList.add('active');
+    if (action !== 'chat' && window.CdeChat) CdeChat.close();
+    if (action === 'tree') {
+        openMobileSidebar();
+    } else if (action === 'upload') {
+        showUpload();
+    } else if (action === 'chat') {
+        if (window.CdeChat) {
+            CdeChat.toggle();
+            if (btn && !document.getElementById('cdeChatPanel').classList.contains('open')) btn.classList.remove('active');
+        } else {
+            showToast("Chat chưa sẵn sàng, vui lòng tải lại trang!");
+        }
+    } else if (action === 'profile') {
+        closeAllModals();
+        toggleAccountModal(true);
+    }
+}
+
+/* ===== Người dùng & phân quyền ===== */
+async function loadUser() {
+    const u = JSON.parse(localStorage.getItem('currentUser') || '{}');
+    S.role = (u.role || '').toUpperCase(); S.permKey = (u.permission || S.role).toUpperCase();
+    let projects = u.projects || '', name = u.fullName;
+    try {
+        const r = await fetch('../../../assets/data/users.json');
+        if (r.ok) {
+            const f = (await r.json()).find(x => x.username === u.username);
+            if (f) { projects = f.projects || projects; name = f.fullName || name;
+                     if (f.permission) S.permKey = f.permission.toUpperCase(); if (f.role) S.role = f.role.toUpperCase(); }
+        }
+    } catch (e) { /* dùng session hiện tại */ }
+    S.admin = S.permKey === 'ADMIN' || S.role === 'ADMIN';
+    S.name = name || u.username || S.name;
+    S.assigned = String(projects).split(/[,]+/).map(p => p.trim());
+}
+function cPerm(c) { // quyền theo container ISO 19650
+    if (S.admin) return PERM_TXT.F;
+    if (typeof getIso19650Permissions === 'function') return getIso19650Permissions(c) || PERM_TXT.N;
+    const m = MATRIX[S.permKey] || MATRIX[S.role];
+    return m ? PERM_TXT[m[ISO_CONTAINERS.indexOf(c)]] : PERM_TXT.N;
+}
+const canWrite = c => /^(FULL CONTROL|READ & WRITE)$/.test(cPerm(c).toUpperCase());
+const canSee = c => cPerm(c).toUpperCase() !== 'NO ACCESS';
+const act = (a, st) => typeof checkActionPermission === 'function' ? checkActionPermission(a, st) : true;
+const myProject = n => { const k = n.replace(/\s+/g, '_').toLowerCase();
+    return S.admin || S.assigned.some(p => p.replace(/\s+/g, '_').toLowerCase() === k || p === 'Tất cả dự án' || p === 'ALL'); };
+
+/* ===== Dữ liệu từ máy chủ CDE ===== */
+function parse(it) { // it.path: database/bim-vdc/<Dự án>/<0x_CONTAINER>/[thư mục con/]<tên file>
+    if (it.type !== 'file') return null;
+    const p = it.path.split('/'), ci = p.findIndex(x => /^0[1-4]_(WIP|SHARED|PUBLISHED|ARCHIVE)$/i.test(x));
+    if (ci < 3) return null;
+    const state = p[ci].toUpperCase(), name = p[p.length - 1], dot = name.lastIndexOf('.');
+    const f = (dot > 0 ? name.slice(0, dot) : name).split('-'), iso = f.length === 7, type = iso ? f[4].toUpperCase() : '';
+    if (!TYPES[type] && !p.includes(SITE_FOLDER)) return null; // chỉ lấy dữ liệu thi công
+    return { path: it.path, name, project: p[2], state, vol: iso ? f[2].toUpperCase() : '—', lvl: iso ? f[3].toUpperCase() : '—',
+             type, ext: dot > 0 ? name.slice(dot + 1) : '', sub: p.slice(ci + 1, -1).join('/') };
+}
+function setLive(ok) { $('#live').className = 'live ' + (ok ? 'on' : 'off'); $('#liveTxt').textContent = ok ? 'Đồng bộ ' + hm() : 'Mất kết nối server CDE'; }
+async function load() {
+    try {
+        const [a, b] = await Promise.all([fetch(`${DATA_SERVER_API}/api/cde-files`), fetch(`${DATA_SERVER_API}/api/issues`)]);
+        if (!a.ok) throw new Error('files');
+        S.flat = await a.json(); S.issues = b.ok ? await b.json() : {};
+        S.projects = S.flat.filter(x => x.type === 'folder' && x.path.split('/').length === 3).map(x => x.name).filter(myProject);
+        S.rec = S.flat.map(parse).filter(r => r && myProject(r.project) && canSee(r.state));
+        setLive(true);
+    } catch (e) { setLive(false); return; }
+    const next = new Map(S.rec.map(r => [r.path, r.state])), msgs = [];
+    if (S.prev) next.forEach((st, p) => { const o = S.prev.get(p);
+        if (o !== st) { S.flash.add(p); msgs.push(o ? `${p.split('/').pop()}: ${o} ➔ ${st}` : `Dữ liệu mới: ${p.split('/').pop()}`); } });
+    S.prev = next;
+    if (msgs.length > 3) showToast(`Có ${msgs.length} thay đổi mới từ công trường`); else msgs.forEach(showToast);
+    const sig = JSON.stringify([...next, Object.entries(S.issues).map(([k, v]) => [k, v.length])]);
+    if (sig !== S.sig || msgs.length) { S.sig = sig; render(); }
+}
+
+/* ===== Hiển thị ===== */
+function vis(skipState) {
+    const f = S.f;
+    return S.rec.filter(r => (f.prj === 'ALL' || r.project === f.prj) && (!f.vol || r.vol === f.vol) && (!f.lvl || r.lvl === f.lvl) &&
+        (skipState || f.state === 'ALL' || r.state === f.state) && (f.type === 'ALL' || r.type === f.type) &&
+        (!f.q || (r.name + r.project).toLowerCase().includes(f.q)));
+}
+function render() { projectOptions(); stats(); tree(); table(); }
+function projectOptions() {
+    const sel = $('#projectSelect'), cur = S.f.prj;
+    sel.innerHTML = (S.admin ? '<option value="ALL">Tất cả Dự án (All Projects)</option>' : '') + S.projects.map(p => `<option value="${esc(p)}">${esc(p)}</option>`).join('');
+    sel.value = [...sel.options].some(o => o.value === cur) ? cur : (sel.options[0] ? sel.options[0].value : 'ALL');
+    S.f.prj = sel.value || 'ALL';
+}
+function stats() {
+    const b = vis(true), n = s => b.filter(r => r.state === s).length, iss = b.reduce((t, r) => t + (S.issues[r.path] || []).length, 0);
+    const c = (t, v, d) => `<div class="stat-card"><div class="stat-title">${t}</div><div class="stat-value">${v}</div><div class="stat-desc">${d}</div></div>`;
+    $('#stats').innerHTML = c('01_WIP', n('01_WIP') + ' File', 'Đang cập nhật tại công trường') + c('02_SHARED', n('02_SHARED') + ' File', 'Chờ duyệt Gate 2') +
+        c('03_PUBLISHED', n('03_PUBLISHED') + ' File', 'Dùng để thi công') + c('Issue / QA-QC', iss, 'Ghi chú trên file thi công');
+}
+function tree() {
+    const b = S.rec.filter(r => S.f.prj === 'ALL' || r.project === S.f.prj), f = S.f, vols = [...new Set(b.map(r => r.vol))].sort();
+    const ico = '<span class="icon-folder"><svg class="svg-icon"><use href="#i-folder"/></svg></span>';
+    const it = (v, l, t, pad, n) => `<div class="tree-node-item ${f.vol === v && f.lvl === l ? 'active' : ''}" data-v="${esc(v)}" data-l="${esc(l)}" tabindex="0" style="padding-left:${pad}px"><span class="node-title">${t}</span><span class="folder-file-count">${n}</span></div>`;
+    $('#tree').innerHTML = it('', '', ico + 'Tất cả khu vực', 6, b.length) + (vols.length ? vols.map(v => {
+        const bv = b.filter(r => r.vol === v), lv = [...new Set(bv.map(r => r.lvl))].sort();
+        return it(v, '', ico + esc(v), 6, bv.length) + '<div class="tree-branch">' + lv.map(l => it(v, l, esc(l), 6, bv.filter(r => r.lvl === l).length)).join('') + '</div>';
+    }).join('') : '<div class="note" style="padding:6px">Chưa có dữ liệu thi công.</div>');
+}
+function row(r) {
+    const st = STATES[r.state], g = GATES[r.state], n = (S.issues[r.path] || []).length, d = `data-p="${esc(r.path)}"`;
+    return `<tr class="${S.flash.has(r.path) ? 'flash' : ''}"><td><span class="badge badge-prj">${esc(r.project)}</span></td>
+    <td class="file-code" title="${esc(r.path)}">${esc(r.name)}</td><td><span class="badge ${st[0]}">${r.state}</span></td>
+    <td><span class="badge badge-${st[1].toLowerCase()}">${st[2]}</span></td><td><span class="rev-tag">${st[3]}</span></td>
+    <td>${TYPES[r.type] || '—'}</td><td>${esc(r.vol)} / ${esc(r.lvl)}</td>
+    <td><div class="action-btns"><button class="btn-open-file" data-a="open" ${d}>Mở</button>
+    ${g && act('GATE_APPROVAL', r.state) ? `<button class="btn-icon" data-a="gate" ${d}>${g[1].replace('GATE ', 'Gate ')}</button>` : ''}
+    <button class="btn-icon ${n ? 'badge-issue' : ''}" data-a="issue" ${d}>Issue${n ? ' · ' + n : ''}</button></div></td></tr>`;
+}
+function table() {
+    const v = vis(false).sort((a, b) => a.name < b.name ? 1 : -1); $('#cnt').textContent = v.length;
+    $('#rows').innerHTML = v.length ? v.map(row).join('') :
+        '<tr><td class="empty" colspan="8">Chưa có dữ liệu thi công khớp bộ lọc. Chọn Tải lên để gửi ảnh, video hoặc nhật ký mới.</td></tr>';
+    S.flash.clear();
+}
+
+/* ===== Gate (WIP ➔ SHARED ➔ PUBLISHED ➔ ARCHIVE) ===== */
+const findRec = p => S.rec.find(r => r.path === p);
+function showGate(p) {
+    const r = findRec(p), g = r && GATES[r.state]; if (!g) return;
+    const to = STATES[g[0]];
+    openMd(g[1], `<div class="form"><div class="note"><b style="color:var(--text-heading)">${esc(r.name)}</b><br>${r.state} ➔ ${g[0]} (${to[2]} | Rev: ${to[3]})</div>
+     <label>Ghi chú QA/QC<textarea class="inp" id="gNote" rows="2" placeholder="Đã kiểm tra hiện trường, đúng bản vẽ..."></textarea></label>
+     <label style="display:flex;grid-template-columns:none;align-items:center;gap:6px;color:var(--text-heading)"><input type="checkbox" id="gSync" checked> Tự động tạo Issue / QA-QC từ ghi chú này</label>
+     <button class="btn btn-primary" id="gGo">Phê duyệt ${g[1]}</button></div>`);
+    $('#gGo').onclick = () => submitGate(r);
+}
+async function submitGate(r) {
+    const g = GATES[r.state], note = $('#gNote').value.trim(), syncIssue = $('#gSync').checked;
+    if (!act('GATE_APPROVAL', r.state)) { showToast('Vai trò của bạn không có quyền duyệt Gate trên phân vùng này!'); return; }
+    const targetDir = ['database/bim-vdc', r.project, g[0]].concat(r.sub ? [r.sub] : []).join('/'); // giữ nguyên thư mục con THI_CONG
+    try {
+        const res = await fetch(`${DATA_SERVER_API}/api/move`, { method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ sourcePath: r.path, targetDir }) });
+        const data = await res.json();
+        if (!data.success) { showToast('Lỗi chuyển Gate: ' + (data.error || 'Thất bại')); return; }
+        if (syncIssue && note) await fetch(`${DATA_SERVER_API}/api/issues/add`, { method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ filePath: `${targetDir}/${r.name}`, text: `[${g[1]} (${r.state} ➔ ${g[0]})] ${note}`, author: S.name }) }).catch(() => { });
+        showToast('Đã phê duyệt Gate & di chuyển file thành công!'); closeMd();
+        sync.postMessage({ type: 'REFRESH_CDE_DATA' }); load();
+    } catch (e) { showToast(`Không thể kết nối tới CDE Server tại (${DATA_SERVER_API})!`); }
+}
+
+/* ===== Issue / QA-QC ===== */
+function showIssues(p) {
+    const r = findRec(p); if (!r) return; const list = S.issues[p] || [];
+    openMd('Issue / QA-QC', `<div class="note" style="margin-bottom:6px">${esc(r.name)}</div>
+     <ul class="log">${list.length ? list.map(i => `<li><small>👤 ${esc(i.author)} • ${esc(i.time)}</small>${esc(i.text)}</li>`).join('') : '<li>Chưa có issue nào cho file này.</li>'}</ul>
+     ${act('CREATE_ISSUE', r.state) ? `<div class="form"><textarea class="inp" id="iTxt" rows="2" placeholder="Nội dung Issue / QA-QC..."></textarea><button class="btn btn-primary" id="iGo">Thêm Issue</button></div>` : ''}`);
+    const go = $('#iGo'); if (go) go.onclick = async () => {
+        const text = $('#iTxt').value.trim(); if (!text) return;
+        try {
+            const d = await (await fetch(`${DATA_SERVER_API}/api/issues/add`, { method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ filePath: p, text, author: S.name }) })).json();
+            if (!d.success) throw new Error(d.error);
+            S.issues[p] = d.issues; showIssues(p); stats(); table(); sync.postMessage({ type: 'REFRESH_CDE_DATA' }); showToast('Đã thêm Issue lên server!');
+        } catch (e) { showToast('Không lưu được Issue: ' + (e.message || 'lỗi kết nối')); }
+    };
+}
+
+/* ===== Tải lên (tên file theo ISO 19650, đặt vào <Dự án>/<container>/THI_CONG) ===== */
+function nextNum(prefix) {
+    let max = 0;
+    S.flat.forEach(x => { if (x.type === 'file') { const n = x.name.toUpperCase();
+        if (n.startsWith(prefix)) max = Math.max(max, parseInt(n.slice(prefix.length), 10) || 0); } });
+    return String(max + 1).padStart(4, '0');
+}
+function showUpload() {
+    if (!S.projects.length) { showToast('Bạn chưa được gán dự án nào hoặc chưa tải được dữ liệu.'); return; }
+    const opt = o => Object.entries(o).map(([k, v]) => `<option value="${k}">${esc(v)}</option>`).join('');
+    const cont = ISO_CONTAINERS.map(c => `<option value="${c}" ${canWrite(c) ? '' : 'disabled'}>${c} (${canWrite(c) ? cPerm(c) : '🔒 ' + cPerm(c)})</option>`).join('');
+    const vols = [...new Set(S.rec.map(r => r.vol))].filter(v => v !== '—'), lvls = [...new Set(S.rec.map(r => r.lvl))].filter(v => v !== '—');
+    openMd('Tải lên dữ liệu thi công', `<div class="form">
+     <div class="two"><label>Dự án<select class="inp" id="uP">${S.projects.map(p => `<option>${esc(p)}</option>`).join('')}</select></label>
+     <label>Container<select class="inp" id="uC">${cont}</select></label></div>
+     <div class="two"><label>Khu vực (Volume)<input class="inp" id="uV" maxlength="6" value="ZZ" list="dlV"></label>
+     <label>Tầng (Level)<input class="inp" id="uL" maxlength="6" value="ZZ" list="dlL"></label></div>
+     <datalist id="dlV">${vols.map(v => `<option>${esc(v)}</option>`).join('')}</datalist><datalist id="dlL">${lvls.map(v => `<option>${esc(v)}</option>`).join('')}</datalist>
+     <div class="two"><label>Loại<select class="inp" id="uT">${opt(TYPES)}</select></label><label>Vai trò<select class="inp" id="uR">${opt(ROLES)}</select></label></div>
+     <label>Ảnh, video hoặc tài liệu<input class="inp" id="uF" type="file" accept="image/*,video/*,.pdf"></label>
+     <div><div class="note" style="margin-bottom:3px">Tên file sẽ lưu</div><span class="code-preview file-code" id="uN"></span></div>
+     <button class="btn btn-primary" id="uGo">Tải lên</button></div>`);
+    const first = [...$('#uC').options].find(o => !o.disabled); if (first) $('#uC').value = first.value;
+    const upd = () => { const f = $('#uF').files[0], ext = f && f.name.includes('.') ? f.name.split('.').pop().toLowerCase() : 'jpg';
+        const pre = [clean($('#uP').value) || 'PRJ', 'PVI', clean($('#uV').value) || 'ZZ', clean($('#uL').value) || 'ZZ', $('#uT').value, $('#uR').value].join('-') + '-';
+        $('#uN').dataset.pre = pre; $('#uN').dataset.ext = ext; $('#uN').textContent = pre + nextNum(pre) + '.' + ext; };
+    ['#uP', '#uV', '#uL', '#uT', '#uR', '#uF'].forEach(i => $(i).oninput = upd); upd();
+    $('#uGo').onclick = doUpload;
+}
+async function doUpload() {
+    const f = $('#uF').files[0], c = $('#uC').value;
+    if (!f) { showToast('Vui lòng chọn tệp tin cần upload!'); return; }
+    if (!c || !canWrite(c)) { showToast('Bạn không có quyền ghi vào container này!'); return; }
+    const name = $('#uN').textContent, target = `database/bim-vdc/${$('#uP').value}/${c}/${SITE_FOLDER}`;
+    if (!/^[A-Z0-9]+-[A-Z0-9]+-[A-Z0-9]+-[A-Z0-9]+-[A-Z0-9]+-[A-Z0-9]+-[0-9]{4}\.[a-z0-9]+$/i.test(name)) { showToast('Tên file chưa đúng chuẩn ISO 19650!'); return; }
+    const fd = new FormData(); fd.append('targetPath', target);               // trường văn bản phải đứng trước file để multer đọc được
+    fd.append('file', new File([f], name, { type: f.type }));
+    $('#uGo').disabled = true;
+    try {
+        const d = await (await fetch(`${DATA_SERVER_API}/api/upload?path=${encodeURIComponent(target)}`, { method: 'POST', body: fd })).json();
+        if (!d.success) throw new Error(d.error || 'Thất bại');
+        showToast('Đã tải lên: ' + name); closeMd(); sync.postMessage({ type: 'REFRESH_CDE_DATA' }); load();
+    } catch (e) { showToast('Lỗi upload: ' + (e.message || 'không kết nối được server')); $('#uGo').disabled = false; }
+}
+
+/* ===== Sự kiện ===== */
+$('#projectSelect').onchange = e => { S.f.prj = e.target.value; S.f.vol = S.f.lvl = ''; if (innerWidth <= 768) closeMobileSidebar(); render(); };
+$('#addBtn').onclick = showUpload;
+$('#q').oninput = e => { S.f.q = e.target.value.trim().toLowerCase(); stats(); table(); };
+$('#fs').onchange = e => { S.f.state = e.target.value; table(); };
+$('#ft').innerHTML = '<option value="ALL">Mọi loại</option>' + Object.entries(TYPES).map(([k, v]) => `<option value="${k}">${v}</option>`).join('');
+$('#ft').onchange = e => { S.f.type = e.target.value; stats(); table(); };
+$('#tree').onclick = $('#tree').onkeydown = e => { const n = e.target.closest('[data-v]'); if (!n || (e.type === 'keydown' && e.key !== 'Enter')) return;
+    S.f.vol = n.dataset.v; S.f.lvl = n.dataset.l; if (innerWidth <= 768) closeMobileSidebar(); stats(); tree(); table(); };
+$('#rows').onclick = e => { const b = e.target.closest('[data-a]'); if (!b) return; const p = b.dataset.p;
+    if (b.dataset.a === 'open') { const rel = p.replace(/^database\/bim-vdc\/?/, '').split('/').map(encodeURIComponent).join('/'); window.open(`${DATA_SERVER_API}/files/${rel}`, '_blank', 'noopener'); }
+    else if (b.dataset.a === 'gate') showGate(p); else showIssues(p); };
+$('#md').onclick = e => { if (e.target.id === 'md') closeMd(); };
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeAllModals(); });
+document.addEventListener('visibilitychange', () => { if (!document.hidden) load(); });
+setInterval(() => { if (!document.hidden) load(); }, POLL_MS);
+
+document.addEventListener('DOMContentLoaded', async () => {
+    updateThemeUI(localStorage.getItem('cde_theme') || 'dark');
+    await loadUser(); await load(); render();
+    // Nhóm chat riêng của nhân sự công trường (room = 'site'), tách khỏi chat chung của mir.html
+    if (window.CdeChat) {
+        CdeChat.init({
+            apiBase: () => DATA_SERVER_API,
+            getUser: () => JSON.parse(localStorage.getItem('currentUser') || '{}'),
+            room: 'site', title: 'Nhóm Site'
+        });
+    }
+});
+</script>
+</body>
+</html>
