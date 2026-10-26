@@ -7,7 +7,6 @@ document.getElementById('loginForm')?.addEventListener('submit', async function 
 
   const username = usernameInput ? usernameInput.value.trim() : '';
   const password = passwordInput ? passwordInput.value.trim() : '';
-
   const originalBtnContent = submitBtn ? submitBtn.innerHTML : '';
 
   if (submitBtn) {
@@ -32,22 +31,20 @@ document.getElementById('loginForm')?.addEventListener('submit', async function 
     }
   };
 
-  // Định nghĩa SCRIPT_URL Google Sheets dự phòng
-  const SCRIPT_URL = 'https://script.google.com';
-
+  const SCRIPT_URL = 'https://script.google.com'; // https://script.google.com/macros/s/AKfycbwnudZdtcWdcNaBX-y_f_9KO15drju3bOC9aiK1Pr1YdIKs2FJZDE15g46QPPkIvrD0/exec
   let loginSuccess = false;
   let userData = null;
   let tokenData = 'FALLBACK_SHEETS_TOKEN_2026';
 
   try {
-    // 1. THỬ KẾT NỐI AUTH SERVICE CHÍNH TRƯỚC (Dùng chung cổng 3000 sau khi gộp file)
+    // Trỏ trực tiếp về cổng 3000 sau khi gộp chung server.js
     const loginUrl = typeof CONFIG !== 'undefined' ? `${CONFIG.AUTH_API}/login` : 'http://localhost:3000/api/auth/login';
 
     const response = await fetch(loginUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username, password }),
-      signal: AbortSignal.timeout(5000) // Timeout sau 5 giây nếu server treo
+      signal: AbortSignal.timeout(5000)
     });
 
     const data = await response.json();
@@ -57,64 +54,45 @@ document.getElementById('loginForm')?.addEventListener('submit', async function 
       userData = data.user;
       tokenData = data.token;
     } else {
-      // Nếu server chính trả về lỗi (sai mật khẩu, tài khoản không tồn tại), thông báo thẳng luôn
       alert(data.error || 'Tài khoản hoặc mật khẩu không chính xác!');
       resetBtn();
       return;
     }
 
   } catch (primaryError) {
-    console.warn('⚠️ Auth Service chính không phản hồi, đang chuyển hướng xác thực sang Google Sheets...', primaryError);
+    console.warn('⚠️ Server chính không phản hồi, đang chuyển hướng sang Google Sheets...', primaryError);
 
     try {
-      // 2. KHI SERVER CHÍNH LỖI -> FALLBACK SANG GOOGLE APPS SCRIPT (GOOGLE SHEETS)
       const scriptResponse = await fetch(SCRIPT_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: JSON.stringify({ action: 'login', username, password })
       });
 
-      const textResult = await scriptResponse.text();
-      let result;
-      try {
-        result = JSON.parse(textResult);
-      } catch (e) {
-        result = { success: false, error: textResult };
-      }
+      const result = JSON.parse(await scriptResponse.text());
 
       if (result.success) {
         loginSuccess = true;
-        userData = result.user || {
-          username: username,
-          fullName: result.fullName || username,
-          role: result.role || 'DESIGNER',
-          company: 'PV INCONS CO.LTD'
-        };
+        userData = result.user || { username, fullName: result.fullName || username, role: result.role || 'DESIGNER', company: 'PV INCONS CO.LTD' };
       } else {
-        alert(result.error || 'Xác thực qua Google Sheets thất bại: Sai tài khoản hoặc mật khẩu!');
+        alert(result.error || 'Xác thực qua Google Sheets thất bại!');
         resetBtn();
         return;
       }
-
     } catch (fallbackError) {
-      console.error('❌ Cả Auth Service và Google Sheets đều không thể kết nối:', fallbackError);
-      alert('Không thể kết nối đến hệ thống xác thực (Cả Server chính và Google Sheets đều ngoại tuyến)!');
+      alert('Không thể kết nối đến hệ thống xác thực!');
       resetBtn();
       return;
     }
   }
 
-  // NẾU ĐĂNG NHẬP THÀNH CÔNG (TỪ BẤT KỲ NGUỒN NÀO)
   if (loginSuccess && userData) {
     let redirectUrl = './content/bim-vdc/index.html';
-
     if (userData.role === 'INTERNAL') {
       redirectUrl = './content/internal/index.html';
     }
-
     localStorage.setItem('access_token', tokenData);
     localStorage.setItem('currentUser', JSON.stringify(userData));
-
     window.location.href = redirectUrl;
   }
 });
