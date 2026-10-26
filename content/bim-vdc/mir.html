@@ -27,7 +27,6 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
         rel="stylesheet">
-
 </head>
 
 <body>
@@ -95,8 +94,6 @@
             </div>
 
             <div class="top-actions">
-                <!-- 3 NÚT MỚI BỔ SUNG THEO YÊU CẦU -->
-
                 <button class="btn btn-outline" onclick="navBottomAction('profile', this)" title="Thông tin tài khoản">
                     <svg class="svg-icon-sm" viewBox="0 0 24 24">
                         <path
@@ -141,8 +138,6 @@
                             d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z" />
                     </svg> Đăng xuất
                 </button>
-
-
             </div>
         </div>
 
@@ -338,7 +333,7 @@
         </div>
     </div>
 
-    <!-- MODAL ĐỔI TÊN FILE ISO (ĐÃ CẢI TIẾN BỐ CỤC GỌN GÀNG, HIỆN ĐẠI) -->
+    <!-- MODAL ĐỔI TÊN FILE ISO -->
     <div class="modal" id="isoRenameModal">
         <div class="modal-content">
             <div class="modal-header">
@@ -458,7 +453,7 @@
         </div>
     </div>
 
-    <!-- MODAL SỬA METADATA (DROPDOWN SUITABILITY) -->
+    <!-- MODAL SỬA METADATA -->
     <div class="modal" id="metadataModal">
         <div class="modal-content" style="max-width: 420px; width: 92%;">
             <div class="modal-header">
@@ -594,6 +589,7 @@
         </div>
     </div>
 
+    <!-- MODAL NAMING CHECKER -->
     <div class="modal" id="namingModal">
         <div class="modal-content">
             <div class="modal-header">
@@ -631,6 +627,7 @@
         </div>
     </div>
 
+    <!-- MODAL UPLOAD -->
     <div class="modal" id="uploadModal">
         <div class="modal-content">
             <div class="modal-header">
@@ -669,7 +666,7 @@
 
     <div class="toast-container" id="toastContainer"></div>
 
-    <!-- JAVASCRIPT XỬ LÝ -->
+    <!-- JAVASCRIPT XỬ LÝ TỐI ƯU & KHẮC PHỤC LỖI KHÔNG MỞ ĐƯỢC CHAT -->
     <script>
         let DATA_SERVER_API = localStorage.getItem('cde_api_url') || (
             window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
@@ -683,7 +680,6 @@
         let currentActiveFilePath = "";
         let serverIssuesDB = {};
 
-        // Biến toàn cục quản lý quyền và thông tin user hiện tại
         let currentUserRole = '';
         let currentUserPermission = '';
         let currentUserAssignedProjects = [];
@@ -700,7 +696,6 @@
         };
 
         const ISO_CONTAINERS = ['01_WIP', '02_SHARED', '03_PUBLISHED', '04_ARCHIVE'];
-
         const cdeSyncChannel = new BroadcastChannel('pvincons_cde_sync_channel');
 
         cdeSyncChannel.onmessage = (event) => {
@@ -741,24 +736,24 @@
         }
 
         function navBottomAction(action, btn) {
+            if (action === 'chat') {
+                // Trạng thái active của nút Chat do chat-client.js tự đồng bộ khi mở/đóng (kể cả vuốt xuống để đóng)
+                if (window.CdeChat) {
+                    CdeChat.toggle();
+                } else {
+                    showToast("Chat chưa sẵn sàng, vui lòng tải lại trang!");
+                }
+                return;
+            }
+
+            if (window.CdeChat) CdeChat.close();
             document.querySelectorAll('.bottom-nav-item').forEach(el => el.classList.remove('active'));
             if (btn) btn.classList.add('active');
-
-            // Các thao tác khác sẽ đóng khung chat để không bị che
-            if (action !== 'chat' && window.CdeChat) CdeChat.close();
 
             if (action === 'tree') {
                 openMobileSidebar();
             } else if (action === 'upload') {
                 openModal('uploadModal');
-            } else if (action === 'chat') {
-                if (window.CdeChat) {
-                    CdeChat.toggle();
-                    // Chỉ giữ highlight "Chat" khi khung chat đang mở
-                    if (btn && !document.getElementById('cdeChatPanel').classList.contains('open')) btn.classList.remove('active');
-                } else {
-                    showToast("Chat chưa sẵn sàng, vui lòng tải lại trang!");
-                }
             } else if (action === 'profile') {
                 closeAllModals();
                 toggleAccountModal(true);
@@ -767,6 +762,7 @@
 
         function showToast(message) {
             const container = document.getElementById('toastContainer');
+            if (!container) return;
             const toast = document.createElement('div');
             toast.className = 'toast';
             toast.innerHTML = `<svg class="svg-icon-sm" viewBox="0 0 24 24" style="color:var(--primary);"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg> <span>${message}</span>`;
@@ -822,7 +818,8 @@
 
                 virtualTreeData = buildTreeFromFlatList(flatItems);
 
-                document.getElementById('tableBody').innerHTML = '';
+                const tbody = document.getElementById('tableBody');
+                if (tbody) tbody.innerHTML = '';
                 buildTableFromTree(virtualTreeData);
                 populateProjectOptions();
                 renderTreeUI();
@@ -885,6 +882,7 @@
 
         async function populateProjectOptions() {
             const select = document.getElementById('projectSelect');
+            if (!select) return;
             let currentVal = select.value;
             select.innerHTML = '';
 
@@ -1024,6 +1022,7 @@
 
         function renderTreeUI() {
             const container = document.getElementById('dynamicTreeContainer');
+            if (!container) return;
             container.innerHTML = '';
             if (!virtualTreeData.children || virtualTreeData.children.length === 0) {
                 container.innerHTML = `<div style="font-size:0.72rem; color:var(--text-muted); padding:6px;">Chưa có dữ liệu.</div>`;
@@ -1160,7 +1159,7 @@
             let iconHtml = '';
             if (isFolder) {
                 if (locked) {
-                    iconHtml = `<span class="icon-lock" style="color:#eab308; display:inline-flex; align-items:center;" title="No Access - Không có quyền truy cập"><svg class="svg-icon-sm" viewBox="0 0 24 24" fill="currentColor"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg></span>`;
+                    iconHtml = `<span class="icon-lock" style="color:#eab308; display:inline-flex; align-items:center;" title="No Access"><svg class="svg-icon-sm" viewBox="0 0 24 24" fill="currentColor"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg></span>`;
                 } else {
                     iconHtml = `<span class="icon-folder"><svg class="svg-icon-sm" viewBox="0 0 24 24"><path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/></svg></span>`;
                 }
@@ -1224,9 +1223,11 @@
             selectedFolderPathFilter = node.path;
 
             if (ISO_CONTAINERS.includes(node.name)) {
-                document.getElementById('stateFilter').value = node.name;
+                const stateFilter = document.getElementById('stateFilter');
+                if (stateFilter) stateFilter.value = node.name;
             } else {
-                document.getElementById('stateFilter').value = "ALL";
+                const stateFilter = document.getElementById('stateFilter');
+                if (stateFilter) stateFilter.value = "ALL";
             }
             applyFilters();
             if (window.innerWidth <= 768) closeMobileSidebar();
@@ -1333,13 +1334,13 @@
             } else if (state === '03_PUBLISHED' && hasGatePermission) {
                 gateBtn = `<button class="btn-icon" onclick="openGateModal(this)" title="Chuyển Gate 3">Gate 3</button>`;
             } else {
-                gateBtn = `<button class="btn-icon" disabled style="opacity:0.4; cursor:not-allowed;" title="Không có quyền duyệt Gate">Gate</button>`;
+                gateBtn = `<button class="btn-icon" disabled style="opacity:0.4; cursor:not-allowed;">Gate</button>`;
             }
 
             const safePath = String(relativePath || '').replace(/'/g, "\\'");
             let fileIssues = serverIssuesDB[relativePath] || [];
             let issueBadge = fileIssues.length > 0
-                ? `<span class="badge badge-issue" onclick="openIssuesModal('${safePath}')" title="Xem danh sách Issue">
+                ? `<span class="badge badge-issue" onclick="openIssuesModal('${safePath}')">
                     <svg class="svg-icon-sm" viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z"/></svg> 
                     ${fileIssues.length} Issue</span>`
                 : '';
@@ -1353,47 +1354,26 @@
             const canDelete = checkActionPermission('DELETE', state);
 
             let dropdownItemsHtml = '';
-
             if (canRename) {
-                dropdownItemsHtml += `<button onclick="openIsoRenameModal(this)">
-                    <svg class="svg-icon-sm" viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg> Đổi tên ISO 19650
-                </button>`;
+                dropdownItemsHtml += `<button onclick="openIsoRenameModal(this)">Đổi tên ISO 19650</button>`;
             }
-
             if (canUpload) {
-                dropdownItemsHtml += `<button onclick="uploadNewRevision(this)">
-                    <svg class="svg-icon-sm" viewBox="0 0 24 24"><path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z"/></svg> Up phiên bản mới
-                </button>`;
+                dropdownItemsHtml += `<button onclick="uploadNewRevision(this)">Up phiên bản mới</button>`;
             }
-
             if (canHistory) {
-                dropdownItemsHtml += `<button onclick="viewVersionHistory(this)">
-                    <svg class="svg-icon-sm" viewBox="0 0 24 24"><path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/></svg> Lịch sử Version
-                </button>`;
+                dropdownItemsHtml += `<button onclick="viewVersionHistory(this)">Lịch sử Version</button>`;
             }
-
             if (canMetadata) {
-                dropdownItemsHtml += `<button onclick="editMetadata(this)">
-                    <svg class="svg-icon-sm" viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg> Sửa Metadata
-                </button>`;
+                dropdownItemsHtml += `<button onclick="editMetadata(this)">Sửa Metadata</button>`;
             }
-
             if (canShare) {
-                dropdownItemsHtml += `<button onclick="shareFile(this)">
-                    <svg class="svg-icon-sm" viewBox="0 0 24 24"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5-2.24-5-5-5z"/></svg> Chia sẻ Link
-                </button>`;
+                dropdownItemsHtml += `<button onclick="shareFile(this)">Chia sẻ Link</button>`;
             }
-
             if (canIssue) {
-                dropdownItemsHtml += `<button onclick="createIssuePrompt('${safePath}')">
-                    <svg class="svg-icon-sm" viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z"/></svg> Tạo Issue / QA-QC
-                </button>`;
+                dropdownItemsHtml += `<button onclick="createIssuePrompt('${safePath}')">Tạo Issue / QA-QC</button>`;
             }
-
             if (canDelete) {
-                dropdownItemsHtml += `<button onclick="deleteRowFile(this)" style="color:#ef4444;">
-                    <svg class="svg-icon-sm" viewBox="0 0 24 24" style="fill:#ef4444;"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg> Xóa file
-                </button>`;
+                dropdownItemsHtml += `<button onclick="deleteRowFile(this)" style="color:#ef4444;">Xóa file</button>`;
             }
 
             let dropdownHtml = dropdownItemsHtml !== '' ? `
@@ -1406,10 +1386,10 @@
             ` : '';
 
             return `
-                <button class="btn-open-file" onclick="openWithLocalApp('${safePath}')" title="Mở trực tiếp tệp tin">Mở</button>
-                <button class="btn-icon" onclick="previewFile(this)" title="Xem chi tiết & Đường dẫn">View</button>
+                <button class="btn-open-file" onclick="openWithLocalApp('${safePath}')">Mở</button>
+                <button class="btn-icon" onclick="previewFile(this)">View</button>
                 ${gateBtn}
-                <button class="btn-icon" onclick="downloadFile(this)" title="Tải về file">
+                <button class="btn-icon" onclick="downloadFile(this)">
                     <svg class="svg-icon-sm" viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
                 </button>
                 ${issueBadge}
@@ -1441,13 +1421,15 @@
 
         function openIssuesModal(filePath) {
             currentActiveFilePath = filePath;
-            document.getElementById('issueFileName').innerText = filePath.split('/').pop();
+            const issueFileNameEl = document.getElementById('issueFileName');
+            if (issueFileNameEl) issueFileNameEl.innerText = filePath.split('/').pop();
             renderIssueListModal(filePath);
             openModal('issuesModal');
         }
 
         function renderIssueListModal(filePath) {
             const container = document.getElementById('issueListContainer');
+            if (!container) return;
             container.innerHTML = '';
             let issues = serverIssuesDB[filePath] || [];
 
@@ -1481,6 +1463,7 @@
 
         function addIssueToServer() {
             let input = document.getElementById('newIssueInput');
+            if (!input) return;
             let text = input.value.trim();
             if (!text || !currentActiveFilePath) return;
 
@@ -1594,6 +1577,7 @@
 
         function setSelectValueWithCustom(selectId, customInputId, val, defaultVal) {
             let sel = document.getElementById(selectId);
+            if (!sel) return;
             let exists = Array.from(sel.options).some(opt => opt.value === val);
             if (exists) {
                 sel.value = val;
@@ -1612,24 +1596,27 @@
         }
 
         function updateIsoName() {
-            let prj = (document.getElementById('iso_project').value.trim() || 'PRJ_001').toUpperCase().replace(/[^A-Z0-9_]/g, '');
+            let prjInput = document.getElementById('iso_project');
+            let prj = (prjInput ? prjInput.value.trim() : 'PRJ_001').toUpperCase().replace(/[^A-Z0-9_]/g, '');
             let orig = getIsoFieldValue('iso_originator', 'iso_originator_custom', 'PVI');
             let vol = getIsoFieldValue('iso_volume', 'iso_volume_custom', 'ZZ');
             let lvl = getIsoFieldValue('iso_level', 'iso_level_custom', 'ZZ');
             let type = getIsoFieldValue('iso_type', 'iso_type_custom', 'DR');
             let role = getIsoFieldValue('iso_role', 'iso_role_custom', 'A');
 
-            let numInput = document.getElementById('iso_number').value;
-            let num = numInput.padStart(4, '0');
+            let numInput = document.getElementById('iso_number');
+            let num = numInput ? numInput.value.padStart(4, '0') : '0001';
 
             let newFullName = `${prj}-${orig}-${vol}-${lvl}-${type}-${role}-${num}.${currentExt}`;
-            document.getElementById('isoLivePreview').innerText = newFullName;
+            let livePreview = document.getElementById('isoLivePreview');
+            if (livePreview) livePreview.innerText = newFullName;
         }
 
         async function saveIsoRename() {
             if (!currentRowElement) return;
 
-            let newFileName = document.getElementById('isoLivePreview').innerText;
+            let livePreview = document.getElementById('isoLivePreview');
+            let newFileName = livePreview ? livePreview.innerText : '';
             let oldPath = currentRowElement.getAttribute('data-path');
 
             try {
@@ -1792,6 +1779,7 @@
 
         function appendFileToTable(fileName, relativePath) {
             const tbody = document.getElementById('tableBody');
+            if (!tbody) return;
             const upperPath = relativePath.toUpperCase();
             const pathParts = relativePath.split('/');
 
@@ -1840,6 +1828,56 @@
             tbody.appendChild(tr);
         }
 
+        function applyFilters() {
+            const searchInput = document.getElementById('searchInput');
+            const stateFilter = document.getElementById('stateFilter');
+            const suitFilter = document.getElementById('suitFilter');
+            const projectSelect = document.getElementById('projectSelect');
+
+            const query = searchInput ? searchInput.value.toLowerCase() : '';
+            const stateVal = stateFilter ? stateFilter.value : 'ALL';
+            const suitVal = suitFilter ? suitFilter.value : 'ALL';
+            const projVal = projectSelect ? projectSelect.value : 'ALL';
+
+            const tbody = document.getElementById('tableBody');
+            if (!tbody) return;
+            const rows = tbody.querySelectorAll('tr');
+
+            let wipCount = 0, sharedCount = 0, pubCount = 0, arcCount = 0;
+
+            rows.forEach(row => {
+                const prj = row.getAttribute('data-project') || '';
+                const state = row.getAttribute('data-state') || '';
+                const suit = row.getAttribute('data-suitability') || '';
+                const text = row.innerText.toLowerCase();
+
+                let matchesProj = (projVal === 'ALL' || prj === projVal);
+                let matchesState = (stateVal === 'ALL' || state === stateVal);
+                let matchesSuit = (suitVal === 'ALL' || suit === suitVal);
+                let matchesSearch = (!query || text.includes(query));
+
+                if (matchesProj && matchesState && matchesSuit && matchesSearch) {
+                    row.style.display = '';
+                    if (state === '01_WIP') wipCount++;
+                    else if (state === '02_SHARED') sharedCount++;
+                    else if (state === '03_PUBLISHED') pubCount++;
+                    else if (state === '04_ARCHIVE') arcCount++;
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+
+            const wipEl = document.getElementById('card-wip');
+            const sharedEl = document.getElementById('card-shared');
+            const pubEl = document.getElementById('card-pub');
+            const arcEl = document.getElementById('card-arc');
+
+            if (wipEl) wipEl.innerText = `${wipCount} Files`;
+            if (sharedEl) sharedEl.innerText = `${sharedCount} Files`;
+            if (pubEl) pubEl.innerText = `${pubCount} Files`;
+            if (arcEl) arcEl.innerText = `${arcCount} Files`;
+        }
+
         function toggleTheme() {
             const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
             const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
@@ -1865,35 +1903,46 @@
         }
 
         function openModal(id) {
+            // Trên điện thoại: thu khung chat lại để không che cửa sổ vừa mở
+            if (window.CdeChat && window.innerWidth <= 1024) CdeChat.close();
             if (id === 'uploadModal') populateUploadFolderOptions();
-            document.getElementById(id).classList.add('active');
+            const el = document.getElementById(id);
+            if (el) el.classList.add('active');
         }
 
-        function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+        function closeModal(id) {
+            const el = document.getElementById(id);
+            if (el) el.classList.remove('active');
+        }
 
         function openGateModal(btnBtn) {
             currentRowElement = btnBtn.closest('tr');
-            document.getElementById('gateFileName').innerText = currentRowElement.querySelector('.file-code').innerText;
+            const gateFileName = document.getElementById('gateFileName');
+            if (gateFileName) gateFileName.innerText = currentRowElement.querySelector('.file-code').innerText;
             openModal('gateModal');
         }
 
         function validateISOFileName() {
-            let input = document.getElementById('testFileNameInput').value.trim();
-            if (!input) input = document.getElementById('testFileNameInput').placeholder;
+            let inputEl = document.getElementById('testFileNameInput');
+            let input = inputEl ? inputEl.value.trim() : '';
+            if (!input && inputEl) input = inputEl.placeholder;
             let regex = /^[A-Z0-9]+-[A-Z0-9]+-[A-Z0-9]+-[A-Z0-9]+-[A-Z0-9]+-[A-Z0-9]+-[0-9]{4}\.[a-z0-9]+$/i;
 
-            document.getElementById('valResultSuccess').style.display = 'none';
-            document.getElementById('valResultError').style.display = 'none';
+            const resSuccess = document.getElementById('valResultSuccess');
+            const resError = document.getElementById('valResultError');
+            if (resSuccess) resSuccess.style.display = 'none';
+            if (resError) resError.style.display = 'none';
 
             if (regex.test(input)) {
-                document.getElementById('valResultSuccess').style.display = 'block';
+                if (resSuccess) resSuccess.style.display = 'block';
             } else {
-                document.getElementById('valResultError').style.display = 'block';
+                if (resError) resError.style.display = 'block';
             }
         }
 
         function populateUploadFolderOptions() {
             const select = document.getElementById('uploadTargetFolderSelect');
+            if (!select) return;
             select.innerHTML = '';
 
             const normalizedAssigned = currentUserAssignedProjects.map(p => p.replace(/\s+/g, '_').toLowerCase());
@@ -1910,36 +1959,8 @@
 
                     let opt = document.createElement('option');
                     opt.value = parent.path;
-
-                    let containerName = parent.name.toUpperCase();
-                    let cleanContainer = containerName.replace(/^\d+_/, '');
-                    let isContainer = ISO_CONTAINERS.includes(containerName) || ['WIP', 'SHARED', 'PUBLISHED', 'ARCHIVE'].includes(cleanContainer);
-
-                    let perm = 'Full Control';
-                    if (isContainer) {
-                        if (typeof getIso19650Permissions === 'function') {
-                            perm = getIso19650Permissions(containerName);
-                        }
-                    } else if (depth === 1) {
-                        perm = 'No Access';
-                    } else {
-                        let foundContainer = ISO_CONTAINERS.find(c => parent.path.toUpperCase().includes(c));
-                        if (foundContainer && typeof getIso19650Permissions === 'function') {
-                            perm = getIso19650Permissions(foundContainer);
-                        }
-                    }
-
-                    let permUpper = (perm || '').toUpperCase();
-                    let canUploadFolder = isUserAdmin || (permUpper === 'FULL CONTROL' || permUpper === 'READ & WRITE');
-
-                    if (!canUploadFolder) {
-                        opt.disabled = true;
-                        opt.innerText = '—'.repeat(depth) + ' ' + parent.name + ` (🔒 ${perm})`;
-                    } else {
-                        opt.disabled = false;
-                        opt.innerText = '—'.repeat(depth) + ' ' + parent.name + (isContainer ? ` (${perm})` : '');
-                    }
-
+                    let indent = '—'.repeat(Math.max(0, depth - 1));
+                    opt.innerText = indent ? `${indent} ${parent.name}` : parent.name;
                     select.appendChild(opt);
 
                     if (parent.children) {
@@ -1947,134 +1968,83 @@
                     }
                 }
             }
-
-            if (virtualTreeData && virtualTreeData.children) {
-                virtualTreeData.children.forEach(child => addFolders(child, 1));
-            }
-
-            let firstEnabled = Array.from(select.options).find(o => !o.disabled);
-            if (firstEnabled) {
-                select.value = firstEnabled.value;
+            if (virtualTreeData) {
+                addFolders(virtualTreeData, 0);
             }
         }
 
         async function executeUploadFiles() {
             const fileInput = document.getElementById('fileUploadInput');
-            const targetFolder = document.getElementById('uploadTargetFolderSelect').value;
-            if (!fileInput.files || fileInput.files.length === 0) {
-                showToast("Vui lòng chọn tệp tin cần upload!");
+            const targetFolderSelect = document.getElementById('uploadTargetFolderSelect');
+            if (!fileInput || !fileInput.files || fileInput.files.length === 0) {
+                showToast("Vui lòng chọn ít nhất một tệp để tải lên!");
+                return;
+            }
+            if (!targetFolderSelect || !targetFolderSelect.value) {
+                showToast("Vui lòng chọn thư mục đích CDE!");
                 return;
             }
 
+            const targetFolder = targetFolderSelect.value;
+            const formData = new FormData();
+            formData.append('targetFolder', targetFolder);
             for (let i = 0; i < fileInput.files.length; i++) {
-                let file = fileInput.files[i];
-                let formData = new FormData();
-                formData.append('file', file);
-                formData.append('targetPath', targetFolder);
-
-                try {
-                    const res = await fetch(`${DATA_SERVER_API}/api/upload`, {
-                        method: 'POST',
-                        body: formData
-                    });
-                    const data = await res.json();
-                    if (!data.success) {
-                        showToast(`Lỗi upload file ${file.name}: ${data.error || 'Thất bại'}`);
-                    }
-                } catch (e) {
-                    showToast(`Không thể kết nối đến CDE Server khi upload file ${file.name}!`);
-                }
+                formData.append('files', fileInput.files[i]);
             }
 
-            showToast("Đã hoàn tất quá trình upload file!");
-            closeModal('uploadModal');
-            cdeSyncChannel.postMessage({ type: 'REFRESH_CDE_DATA' });
-            reloadDatabaseData();
-        }
-
-        function applyFilters() {
-            const query = document.getElementById('searchInput').value.toLowerCase().trim();
-            const stateVal = document.getElementById('stateFilter').value;
-            const suitVal = document.getElementById('suitFilter').value;
-            const prjVal = document.getElementById('projectSelect').value;
-
-            const tbody = document.getElementById('tableBody');
-            const rows = tbody.querySelectorAll('tr');
-
-            const normalizedAssigned = currentUserAssignedProjects.map(p => p.replace(/\s+/g, '_').toLowerCase());
-
-            let wipCount = 0;
-            let sharedCount = 0;
-            let pubCount = 0;
-            let arcCount = 0;
-
-            rows.forEach(row => {
-                let prj = row.getAttribute('data-project');
-                let state = row.getAttribute('data-state');
-                let suit = row.getAttribute('data-suitability');
-                let path = row.getAttribute('data-path') || '';
-                let text = row.innerText.toLowerCase();
-
-                let prjNorm = (prj || '').replace(/\s+/g, '_').toLowerCase();
-                let matchAssignedPrj = isUserAdmin || normalizedAssigned.includes(prjNorm) || currentUserAssignedProjects.includes('Tất cả dự án') || currentUserAssignedProjects.includes('ALL');
-
-                let matchPrj = (prjVal === 'ALL' || prj === prjVal);
-                let matchState = (stateVal === 'ALL' || state === stateVal);
-                let matchSuit = (suitVal === 'ALL' || suit === suitVal);
-                let matchFolder = (!selectedFolderPathFilter || path.startsWith(selectedFolderPathFilter));
-                let matchQuery = (!query || text.includes(query));
-
-                if (matchAssignedPrj && matchPrj && matchState && matchSuit && matchFolder && matchQuery) {
-                    row.style.display = '';
-                    if (state === '01_WIP') wipCount++;
-                    else if (state === '02_SHARED') sharedCount++;
-                    else if (state === '03_PUBLISHED') pubCount++;
-                    else if (state === '04_ARCHIVE') arcCount++;
-                } else {
-                    row.style.display = 'none';
-                }
-            });
-
-            document.getElementById('card-wip').innerText = wipCount + ' Files';
-            document.getElementById('card-shared').innerText = sharedCount + ' Files';
-            document.getElementById('card-pub').innerText = pubCount + ' Files';
-            document.getElementById('card-arc').innerText = arcCount + ' Files';
-        }
-
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                document.querySelectorAll('.modal.active').forEach(modal => {
-                    modal.classList.remove('active');
+            showToast("Đang tải lên tệp vào CDE...");
+            try {
+                const res = await fetch(`${DATA_SERVER_API}/api/upload`, {
+                    method: 'POST',
+                    body: formData
                 });
-                closeAllModals();
+                const data = await res.json();
+                if (data.success) {
+                    showToast("Tải lên tệp thành công!");
+                    closeModal('uploadModal');
+                    fileInput.value = '';
+                    cdeSyncChannel.postMessage({ type: 'REFRESH_CDE_DATA' });
+                    reloadDatabaseData();
+                } else {
+                    showToast("Lỗi tải lên: " + (data.error || "Không rõ nguyên nhân"));
+                }
+            } catch (err) {
+                showToast("Không kết nối được server CDE khi tải lên!");
             }
-        });
+        }
 
         document.addEventListener('DOMContentLoaded', () => {
-            let savedTheme = localStorage.getItem('cde_theme') || 'dark';
+            const savedTheme = localStorage.getItem('cde_theme') || 'dark';
             document.documentElement.setAttribute('data-theme', savedTheme);
             updateThemeUI(savedTheme);
 
             const dropZone = document.getElementById('dropZone');
-            const fileInput = document.getElementById('fileUploadInput');
+            const fileUploadInput = document.getElementById('fileUploadInput');
+            if (dropZone && fileUploadInput) {
+                dropZone.onclick = () => fileUploadInput.click();
+                dropZone.ondragover = (e) => { e.preventDefault(); dropZone.style.borderColor = 'var(--primary)'; };
+                dropZone.ondragleave = () => { dropZone.style.borderColor = 'var(--border-color)'; };
+                dropZone.ondrop = (e) => {
+                    e.preventDefault();
+                    dropZone.style.borderColor = 'var(--border-color)';
+                    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+                        fileUploadInput.files = e.dataTransfer.files;
+                        showToast(`Đã chọn ${e.dataTransfer.files.length} tệp.`);
+                    }
+                };
+                fileUploadInput.onchange = () => {
+                    if (fileUploadInput.files && fileUploadInput.files.length > 0) {
+                        showToast(`Đã chọn ${fileUploadInput.files.length} tệp.`);
+                    }
+                };
+            }
 
-            dropZone.onclick = () => fileInput.click();
-            dropZone.ondragover = (e) => { e.preventDefault(); dropZone.style.borderColor = 'var(--primary)'; };
-            dropZone.ondragleave = () => { dropZone.style.borderColor = 'var(--border-color)'; };
-            dropZone.ondrop = (e) => {
-                e.preventDefault();
-                dropZone.style.borderColor = 'var(--border-color)';
-                if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-                    fileInput.files = e.dataTransfer.files;
-                    showToast(`Đã chọn ${e.dataTransfer.files.length} tệp để upload.`);
-                }
-            };
-
+            // Tải dữ liệu kho CDE
             reloadDatabaseData();
 
-            // Khởi động Chat nhóm realtime cho tài khoản đang đăng nhập
+            // KÍCH HOẠT VÀ KHỞI TẠO HỆ THỐNG CHAT REALTIME
             if (window.CdeChat) {
-                CdeChat.init({
+                window.CdeChat.init({
                     apiBase: () => DATA_SERVER_API,
                     getUser: () => JSON.parse(localStorage.getItem('currentUser') || '{}')
                 });
@@ -2082,5 +2052,4 @@
         });
     </script>
 </body>
-
 </html>
