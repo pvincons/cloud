@@ -6,7 +6,13 @@ document.getElementById('loginForm')?.addEventListener('submit', async function 
   const submitBtn = document.getElementById('submitBtn');
 
   const username = usernameInput ? usernameInput.value.trim() : '';
-  const password = passwordInput ? passwordInput.value.trim() : '';
+  // Không trim mật khẩu: server so sánh nguyên văn
+  const password = passwordInput ? passwordInput.value : '';
+
+  if (!username || !password) {
+    alert('Vui lòng nhập đầy đủ tài khoản và mật khẩu!');
+    return;
+  }
 
   const originalBtnContent = submitBtn ? submitBtn.innerHTML : '';
 
@@ -32,33 +38,36 @@ document.getElementById('loginForm')?.addEventListener('submit', async function 
     }
   };
 
-  let userData = null;
-  let tokenData = null;
+  // Địa chỉ API: ưu tiên CONFIG.AUTH_API; nếu không có thì dùng cùng domain (hoặc localhost:3000 khi chạy local)
+  const authApi = (() => {
+    if (typeof CONFIG !== 'undefined' && CONFIG && CONFIG.AUTH_API) {
+      return String(CONFIG.AUTH_API).replace(/\/+$/, '');
+    }
+    const local = location.protocol === 'file:' || ['localhost', '127.0.0.1'].includes(location.hostname);
+    return local ? 'http://localhost:3000/api/auth' : location.origin + '/api/auth';
+  })();
 
+  let data;
   try {
-    // GỌI API ĐĂNG NHẬP TRÊN SERVER TỔNG HỢP (DÙNG CONFIG CHUNG HOẶC LOCALHOST)
-    const loginUrl = (typeof CONFIG !== 'undefined' && CONFIG.AUTH_API)
-      ? `${CONFIG.AUTH_API}/login`
-      : 'http://localhost:3000/api/auth/login';
-
-    const response = await fetch(loginUrl, {
+    const response = await fetch(`${authApi}/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username, password }),
-      signal: AbortSignal.timeout(5000) // Timeout sau 5 giây nếu server treo
+      signal: AbortSignal.timeout(8000) // Timeout nếu server treo
     });
 
-    const data = await response.json();
+    // Server có thể trả HTML (vd: 502 từ proxy) → không để lỗi parse che mất nguyên nhân thật
+    const body = await response.json().catch(() => null);
 
-    if (response.ok && data.success && data.token && data.user) {
-      userData = data.user;
-      tokenData = data.token;
-    } else {
-      alert(data.error || 'Tài khoản hoặc mật khẩu không chính xác!');
+    if (!response.ok || !body || !body.success || !body.token || !body.user) {
+      const fallbackMsg = response.status >= 500
+        ? 'Máy chủ xác thực đang gặp sự cố, vui lòng thử lại sau!'
+        : 'Tài khoản hoặc mật khẩu không chính xác!';
+      alert((body && body.error) || fallbackMsg);
       resetBtn();
       return;
     }
-
+    data = body;
   } catch (error) {
     console.error('❌ Không thể kết nối đến server xác thực:', error);
     alert(
@@ -71,13 +80,14 @@ document.getElementById('loginForm')?.addEventListener('submit', async function 
   }
 
   // ĐĂNG NHẬP THÀNH CÔNG
+  const userData = data.user;
   let redirectUrl = './content/bim-vdc/index.html';
 
-  if (userData.role === 'INTERNAL') {
+  if (String(userData.role).toUpperCase() === 'INTERNAL') {
     redirectUrl = './content/internal/index.html';
   }
 
-  localStorage.setItem('access_token', tokenData);
+  localStorage.setItem('access_token', data.token);
   localStorage.setItem('currentUser', JSON.stringify(userData));
 
   window.location.href = redirectUrl;
