@@ -239,7 +239,7 @@
             border-radius: 999px; background: #ef4444; color: #fff; font-size: 0.6rem; font-weight: 700;
             display: inline-flex; align-items: center; justify-content: center; line-height: 1; pointer-events: none; }
         .cdechat-badge.muted { background: #64748b; }
-        .cdechat-popups { position: fixed; top: 64px; right: 16px; width: 320px; max-width: calc(100vw - 32px);
+        .cdechat-popups { position: fixed; bottom: 16px; right: 16px; width: 320px; max-width: calc(100vw - 32px);
             display: flex; flex-direction: column; gap: 8px; z-index: 200001; }
         .cdechat-popup { display: flex; gap: 10px; background: var(--bg-card, #0f172a); color: var(--text-main, #94a3b8);
             border: 1px solid var(--border-color, #1e293b); border-left: 3px solid var(--primary, #38bdf8);
