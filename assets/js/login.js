@@ -40,8 +40,10 @@ document.getElementById('loginForm')?.addEventListener('submit', async function 
   let tokenData = 'FALLBACK_SHEETS_TOKEN_2026';
 
   try {
-    // 1. THỬ KẾT NỐI AUTH SERVICE CHÍNH TRƯỚC
-    const loginUrl = typeof CONFIG !== 'undefined' ? `${CONFIG.AUTH_API}/login` : 'http://localhost:3001/api/auth/login';
+    // 1. GỌI API ĐĂNG NHẬP TRÊN SERVER TỔNG HỢP (DÙNG ĐƯỜNG DẪN TƯƠNG ĐỐI HOẶC CONFIG CHUNG)
+    const loginUrl = (typeof CONFIG !== 'undefined' && CONFIG.AUTH_API) 
+      ? `${CONFIG.AUTH_API}/login` 
+      : 'http://localhost:3000/api/auth/login';
 
     const response = await fetch(loginUrl, {
       method: 'POST',
@@ -57,17 +59,16 @@ document.getElementById('loginForm')?.addEventListener('submit', async function 
       userData = data.user;
       tokenData = data.token;
     } else {
-      // Nếu server chính trả về lỗi (sai mật khẩu, tài khoản không tồn tại), thông báo thẳng luôn
       alert(data.error || 'Tài khoản hoặc mật khẩu không chính xác!');
       resetBtn();
       return;
     }
 
   } catch (primaryError) {
-    console.warn('⚠️ Auth Service chính không phản hồi, đang chuyển hướng xác thực sang Google Sheets...', primaryError);
+    console.warn('⚠️ Server chính không phản hồi, đang chuyển hướng xác thực sang Google Sheets...', primaryError);
 
     try {
-      // 2. KHI SERVER CHÍNH LỖI -> FALLBACK SANG GOOGLE APPS SCRIPT (GOOGLE SHEETS)
+      // 2. FALLBACK SANG GOOGLE SHEETS
       const scriptResponse = await fetch(SCRIPT_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
@@ -97,14 +98,14 @@ document.getElementById('loginForm')?.addEventListener('submit', async function 
       }
 
     } catch (fallbackError) {
-      console.error('❌ Cả Auth Service và Google Sheets đều không thể kết nối:', fallbackError);
-      alert('Không thể kết nối đến hệ thống xác thực (Cả Server chính và Google Sheets đều ngoại tuyến)!');
+      console.error('❌ Cả Server chính và Google Sheets đều không thể kết nối:', fallbackError);
+      alert('Không thể kết nối đến hệ thống xác thực!');
       resetBtn();
       return;
     }
   }
 
-  // NẾU ĐĂNG NHẬP THÀNH CÔNG (TỪ BẤT KỲ NGUỒN NÀO)
+  // NẾU ĐĂNG NHẬP THÀNH CÔNG
   if (loginSuccess && userData) {
     let redirectUrl = './content/bim-vdc/index.html';
 

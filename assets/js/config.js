@@ -1,8 +1,12 @@
 // assets/js/config.js
 const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
 
+// Cổng server tổng hợp duy nhất (Chạy chung Auth + CDE)
+const BASE_URL = isLocal ? 'http://localhost:3000' : 'https://api.pvincons.cloud';
+
 const CONFIG = {
-    // Nếu chạy local, tự động trỏ về cổng 3001 và 3000. Nếu lên VPS, dùng chung domain qua Caddy Server
-    AUTH_API: isLocal ? 'http://localhost:3001/api/auth' : 'https://api.pvincons.cloud/api/auth',
-    CDE_API: isLocal ? 'http://localhost:3000/api' : 'https://api.pvincons.cloud/api'
+    BASE_URL: BASE_URL,
+    API_URL: `${BASE_URL}/api`,
+    AUTH_API: `${BASE_URL}/api/auth`,
+    CDE_API: `${BASE_URL}/api`
 };
