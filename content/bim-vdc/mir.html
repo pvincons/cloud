@@ -89,7 +89,7 @@
             <div class="search-bar">
                 <svg class="svg-icon-sm" viewBox="0 0 24 24" style="color:var(--text-muted);">
                     <path
-                        d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 11.99 14 9.5 14z" />
+                        d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" />
                 </svg>
                 <input type="text" id="searchInput" onkeyup="applyFilters()" placeholder="Tìm kiếm file ISO 19650...">
             </div>
@@ -338,7 +338,7 @@
         </div>
     </div>
 
-    <!-- MODAL ĐỔI TÊN FILE ISO -->
+    <!-- MODAL ĐỔI TÊN FILE ISO (ĐÃ CẢI TIẾN BỐ CỤC GỌN GÀNG, HIỆN ĐẠI) -->
     <div class="modal" id="isoRenameModal">
         <div class="modal-content">
             <div class="modal-header">
@@ -458,7 +458,7 @@
         </div>
     </div>
 
-    <!-- MODAL SỬA METADATA -->
+    <!-- MODAL SỬA METADATA (DROPDOWN SUITABILITY) -->
     <div class="modal" id="metadataModal">
         <div class="modal-content" style="max-width: 420px; width: 92%;">
             <div class="modal-header">
@@ -643,7 +643,7 @@
                 <div class="close-btn" onclick="closeModal('uploadModal')">✕</div>
             </div>
             <div style="font-size: 0.78rem;">
-                <div id="dropZone" onclick="document.getElementById('fileUploadInput').click()"
+                <div id="dropZone"
                     style="border: 2px dashed var(--border-color); padding: 18px; text-align: center; border-radius: 6px; background: var(--bg-input); margin-bottom: 8px; cursor: pointer;">
                     <svg class="svg-icon-lg icon-folder" viewBox="0 0 24 24"
                         style="width:32px; height:32px; margin-bottom:4px;">
@@ -1908,12 +1908,39 @@
                         }
                     }
 
-                    if (depth > 0) {
-                        let opt = document.createElement('option');
-                        opt.value = parent.path;
-                        opt.innerText = '—'.repeat(depth - 1) + ' ' + parent.name;
-                        select.appendChild(opt);
+                    let opt = document.createElement('option');
+                    opt.value = parent.path;
+
+                    let containerName = parent.name.toUpperCase();
+                    let cleanContainer = containerName.replace(/^\d+_/, '');
+                    let isContainer = ISO_CONTAINERS.includes(containerName) || ['WIP', 'SHARED', 'PUBLISHED', 'ARCHIVE'].includes(cleanContainer);
+
+                    let perm = 'Full Control';
+                    if (isContainer) {
+                        if (typeof getIso19650Permissions === 'function') {
+                            perm = getIso19650Permissions(containerName);
+                        }
+                    } else if (depth === 1) {
+                        perm = 'No Access';
+                    } else {
+                        let foundContainer = ISO_CONTAINERS.find(c => parent.path.toUpperCase().includes(c));
+                        if (foundContainer && typeof getIso19650Permissions === 'function') {
+                            perm = getIso19650Permissions(foundContainer);
+                        }
                     }
+
+                    let permUpper = (perm || '').toUpperCase();
+                    let canUploadFolder = isUserAdmin || (permUpper === 'FULL CONTROL' || permUpper === 'READ & WRITE');
+
+                    if (!canUploadFolder) {
+                        opt.disabled = true;
+                        opt.innerText = '—'.repeat(depth) + ' ' + parent.name + ` (🔒 ${perm})`;
+                    } else {
+                        opt.disabled = false;
+                        opt.innerText = '—'.repeat(depth) + ' ' + parent.name + (isContainer ? ` (${perm})` : '');
+                    }
+
+                    select.appendChild(opt);
 
                     if (parent.children) {
                         parent.children.forEach(child => addFolders(child, depth + 1));
@@ -1921,60 +1948,60 @@
                 }
             }
 
-            addFolders(virtualTreeData);
+            if (virtualTreeData && virtualTreeData.children) {
+                virtualTreeData.children.forEach(child => addFolders(child, 1));
+            }
 
-            if (select.options.length === 0) {
-                let opt = document.createElement('option');
-                opt.value = "database/bim-vdc";
-                opt.innerText = "database/bim-vdc";
-                select.appendChild(opt);
+            let firstEnabled = Array.from(select.options).find(o => !o.disabled);
+            if (firstEnabled) {
+                select.value = firstEnabled.value;
             }
         }
 
         async function executeUploadFiles() {
             const fileInput = document.getElementById('fileUploadInput');
-            const targetPath = document.getElementById('uploadTargetFolderSelect').value;
-
+            const targetFolder = document.getElementById('uploadTargetFolderSelect').value;
             if (!fileInput.files || fileInput.files.length === 0) {
-                showToast("Vui lòng chọn ít nhất 1 tệp tin để tải lên!");
+                showToast("Vui lòng chọn tệp tin cần upload!");
                 return;
             }
 
-            const formData = new FormData();
-            formData.append('targetPath', targetPath);
             for (let i = 0; i < fileInput.files.length; i++) {
-                formData.append('files', fileInput.files[i]);
+                let file = fileInput.files[i];
+                let formData = new FormData();
+                formData.append('file', file);
+                formData.append('targetPath', targetFolder);
+
+                try {
+                    const res = await fetch(`${DATA_SERVER_API}/api/upload`, {
+                        method: 'POST',
+                        body: formData
+                    });
+                    const data = await res.json();
+                    if (!data.success) {
+                        showToast(`Lỗi upload file ${file.name}: ${data.error || 'Thất bại'}`);
+                    }
+                } catch (e) {
+                    showToast(`Không thể kết nối đến CDE Server khi upload file ${file.name}!`);
+                }
             }
 
-            try {
-                showToast("Đang tải tệp tin lên server...");
-                const res = await fetch(`${DATA_SERVER_API}/api/upload`, {
-                    method: 'POST',
-                    body: formData
-                });
-                const data = await res.json();
-                if (data.success) {
-                    showToast("Tải tệp tin lên CDE thành công!");
-                    closeModal('uploadModal');
-                    fileInput.value = '';
-                    cdeSyncChannel.postMessage({ type: 'REFRESH_CDE_DATA' });
-                    reloadDatabaseData();
-                } else {
-                    showToast("Lỗi tải tệp: " + (data.error || "Thất bại"));
-                }
-            } catch (err) {
-                console.error("Lỗi upload:", err);
-                showToast("Không kết nối được server CDE!");
-            }
+            showToast("Đã hoàn tất quá trình upload file!");
+            closeModal('uploadModal');
+            cdeSyncChannel.postMessage({ type: 'REFRESH_CDE_DATA' });
+            reloadDatabaseData();
         }
 
         function applyFilters() {
-            const searchVal = (document.getElementById('searchInput').value || '').toLowerCase().trim();
+            const query = document.getElementById('searchInput').value.toLowerCase().trim();
             const stateVal = document.getElementById('stateFilter').value;
             const suitVal = document.getElementById('suitFilter').value;
-            const prjVal = document.getElementById('projectSelect') ? document.getElementById('projectSelect').value : "ALL";
+            const prjVal = document.getElementById('projectSelect').value;
 
-            const rows = document.querySelectorAll('#tableBody tr');
+            const tbody = document.getElementById('tableBody');
+            const rows = tbody.querySelectorAll('tr');
+
+            const normalizedAssigned = currentUserAssignedProjects.map(p => p.replace(/\s+/g, '_').toLowerCase());
 
             let wipCount = 0;
             let sharedCount = 0;
@@ -1982,47 +2009,76 @@
             let arcCount = 0;
 
             rows.forEach(row => {
-                const rowState = row.getAttribute('data-state');
-                const rowSuit = row.getAttribute('data-suitability');
-                const rowPrj = row.getAttribute('data-project');
-                const rowPath = row.getAttribute('data-path') || '';
-                const fileName = row.querySelector('.file-code').innerText.toLowerCase();
+                let prj = row.getAttribute('data-project');
+                let state = row.getAttribute('data-state');
+                let suit = row.getAttribute('data-suitability');
+                let path = row.getAttribute('data-path') || '';
+                let text = row.innerText.toLowerCase();
 
-                let matchPrj = (prjVal === "ALL" || rowPrj === prjVal);
-                let matchState = (stateVal === "ALL" || rowState === stateVal);
-                let matchSuit = (suitVal === "ALL" || rowSuit === suitVal);
-                let matchSearch = (!searchVal || fileName.includes(searchVal) || rowPath.toLowerCase().includes(searchVal));
+                let prjNorm = (prj || '').replace(/\s+/g, '_').toLowerCase();
+                let matchAssignedPrj = isUserAdmin || normalizedAssigned.includes(prjNorm) || currentUserAssignedProjects.includes('Tất cả dự án') || currentUserAssignedProjects.includes('ALL');
 
-                let matchTree = true;
-                if (selectedFolderPathFilter) {
-                    matchTree = rowPath.startsWith(selectedFolderPathFilter + '/') || rowPath === selectedFolderPathFilter;
-                }
+                let matchPrj = (prjVal === 'ALL' || prj === prjVal);
+                let matchState = (stateVal === 'ALL' || state === stateVal);
+                let matchSuit = (suitVal === 'ALL' || suit === suitVal);
+                let matchFolder = (!selectedFolderPathFilter || path.startsWith(selectedFolderPathFilter));
+                let matchQuery = (!query || text.includes(query));
 
-                if (matchPrj && matchState && matchSuit && matchSearch && matchTree) {
+                if (matchAssignedPrj && matchPrj && matchState && matchSuit && matchFolder && matchQuery) {
                     row.style.display = '';
-
-                    if (rowState === '01_WIP') wipCount++;
-                    else if (rowState === '02_SHARED') sharedCount++;
-                    else if (rowState === '03_PUBLISHED') pubCount++;
-                    else if (rowState === '04_ARCHIVE') arcCount++;
-
+                    if (state === '01_WIP') wipCount++;
+                    else if (state === '02_SHARED') sharedCount++;
+                    else if (state === '03_PUBLISHED') pubCount++;
+                    else if (state === '04_ARCHIVE') arcCount++;
                 } else {
                     row.style.display = 'none';
                 }
             });
 
-            document.getElementById('card-wip').innerText = wipCount + " Files";
-            document.getElementById('card-shared').innerText = sharedCount + " Files";
-            document.getElementById('card-pub').innerText = pubCount + " Files";
-            document.getElementById('card-arc').innerText = arcCount + " Files";
+            document.getElementById('card-wip').innerText = wipCount + ' Files';
+            document.getElementById('card-shared').innerText = sharedCount + ' Files';
+            document.getElementById('card-pub').innerText = pubCount + ' Files';
+            document.getElementById('card-arc').innerText = arcCount + ' Files';
         }
 
-        // Đợi DOM sẵn sàng rồi khởi tạo
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                document.querySelectorAll('.modal.active').forEach(modal => {
+                    modal.classList.remove('active');
+                });
+                closeAllModals();
+            }
+        });
+
         document.addEventListener('DOMContentLoaded', () => {
-            const savedTheme = localStorage.getItem('cde_theme') || 'dark';
+            let savedTheme = localStorage.getItem('cde_theme') || 'dark';
             document.documentElement.setAttribute('data-theme', savedTheme);
             updateThemeUI(savedTheme);
+
+            const dropZone = document.getElementById('dropZone');
+            const fileInput = document.getElementById('fileUploadInput');
+
+            dropZone.onclick = () => fileInput.click();
+            dropZone.ondragover = (e) => { e.preventDefault(); dropZone.style.borderColor = 'var(--primary)'; };
+            dropZone.ondragleave = () => { dropZone.style.borderColor = 'var(--border-color)'; };
+            dropZone.ondrop = (e) => {
+                e.preventDefault();
+                dropZone.style.borderColor = 'var(--border-color)';
+                if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+                    fileInput.files = e.dataTransfer.files;
+                    showToast(`Đã chọn ${e.dataTransfer.files.length} tệp để upload.`);
+                }
+            };
+
             reloadDatabaseData();
+
+            // Khởi động Chat nhóm realtime cho tài khoản đang đăng nhập
+            if (window.CdeChat) {
+                CdeChat.init({
+                    apiBase: () => DATA_SERVER_API,
+                    getUser: () => JSON.parse(localStorage.getItem('currentUser') || '{}')
+                });
+            }
         });
     </script>
 </body>
