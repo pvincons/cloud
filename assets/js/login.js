@@ -59,11 +59,18 @@ document.getElementById('loginForm')?.addEventListener('submit', async function 
     // Server có thể trả HTML (vd: 502 từ proxy) → không để lỗi parse che mất nguyên nhân thật
     const body = await response.json().catch(() => null);
 
-    if (!response.ok || !body || !body.success || !body.token || !body.user) {
-      const fallbackMsg = response.status >= 500
+    // Phản hồi không phải JSON = request chưa tới được API đăng nhập (thường do proxy/đường dẫn /api)
+    if (!body) {
+      console.error(`❌ Phản hồi không phải JSON từ ${authApi}/login (HTTP ${response.status})`);
+      alert(`Máy chủ không trả về đúng API đăng nhập (HTTP ${response.status}). Hãy kiểm tra cấu hình proxy /api trên server.`);
+      resetBtn();
+      return;
+    }
+
+    if (!response.ok || !body.success || !body.token || !body.user) {
+      alert(body.error || (response.status >= 500
         ? 'Máy chủ xác thực đang gặp sự cố, vui lòng thử lại sau!'
-        : 'Tài khoản hoặc mật khẩu không chính xác!';
-      alert((body && body.error) || fallbackMsg);
+        : 'Tài khoản hoặc mật khẩu không chính xác!'));
       resetBtn();
       return;
     }
