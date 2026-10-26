@@ -31,8 +31,7 @@ document.getElementById('loginForm')?.addEventListener('submit', async function 
     }
   };
 
-  const SCRIPT_URL = 'https://script.google.com'; // https://script.google.com/macros/s/AKfycbwnudZdtcWdcNaBX-y_f_9KO15drju3bOC9aiK1Pr1YdIKs2FJZDE15g46QPPkIvrD0/exec
-  let loginSuccess = false;
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwnudZdtcWdcNaBX-y_f_9KO15drju3bOC9aiK1Pr1YdIKs2FJZDE15g46QPPkIvrD0/exec';
   let userData = null;
   let tokenData = 'FALLBACK_SHEETS_TOKEN_2026';
 
