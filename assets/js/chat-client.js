@@ -4,7 +4,7 @@
  * Sử dụng trong trang:
  *   <script src="/assets/js/chat-client.js"></script>
  *   CdeChat.init({
- *       apiBase: () => (typeof CONFIG !== 'undefined' ? CONFIG.BASE_URL : ''),
+ *       apiBase: () => DATA_SERVER_API,
  *       getUser: () => JSON.parse(localStorage.getItem('currentUser') || '{}')
  *   });
  *   CdeChat.toggle();   // mở / đóng khung chat
@@ -24,7 +24,7 @@
     const MAX_POPUPS = 3;
 
     const S = {
-        apiBase: () => (typeof CONFIG !== 'undefined' ? (CONFIG.BASE_URL || '') : ''),
+        apiBase: () => '',
         getUser: () => ({}),
         user: null,
         messages: [],
@@ -123,6 +123,7 @@
     const ICON_BELL = '<svg viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>';
     const ICON_BELL_OFF = '<svg viewBox="0 0 24 24"><path d="M20 18.69L7.84 6.14 5.27 3.49 4 4.76l2.8 2.8v.01c-.52.99-.8 2.16-.8 3.42v5l-2 2v1h13.73l2 2L21 19.72l-1-1.03zM12 22c1.11 0 2-.89 2-2h-4c0 1.11.89 2 2 2zm6-7.32V11c0-3.08-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68c-.15.03-.29.08-.42.12-.1.03-.2.07-.3.11h-.01c-.01 0-.01 0-.02.01-.23.09-.46.2-.68.31 0 0-.01 0-.01.01L18 14.68z"/></svg>';
 
+    // Chuông thường = nhận thông báo; chuông gạch chéo = Không làm phiền
     function refreshDndUi() {
         const bell = $('cdeChatBell');
         if (!bell) return;
@@ -301,8 +302,10 @@
         $('cdeChatBell').addEventListener('click', () => setDnd(isDnd() ? 'off' : 'forever'));
         $('cdeChatSend').addEventListener('click', send);
 
+
         const input = $('cdeChatInput');
         input.addEventListener('keydown', (e) => {
+            // Bỏ qua Enter khi đang gõ tiếng Việt bằng bộ gõ (IME)
             if (e.key === 'Enter' && !e.shiftKey && !e.isComposing && e.keyCode !== 229) {
                 e.preventDefault();
                 send();
@@ -362,6 +365,7 @@
         body.appendChild(el);
         S.lastRendered = m;
 
+        // Giới hạn số node hiển thị
         while (body.querySelectorAll('.cdechat-msg').length > MAX_RENDERED) {
             const first = body.querySelector('.cdechat-msg');
             if (first) first.remove(); else break;
@@ -416,7 +420,7 @@
 
     // ---------- Thông báo ----------
     function notify(msg) {
-        if (isDnd()) return;
+        if (isDnd()) return; // Đang bật Không làm phiền → chỉ tăng badge, không popup
         showPopup(msg);
         if (document.hidden && 'Notification' in window && Notification.permission === 'granted') {
             try {
@@ -425,7 +429,7 @@
                     tag: 'cde-chat'
                 });
                 n.onclick = () => { window.focus(); open(); n.close(); };
-            } catch (e) { }
+            } catch (e) { /* một số trình duyệt di động không hỗ trợ */ }
         }
     }
 
@@ -460,8 +464,7 @@
 
     // ---------- Kết nối ----------
     async function loadHistory() {
-        const baseUrl = S.apiBase();
-        const res = await fetch(`${baseUrl}/api/chat/history?limit=200&room=${encodeURIComponent(S.room)}&username=${encodeURIComponent(S.user.username)}`);
+        const res = await fetch(`${S.apiBase()}/api/chat/history?limit=200&room=${encodeURIComponent(S.room)}&username=${encodeURIComponent(S.user.username)}`);
         const data = await res.json().catch(() => ({}));
         if (!res.ok) { const err = new Error((data && data.message) || 'Không tải được lịch sử chat'); err.status = res.status; throw err; }
         if (data && Array.isArray(data.messages)) {
@@ -475,25 +478,25 @@
         clearTimeout(S.retryTimer);
         if (S.es) { S.es.close(); S.es = null; }
 
-        const baseUrl = S.apiBase();
-        const url = `${baseUrl}/api/chat/stream?username=${encodeURIComponent(S.user.username)}&room=${encodeURIComponent(S.room)}`;
+        const url = `${S.apiBase()}/api/chat/stream?username=${encodeURIComponent(S.user.username)}&room=${encodeURIComponent(S.room)}`;
         const es = new EventSource(url);
         S.es = es;
 
         es.onopen = () => {
             setStatus('on', '');
-            if (S.everConnected) loadHistory().catch(() => { });
+            if (S.everConnected) loadHistory().catch(() => { }); // bù tin nhắn bị lỡ khi mất mạng
             S.everConnected = true;
         };
         es.addEventListener('chat', (e) => {
-            try { onIncoming(JSON.parse(e.data), true); } catch (err) { }
+            try { onIncoming(JSON.parse(e.data), true); } catch (err) { /* bỏ qua */ }
         });
         es.addEventListener('presence', (e) => {
-            try { S.online = JSON.parse(e.data); renderPresence(); } catch (err) { }
+            try { S.online = JSON.parse(e.data); renderPresence(); } catch (err) { /* bỏ qua */ }
         });
         es.onerror = () => {
             setStatus('off', 'Mất kết nối chat, đang thử kết nối lại...');
             if (es.readyState === EventSource.CLOSED) {
+                // Server từ chối hoặc không phản hồi → tự thử lại sau 10 giây
                 S.retryTimer = setTimeout(connect, 10000);
             }
         };
@@ -512,8 +515,7 @@
         input.style.height = 'auto';
 
         try {
-            const baseUrl = S.apiBase();
-            const res = await fetch(`${baseUrl}/api/chat/send`, {
+            const res = await fetch(`${S.apiBase()}/api/chat/send`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ username: S.user.username, text, room: S.room })
@@ -523,7 +525,7 @@
             setStatus(S.es && S.es.readyState === EventSource.OPEN ? 'on' : 'off', '');
             onIncoming(data.message, true);
         } catch (err) {
-            input.value = text;
+            input.value = text; // trả lại nội dung để người dùng gửi lại
             sessionStorage.setItem(DRAFT_KEY, text);
             setStatus('off', err.message === 'Failed to fetch' ? 'Không kết nối được server chat' : err.message);
         } finally {
@@ -544,7 +546,7 @@
         scrollToBottom();
         $('cdeChatInput').focus();
         if (!(opts && opts.silent) && 'Notification' in window && Notification.permission === 'default') {
-            try { Notification.requestPermission(); } catch (e) { }
+            try { Notification.requestPermission(); } catch (e) { /* ignore */ }
         }
     }
 
@@ -568,7 +570,7 @@
         if (S.room !== 'general') { OPEN_KEY += '_' + S.room; DRAFT_KEY += '_' + S.room; }
 
         const u = S.getUser() || {};
-        if (!u.username) return;
+        if (!u.username) return; // chưa đăng nhập → không bật chat
         S.user = { username: u.username, fullName: u.fullName || u.username };
         S.baseTitle = document.title;
 
@@ -576,15 +578,16 @@
         $('cdeChatTitle').textContent = S.title;
         updateBadges();
 
-        setInterval(() => { refreshDndUi(); updateBadges(); }, 20000);
+        setInterval(() => { refreshDndUi(); updateBadges(); }, 20000); // tự hết hạn "Không làm phiền"
 
         try { await loadHistory(); } catch (e) {
-            if (e && e.status === 403) S.denied = true;
+            if (e && e.status === 403) S.denied = true; // không thuộc nhóm → không mở kênh realtime
             setStatus('off', e && e.message && e.message !== 'Failed to fetch' ? e.message : 'Không kết nối được server chat');
             renderEmptyIfNeeded();
         }
         if (!S.denied) connect();
 
+        // Trang vừa tải lại (F5, Live Server reload...) mà khung chat đang mở → mở lại, giữ nguyên bản nháp
         if (sessionStorage.getItem(OPEN_KEY) === '1') {
             const draft = sessionStorage.getItem(DRAFT_KEY);
             if (draft) $('cdeChatInput').value = draft;

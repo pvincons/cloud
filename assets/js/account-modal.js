@@ -177,15 +177,13 @@
             let userData = userSession;
 
             try {
-                // Đã cập nhật kết hợp BASE_URL từ config để định vị chính xác file users.json từ mọi cấp thư mục
                 const possiblePaths = [
-                    (typeof CONFIG !== 'undefined' && CONFIG.BASE_URL) ? `${CONFIG.BASE_URL}/assets/data/users.json` : null,
                     '/assets/data/users.json',
                     './assets/data/users.json',
                     '../assets/data/users.json',
                     '../../assets/data/users.json',
                     '../../../../assets/data/users.json'
-                ].filter(Boolean);
+                ];
 
                 for (const path of possiblePaths) {
                     try {

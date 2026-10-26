@@ -6,13 +6,7 @@ document.getElementById('loginForm')?.addEventListener('submit', async function 
   const submitBtn = document.getElementById('submitBtn');
 
   const username = usernameInput ? usernameInput.value.trim() : '';
-  // Không trim mật khẩu: server so sánh nguyên văn
-  const password = passwordInput ? passwordInput.value : '';
-
-  if (!username || !password) {
-    alert('Vui lòng nhập đầy đủ tài khoản và mật khẩu!');
-    return;
-  }
+  const password = passwordInput ? passwordInput.value.trim() : '';
 
   const originalBtnContent = submitBtn ? submitBtn.innerHTML : '';
 
@@ -38,64 +32,89 @@ document.getElementById('loginForm')?.addEventListener('submit', async function 
     }
   };
 
-  // Địa chỉ API: ưu tiên CONFIG.AUTH_API; nếu không có thì dùng cùng domain (hoặc localhost:3000 khi chạy local)
-  const authApi = (() => {
-    if (typeof CONFIG !== 'undefined' && CONFIG && CONFIG.AUTH_API) {
-      return String(CONFIG.AUTH_API).replace(/\/+$/, '');
-    }
-    const local = location.protocol === 'file:' || ['localhost', '127.0.0.1'].includes(location.hostname);
-    return local ? 'http://localhost:3000/api/auth' : location.origin + '/api/auth';
-  })();
+  // Định nghĩa SCRIPT_URL Google Sheets dự phòng
+  const SCRIPT_URL = 'https://script.google.com';
 
-  let data;
+  let loginSuccess = false;
+  let userData = null;
+  let tokenData = 'FALLBACK_SHEETS_TOKEN_2026';
+
   try {
-    const response = await fetch(`${authApi}/login`, {
+    // 1. THỬ KẾT NỐI AUTH SERVICE CHÍNH TRƯỚC (Dùng chung cổng 3000 sau khi gộp file)
+    const loginUrl = typeof CONFIG !== 'undefined' ? `${CONFIG.AUTH_API}/login` : 'http://localhost:3000/api/auth/login';
+
+    const response = await fetch(loginUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username, password }),
-      signal: AbortSignal.timeout(8000) // Timeout nếu server treo
+      signal: AbortSignal.timeout(5000) // Timeout sau 5 giây nếu server treo
     });
 
-    // Server có thể trả HTML (vd: 502 từ proxy) → không để lỗi parse che mất nguyên nhân thật
-    const body = await response.json().catch(() => null);
+    const data = await response.json();
 
-    // Phản hồi không phải JSON = request chưa tới được API đăng nhập (thường do proxy/đường dẫn /api)
-    if (!body) {
-      console.error(`❌ Phản hồi không phải JSON từ ${authApi}/login (HTTP ${response.status})`);
-      alert(`Máy chủ không trả về đúng API đăng nhập (HTTP ${response.status}). Hãy kiểm tra cấu hình proxy /api trên server.`);
+    if (response.ok && data.success) {
+      loginSuccess = true;
+      userData = data.user;
+      tokenData = data.token;
+    } else {
+      // Nếu server chính trả về lỗi (sai mật khẩu, tài khoản không tồn tại), thông báo thẳng luôn
+      alert(data.error || 'Tài khoản hoặc mật khẩu không chính xác!');
       resetBtn();
       return;
     }
 
-    if (!response.ok || !body.success || !body.token || !body.user) {
-      alert(body.error || (response.status >= 500
-        ? 'Máy chủ xác thực đang gặp sự cố, vui lòng thử lại sau!'
-        : 'Tài khoản hoặc mật khẩu không chính xác!'));
+  } catch (primaryError) {
+    console.warn('⚠️ Auth Service chính không phản hồi, đang chuyển hướng xác thực sang Google Sheets...', primaryError);
+
+    try {
+      // 2. KHI SERVER CHÍNH LỖI -> FALLBACK SANG GOOGLE APPS SCRIPT (GOOGLE SHEETS)
+      const scriptResponse = await fetch(SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ action: 'login', username, password })
+      });
+
+      const textResult = await scriptResponse.text();
+      let result;
+      try {
+        result = JSON.parse(textResult);
+      } catch (e) {
+        result = { success: false, error: textResult };
+      }
+
+      if (result.success) {
+        loginSuccess = true;
+        userData = result.user || {
+          username: username,
+          fullName: result.fullName || username,
+          role: result.role || 'DESIGNER',
+          company: 'PV INCONS CO.LTD'
+        };
+      } else {
+        alert(result.error || 'Xác thực qua Google Sheets thất bại: Sai tài khoản hoặc mật khẩu!');
+        resetBtn();
+        return;
+      }
+
+    } catch (fallbackError) {
+      console.error('❌ Cả Auth Service và Google Sheets đều không thể kết nối:', fallbackError);
+      alert('Không thể kết nối đến hệ thống xác thực (Cả Server chính và Google Sheets đều ngoại tuyến)!');
       resetBtn();
       return;
     }
-    data = body;
-  } catch (error) {
-    console.error('❌ Không thể kết nối đến server xác thực:', error);
-    alert(
-      error && error.name === 'TimeoutError'
-        ? 'Máy chủ xác thực phản hồi quá chậm, vui lòng thử lại sau!'
-        : 'Không thể kết nối đến máy chủ xác thực!'
-    );
-    resetBtn();
-    return;
   }
 
-  // ĐĂNG NHẬP THÀNH CÔNG
-  const userData = data.user;
-  let redirectUrl = './content/bim-vdc/index.html';
+  // NẾU ĐĂNG NHẬP THÀNH CÔNG (TỪ BẤT KỲ NGUỒN NÀO)
+  if (loginSuccess && userData) {
+    let redirectUrl = './content/bim-vdc/index.html';
 
-  if (String(userData.role).toUpperCase() === 'INTERNAL') {
-    redirectUrl = './content/internal/index.html';
+    if (userData.role === 'INTERNAL') {
+      redirectUrl = './content/internal/index.html';
+    }
+
+    localStorage.setItem('access_token', tokenData);
+    localStorage.setItem('currentUser', JSON.stringify(userData));
+
+    window.location.href = redirectUrl;
   }
-
-  localStorage.setItem('access_token', data.token);
-  localStorage.setItem('currentUser', JSON.stringify(userData));
-
-  window.location.href = redirectUrl;
 });
