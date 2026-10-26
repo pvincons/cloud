@@ -204,6 +204,19 @@
         let fetchedItems = [];
         let clipboard = null;
 
+        // HELPER HEADER VỚI AUTH TOKEN
+        function getAuthHeaders(isJson = true) {
+            const token = localStorage.getItem('token') || localStorage.getItem('jwt') || localStorage.getItem('cde_token');
+            const headers = {};
+            if (isJson) {
+                headers['Content-Type'] = 'application/json';
+            }
+            if (token) {
+                headers['Authorization'] = `Bearer ${token}`;
+            }
+            return headers;
+        }
+
         // KÊNH ĐỒNG BỘ THỜI GIAN THỰC (BROADCAST CHANNEL)
         const cdeSyncChannel = new BroadcastChannel('pvincons_cde_sync_channel');
 
@@ -286,7 +299,9 @@
             renderBreadcrumbs(currentPath);
 
             try {
-                const response = await fetch(`${DATA_SERVER_API}/api/files?path=${encodeURIComponent(currentPath)}`);
+                const response = await fetch(`${DATA_SERVER_API}/api/files?path=${encodeURIComponent(currentPath)}`, {
+                    headers: getAuthHeaders(false)
+                });
                 if (!response.ok) throw new Error('Không thể đọc thư mục');
 
                 fetchedItems = await response.json();
@@ -477,7 +492,7 @@
             try {
                 const res = await fetch(endpoint, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: getAuthHeaders(true),
                     body: JSON.stringify({ sourcePath: clipboard.sourcePath, targetDir: currentPath })
                 });
                 const data = await res.json();
@@ -500,7 +515,7 @@
             try {
                 const res = await fetch(`${DATA_SERVER_API}/api/open-local`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: getAuthHeaders(true),
                     body: JSON.stringify({ path: itemPath })
                 });
                 const data = await res.json();
@@ -521,7 +536,7 @@
             try {
                 const res = await fetch(`${DATA_SERVER_API}/api/create-folder`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: getAuthHeaders(true),
                     body: JSON.stringify({ parentPath: currentPath, folderName })
                 });
                 const data = await res.json();
@@ -545,6 +560,7 @@
             try {
                 const res = await fetch(`${DATA_SERVER_API}/api/upload`, {
                     method: 'POST',
+                    headers: getAuthHeaders(false),
                     body: formData
                 });
                 const data = await res.json();
@@ -566,7 +582,7 @@
             try {
                 const res = await fetch(`${DATA_SERVER_API}/api/rename`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: getAuthHeaders(true),
                     body: JSON.stringify({ path: itemPath, newName })
                 });
                 const data = await res.json();
@@ -585,7 +601,7 @@
             try {
                 const res = await fetch(`${DATA_SERVER_API}/api/delete`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: getAuthHeaders(true),
                     body: JSON.stringify({ path: itemPath })
                 });
                 const data = await res.json();
