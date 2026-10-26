@@ -32,17 +32,13 @@ document.getElementById('loginForm')?.addEventListener('submit', async function 
     }
   };
 
-  // Định nghĩa SCRIPT_URL Google Sheets dự phòng
-  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwnudZdtcWdcNaBX-y_f_9KO15drju3bOC9aiK1Pr1YdIKs2FJZDE15g46QPPkIvrD0/exec';
-
-  let loginSuccess = false;
   let userData = null;
-  let tokenData = 'FALLBACK_SHEETS_TOKEN_2026';
+  let tokenData = null;
 
   try {
-    // 1. GỌI API ĐĂNG NHẬP TRÊN SERVER TỔNG HỢP (DÙNG ĐƯỜNG DẪN TƯƠNG ĐỐI HOẶC CONFIG CHUNG)
-    const loginUrl = (typeof CONFIG !== 'undefined' && CONFIG.AUTH_API) 
-      ? `${CONFIG.AUTH_API}/login` 
+    // GỌI API ĐĂNG NHẬP TRÊN SERVER TỔNG HỢP (DÙNG CONFIG CHUNG HOẶC LOCALHOST)
+    const loginUrl = (typeof CONFIG !== 'undefined' && CONFIG.AUTH_API)
+      ? `${CONFIG.AUTH_API}/login`
       : 'http://localhost:3000/api/auth/login';
 
     const response = await fetch(loginUrl, {
@@ -54,8 +50,7 @@ document.getElementById('loginForm')?.addEventListener('submit', async function 
 
     const data = await response.json();
 
-    if (response.ok && data.success) {
-      loginSuccess = true;
+    if (response.ok && data.success && data.token && data.user) {
       userData = data.user;
       tokenData = data.token;
     } else {
@@ -64,58 +59,26 @@ document.getElementById('loginForm')?.addEventListener('submit', async function 
       return;
     }
 
-  } catch (primaryError) {
-    console.warn('⚠️ Server chính không phản hồi, đang chuyển hướng xác thực sang Google Sheets...', primaryError);
-
-    try {
-      // 2. FALLBACK SANG GOOGLE SHEETS
-      const scriptResponse = await fetch(SCRIPT_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({ action: 'login', username, password })
-      });
-
-      const textResult = await scriptResponse.text();
-      let result;
-      try {
-        result = JSON.parse(textResult);
-      } catch (e) {
-        result = { success: false, error: textResult };
-      }
-
-      if (result.success) {
-        loginSuccess = true;
-        userData = result.user || {
-          username: username,
-          fullName: result.fullName || username,
-          role: result.role || 'DESIGNER',
-          company: 'PV INCONS CO.LTD'
-        };
-      } else {
-        alert(result.error || 'Xác thực qua Google Sheets thất bại: Sai tài khoản hoặc mật khẩu!');
-        resetBtn();
-        return;
-      }
-
-    } catch (fallbackError) {
-      console.error('❌ Cả Server chính và Google Sheets đều không thể kết nối:', fallbackError);
-      alert('Không thể kết nối đến hệ thống xác thực!');
-      resetBtn();
-      return;
-    }
+  } catch (error) {
+    console.error('❌ Không thể kết nối đến server xác thực:', error);
+    alert(
+      error && error.name === 'TimeoutError'
+        ? 'Máy chủ xác thực phản hồi quá chậm, vui lòng thử lại sau!'
+        : 'Không thể kết nối đến máy chủ xác thực!'
+    );
+    resetBtn();
+    return;
   }
 
-  // NẾU ĐĂNG NHẬP THÀNH CÔNG
-  if (loginSuccess && userData) {
-    let redirectUrl = './content/bim-vdc/index.html';
+  // ĐĂNG NHẬP THÀNH CÔNG
+  let redirectUrl = './content/bim-vdc/index.html';
 
-    if (userData.role === 'INTERNAL') {
-      redirectUrl = './content/internal/index.html';
-    }
-
-    localStorage.setItem('access_token', tokenData);
-    localStorage.setItem('currentUser', JSON.stringify(userData));
-
-    window.location.href = redirectUrl;
+  if (userData.role === 'INTERNAL') {
+    redirectUrl = './content/internal/index.html';
   }
+
+  localStorage.setItem('access_token', tokenData);
+  localStorage.setItem('currentUser', JSON.stringify(userData));
+
+  window.location.href = redirectUrl;
 });
