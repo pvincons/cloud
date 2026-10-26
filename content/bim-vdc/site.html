@@ -174,7 +174,7 @@ tr.flash{animation:flash 2.5s ease-out}
 /* ===== Cấu hình: dùng chung máy chủ CDE với mir.html ===== */
 let DATA_SERVER_API = localStorage.getItem('cde_api_url') || (
     window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-        ? 'http://localhost:3000' : 'https://pvincons-backend.onrender.com');
+        ? 'http://localhost:3000' : 'https://api.pvincons.cloud');
 const SITE_FOLDER = 'THI_CONG';          // thư mục con chứa dữ liệu thi công trong mỗi container
 const POLL_MS = 8000;                    // server chưa có SSE cho file → đồng bộ định kỳ + BroadcastChannel
 const TYPES = { PH: 'Hình ảnh', VD: 'Video', RP: 'Nhật ký / báo cáo', IN: 'Nghiệm thu' };
