@@ -41,7 +41,9 @@
         title: 'Chat nhóm',
         denied: false,
         lastRendered: null,
-        built: false
+        built: false,
+        sheet: 'half',      // mobile: 'half' = nửa màn hình, 'full' = gần toàn màn hình
+        prevActive: null    // mục bottom-nav đang active trước khi mở chat
     };
 
     const $ = (id) => document.getElementById(id);
@@ -183,12 +185,14 @@
     function injectStyles() {
         const css = `
         .cdechat-panel [hidden], .cdechat-popups [hidden], .cdechat-badge[hidden] { display: none !important; }
-        .cdechat-panel { display: none; position: fixed; right: 16px; bottom: 16px; width: 380px;
+        .cdechat-panel { display: flex; position: fixed; right: 16px; bottom: 16px; width: 380px;
             height: min(560px, calc(100vh - 90px)); background: var(--bg-card, #0f172a);
             border: 1px solid var(--border-color, #1e293b); border-radius: 10px; z-index: 100001;
             flex-direction: column; overflow: hidden; color: var(--text-main, #94a3b8);
-            box-shadow: 0 20px 40px -8px rgba(0,0,0,.5); font-size: 0.78rem; }
-        .cdechat-panel.open { display: flex; }
+            box-shadow: 0 20px 40px -8px rgba(0,0,0,.5); font-size: 0.78rem;
+            transform: translateY(120%); opacity: 0; visibility: hidden;
+            transition: transform 400ms cubic-bezier(0.25, 1, 0.5, 1), opacity 400ms ease, visibility 400ms; }
+        .cdechat-panel.open { transform: translateY(0); opacity: 1; visibility: visible; }
         .cdechat-head { display: flex; align-items: center; justify-content: space-between; padding: 10px 12px;
             border-bottom: 1px solid var(--border-color, #1e293b); gap: 8px; }
         .cdechat-title { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 0.85rem;
@@ -212,7 +216,9 @@
         .cdechat-chip { display: inline-flex; align-items: center; gap: 5px; background: var(--bg-input, #131b2e);
             border-radius: 999px; padding: 2px 8px; font-size: 0.68rem; color: var(--text-heading, #f1f5f9); }
         .cdechat-chip i { width: 6px; height: 6px; border-radius: 50%; background: #34d399; display: inline-block; }
-        .cdechat-body { flex: 1; overflow-y: auto; padding: 10px 12px; display: flex; flex-direction: column; gap: 4px; }
+        .cdechat-body { flex: 1; min-height: 0; overflow-y: auto; padding: 10px 12px; display: flex; flex-direction: column; gap: 4px;
+            overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
+        .cdechat-grab { display: none; }
         .cdechat-empty { margin: auto; text-align: center; color: var(--text-muted, #64748b); padding: 20px; }
         .cdechat-day { align-self: center; font-size: 0.64rem; color: var(--text-muted, #64748b); margin: 8px 0 4px;
             background: var(--bg-input, #131b2e); border-radius: 999px; padding: 2px 10px; }
@@ -240,7 +246,8 @@
             display: inline-flex; align-items: center; justify-content: center; line-height: 1; pointer-events: none; }
         .cdechat-badge.muted { background: #64748b; }
         .cdechat-popups { position: fixed; bottom: 16px; right: 16px; width: 320px; max-width: calc(100vw - 32px);
-            display: flex; flex-direction: column; gap: 8px; z-index: 200001; }
+            display: flex; flex-direction: column; gap: 8px; z-index: 200001; pointer-events: none; }
+        .cdechat-popups > * { pointer-events: auto; }
         .cdechat-popup { display: flex; gap: 10px; background: var(--bg-card, #0f172a); color: var(--text-main, #94a3b8);
             border: 1px solid var(--border-color, #1e293b); border-left: 3px solid var(--primary, #38bdf8);
             border-radius: 8px; padding: 10px 12px; cursor: pointer; box-shadow: 0 12px 24px rgba(0,0,0,.35);
@@ -258,8 +265,22 @@
             color: var(--text-muted, #64748b); cursor: pointer; font-size: 0.8rem; }
         @keyframes cdechatIn { from { transform: translateX(30px); opacity: 0; } to { transform: none; opacity: 1; } }
         @media (max-width: 1024px) {
-            .cdechat-panel { right: 0; left: 0; top: 0; bottom: 56px; width: auto; height: auto; border-radius: 0; border: none; }
-            .cdechat-popups { top: 8px; left: 8px; right: 8px; width: auto; max-width: none; }
+            /* Bottom sheet: trượt từ dưới lên, nằm TRÊN thanh bottom-nav (không đè lên), phần trang phía trên vẫn thao tác được */
+            .cdechat-panel { left: 0; right: 0; top: auto; width: 100%;
+                bottom: var(--cc-bottom, 0px); height: var(--cc-height, 60vh);
+                max-height: calc(100dvh - var(--cc-bottom, 0px) - env(safe-area-inset-top, 0px) - 8px);
+                border-radius: 16px 16px 0 0; border-width: 1px 0 0 0;
+                box-shadow: 0 -10px 30px -6px rgba(0,0,0,.45);
+                transform: translateY(calc(100% + var(--cc-bottom, 0px) + 24px));
+                transition: transform 350ms cubic-bezier(0.22, 1, 0.36, 1), height 250ms ease, opacity 250ms ease, visibility 350ms; }
+            .cdechat-panel.open { transform: translateY(0); }
+            .cdechat-panel.dragging { transition: none; }
+            .cdechat-grab { display: flex; justify-content: center; padding: 10px 0 4px; touch-action: none; cursor: grab; flex: none; }
+            .cdechat-grab span { width: 40px; height: 4px; border-radius: 999px; background: var(--text-muted, #64748b); opacity: .55; }
+            .cdechat-head { touch-action: none; padding: 6px 12px 8px; }
+            .cdechat-foot textarea { font-size: 16px; } /* >=16px để iOS không tự phóng to khi focus */
+            .cdechat-panel.flush .cdechat-foot { padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px)); }
+            .cdechat-popups { top: calc(8px + env(safe-area-inset-top, 0px)); bottom: auto; left: 8px; right: 8px; width: auto; max-width: none; }
         }`;
         const style = document.createElement('style');
         style.id = 'cdeChatStyles';
@@ -272,6 +293,7 @@
         const wrap = document.createElement('div');
         wrap.innerHTML = `
         <div id="cdeChatPanel" class="cdechat-panel" role="dialog" aria-label="Chat nhóm">
+            <div class="cdechat-grab" id="cdeChatGrab" aria-hidden="true"><span></span></div>
             <div class="cdechat-head">
                 <div class="cdechat-title">
                     <span class="cdechat-dot" id="cdeChatDot"></span>
@@ -324,6 +346,16 @@
             if (!document.hidden && S.open) markRead();
         });
         window.addEventListener('focus', () => { if (S.open) markRead(); });
+
+        bindSheetDrag();
+        const relayout = () => { if (S.open) applyLayout(); };
+        window.addEventListener('resize', relayout);
+        window.addEventListener('orientationchange', () => setTimeout(relayout, 250));
+        if (window.visualViewport) {
+            window.visualViewport.addEventListener('resize', relayout);
+            window.visualViewport.addEventListener('scroll', relayout);
+        }
+        input.addEventListener('focus', () => setTimeout(relayout, 300));
 
         S.built = true;
         refreshDndUi();
@@ -535,25 +567,144 @@
         }
     }
 
+    // ---------- Bottom sheet (điện thoại / máy tính bảng) ----------
+    function isMobile() { return window.matchMedia('(max-width: 1024px)').matches; }
+
+    // Đo chiều cao thanh bottom-nav + bàn phím ảo để sheet luôn nằm gọn phía trên, không che nút nào
+    function applyLayout() {
+        const panel = $('cdeChatPanel');
+        if (!panel) return;
+        if (!isMobile()) {
+            panel.style.removeProperty('--cc-bottom');
+            panel.style.removeProperty('--cc-height');
+            panel.style.transform = '';
+            panel.classList.remove('flush');
+            return;
+        }
+        const vv = window.visualViewport;
+        const vh = vv ? vv.height : window.innerHeight;
+        const kb = vv ? Math.max(0, window.innerHeight - vv.height - vv.offsetTop) : 0;
+        const keyboard = kb > 120;
+
+        let bottom = 0;
+        if (keyboard) {
+            bottom = kb;                       // bàn phím đang mở: dính sát mép trên bàn phím
+        } else {
+            const nav = document.querySelector('.bottom-nav');
+            if (nav) {
+                const cs = getComputedStyle(nav);
+                const r = nav.getBoundingClientRect();
+                if (cs.display !== 'none' && cs.visibility !== 'hidden' && r.height > 0 && r.top < window.innerHeight) {
+                    bottom = Math.max(0, Math.round(window.innerHeight - r.top));
+                }
+            }
+        }
+        const avail = Math.max(160, (keyboard ? vh : vh - bottom) - 8);
+        const h = (S.sheet === 'full' || keyboard)
+            ? avail
+            : Math.min(avail, Math.max(Math.round(avail * 0.62), 340));
+        panel.style.setProperty('--cc-bottom', bottom + 'px');
+        panel.style.setProperty('--cc-height', h + 'px');
+        panel.classList.toggle('flush', bottom === 0 && !keyboard);
+    }
+
+    function setSheet(state) {
+        S.sheet = state;
+        applyLayout();
+    }
+
+    // Vuốt xuống ở thanh tay nắm/tiêu đề: thu nhỏ hoặc đóng. Vuốt lên: mở rộng. Chạm tay nắm: đổi cỡ.
+    function bindSheetDrag() {
+        const panel = $('cdeChatPanel');
+        const zones = [$('cdeChatGrab'), panel.querySelector('.cdechat-head')];
+        let startY = 0, lastY = 0, lastT = 0, vel = 0, active = false;
+
+        zones.forEach(zone => {
+            zone.addEventListener('pointerdown', (e) => {
+                if (!isMobile() || e.target.closest('button')) return;
+                active = true;
+                startY = lastY = e.clientY;
+                lastT = performance.now();
+                vel = 0;
+                try { zone.setPointerCapture(e.pointerId); } catch (err) { /* ignore */ }
+                panel.classList.add('dragging');
+            });
+            zone.addEventListener('pointermove', (e) => {
+                if (!active) return;
+                const now = performance.now();
+                vel = (e.clientY - lastY) / Math.max(1, now - lastT);
+                lastY = e.clientY;
+                lastT = now;
+                const dy = e.clientY - startY;
+                panel.style.transform = dy > 0 ? `translateY(${dy}px)` : '';
+            });
+            const end = (e) => {
+                if (!active) return;
+                active = false;
+                panel.classList.remove('dragging');
+                panel.style.transform = '';
+                const dy = e.clientY - startY;
+                if (Math.abs(dy) < 6 && zone.id === 'cdeChatGrab') {
+                    setSheet(S.sheet === 'full' ? 'half' : 'full');
+                } else if (dy > 80 || vel > 0.6) {
+                    if (S.sheet === 'full' && dy < 220 && vel < 1.2) setSheet('half'); else close();
+                } else if (dy < -50 || vel < -0.6) {
+                    setSheet('full');
+                }
+            };
+            zone.addEventListener('pointerup', end);
+            zone.addEventListener('pointercancel', end);
+        });
+    }
+
+    // Đồng bộ trạng thái "active" của thanh bottom-nav với việc mở/đóng chat
+    function navMarkChat(on) {
+        const nav = document.querySelector('.bottom-nav');
+        if (!nav) return;
+        if (on) {
+            S.prevActive = Array.from(nav.querySelectorAll('.bottom-nav-item.active')).filter(el => !el.hasAttribute('data-chat-trigger'));
+            S.prevActive.forEach(el => el.classList.remove('active'));
+            nav.querySelectorAll('[data-chat-trigger]').forEach(el => el.classList.add('active'));
+        } else {
+            nav.querySelectorAll('[data-chat-trigger]').forEach(el => el.classList.remove('active'));
+            if (S.prevActive && !nav.querySelector('.bottom-nav-item.active')) S.prevActive.forEach(el => el.classList.add('active'));
+            S.prevActive = null;
+        }
+    }
+
     // ---------- Mở / đóng ----------
     function open(opts) {
         if (!S.user) return;
+        const wasOpen = S.open;
         S.open = true;
         sessionStorage.setItem(OPEN_KEY, '1');
-        $('cdeChatPanel').classList.add('open');
+        const panel = $('cdeChatPanel');
+        const mobile = isMobile();
+        if (mobile && !wasOpen) S.sheet = 'half';
+        applyLayout();
+        if (panel) panel.classList.add('open');
+        if (!wasOpen) navMarkChat(true);
+        // Không khóa cuộn trang: phần phía trên sheet vẫn thao tác bình thường
         $('cdeChatPopups').innerHTML = '';
         markRead();
         scrollToBottom();
-        $('cdeChatInput').focus();
+        if (!mobile) $('cdeChatInput').focus(); // trên điện thoại không tự bật bàn phím (tránh giật layout)
         if (!(opts && opts.silent) && 'Notification' in window && Notification.permission === 'default') {
             try { Notification.requestPermission(); } catch (e) { /* ignore */ }
         }
     }
 
     function close() {
+        const wasOpen = S.open;
         S.open = false;
         sessionStorage.setItem(OPEN_KEY, '0');
-        if ($('cdeChatPanel')) $('cdeChatPanel').classList.remove('open');
+        const panel = $('cdeChatPanel');
+        if (panel) {
+            panel.classList.remove('open', 'dragging');
+            panel.style.transform = '';
+            if (panel.contains(document.activeElement)) document.activeElement.blur(); // hạ bàn phím ảo
+        }
+        if (wasOpen) navMarkChat(false);
         document.querySelectorAll('[data-chat-trigger].active').forEach(el => el.classList.remove('active'));
     }
 
@@ -588,7 +739,8 @@
         if (!S.denied) connect();
 
         // Trang vừa tải lại (F5, Live Server reload...) mà khung chat đang mở → mở lại, giữ nguyên bản nháp
-        if (sessionStorage.getItem(OPEN_KEY) === '1') {
+        // Chỉ khôi phục trên máy tính; điện thoại luôn khởi động với chat đóng (tránh bị chặn màn hình sau khi tải lại)
+        if (sessionStorage.getItem(OPEN_KEY) === '1' && !isMobile()) {
             const draft = sessionStorage.getItem(DRAFT_KEY);
             if (draft) $('cdeChatInput').value = draft;
             open({ silent: true });
