@@ -256,8 +256,8 @@
                             <!-- Ô MÀU ĐỎ TRÊN ẢNH: ĐÃ ẨN ĐƯỜNG DẪN VÀ MÔ TẢ PHỤ TRÊN MOBILE -->
                             <h2 class="text-sm font-bold text-white flex items-center gap-2">
                                 <i class="fa-solid fa-database text-yellow-400"></i> Danh Sách Tài Khoản <span
-                                    class="font-mono text-xs text-purple-300 hidden sm:inline">(
-                                    backend/assets/data/users.json )</span>
+                                    id="users-path-label"
+                                    class="font-mono text-xs text-purple-300 hidden sm:inline">( chưa đồng bộ )</span>
                             </h2>
                             <p class="text-xs text-slate-400 mt-1 hidden sm:block">Hệ thống lọc nâng cao theo Chức vụ,
                                 Vai trò, Công ty, Trạng thái & Sắp xếp</p>
@@ -345,7 +345,7 @@
 
         <footer class="mt-8 text-center text-xs text-slate-500">
             &copy; 2026 PV INCONS Enterprise Workspace. GitHub Path: <span
-                class="font-mono text-purple-400">backend/assets/data/users.json</span>
+                id="users-path-footer" class="font-mono text-purple-400">chưa đồng bộ</span>
         </footer>
     </div>
 
@@ -465,6 +465,35 @@
     <script>
         let usersData = [];
 
+        // ===== TRẠNG THÁI ĐỒNG BỘ users.json VỚI GITHUB =====
+        const USERS_PATH_KEY = 'pv_users_json_path';
+        // Các vị trí thường gặp của users.json trong repo; nếu không có sẽ tự quét toàn repo
+        const USERS_PATH_CANDIDATES = ['assets/data/users.json', 'backend/assets/data/users.json', 'data/users.json', 'users.json'];
+        const USERS_PATH_DEFAULT_NEW = 'assets/data/users.json';
+
+        let usersFilePath = localStorage.getItem(USERS_PATH_KEY) || null; // đường dẫn thực tế của users.json trong repo
+        let usersFileExists = null;          // null: chưa biết | true: có | false: repo chưa có file
+        let usersLoadedFromGitHub = false;   // true khi dữ liệu đang hiển thị lấy thật từ GitHub
+        let isLoadingUsers = false;
+
+        const SAMPLE_USERS = [
+            {
+                "id": 1,
+                "username": "admin",
+                "passwordHash": "$2b$10$Mhg7uk2abtNcK8/yqU1ZFOzT7mPAdzbjK9zPJMX18cF/yalhrIpSa",
+                "role": "ADMIN",
+                "permission": "ADMIN",
+                "fullName": "TRẦN HOÀNG PHƯỚC",
+                "phone": "0939751194",
+                "position": "Giám đốc",
+                "discipline": "Kỹ sư",
+                "projects": "Tất cả dự án",
+                "company": "PV INCONS CO.LTD",
+                "status": "Active"
+            }
+        ];
+
+
         function loadAuth() {
             try {
                 const val = localStorage.getItem('pv_github_auth');
@@ -484,6 +513,12 @@
         function showToast(message, type = 'success') {
             const container = document.getElementById('toast-container');
             if (!container) return;
+
+            // Toast trùng nội dung đang hiển thị thì thay thế, không xếp chồng
+            const key = `${type}|${message}`;
+            Array.from(container.children).forEach(t => { if (t.dataset.key === key) t.remove(); });
+            while (container.children.length >= 4) container.firstElementChild.remove();
+
             const toast = document.createElement('div');
             const isSuccess = type === 'success';
             const isError = type === 'error';
@@ -492,10 +527,15 @@
             const textColor = isSuccess ? 'text-emerald-300' : isError ? 'text-rose-300' : 'text-blue-300';
             const iconClass = isSuccess ? 'fa-circle-check' : isError ? 'fa-circle-exclamation' : 'fa-circle-info';
 
+            toast.dataset.key = key;
             toast.className = `toast-animate border ${borderColor} ${bgColor} ${textColor} p-3 rounded-xl shadow-xl flex items-center gap-2.5 text-xs font-medium pointer-events-auto`;
-            toast.innerHTML = `<i class="fa-solid ${iconClass} shrink-0 text-sm"></i><span>${message}</span>`;
+            const icon = document.createElement('i');
+            icon.className = `fa-solid ${iconClass} shrink-0 text-sm`;
+            const span = document.createElement('span');
+            span.textContent = message; // textContent: thông báo lỗi từ GitHub không được chèn thành HTML
+            toast.append(icon, span);
             container.appendChild(toast);
-            setTimeout(() => { toast.remove(); }, 3500);
+            setTimeout(() => { toast.remove(); }, isError ? 7000 : 4500);
         }
 
         function utf8_to_b64(str) {
@@ -571,52 +611,119 @@
 
         document.getElementById('btn-logout').addEventListener('click', () => {
             localStorage.removeItem('pv_github_auth');
+            localStorage.removeItem('pv_users_json_path');
             location.reload();
         });
 
+        // ===== ĐỒNG BỘ users.json VỚI GITHUB =====
+        function ghHeaders(accept) {
+            return { 'Authorization': `Bearer ${authConfig.token}`, 'Accept': accept || 'application/vnd.github.v3+json' };
+        }
+
+        function ghContentsUrl(filePath) {
+            const enc = filePath.split('/').map(encodeURIComponent).join('/');
+            return `https://api.github.com/repos/${authConfig.owner}/${authConfig.repo}/contents/${enc}`;
+        }
+
+        // Đổi phản hồi lỗi của GitHub thành thông báo tiếng Việt, nêu rõ nguyên nhân
+        async function describeGitHubError(res) {
+            let detail = '';
+            try { detail = (await res.json()).message || ''; } catch (e) { }
+            if (res.status === 401) return 'Token PAT không hợp lệ hoặc đã hết hạn (401). Hãy đăng xuất và nhập lại token.';
+            if (res.status === 403) {
+                if (res.headers.get('x-ratelimit-remaining') === '0') return 'Vượt giới hạn số lần gọi GitHub API (403). Hãy thử lại sau ít phút.';
+                return 'Token không đủ quyền với repo này (403). Token fine-grained cần quyền Contents: Read (và Read and write để xuất bản).' + (detail ? ` [${detail}]` : '');
+            }
+            if (res.status === 404) return 'Không tìm thấy repo hoặc token không truy cập được repo này (404).';
+            return `GitHub trả về lỗi HTTP ${res.status}` + (detail ? `: ${detail}` : '');
+        }
+
+        function updatePathLabels() {
+            const repoName = authConfig ? authConfig.repo : '';
+            const text = usersFilePath ? `${repoName}/${usersFilePath}` : 'chưa có file';
+            const a = document.getElementById('users-path-label');
+            const b = document.getElementById('users-path-footer');
+            if (a) a.textContent = `( ${text} )`;
+            if (b) b.textContent = text;
+        }
+
+        // Tìm users.json: thử các đường dẫn quen thuộc, nếu không có thì quét cây thư mục của repo
+        async function findUsersFile() {
+            const list = [...new Set([usersFilePath, ...USERS_PATH_CANDIDATES].filter(Boolean))];
+            for (const p of list) {
+                const res = await fetch(ghContentsUrl(p), { headers: ghHeaders(), cache: 'no-store' });
+                if (res.ok) return { path: p, data: await res.json() };
+                if (res.status !== 404) throw new Error(await describeGitHubError(res)); // 401/403... không phải do sai đường dẫn
+            }
+
+            const tr = await fetch(`https://api.github.com/repos/${authConfig.owner}/${authConfig.repo}/git/trees/HEAD?recursive=1`, { headers: ghHeaders(), cache: 'no-store' });
+            if (tr.ok) {
+                const tree = (await tr.json()).tree || [];
+                const hits = tree.filter(n => n.type === 'blob' && /(^|\/)users\.json$/i.test(n.path))
+                    .map(n => n.path)
+                    .sort((x, y) => (/assets\/data\//.test(y) ? 1 : 0) - (/assets\/data\//.test(x) ? 1 : 0) || x.length - y.length);
+                if (hits.length) {
+                    const res = await fetch(ghContentsUrl(hits[0]), { headers: ghHeaders(), cache: 'no-store' });
+                    if (res.ok) return { path: hits[0], data: await res.json() };
+                }
+            } else if (tr.status !== 404 && tr.status !== 409) { // 409: repo trống
+                throw new Error(await describeGitHubError(tr));
+            }
+            return null;
+        }
+
+        async function readFileContent(found) {
+            // File lớn hơn 1MB thì GitHub không trả nội dung base64, phải lấy bản raw
+            if (found.data.content && found.data.encoding === 'base64') return b64_to_utf8(found.data.content);
+            const res = await fetch(ghContentsUrl(found.path), { headers: ghHeaders('application/vnd.github.raw+json'), cache: 'no-store' });
+            if (!res.ok) throw new Error(await describeGitHubError(res));
+            return await res.text();
+        }
+
         async function loadUsersFromGitHub() {
-            if (!authConfig) return;
-            const filePath = `backend/assets/data/users.json`;
-            const url = `https://api.github.com/repos/${authConfig.owner}/${authConfig.repo}/contents/${filePath}`;
+            if (!authConfig || isLoadingUsers) return;
+            isLoadingUsers = true;
+            const btn = document.getElementById('btn-sync-github');
+            const oldHtml = btn ? btn.innerHTML : '';
+            if (btn) { btn.disabled = true; btn.innerHTML = `<i class="fa-solid fa-arrows-rotate fa-spin text-xs"></i> Đang tải...`; }
 
             try {
-                const res = await fetch(url, {
-                    headers: {
-                        'Authorization': `Bearer ${authConfig.token}`,
-                        'Accept': 'application/vnd.github.v3+json'
-                    }
-                });
-                if (!res.ok) throw new Error('Không tìm thấy file users.json trên repo.');
-                const data = await res.json();
-                const content = JSON.parse(b64_to_utf8(data.content));
+                const found = await findUsersFile();
+                if (!found) {
+                    usersFileExists = false;
+                    usersLoadedFromGitHub = false;
+                    if (!usersData.length) usersData = JSON.parse(JSON.stringify(SAMPLE_USERS));
+                    updatePathLabels();
+                    showToast(`Repo ${authConfig.owner}/${authConfig.repo} chưa có file users.json. Đang hiển thị dữ liệu mẫu, bấm "Xuất bản GitHub" để tạo file mới.`, 'info');
+                } else {
+                    let content;
+                    try { content = JSON.parse(await readFileContent(found)); }
+                    catch (e) { throw new Error(`File ${found.path} không đọc được hoặc không phải JSON hợp lệ (${e.message}).`); }
+                    if (!Array.isArray(content)) throw new Error(`File ${found.path} sai định dạng: nội dung phải là một mảng tài khoản.`);
 
-                usersData = Array.isArray(content) ? content.map(u => ({
-                    ...u,
-                    status: (u.status === 'Active' || u.status === 'Đang triển khai') ? 'Active' : 'Inactive'
-                })) : [];
-
-                populateFilterDropdowns();
-                applyFiltersAndSort();
-                showToast('Đã tải users.json từ GitHub thành công!');
+                    usersFilePath = found.path;
+                    localStorage.setItem(USERS_PATH_KEY, found.path);
+                    usersFileExists = true;
+                    usersLoadedFromGitHub = true;
+                    usersData = content.map(u => ({
+                        ...u,
+                        status: (u.status === 'Active' || u.status === 'Đang triển khai') ? 'Active' : 'Inactive'
+                    }));
+                    updatePathLabels();
+                    showToast(`Đã tải ${usersData.length} tài khoản từ GitHub (${found.path}).`);
+                }
             } catch (err) {
                 console.error(err);
-                showToast('Không tải được users.json từ GitHub, dùng dữ liệu mẫu cục bộ.', 'info');
-                usersData = [
-                    {
-                        "id": 1,
-                        "username": "admin",
-                        "passwordHash": "$2b$10$Mhg7uk2abtNcK8/yqU1ZFOzT7mPAdzbjK9zPJMX18cF/yalhrIpSa",
-                        "role": "ADMIN",
-                        "permission": "ADMIN",
-                        "fullName": "TRẦN HOÀNG PHƯỚC",
-                        "phone": "0939751194",
-                        "position": "Giám đốc",
-                        "discipline": "Kỹ sư",
-                        "projects": "Tất cả dự án",
-                        "company": "PV INCONS CO.LTD",
-                        "status": "Active"
-                    }
-                ];
+                usersLoadedFromGitHub = false;
+                const msg = err.message === 'Failed to fetch'
+                    ? 'Không kết nối được tới GitHub (mất mạng hoặc bị chặn). Kiểm tra kết nối rồi bấm Tải dữ liệu lại.'
+                    : err.message;
+                showToast(`Không tải được users.json: ${msg}`, 'error');
+                // Giữ nguyên dữ liệu đang có; chỉ dùng dữ liệu mẫu khi chưa có gì để hiển thị
+                if (!usersData.length) usersData = JSON.parse(JSON.stringify(SAMPLE_USERS));
+            } finally {
+                isLoadingUsers = false;
+                if (btn) { btn.disabled = false; btn.innerHTML = oldHtml; }
                 populateFilterDropdowns();
                 applyFiltersAndSort();
             }
@@ -626,8 +733,20 @@
 
         document.getElementById('btn-publish-github').addEventListener('click', async () => {
             if (!authConfig) return;
-            const filePath = `backend/assets/data/users.json`;
-            const url = `https://api.github.com/repos/${authConfig.owner}/${authConfig.repo}/contents/${filePath}`;
+
+            // Chặn ghi đè nhầm: dữ liệu mẫu (do tải lỗi) không được phép đẩy lên GitHub
+            if (!usersLoadedFromGitHub && usersFileExists !== false) {
+                showToast('Chưa đồng bộ được users.json từ GitHub nên không thể xuất bản (tránh ghi đè bằng dữ liệu mẫu). Hãy bấm "Tải dữ liệu" đến khi thành công.', 'error');
+                return;
+            }
+
+            let filePath = usersFilePath;
+            if (!filePath) {
+                const typed = prompt(`Repo ${authConfig.owner}/${authConfig.repo} chưa có users.json.\nNhập đường dẫn file để tạo mới (gồm ${usersData.length} tài khoản hiện tại):`, USERS_PATH_DEFAULT_NEW);
+                if (!typed || !typed.trim()) return;
+                filePath = typed.trim().replace(/^\/+/, '');
+            }
+            const url = ghContentsUrl(filePath);
 
             const btnPub = document.getElementById('btn-publish-github');
             btnPub.disabled = true;
@@ -635,12 +754,11 @@
 
             try {
                 let sha = null;
-                const checkRes = await fetch(url, {
-                    headers: { 'Authorization': `Bearer ${authConfig.token}`, 'Accept': 'application/vnd.github.v3+json' }
-                });
+                const checkRes = await fetch(url, { headers: ghHeaders(), cache: 'no-store' });
                 if (checkRes.ok) {
-                    const fileData = await checkRes.json();
-                    sha = fileData.sha;
+                    sha = (await checkRes.json()).sha;
+                } else if (checkRes.status !== 404) {
+                    throw new Error(await describeGitHubError(checkRes));
                 }
 
                 const jsonString = JSON.stringify(usersData, null, 2);
@@ -648,11 +766,7 @@
 
                 const putRes = await fetch(url, {
                     method: 'PUT',
-                    headers: {
-                        'Authorization': `Bearer ${authConfig.token}`,
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/vnd.github.v3+json'
-                    },
+                    headers: { ...ghHeaders(), 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         message: `Update ${filePath} via Super Admin Portal`,
                         content: contentBase64,
@@ -660,8 +774,14 @@
                     })
                 });
 
-                if (!putRes.ok) throw new Error('Không thể xuất bản lên GitHub.');
-                showToast('Đã xuất bản users.json lên GitHub thành công!');
+                if (!putRes.ok) throw new Error(await describeGitHubError(putRes));
+
+                usersFilePath = filePath;
+                localStorage.setItem(USERS_PATH_KEY, filePath);
+                usersFileExists = true;
+                usersLoadedFromGitHub = true;
+                updatePathLabels();
+                showToast(`Đã xuất bản ${usersData.length} tài khoản lên GitHub (${filePath}).`);
             } catch (err) {
                 showToast(`Lỗi xuất bản: ${err.message}`, 'error');
             } finally {
