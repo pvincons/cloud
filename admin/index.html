@@ -35,7 +35,6 @@
             border-color: rgba(59, 130, 246, 0.4);
             transform: translateY(-2px);
         }
-        
     </style>
 </head>
 
@@ -45,22 +44,19 @@
         <!-- HEADER ADMIN -->
         <header class="flex flex-wrap items-center justify-between gap-4 mb-8">
             <div class="flex items-center gap-3">
-                <div
-                    class="w-10 h-10 rounded-xl bg-purple-600/20 border border-purple-500/30 text-purple-400 flex items-center justify-center text-xl">
+                <div class="w-10 h-10 rounded-xl bg-purple-600/20 border border-purple-500/30 text-purple-400 flex items-center justify-center text-xl">
                     <i class="fa-solid fa-user-shield"></i>
                 </div>
                 <div>
                     <h1 class="font-extrabold text-white text-lg tracking-wider flex items-center gap-2">
-                        SUPER ADMIN PORTAL <span
-                            class="text-[10px] bg-purple-500/20 text-purple-300 px-2 py-0.5 rounded border border-purple-500/30">ROOT</span>
+                        SUPER ADMIN PORTAL <span class="text-[10px] bg-purple-500/20 text-purple-300 px-2 py-0.5 rounded border border-purple-500/30">ROOT</span>
                     </h1>
-                    <p class="text-xs text-slate-400">Quản lý mã truy cập, phân quyền điều hướng & cấu hình SSO</p>
+                    <p class="text-xs text-slate-400">Quản lý tài khoản, phân quyền điều hướng & đồng bộ cơ sở dữ liệu users.json</p>
                 </div>
             </div>
 
             <div class="flex items-center gap-3">
-                <a href="../index.html"
-                    class="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-semibold text-slate-200 flex items-center gap-2 transition-all">
+                <a href="../index.html" class="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-semibold text-slate-200 flex items-center gap-2 transition-all">
                     <i class="fa-solid fa-house"></i>
                     <span>Trang Chủ Portal</span>
                 </a>
@@ -70,8 +66,7 @@
                         <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Authenticated
                     </span>
                 </div>
-                <a href="../index.html" onclick="localStorage.removeItem('currentUser')"
-                    class="px-3 py-2 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 text-xs font-bold transition-all">
+                <a href="../index.html" onclick="localStorage.removeItem('currentUser')" class="px-3 py-2 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 text-xs font-bold transition-all">
                     <i class="fa-solid fa-right-from-bracket"></i> Đăng xuất
                 </a>
             </div>
@@ -81,33 +76,33 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
             <div class="glass-card p-5 rounded-2xl flex items-center justify-between">
                 <div>
-                    <p class="text-xs font-semibold text-slate-400 uppercase">TỔNG MÃ TRUY CẬP</p>
-                    <p class="text-2xl font-black text-white mt-1">5</p>
+                    <p class="text-xs font-semibold text-slate-400 uppercase">TỔNG TÀI KHOẢN</p>
+                    <p id="stat-total" class="text-2xl font-black text-white mt-1">0</p>
                 </div>
                 <div class="text-blue-400 text-2xl"><i class="fa-solid fa-users"></i></div>
             </div>
             <div class="glass-card p-5 rounded-2xl flex items-center justify-between">
                 <div>
-                    <p class="text-xs font-semibold text-slate-400 uppercase">MÃ NỘI BỘ (-INT)</p>
-                    <p class="text-2xl font-black text-emerald-400 mt-1">2</p>
+                    <p class="text-xs font-semibold text-slate-400 uppercase">TÀI KHOẢN HOẠT ĐỘNG</p>
+                    <p id="stat-active" class="text-2xl font-black text-emerald-400 mt-1">0</p>
                 </div>
-                <div class="text-emerald-400 text-2xl"><i class="fa-solid fa-folder-closed"></i></div>
+                <div class="text-emerald-400 text-2xl"><i class="fa-solid fa-user-check"></i></div>
             </div>
             <div class="glass-card p-5 rounded-2xl flex items-center justify-between">
                 <div>
-                    <p class="text-xs font-semibold text-slate-400 uppercase">MÃ BIM - CDE (-CDE)</p>
-                    <p class="text-2xl font-black text-indigo-400 mt-1">2</p>
+                    <p class="text-xs font-semibold text-slate-400 uppercase">QUẢN TRỊ / MASTER</p>
+                    <p id="stat-admin" class="text-2xl font-black text-indigo-400 mt-1">0</p>
                 </div>
-                <div class="text-indigo-400 text-2xl"><i class="fa-solid fa-cubes"></i></div>
+                <div class="text-indigo-400 text-2xl"><i class="fa-solid fa-user-shield"></i></div>
             </div>
             <div class="glass-card p-5 rounded-2xl flex items-center justify-between">
                 <div>
                     <p class="text-xs font-semibold text-slate-400 uppercase">TRẠNG THÁI HỆ THỐNG</p>
                     <p class="text-xs font-bold text-emerald-400 mt-2 flex items-center gap-1.5">
-                        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> HOẠT ĐỘNG
+                        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> ĐÃ KẾT NỐI JSON
                     </p>
                 </div>
-                <div class="text-emerald-400 text-2xl"><i class="fa-solid fa-circle-check"></i></div>
+                <div class="text-emerald-400 text-2xl"><i class="fa-solid fa-database"></i></div>
             </div>
         </div>
 
@@ -117,243 +112,363 @@
                 <i class="fa-solid fa-compass text-blue-400"></i> ĐIỀU HƯỚNG TRỰC TIẾP ĐẾN WORKSPACE & QUẢN TRỊ NỘI DUNG
             </h2>
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-
-                <!-- 1. CRM & Khách Hàng -->
-                <a href="../content/partner/index.html"
-                    class="workspace-card p-4 rounded-2xl flex items-center justify-between group">
+                <a href="../content/partner/index.html" class="workspace-card p-4 rounded-2xl flex items-center justify-between group">
                     <div class="flex items-center gap-3">
-                        <div
-                            class="w-10 h-10 rounded-xl bg-orange-500/10 border border-orange-500/30 text-orange-400 flex items-center justify-center text-lg">
+                        <div class="w-10 h-10 rounded-xl bg-orange-500/10 border border-orange-500/30 text-orange-400 flex items-center justify-center text-lg">
                             <i class="fa-solid fa-handshake"></i>
                         </div>
                         <div>
-                            <h3 class="font-bold text-sm text-white group-hover:text-orange-300 transition-colors">CRM
-                                Khách Hàng</h3>
+                            <h3 class="font-bold text-sm text-white group-hover:text-orange-300 transition-colors">CRM Khách Hàng</h3>
                             <p class="text-[11px] text-slate-400 font-mono mt-0.5">content/partner/index.html</p>
                         </div>
                     </div>
-                    <i
-                        class="fa-solid fa-arrow-right text-xs text-slate-500 group-hover:text-orange-400 group-hover:translate-x-1 transition-all"></i>
+                    <i class="fa-solid fa-arrow-right text-xs text-slate-500 group-hover:text-orange-400 group-hover:translate-x-1 transition-all"></i>
                 </a>
 
-                <!-- 2. Quản Lý Nội Bộ -->
-                <a href="../content/internal/index.html"
-                    class="workspace-card p-4 rounded-2xl flex items-center justify-between group">
+                <a href="../content/internal/index.html" class="workspace-card p-4 rounded-2xl flex items-center justify-between group">
                     <div class="flex items-center gap-3">
-                        <div
-                            class="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 flex items-center justify-center text-lg">
+                        <div class="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 flex items-center justify-center text-lg">
                             <i class="fa-solid fa-folder-closed"></i>
                         </div>
                         <div>
-                            <h3 class="font-bold text-sm text-white group-hover:text-emerald-300 transition-colors">Quản
-                                Lý Nội Bộ</h3>
+                            <h3 class="font-bold text-sm text-white group-hover:text-emerald-300 transition-colors">Quản Lý Nội Bộ</h3>
                             <p class="text-[11px] text-slate-400 font-mono mt-0.5">content/internal/index.html</p>
                         </div>
                     </div>
-                    <i
-                        class="fa-solid fa-arrow-right text-xs text-slate-500 group-hover:text-emerald-400 group-hover:translate-x-1 transition-all"></i>
+                    <i class="fa-solid fa-arrow-right text-xs text-slate-500 group-hover:text-emerald-400 group-hover:translate-x-1 transition-all"></i>
                 </a>
 
-                <!-- 3. BIM - VDC CDE -->
-                <a href="../content/bim-vdc/index.html"
-                    class="workspace-card p-4 rounded-2xl flex items-center justify-between group">
+                <a href="../content/bim-vdc/index.html" class="workspace-card p-4 rounded-2xl flex items-center justify-between group">
                     <div class="flex items-center gap-3">
-                        <div
-                            class="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/30 text-blue-400 flex items-center justify-center text-lg">
+                        <div class="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/30 text-blue-400 flex items-center justify-center text-lg">
                             <i class="fa-solid fa-cubes"></i>
                         </div>
                         <div>
-                            <h3 class="font-bold text-sm text-white group-hover:text-blue-300 transition-colors">BIM -
-                                VDC CDE</h3>
+                            <h3 class="font-bold text-sm text-white group-hover:text-blue-300 transition-colors">BIM - VDC CDE</h3>
                             <p class="text-[11px] text-slate-400 font-mono mt-0.5">content/bim-vdc/index.html</p>
                         </div>
                     </div>
-                    <i
-                        class="fa-solid fa-arrow-right text-xs text-slate-500 group-hover:text-blue-400 group-hover:translate-x-1 transition-all"></i>
+                    <i class="fa-solid fa-arrow-right text-xs text-slate-500 group-hover:text-blue-400 group-hover:translate-x-1 transition-all"></i>
                 </a>
 
-                <!-- 4. Quản Trị Nội Dung (CMS Portal) -->
-                <a href="../content/cms/index.html"
-                    class="workspace-card p-4 rounded-2xl flex items-center justify-between group">
+                <a href="../content/cms/index.html" class="workspace-card p-4 rounded-2xl flex items-center justify-between group">
                     <div class="flex items-center gap-3">
-                        <div
-                            class="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/30 text-purple-400 flex items-center justify-center text-lg">
+                        <div class="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/30 text-purple-400 flex items-center justify-center text-lg">
                             <i class="fa-solid fa-pen-to-square"></i>
                         </div>
                         <div>
-                            <h3 class="font-bold text-sm text-white group-hover:text-purple-300 transition-colors">Quản
-                                Trị Nội Dung</h3>
+                            <h3 class="font-bold text-sm text-white group-hover:text-purple-300 transition-colors">Quản Trị Nội Dung</h3>
                             <p class="text-[11px] text-slate-400 font-mono mt-0.5">content/cms/index.html</p>
                         </div>
                     </div>
-                    <i
-                        class="fa-solid fa-arrow-right text-xs text-slate-500 group-hover:text-purple-400 group-hover:translate-x-1 transition-all"></i>
+                    <i class="fa-solid fa-arrow-right text-xs text-slate-500 group-hover:text-purple-400 group-hover:translate-x-1 transition-all"></i>
                 </a>
-
             </div>
         </div>
 
-        <!-- THƯ MỤC 2: DANH SÁCH MÃ TRUY CẬP & SELECT PHÂN QUYỀN -->
+        <!-- THƯ MỤC 2: DANH SÁCH TỪ USERS.JSON & QUẢN TRỊ CHI TIẾT -->
         <div class="glass-card p-6 rounded-3xl">
             <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
                 <div>
                     <h2 class="text-sm font-bold text-white flex items-center gap-2">
-                        <i class="fa-solid fa-key text-yellow-400"></i> Danh Sách Mã Truy Cập & Phân Quyền
+                        <i class="fa-solid fa-database text-yellow-400"></i> Quản Lý Dữ Liệu Users từ <span class="font-mono text-xs text-purple-300">assets/data/users.json</span>
                     </h2>
-                    <p class="text-xs text-slate-400 mt-1">Tạo mới, phân quyền đường dẫn điều hướng và khóa mã truy cập
-                    </p>
+                    <p class="text-xs text-slate-400 mt-1">Đồng bộ toàn bộ các trường: ID, Username, Role, Permission, Họ tên, Chức vụ, Công ty & Dự án</p>
                 </div>
-                <button
-                    class="px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold text-xs rounded-xl shadow-lg transition-all flex items-center gap-2">
-                    <i class="fa-solid fa-plus"></i> Thêm Mã Truy Cập Mới
-                </button>
+                <div class="flex items-center gap-3">
+                    <input type="text" id="searchInput" placeholder="Tìm kiếm tài khoản, họ tên..." onkeyup="filterUsers()" class="bg-slate-900 border border-slate-700 text-xs px-3 py-2 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-purple-400">
+                    <button onclick="openAddModal()" class="px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold text-xs rounded-xl shadow-lg transition-all flex items-center gap-2">
+                        <i class="fa-solid fa-plus"></i> Thêm Người Dùng
+                    </button>
+                </div>
             </div>
 
-            <!-- BẢNG TÀI KHOẢN -->
+            <!-- BẢNG TÀI KHOẢN DYNAMIC -->
             <div class="overflow-x-auto">
                 <table class="w-full text-left text-xs">
                     <thead>
                         <tr class="border-b border-white/10 text-slate-400 uppercase font-semibold">
-                            <th class="pb-3 px-3">Mã NV / Account</th>
-                            <th class="pb-3 px-3">Quy Tắc Định Danh (Phân Quyền)</th>
-                            <th class="pb-3 px-3">Đường Dẫn Điều Hướng Default</th>
+                            <th class="pb-3 px-3">ID / Username</th>
+                            <th class="pb-3 px-3">Họ Tên & Liên Lạc</th>
+                            <th class="pb-3 px-3">Chức Vụ & Chuyên Môn</th>
+                            <th class="pb-3 px-3">Vai Trò & Quyền (Role/Permission)</th>
+                            <th class="pb-3 px-3">Công Ty & Dự Án</th>
                             <th class="pb-3 px-3">Trạng Thái</th>
                             <th class="pb-3 px-3 text-right">Thao Tác</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-white/5 font-medium">
-
-                        <!-- Hàng Admin -->
-                        <tr>
-                            <td class="py-3.5 px-3 font-bold text-white flex items-center gap-2">
-                                <i class="fa-solid fa-user-shield text-purple-400"></i> admin
-                            </td>
-                            <td class="py-3.5 px-3">
-                                <select onchange="updateRole('admin', this.value)"
-                                    class="bg-slate-900 border border-purple-500/40 text-purple-300 font-bold px-3 py-1.5 rounded-lg focus:outline-none focus:border-purple-400">
-                                    <option value="SUPER_ADMIN" selected>Super Admin</option>
-                                    <option value="INTERNAL">Nội bộ (-int)</option>
-                                    <option value="BIM_CDE">BIM CDE (-cde)</option>
-                                    <option value="PARTNER">Đối tác / Khách hàng</option>
-                                </select>
-                            </td>
-                            <td class="py-3.5 px-3 font-mono text-slate-400">admin/index.html</td>
-                            <td class="py-3.5 px-3"><span class="text-emerald-400 font-bold">● ACTIVE</span></td>
-                            <td class="py-3.5 px-3 text-right">
-                                <button class="px-2.5 py-1 bg-slate-800 text-slate-400 rounded-lg">Khóa</button>
-                            </td>
-                        </tr>
-
-                        <!-- Hàng manager-int -->
-                        <tr>
-                            <td class="py-3.5 px-3 text-slate-200 flex items-center gap-2">
-                                <i class="fa-regular fa-user text-slate-400"></i> manager-int
-                            </td>
-                            <td class="py-3.5 px-3">
-                                <select onchange="updateRole('manager-int', this.value)"
-                                    class="bg-slate-900 border border-emerald-500/40 text-emerald-400 font-bold px-3 py-1.5 rounded-lg focus:outline-none focus:border-emerald-400">
-                                    <option value="SUPER_ADMIN">Super Admin</option>
-                                    <option value="INTERNAL" selected>Nội bộ (-int)</option>
-                                    <option value="BIM_CDE">BIM CDE (-cde)</option>
-                                    <option value="PARTNER">Đối tác / Khách hàng</option>
-                                </select>
-                            </td>
-                            <td class="py-3.5 px-3 font-mono text-slate-400">content/internal/index.html</td>
-                            <td class="py-3.5 px-3"><span class="text-emerald-400 font-bold">● ACTIVE</span></td>
-                            <td class="py-3.5 px-3 text-right space-x-1">
-                                <button
-                                    class="px-2.5 py-1 bg-slate-800 text-slate-300 rounded-lg hover:bg-slate-700">Khóa</button>
-                                <button class="px-2 py-1 bg-red-500/10 text-red-400 rounded-lg hover:bg-red-500/20"><i
-                                        class="fa-solid fa-trash"></i></button>
-                            </td>
-                        </tr>
-
-                        <!-- Hàng staff-int -->
-                        <tr>
-                            <td class="py-3.5 px-3 text-slate-200 flex items-center gap-2">
-                                <i class="fa-regular fa-user text-slate-400"></i> staff-int
-                            </td>
-                            <td class="py-3.5 px-3">
-                                <select onchange="updateRole('staff-int', this.value)"
-                                    class="bg-slate-900 border border-emerald-500/40 text-emerald-400 font-bold px-3 py-1.5 rounded-lg focus:outline-none focus:border-emerald-400">
-                                    <option value="SUPER_ADMIN">Super Admin</option>
-                                    <option value="INTERNAL" selected>Nội bộ (-int)</option>
-                                    <option value="BIM_CDE">BIM CDE (-cde)</option>
-                                    <option value="PARTNER">Đối tác / Khách hàng</option>
-                                </select>
-                            </td>
-                            <td class="py-3.5 px-3 font-mono text-slate-400">content/internal/index.html</td>
-                            <td class="py-3.5 px-3"><span class="text-emerald-400 font-bold">● ACTIVE</span></td>
-                            <td class="py-3.5 px-3 text-right space-x-1">
-                                <button
-                                    class="px-2.5 py-1 bg-slate-800 text-slate-300 rounded-lg hover:bg-slate-700">Khóa</button>
-                                <button class="px-2 py-1 bg-red-500/10 text-red-400 rounded-lg hover:bg-red-500/20"><i
-                                        class="fa-solid fa-trash"></i></button>
-                            </td>
-                        </tr>
-
-                        <!-- Hàng bim-lead-cde -->
-                        <tr>
-                            <td class="py-3.5 px-3 text-slate-200 flex items-center gap-2">
-                                <i class="fa-regular fa-user text-slate-400"></i> bim-lead-cde
-                            </td>
-                            <td class="py-3.5 px-3">
-                                <select onchange="updateRole('bim-lead-cde', this.value)"
-                                    class="bg-slate-900 border border-blue-500/40 text-blue-400 font-bold px-3 py-1.5 rounded-lg focus:outline-none focus:border-blue-400">
-                                    <option value="SUPER_ADMIN">Super Admin</option>
-                                    <option value="INTERNAL">Nội bộ (-int)</option>
-                                    <option value="BIM_CDE" selected>BIM CDE (-cde)</option>
-                                    <option value="PARTNER">Đối tác / Khách hàng</option>
-                                </select>
-                            </td>
-                            <td class="py-3.5 px-3 font-mono text-slate-400">content/bim-vdc/index.html</td>
-                            <td class="py-3.5 px-3"><span class="text-emerald-400 font-bold">● ACTIVE</span></td>
-                            <td class="py-3.5 px-3 text-right space-x-1">
-                                <button
-                                    class="px-2.5 py-1 bg-slate-800 text-slate-300 rounded-lg hover:bg-slate-700">Khóa</button>
-                                <button class="px-2 py-1 bg-red-500/10 text-red-400 rounded-lg hover:bg-red-500/20"><i
-                                        class="fa-solid fa-trash"></i></button>
-                            </td>
-                        </tr>
-
-                        <!-- Hàng designer-cde -->
-                        <tr>
-                            <td class="py-3.5 px-3 text-slate-200 flex items-center gap-2">
-                                <i class="fa-regular fa-user text-slate-400"></i> designer-cde
-                            </td>
-                            <td class="py-3.5 px-3">
-                                <select onchange="updateRole('designer-cde', this.value)"
-                                    class="bg-slate-900 border border-blue-500/40 text-blue-400 font-bold px-3 py-1.5 rounded-lg focus:outline-none focus:border-blue-400">
-                                    <option value="SUPER_ADMIN">Super Admin</option>
-                                    <option value="INTERNAL">Nội bộ (-int)</option>
-                                    <option value="BIM_CDE" selected>BIM CDE (-cde)</option>
-                                    <option value="PARTNER">Đối tác / Khách hàng</option>
-                                </select>
-                            </td>
-                            <td class="py-3.5 px-3 font-mono text-slate-400">content/bim-vdc/index.html</td>
-                            <td class="py-3.5 px-3"><span class="text-emerald-400 font-bold">● ACTIVE</span></td>
-                            <td class="py-3.5 px-3 text-right space-x-1">
-                                <button
-                                    class="px-2.5 py-1 bg-slate-800 text-slate-300 rounded-lg hover:bg-slate-700">Khóa</button>
-                                <button class="px-2 py-1 bg-red-500/10 text-red-400 rounded-lg hover:bg-red-500/20"><i
-                                        class="fa-solid fa-trash"></i></button>
-                            </td>
-                        </tr>
-
+                    <tbody id="userTableBody" class="divide-y divide-white/5 font-medium">
+                        <!-- Dữ liệu render động bằng JS -->
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
 
+    <!-- MODAL CHI TIẾT / CHỈNH SỬA USER -->
+    <div id="userModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+        <div class="glass-card max-w-2xl w-full p-6 rounded-3xl border border-white/20 max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-4">
+                <h3 id="modalTitle" class="text-sm font-bold text-white uppercase flex items-center gap-2">
+                    <i class="fa-solid fa-user-pen text-purple-400"></i> Chỉnh Sửa / Thêm Người Dùng
+                </h3>
+                <button onclick="closeModal()" class="text-slate-400 hover:text-white text-base"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <form id="userForm" onsubmit="saveUser(event)" class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+                <input type="hidden" id="userId">
+                <div>
+                    <label class="block text-slate-400 mb-1 font-semibold">Username</label>
+                    <input type="text" id="formUsername" required class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-purple-400">
+                </div>
+                <div>
+                    <label class="block text-slate-400 mb-1 font-semibold">Mật khẩu (Password Hash)</label>
+                    <input type="text" id="formPassword" required class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-purple-400">
+                </div>
+                <div>
+                    <label class="block text-slate-400 mb-1 font-semibold">Họ và Tên (fullName)</label>
+                    <input type="text" id="formFullName" required class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-purple-400">
+                </div>
+                <div>
+                    <label class="block text-slate-400 mb-1 font-semibold">Số điện thoại (phone)</label>
+                    <input type="text" id="formPhone" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-purple-400">
+                </div>
+                <div>
+                    <label class="block text-slate-400 mb-1 font-semibold">Chức vụ (position)</label>
+                    <input type="text" id="formPosition" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-purple-400">
+                </div>
+                <div>
+                    <label class="block text-slate-400 mb-1 font-semibold">Chuyên môn / Ngành nghề (discipline)</label>
+                    <input type="text" id="formDiscipline" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-purple-400">
+                </div>
+                <div>
+                    <label class="block text-slate-400 mb-1 font-semibold">Vai trò (role)</label>
+                    <select id="formRole" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-purple-400">
+                        <option value="ADMIN">ADMIN</option>
+                        <option value="MASTER">MASTER</option>
+                        <option value="DESIGNER">DESIGNER</option>
+                        <option value="MANAGEMENT">MANAGEMENT</option>
+                        <option value="CONTRACTOR">CONTRACTOR</option>
+                        <option value="INTERNAL">INTERNAL</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-slate-400 mb-1 font-semibold">Phân quyền (permission)</label>
+                    <select id="formPermission" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-purple-400">
+                        <option value="ADMIN">ADMIN</option>
+                        <option value="MASTER">MASTER</option>
+                        <option value="DESIGNER">DESIGNER</option>
+                        <option value="MANAGEMENT">MANAGEMENT</option>
+                        <option value="CONTRACTOR">CONTRACTOR</option>
+                        <option value="INTERNAL">INTERNAL</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-slate-400 mb-1 font-semibold">Công ty (company)</label>
+                    <input type="text" id="formCompany" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-purple-400">
+                </div>
+                <div>
+                    <label class="block text-slate-400 mb-1 font-semibold">Trạng thái (status)</label>
+                    <select id="formStatus" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-purple-400">
+                        <option value="Active">Active</option>
+                        <option value="Đang triển khai">Đang triển khai</option>
+                        <option value="Inactive">Inactive</option>
+                    </select>
+                </div>
+                <div class="sm:col-span-2">
+                    <label class="block text-slate-400 mb-1 font-semibold">Dự án tham gia (projects - phân tách bằng dấu phẩy)</label>
+                    <input type="text" id="formProjects" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-purple-400">
+                </div>
+                <div class="sm:col-span-2 flex justify-end gap-3 mt-4">
+                    <button type="button" onclick="closeModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl font-bold">Hủy</button>
+                    <button type="submit" class="px-5 py-2 bg-purple-600 hover:bg-purple-500 text-white rounded-xl font-bold shadow-lg">Lưu Thay Đổi</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <footer class="mt-8 text-center text-xs text-slate-500">
-        &copy; 2026 PV INCONS Enterprise Workspace. Admin Privilege Portal.
+        &copy; 2026 PV INCONS Enterprise Workspace. Admin Privilege Portal. GitHub Path: <span class="font-mono text-purple-400">backend/assets/data/users.json</span>
     </footer>
 
     <script>
-        function updateRole(account, newRole) {
-            console.log(`Đã cập nhật phân quyền cho tài khoản ${account} sang ${newRole}`);
+        let usersData = [];
+
+        // Tải dữ liệu từ file users.json theo đúng cấu trúc thư mục GitHub (backend/assets/data/users.json)
+        async function loadUsersData() {
+            try {
+                const response = await fetch('../assets/data/users.json');
+                if (!response.ok) throw new Error('Không thể tải file users.json');
+                usersData = await response.json();
+                renderTable(usersData);
+                updateStats(usersData);
+            } catch (error) {
+                console.error("Lỗi tải JSON:", error);
+                // Dữ liệu fallback dự phòng nếu chạy file tĩnh chưa qua server
+                usersData = [
+                    {
+                        "id": 1,
+                        "username": "admin",
+                        "passwordHash": "$2b$10$Mhg7uk2abtNcK8/yqU1ZFOzT7mPAdzbjK9zPJMX18cF/yalhrIpSa",
+                        "role": "ADMIN",
+                        "permission": "ADMIN",
+                        "avatarLink": "",
+                        "fullName": "TRẦN HOÀNG PHƯỚC",
+                        "phone": "0939751194",
+                        "position": "Giám đốc",
+                        "discipline": "Kỹ sư",
+                        "projects": "Tất cả dự án",
+                        "company": "PV INCONS CO.LTD",
+                        "status": "Đang triển khai"
+                    }
+                ];
+                renderTable(usersData);
+                updateStats(usersData);
+            }
         }
+
+        function updateStats(data) {
+            document.getElementById('stat-total').innerText = data.length;
+            const activeCount = data.filter(u => u.status === 'Active' || u.status === 'Đang triển khai').length;
+            document.getElementById('stat-active').innerText = activeCount;
+            const adminCount = data.filter(u => u.role === 'ADMIN' || u.role === 'MASTER').length;
+            document.getElementById('stat-admin').innerText = adminCount;
+        }
+
+        function renderTable(data) {
+            const tbody = document.getElementById('userTableBody');
+            tbody.innerHTML = '';
+
+            data.forEach(user => {
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-white/5 transition-colors';
+                tr.innerHTML = `
+                    <td class="py-3.5 px-3">
+                        <div class="font-bold text-white flex items-center gap-2">
+                            <i class="fa-solid fa-user text-purple-400"></i> ${user.username}
+                        </div>
+                        <span class="text-[10px] text-slate-500 font-mono">ID: ${user.id}</span>
+                    </td>
+                    <td class="py-3.5 px-3">
+                        <div class="font-bold text-slate-200">${user.fullName || 'Chưa cập nhật'}</div>
+                        <div class="text-[11px] text-slate-400">${user.phone || 'Không có SĐT'}</div>
+                    </td>
+                    <td class="py-3.5 px-3">
+                        <div class="text-slate-300 font-medium">${user.position || 'Nhân viên'}</div>
+                        <div class="text-[11px] text-slate-400">${user.discipline || ''}</div>
+                    </td>
+                    <td class="py-3.5 px-3">
+                        <span class="px-2.5 py-1 rounded-lg text-[10px] font-extrabold bg-purple-500/10 text-purple-300 border border-purple-500/30">
+                            ${user.role} (${user.permission})
+                        </span>
+                    </td>
+                    <td class="py-3.5 px-3">
+                        <div class="text-slate-300 font-bold">${user.company}</div>
+                        <div class="text-[10px] text-slate-400 font-mono">Dự án: ${user.projects}</div>
+                    </td>
+                    <td class="py-3.5 px-3">
+                        <span class="font-bold ${user.status === 'Active' || user.status === 'Đang triển khai' ? 'text-emerald-400' : 'text-amber-400'}">
+                            ● ${user.status}
+                        </span>
+                    </td>
+                    <td class="py-3.5 px-3 text-right space-x-1">
+                        <button onclick="editUser(${user.id})" class="px-2.5 py-1 bg-slate-800 text-slate-300 rounded-lg hover:bg-slate-700 transition-all" title="Chỉnh sửa">
+                            <i class="fa-solid fa-pen"></i>
+                        </button>
+                        <button onclick="deleteUser(${user.id})" class="px-2 py-1 bg-red-500/10 text-red-400 rounded-lg hover:bg-red-500/20 transition-all" title="Xóa">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function filterUsers() {
+            const keyword = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = usersData.filter(u => 
+                u.username.toLowerCase().includes(keyword) || 
+                (u.fullName && u.fullName.toLowerCase().includes(keyword)) ||
+                (u.company && u.company.toLowerCase().includes(keyword))
+            );
+            renderTable(filtered);
+        }
+
+        function openAddModal() {
+            document.getElementById('modalTitle').innerHTML = '<i class="fa-solid fa-user-plus text-purple-400"></i> Thêm Người Dùng Mới';
+            document.getElementById('userForm').reset();
+            document.getElementById('userId').value = '';
+            document.getElementById('formPassword').value = '$2b$10$Mhg7uk2abtNcK8/yqU1ZFOzT7mPAdzbjK9zPJMX18cF/yalhrIpSa';
+            document.getElementById('userModal').classList.remove('hidden');
+            document.getElementById('userModal').classList.add('flex');
+        }
+
+        function editUser(id) {
+            const user = usersData.find(u => u.id === id);
+            if (!user) return;
+            document.getElementById('modalTitle').innerHTML = `<i class="fa-solid fa-user-pen text-purple-400"></i> Chỉnh Sửa Tài Khoản: ${user.username}`;
+            document.getElementById('userId').value = user.id;
+            document.getElementById('formUsername').value = user.username;
+            document.getElementById('formPassword').value = user.passwordHash;
+            document.getElementById('formFullName').value = user.fullName || '';
+            document.getElementById('formPhone').value = user.phone || '';
+            document.getElementById('formPosition').value = user.position || '';
+            document.getElementById('formDiscipline').value = user.discipline || '';
+            document.getElementById('formRole').value = user.role || 'INTERNAL';
+            document.getElementById('formPermission').value = user.permission || 'INTERNAL';
+            document.getElementById('formCompany').value = user.company || '';
+            document.getElementById('formStatus').value = user.status || 'Active';
+            document.getElementById('formProjects').value = user.projects || '';
+
+            document.getElementById('userModal').classList.remove('hidden');
+            document.getElementById('userModal').classList.add('flex');
+        }
+
+        function closeModal() {
+            document.getElementById('userModal').classList.remove('flex');
+            document.getElementById('userModal').classList.add('hidden');
+        }
+
+        function saveUser(event) {
+            event.preventDefault();
+            const idVal = document.getElementById('userId').value;
+            const userData = {
+                id: idVal ? parseInt(idVal) : (usersData.length ? Math.max(...usersData.map(u => u.id)) + 1 : 1),
+                username: document.getElementById('formUsername').value,
+                passwordHash: document.getElementById('formPassword').value,
+                role: document.getElementById('formRole').value,
+                permission: document.getElementById('formPermission').value,
+                avatarLink: "",
+                fullName: document.getElementById('formFullName').value,
+                phone: document.getElementById('formPhone').value,
+                position: document.getElementById('formPosition').value,
+                discipline: document.getElementById('formDiscipline').value,
+                projects: document.getElementById('formProjects').value,
+                company: document.getElementById('formCompany').value,
+                status: document.getElementById('formStatus').value
+            };
+
+            if (idVal) {
+                const index = usersData.findIndex(u => u.id === parseInt(idVal));
+                if (index !== -1) usersData[index] = userData;
+            } else {
+                usersData.push(userData);
+            }
+
+            renderTable(usersData);
+            updateStats(usersData);
+            closeModal();
+            alert('Đã cập nhật dữ liệu tài khoản thành công! (Vui lòng đồng bộ lại file users.json lên nhánh main của repository GitHub tại backend/assets/data/users.json)');
+        }
+
+        function deleteUser(id) {
+            if (confirm('Bạn có chắc chắn muốn xóa tài khoản này khỏi danh sách quản trị không?')) {
+                usersData = usersData.filter(u => u.id !== id);
+                renderTable(usersData);
+                updateStats(usersData);
+            }
+        }
+
+        window.onload = loadUsersData;
     </script>
 </body>
 
