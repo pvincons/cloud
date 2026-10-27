@@ -59,7 +59,7 @@ document.getElementById('loginForm')?.addEventListener('submit', async function 
     }
 
   } catch (primaryError) {
-    console.warn('⚠️ Server chính không phản hồi, đang chuyển hướng sang Google Sheets...', primaryError);
+    console.warn('⚠️ Server chính không phản hồi, đang chuyển hướng dữ liệu xác thực...', primaryError);
 
     try {
       const scriptResponse = await fetch(SCRIPT_URL, {
@@ -74,7 +74,7 @@ document.getElementById('loginForm')?.addEventListener('submit', async function 
         loginSuccess = true;
         userData = result.user || { username, fullName: result.fullName || username, role: result.role || 'DESIGNER', company: 'PV INCONS CO.LTD' };
       } else {
-        alert(result.error || 'Xác thực qua Google Sheets thất bại!');
+        alert(result.error || 'Xác thực thất bại!');
         resetBtn();
         return;
       }
