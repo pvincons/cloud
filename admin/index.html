@@ -48,6 +48,21 @@
         .toast-animate {
             animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
+
+        .tab-btn {
+            border-bottom: 2px solid transparent;
+            color: #94a3b8;
+            transition: all 0.2s ease;
+        }
+
+        .tab-btn:hover {
+            color: #e2e8f0;
+        }
+
+        .tab-btn[aria-selected="true"] {
+            border-bottom-color: #a855f7;
+            color: #d8b4fe;
+        }
     </style>
 </head>
 
@@ -124,7 +139,7 @@
                     <span
                         class="text-[10px] sm:text-xs text-slate-400 font-mono flex items-center gap-1 shrink-0 bg-slate-900 px-2.5 py-1.5 rounded-xl border border-slate-800">
                         <i class="fa-brands fa-github text-xs text-slate-300"></i>
-                        <span id="display-repo-info" class="text-purple-300 font-semibold">pvincons/website</span>
+                        <span id="display-repo-info" class="text-purple-300 font-semibold">pvincons/backend</span>
                     </span>
                     <button id="btn-logout"
                         class="px-3 py-2 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 text-xs font-bold transition-all flex items-center gap-1.5">
@@ -248,6 +263,24 @@
                 </div>
             </div>
 
+            <!-- TAB USERS: XUẤT users.json -->
+            <div class="flex flex-wrap items-center justify-between gap-3 mb-4 border-b border-white/10" role="tablist">
+                <div class="flex items-center gap-1">
+                    <button type="button" id="tab-btn-users" role="tab" data-tab="users" aria-selected="true"
+                        aria-controls="tab-panel-users" onclick="switchTab('users')"
+                        class="tab-btn px-4 py-2.5 text-xs font-bold uppercase tracking-widest flex items-center gap-2 -mb-px">
+                        <i class="fa-solid fa-users"></i> Users
+                        <span id="tab-users-count"
+                            class="text-[10px] bg-purple-500/20 text-purple-300 px-1.5 py-0.5 rounded border border-purple-500/30">0</span>
+                    </button>
+                </div>
+                <button type="button" id="btn-export-users-json" onclick="exportUsersJson()"
+                    class="mb-2 px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-amber-400 border border-slate-700 font-bold text-xs rounded-xl transition-all flex items-center gap-1.5 shadow">
+                    <i class="fa-solid fa-file-arrow-down"></i> Xuất users.json
+                </button>
+            </div>
+
+            <div id="tab-panel-users" role="tabpanel" aria-labelledby="tab-btn-users">
             <!-- THƯ MỤC 2: QUẢN LÝ TÀI KHOẢN USERS.JSON & BỘ LỌC -->
             <div class="glass-card p-4 sm:p-6 rounded-3xl">
                 <div class="flex flex-col gap-4 mb-6">
@@ -340,6 +373,7 @@
 
                 <!-- DANH SÁCH DẠNG CARD - MOBILE & TABLET VIEW -->
                 <div id="userCardList" class="md:hidden grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
+            </div>
             </div>
         </div>
 
@@ -466,12 +500,16 @@
         let usersData = [];
 
         // ===== TRẠNG THÁI ĐỒNG BỘ users.json VỚI GITHUB =====
-        const USERS_PATH_KEY = 'pv_users_json_path';
-        // Các vị trí thường gặp của users.json trong repo; nếu không có sẽ tự quét toàn repo
-        const USERS_PATH_CANDIDATES = ['assets/data/users.json', 'backend/assets/data/users.json', 'data/users.json', 'users.json'];
-        const USERS_PATH_DEFAULT_NEW = 'assets/data/users.json';
+        // users.json nằm tại: https://github.com/pvincons/backend/tree/main/assets/data
+        const USERS_FILE_PATH = 'assets/data/users.json';
+        const GITHUB_BRANCH = 'main';
+        const USERS_PATH_KEY = 'pv_users_json_path'; // khóa cũ (đường dẫn tự dò) - chỉ dùng để dọn dẹp
+        localStorage.removeItem(USERS_PATH_KEY);
 
-        let usersFilePath = localStorage.getItem(USERS_PATH_KEY) || null; // đường dẫn thực tế của users.json trong repo
+        // Thứ tự trường & cấu trúc chuẩn của mỗi tài khoản trong users.json
+        const USER_FIELDS = ['id', 'username', 'passwordHash', 'role', 'permission', 'avatarLink', 'fullName', 'phone', 'position', 'discipline', 'projects', 'company', 'status'];
+
+        let usersFilePath = USERS_FILE_PATH;
         let usersFileExists = null;          // null: chưa biết | true: có | false: repo chưa có file
         let usersLoadedFromGitHub = false;   // true khi dữ liệu đang hiển thị lấy thật từ GitHub
         let isLoadingUsers = false;
@@ -483,6 +521,7 @@
                 "passwordHash": "$2b$10$Mhg7uk2abtNcK8/yqU1ZFOzT7mPAdzbjK9zPJMX18cF/yalhrIpSa",
                 "role": "ADMIN",
                 "permission": "ADMIN",
+                "avatarLink": "",
                 "fullName": "TRẦN HOÀNG PHƯỚC",
                 "phone": "0939751194",
                 "position": "Giám đốc",
@@ -620,9 +659,10 @@
             return { 'Authorization': `Bearer ${authConfig.token}`, 'Accept': accept || 'application/vnd.github.v3+json' };
         }
 
-        function ghContentsUrl(filePath) {
+        function ghContentsUrl(filePath, withRef = true) {
             const enc = filePath.split('/').map(encodeURIComponent).join('/');
-            return `https://api.github.com/repos/${authConfig.owner}/${authConfig.repo}/contents/${enc}`;
+            const base = `https://api.github.com/repos/${authConfig.owner}/${authConfig.repo}/contents/${enc}`;
+            return withRef ? `${base}?ref=${encodeURIComponent(GITHUB_BRANCH)}` : base;
         }
 
         // Đổi phản hồi lỗi của GitHub thành thông báo tiếng Việt, nêu rõ nguyên nhân
@@ -638,6 +678,47 @@
             return `GitHub trả về lỗi HTTP ${res.status}` + (detail ? `: ${detail}` : '');
         }
 
+        function normalizeStatus(st) {
+            return (st === 'Active' || st === 'Đang triển khai') ? 'Active' : 'Inactive';
+        }
+
+        // Dựng mảng tài khoản đúng cấu trúc users.json (đủ trường, đúng thứ tự, không có trường nội bộ)
+        function serializeUsers() {
+            return usersData.map(u => {
+                const o = {};
+                USER_FIELDS.forEach(k => {
+                    if (k === 'id') o.id = Number(u.id);
+                    else if (k === 'status') o.status = (u._rawStatus !== undefined && normalizeStatus(u._rawStatus) === u.status) ? u._rawStatus : u.status;
+                    else o[k] = (u[k] === undefined || u[k] === null) ? '' : u[k];
+                });
+                // giữ lại các trường lạ (nếu repo có thêm) để không bị mất dữ liệu khi xuất
+                Object.keys(u).forEach(k => { if (!(k in o) && !k.startsWith('_')) o[k] = u[k]; });
+                return o;
+            });
+        }
+
+        // Tải về file users.json (đúng cấu trúc, thụt lề 2 khoảng trắng)
+        function exportUsersJson() {
+            if (!usersData.length || (!usersLoadedFromGitHub && usersFileExists !== false)) {
+                showToast('Chưa có dữ liệu users.json từ GitHub để xuất. Hãy bấm "Tải dữ liệu" đến khi thành công.', 'error');
+                return;
+            }
+            const blob = new Blob([JSON.stringify(serializeUsers(), null, 2)], { type: 'application/json;charset=utf-8' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'users.json';
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+            showToast(`Đã xuất users.json (${usersData.length} tài khoản).`);
+        }
+
+        function switchTab(name) {
+            document.querySelectorAll('[data-tab]').forEach(b => b.setAttribute('aria-selected', b.dataset.tab === name ? 'true' : 'false'));
+            document.querySelectorAll('[role="tabpanel"]').forEach(p => p.classList.toggle('hidden', p.id !== `tab-panel-${name}`));
+        }
+
         function updatePathLabels() {
             const repoName = authConfig ? authConfig.repo : '';
             const text = usersFilePath ? `${repoName}/${usersFilePath}` : 'chưa có file';
@@ -647,28 +728,11 @@
             if (b) b.textContent = text;
         }
 
-        // Tìm users.json: thử các đường dẫn quen thuộc, nếu không có thì quét cây thư mục của repo
+        // Lấy users.json tại đường dẫn cố định assets/data/users.json (nhánh main)
         async function findUsersFile() {
-            const list = [...new Set([usersFilePath, ...USERS_PATH_CANDIDATES].filter(Boolean))];
-            for (const p of list) {
-                const res = await fetch(ghContentsUrl(p), { headers: ghHeaders(), cache: 'no-store' });
-                if (res.ok) return { path: p, data: await res.json() };
-                if (res.status !== 404) throw new Error(await describeGitHubError(res)); // 401/403... không phải do sai đường dẫn
-            }
-
-            const tr = await fetch(`https://api.github.com/repos/${authConfig.owner}/${authConfig.repo}/git/trees/HEAD?recursive=1`, { headers: ghHeaders(), cache: 'no-store' });
-            if (tr.ok) {
-                const tree = (await tr.json()).tree || [];
-                const hits = tree.filter(n => n.type === 'blob' && /(^|\/)users\.json$/i.test(n.path))
-                    .map(n => n.path)
-                    .sort((x, y) => (/assets\/data\//.test(y) ? 1 : 0) - (/assets\/data\//.test(x) ? 1 : 0) || x.length - y.length);
-                if (hits.length) {
-                    const res = await fetch(ghContentsUrl(hits[0]), { headers: ghHeaders(), cache: 'no-store' });
-                    if (res.ok) return { path: hits[0], data: await res.json() };
-                }
-            } else if (tr.status !== 404 && tr.status !== 409) { // 409: repo trống
-                throw new Error(await describeGitHubError(tr));
-            }
+            const res = await fetch(ghContentsUrl(USERS_FILE_PATH), { headers: ghHeaders(), cache: 'no-store' });
+            if (res.ok) return { path: USERS_FILE_PATH, data: await res.json() };
+            if (res.status !== 404) throw new Error(await describeGitHubError(res)); // 401/403... không phải do sai đường dẫn
             return null;
         }
 
@@ -702,12 +766,12 @@
                     if (!Array.isArray(content)) throw new Error(`File ${found.path} sai định dạng: nội dung phải là một mảng tài khoản.`);
 
                     usersFilePath = found.path;
-                    localStorage.setItem(USERS_PATH_KEY, found.path);
                     usersFileExists = true;
                     usersLoadedFromGitHub = true;
                     usersData = content.map(u => ({
                         ...u,
-                        status: (u.status === 'Active' || u.status === 'Đang triển khai') ? 'Active' : 'Inactive'
+                        _rawStatus: u.status, // giữ giá trị status gốc (VD "Đang triển khai") để xuất lại đúng như file
+                        status: normalizeStatus(u.status)
                     }));
                     updatePathLabels();
                     showToast(`Đã tải ${usersData.length} tài khoản từ GitHub (${found.path}).`);
@@ -740,13 +804,9 @@
                 return;
             }
 
-            let filePath = usersFilePath;
-            if (!filePath) {
-                const typed = prompt(`Repo ${authConfig.owner}/${authConfig.repo} chưa có users.json.\nNhập đường dẫn file để tạo mới (gồm ${usersData.length} tài khoản hiện tại):`, USERS_PATH_DEFAULT_NEW);
-                if (!typed || !typed.trim()) return;
-                filePath = typed.trim().replace(/^\/+/, '');
-            }
+            const filePath = USERS_FILE_PATH;
             const url = ghContentsUrl(filePath);
+            const putUrl = ghContentsUrl(filePath, false);
 
             const btnPub = document.getElementById('btn-publish-github');
             btnPub.disabled = true;
@@ -761,15 +821,16 @@
                     throw new Error(await describeGitHubError(checkRes));
                 }
 
-                const jsonString = JSON.stringify(usersData, null, 2);
+                const jsonString = JSON.stringify(serializeUsers(), null, 2);
                 const contentBase64 = utf8_to_b64(jsonString);
 
-                const putRes = await fetch(url, {
+                const putRes = await fetch(putUrl, {
                     method: 'PUT',
                     headers: { ...ghHeaders(), 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         message: `Update ${filePath} via Super Admin Portal`,
                         content: contentBase64,
+                        branch: GITHUB_BRANCH,
                         sha: sha || undefined
                     })
                 });
@@ -777,7 +838,6 @@
                 if (!putRes.ok) throw new Error(await describeGitHubError(putRes));
 
                 usersFilePath = filePath;
-                localStorage.setItem(USERS_PATH_KEY, filePath);
                 usersFileExists = true;
                 usersLoadedFromGitHub = true;
                 updatePathLabels();
@@ -831,6 +891,7 @@
 
         function updateStats(data) {
             document.getElementById('stat-total').innerText = data.length;
+            document.getElementById('tab-users-count').innerText = data.length;
             document.getElementById('stat-active').innerText = data.filter(u => u.status === 'Active').length;
             document.getElementById('stat-inactive').innerText = data.filter(u => u.status === 'Inactive').length;
         }
@@ -1000,22 +1061,21 @@
             const idVal = document.getElementById('userId').value;
             const rawPassword = document.getElementById('formRawPassword').value;
 
+            const existingUser = idVal ? usersData.find(u => u.id === parseInt(idVal)) : null;
             let finalPasswordHash = "$2b$10$Mhg7uk2abtNcK8/yqU1ZFOzT7mPAdzbjK9zPJMX18cF/yalhrIpSa";
-            if (idVal) {
-                const existingUser = usersData.find(u => u.id === parseInt(idVal));
-                if (existingUser) finalPasswordHash = existingUser.passwordHash;
-            }
+            if (existingUser) finalPasswordHash = existingUser.passwordHash;
             if (rawPassword.trim() !== '') {
                 finalPasswordHash = `$2b$10$${btoa(rawPassword).substring(0, 10)}...HASHED...${rawPassword.length}`;
             }
 
             const userData = {
+                ...(existingUser || {}),
                 id: idVal ? parseInt(idVal) : (usersData.length ? Math.max(...usersData.map(u => u.id)) + 1 : 1),
                 username: document.getElementById('formUsername').value.trim(),
                 passwordHash: finalPasswordHash,
                 role: document.getElementById('formRole').value,
                 permission: document.getElementById('formPermission').value,
-                avatarLink: "",
+                avatarLink: existingUser ? (existingUser.avatarLink || "") : "",
                 fullName: document.getElementById('formFullName').value.trim(),
                 phone: document.getElementById('formPhone').value.trim(),
                 position: document.getElementById('formPosition').value.trim(),
