@@ -119,7 +119,7 @@
     <div id="admin-workspace" class="hidden flex-1 flex flex-col justify-between">
         <div>
             <!-- HEADER ADMIN -->
-            <header class="flex flex-wrap items-center justify-between gap-4 mb-6 md:mb-8">
+            <header class="flex flex-wrap items-center justify-between gap-4 mb-4 md:mb-8">
                 <div class="flex items-center gap-3">
                     <div
                         class="w-10 h-10 rounded-xl bg-purple-600/20 border border-purple-500/30 text-purple-400 flex items-center justify-center text-xl shrink-0">
@@ -149,124 +149,131 @@
                 </div>
             </header>
 
-            <!-- THỐNG KÊ TỔNG QUAN -->
-            <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6 md:mb-8">
-                <div class="glass-card p-4 sm:p-5 rounded-2xl flex items-center justify-between">
-                    <div>
+            <!-- 7 Ô GOM CHUNG TRÊN 1 HÀNG MÁY TÍNH (4 Thống kê + 3 Điều hướng trực tiếp) -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-7 gap-3 sm:gap-4 mb-4 md:mb-8">
+                <!-- 1. Tổng tài khoản -->
+                <div class="glass-card p-3 sm:p-5 rounded-2xl flex items-center justify-between">
+                    <div class="flex lg:hidden items-center justify-between w-full">
+                        <span class="text-xs font-semibold text-slate-400 uppercase">TỔNG TÀI KHOẢN</span>
+                        <div class="flex items-center gap-3">
+                            <span id="stat-total-mob" class="text-lg font-black text-white">0</span>
+                            <div class="text-blue-400 text-xl"><i class="fa-solid fa-users"></i></div>
+                        </div>
+                    </div>
+                    <div class="hidden lg:block">
                         <p class="text-[10px] sm:text-xs font-semibold text-slate-400 uppercase">TỔNG TÀI KHOẢN</p>
                         <p id="stat-total" class="text-xl sm:text-2xl font-black text-white mt-1">0</p>
                     </div>
-                    <div class="text-blue-400 text-xl sm:text-2xl"><i class="fa-solid fa-users"></i></div>
+                    <div class="hidden lg:block text-blue-400 text-xl sm:text-2xl"><i class="fa-solid fa-users"></i></div>
                 </div>
-                <div class="glass-card p-4 sm:p-5 rounded-2xl flex items-center justify-between">
-                    <div>
+
+                <!-- 2. Hoạt động -->
+                <div class="glass-card p-3 sm:p-5 rounded-2xl flex items-center justify-between">
+                    <div class="flex lg:hidden items-center justify-between w-full">
+                        <span class="text-xs font-semibold text-slate-400 uppercase">HOẠT ĐỘNG (ACTIVE)</span>
+                        <div class="flex items-center gap-3">
+                            <span id="stat-active-mob" class="text-lg font-black text-emerald-400">0</span>
+                            <div class="text-emerald-400 text-xl"><i class="fa-solid fa-user-check"></i></div>
+                        </div>
+                    </div>
+                    <div class="hidden lg:block">
                         <p class="text-[10px] sm:text-xs font-semibold text-slate-400 uppercase">HOẠT ĐỘNG (ACTIVE)</p>
                         <p id="stat-active" class="text-xl sm:text-2xl font-black text-emerald-400 mt-1">0</p>
                     </div>
-                    <div class="text-emerald-400 text-xl sm:text-2xl"><i class="fa-solid fa-user-check"></i></div>
+                    <div class="hidden lg:block text-emerald-400 text-xl sm:text-2xl"><i class="fa-solid fa-user-check"></i></div>
                 </div>
-                <div class="glass-card p-4 sm:p-5 rounded-2xl flex items-center justify-between">
-                    <div>
+
+                <!-- 3. Khóa -->
+                <div class="glass-card p-3 sm:p-5 rounded-2xl flex items-center justify-between">
+                    <div class="flex lg:hidden items-center justify-between w-full">
+                        <span class="text-xs font-semibold text-slate-400 uppercase">KHÓA (INACTIVE)</span>
+                        <div class="flex items-center gap-3">
+                            <span id="stat-inactive-mob" class="text-lg font-black text-amber-400">0</span>
+                            <div class="text-amber-400 text-xl"><i class="fa-solid fa-user-slash"></i></div>
+                        </div>
+                    </div>
+                    <div class="hidden lg:block">
                         <p class="text-[10px] sm:text-xs font-semibold text-slate-400 uppercase">KHÓA (INACTIVE)</p>
                         <p id="stat-inactive" class="text-xl sm:text-2xl font-black text-amber-400 mt-1">0</p>
                     </div>
-                    <div class="text-amber-400 text-xl sm:text-2xl"><i class="fa-solid fa-user-slash"></i></div>
+                    <div class="hidden lg:block text-amber-400 text-xl sm:text-2xl"><i class="fa-solid fa-user-slash"></i></div>
                 </div>
-                <div class="glass-card p-4 sm:p-5 rounded-2xl flex items-center justify-between">
-                    <div>
+
+                <!-- 4. Hệ thống GitHub -->
+                <div class="glass-card p-3 sm:p-5 rounded-2xl flex items-center justify-between">
+                    <div class="flex lg:hidden items-center justify-between w-full">
+                        <span class="text-xs font-semibold text-slate-400 uppercase">HỆ THỐNG GITHUB</span>
+                        <div class="flex items-center gap-2">
+                            <span class="text-[11px] font-bold text-emerald-400 flex items-center gap-1">
+                                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> API CONNECTED
+                            </span>
+                            <div class="text-emerald-400 text-xl"><i class="fa-solid fa-cloud"></i></div>
+                        </div>
+                    </div>
+                    <div class="hidden lg:block">
                         <p class="text-[10px] sm:text-xs font-semibold text-slate-400 uppercase">HỆ THỐNG GITHUB</p>
                         <p class="text-[11px] sm:text-xs font-bold text-emerald-400 mt-2 flex items-center gap-1.5">
                             <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> API CONNECTED
                         </p>
                     </div>
-                    <div class="text-emerald-400 text-xl sm:text-2xl"><i class="fa-solid fa-cloud"></i></div>
+                    <div class="hidden lg:block text-emerald-400 text-xl sm:text-2xl"><i class="fa-solid fa-cloud"></i></div>
                 </div>
+
+                <!-- 5. CRM Khách Hàng -->
+                <a href="../content/partner/index.html"
+                    class="workspace-card p-3 sm:p-5 rounded-2xl flex items-center justify-between group">
+                    <div class="flex items-center gap-3">
+                        <div
+                            class="w-9 h-9 rounded-xl bg-orange-500/10 border border-orange-500/30 text-orange-400 flex items-center justify-center text-base shrink-0">
+                            <i class="fa-solid fa-handshake"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-xs sm:text-sm text-white group-hover:text-orange-300 transition-colors">
+                                CRM Khách Hàng</h3>
+                            <p class="text-[10px] text-slate-400 font-mono mt-0.5">partner/index.html</p>
+                        </div>
+                    </div>
+                    <i class="fa-solid fa-arrow-right text-xs text-slate-500 group-hover:text-orange-400 group-hover:translate-x-1 transition-all"></i>
+                </a>
+
+                <!-- 6. Quản Lý Nội Bộ -->
+                <a href="../content/internal/index.html"
+                    class="workspace-card p-3 sm:p-5 rounded-2xl flex items-center justify-between group">
+                    <div class="flex items-center gap-3">
+                        <div
+                            class="w-9 h-9 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 flex items-center justify-center text-base shrink-0">
+                            <i class="fa-solid fa-folder-closed"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-xs sm:text-sm text-white group-hover:text-emerald-300 transition-colors">
+                                Quản Lý Nội Bộ</h3>
+                            <p class="text-[10px] text-slate-400 font-mono mt-0.5">internal/index.html</p>
+                        </div>
+                    </div>
+                    <i class="fa-solid fa-arrow-right text-xs text-slate-500 group-hover:text-emerald-400 group-hover:translate-x-1 transition-all"></i>
+                </a>
+
+                <!-- 7. BIM - VDC CDE -->
+                <a href="../content/bim-vdc/index.html"
+                    class="workspace-card p-3 sm:p-5 rounded-2xl flex items-center justify-between group">
+                    <div class="flex items-center gap-3">
+                        <div
+                            class="w-9 h-9 rounded-xl bg-blue-500/10 border border-blue-500/30 text-blue-400 flex items-center justify-center text-base shrink-0">
+                            <i class="fa-solid fa-cubes"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-xs sm:text-sm text-white group-hover:text-blue-300 transition-colors">
+                                BIM - VDC CDE</h3>
+                            <p class="text-[10px] text-slate-400 font-mono mt-0.5">bim-vdc/index.html</p>
+                        </div>
+                    </div>
+                    <i class="fa-solid fa-arrow-right text-xs text-slate-500 group-hover:text-blue-400 group-hover:translate-x-1 transition-all"></i>
+                </a>
             </div>
 
-            <!-- THƯ MỤC 1: ĐIỀU HƯỚNG TRỰC TIẾP -->
-            <div class="glass-card p-4 sm:p-6 rounded-3xl mb-6 md:mb-8">
-                <h2 class="text-xs font-bold text-slate-300 uppercase tracking-widest flex items-center gap-2 mb-4">
-                    <i class="fa-solid fa-compass text-blue-400"></i> ĐIỀU HƯỚNG TRỰC TIẾP WORKSPACE
-                </h2>
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-                    <a href="../content/partner/index.html"
-                        class="workspace-card p-3.5 sm:p-4 rounded-2xl flex items-center justify-between group">
-                        <div class="flex items-center gap-3">
-                            <div
-                                class="w-9 h-9 rounded-xl bg-orange-500/10 border border-orange-500/30 text-orange-400 flex items-center justify-center text-base shrink-0">
-                                <i class="fa-solid fa-handshake"></i>
-                            </div>
-                            <div>
-                                <h3
-                                    class="font-bold text-xs sm:text-sm text-white group-hover:text-orange-300 transition-colors">
-                                    CRM Khách Hàng</h3>
-                                <p class="text-[10px] text-slate-400 font-mono mt-0.5">content/partner/index.html</p>
-                            </div>
-                        </div>
-                        <i
-                            class="fa-solid fa-arrow-right text-xs text-slate-500 group-hover:text-orange-400 group-hover:translate-x-1 transition-all"></i>
-                    </a>
-
-                    <a href="../content/internal/index.html"
-                        class="workspace-card p-3.5 sm:p-4 rounded-2xl flex items-center justify-between group">
-                        <div class="flex items-center gap-3">
-                            <div
-                                class="w-9 h-9 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 flex items-center justify-center text-base shrink-0">
-                                <i class="fa-solid fa-folder-closed"></i>
-                            </div>
-                            <div>
-                                <h3
-                                    class="font-bold text-xs sm:text-sm text-white group-hover:text-emerald-300 transition-colors">
-                                    Quản Lý Nội Bộ</h3>
-                                <p class="text-[10px] text-slate-400 font-mono mt-0.5">content/internal/index.html</p>
-                            </div>
-                        </div>
-                        <i
-                            class="fa-solid fa-arrow-right text-xs text-slate-500 group-hover:text-emerald-400 group-hover:translate-x-1 transition-all"></i>
-                    </a>
-
-                    <a href="../content/bim-vdc/index.html"
-                        class="workspace-card p-3.5 sm:p-4 rounded-2xl flex items-center justify-between group">
-                        <div class="flex items-center gap-3">
-                            <div
-                                class="w-9 h-9 rounded-xl bg-blue-500/10 border border-blue-500/30 text-blue-400 flex items-center justify-center text-base shrink-0">
-                                <i class="fa-solid fa-cubes"></i>
-                            </div>
-                            <div>
-                                <h3
-                                    class="font-bold text-xs sm:text-sm text-white group-hover:text-blue-300 transition-colors">
-                                    BIM - VDC CDE</h3>
-                                <p class="text-[10px] text-slate-400 font-mono mt-0.5">content/bim-vdc/index.html</p>
-                            </div>
-                        </div>
-                        <i
-                            class="fa-solid fa-arrow-right text-xs text-slate-500 group-hover:text-blue-400 group-hover:translate-x-1 transition-all"></i>
-                    </a>
-
-                    <!-- QUẢN TRỊ THÔNG BÁO -->
-                    <a href="../content/cms/index.html"
-                        class="workspace-card p-3.5 sm:p-4 rounded-2xl flex items-center justify-between group">
-                        <div class="flex items-center gap-3">
-                            <div
-                                class="w-9 h-9 rounded-xl bg-purple-500/10 border border-purple-500/30 text-purple-400 flex items-center justify-center text-base shrink-0">
-                                <i class="fa-solid fa-bullhorn"></i>
-                            </div>
-                            <div>
-                                <h3
-                                    class="font-bold text-xs sm:text-sm text-white group-hover:text-purple-300 transition-colors">
-                                    Quản Trị Thông Báo</h3>
-                                <p class="text-[10px] text-slate-400 font-mono mt-0.5">content/cms/index.html</p>
-                            </div>
-                        </div>
-                        <i
-                            class="fa-solid fa-arrow-right text-xs text-slate-500 group-hover:text-purple-400 group-hover:translate-x-1 transition-all"></i>
-                    </a>
-                </div>
-            </div>
-
-            <!-- TAB USERS: XUẤT users.json -->
+            <!-- THANH ĐIỀU HƯỚNG TAB & NÚT XUẤT JSON Ở VỊ TRÍ CŨ -->
             <div class="flex flex-wrap items-center justify-between gap-3 mb-4 border-b border-white/10" role="tablist">
-                <div class="flex items-center gap-1">
+                <div class="flex items-center gap-2">
                     <button type="button" id="tab-btn-users" role="tab" data-tab="users" aria-selected="true"
                         aria-controls="tab-panel-users" onclick="switchTab('users')"
                         class="tab-btn px-4 py-2.5 text-xs font-bold uppercase tracking-widest flex items-center gap-2 -mb-px">
@@ -274,7 +281,13 @@
                         <span id="tab-users-count"
                             class="text-[10px] bg-purple-500/20 text-purple-300 px-1.5 py-0.5 rounded border border-purple-500/30">0</span>
                     </button>
+
+                    <a href="../content/cms/index.html"
+                        class="tab-btn px-4 py-2.5 text-xs font-bold uppercase tracking-widest flex items-center gap-2 -mb-px text-slate-400 hover:text-purple-300 transition-colors">
+                        <i class="fa-solid fa-bullhorn text-purple-400"></i> Quản Trị Thông Báo
+                    </a>
                 </div>
+
                 <button type="button" id="btn-export-users-json" onclick="exportUsersJson()"
                     class="mb-2 px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-amber-400 border border-slate-700 font-bold text-xs rounded-xl transition-all flex items-center gap-1.5 shadow">
                     <i class="fa-solid fa-file-arrow-down"></i> Xuất users.json
@@ -287,7 +300,6 @@
                 <div class="flex flex-col gap-4 mb-6">
                     <div class="flex flex-wrap items-center justify-between gap-4">
                         <div>
-                            <!-- Ô MÀU ĐỎ TRÊN ẢNH: ĐÃ ẨN ĐƯỜNG DẪN VÀ MÔ TẢ PHỤ TRÊN MOBILE -->
                             <h2 class="text-sm font-bold text-white flex items-center gap-2">
                                 <i class="fa-solid fa-database text-yellow-400"></i> Danh Sách Tài Khoản <span
                                     id="users-path-label"
@@ -297,23 +309,24 @@
                                 Vai trò, Công ty, Trạng thái & Sắp xếp</p>
                         </div>
 
-                        <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
+                        <!-- 3 NÚT ĐƯỢC CHỈNH KÍCH THƯỚC BẰNG NHAU TRÊN MOBILE (grid grid-cols-3) -->
+                        <div class="grid grid-cols-3 gap-1.5 sm:flex sm:items-center sm:gap-2 w-full sm:w-auto justify-end">
                             <button id="btn-sync-github"
-                                class="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-blue-400 border border-slate-700 font-bold text-xs rounded-xl transition-all flex items-center gap-1.5 shadow">
-                                <i class="fa-solid fa-arrows-rotate"></i> Tải dữ liệu
+                                class="w-full sm:w-auto justify-center px-2 sm:px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-blue-400 border border-slate-700 font-bold text-[11px] sm:text-xs rounded-xl transition-all flex items-center gap-1 shadow truncate">
+                                <i class="fa-solid fa-arrows-rotate shrink-0"></i> <span class="truncate">Tải dữ liệu</span>
                             </button>
                             <button id="btn-publish-github"
-                                class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow-lg transition-all flex items-center gap-1.5 shadow">
-                                <i class="fa-solid fa-cloud-arrow-up"></i> Xuất bản GitHub
+                                class="w-full sm:w-auto justify-center px-2 sm:px-3.5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-[11px] sm:text-xs rounded-xl shadow-lg transition-all flex items-center gap-1 shadow truncate">
+                                <i class="fa-solid fa-cloud-arrow-up shrink-0"></i> <span class="truncate">Xuất bản</span>
                             </button>
                             <button onclick="openAddModal()"
-                                class="px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold text-xs rounded-xl shadow-lg transition-all flex items-center gap-2">
-                                <i class="fa-solid fa-plus"></i> Thêm
+                                class="w-full sm:w-auto justify-center px-2 sm:px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold text-[11px] sm:text-xs rounded-xl shadow-lg transition-all flex items-center gap-1 shadow truncate">
+                                <i class="fa-solid fa-plus shrink-0"></i> <span class="truncate">Thêm</span>
                             </button>
                         </div>
                     </div>
 
-                    <!-- THANH BỘ LỌC VÀ SẮP XẾP -->
+                    <!-- THANH BỘ LỌC VÀ SẮP XẾP (6 Ô) -->
                     <div
                         class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2.5 pt-2 border-t border-white/10">
                         <select id="sortSelect" onchange="applyFiltersAndSort()"
@@ -348,7 +361,6 @@
                                 onkeyup="applyFiltersAndSort()"
                                 class="w-full bg-slate-900 border border-slate-700 text-xs pl-8 pr-3 py-2.5 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-purple-400">
                         </div>
-
                     </div>
                 </div>
 
@@ -501,18 +513,16 @@
         let usersData = [];
 
         // ===== TRẠNG THÁI ĐỒNG BỘ users.json VỚI GITHUB =====
-        // users.json nằm tại: https://github.com/pvincons/backend/tree/main/assets/data
         const USERS_FILE_PATH = 'assets/data/users.json';
         const GITHUB_BRANCH = 'main';
-        const USERS_PATH_KEY = 'pv_users_json_path'; // khóa cũ (đường dẫn tự dò) - chỉ dùng để dọn dẹp
+        const USERS_PATH_KEY = 'pv_users_json_path'; 
         localStorage.removeItem(USERS_PATH_KEY);
 
-        // Thứ tự trường & cấu trúc chuẩn của mỗi tài khoản trong users.json
         const USER_FIELDS = ['id', 'username', 'passwordHash', 'role', 'permission', 'avatarLink', 'fullName', 'phone', 'position', 'discipline', 'projects', 'company', 'status'];
 
         let usersFilePath = USERS_FILE_PATH;
-        let usersFileExists = null;          // null: chưa biết | true: có | false: repo chưa có file
-        let usersLoadedFromGitHub = false;   // true khi dữ liệu đang hiển thị lấy thật từ GitHub
+        let usersFileExists = null;          
+        let usersLoadedFromGitHub = false;   
         let isLoadingUsers = false;
 
         const SAMPLE_USERS = [
@@ -532,7 +542,6 @@
                 "status": "Active"
             }
         ];
-
 
         function loadAuth() {
             try {
@@ -554,7 +563,6 @@
             const container = document.getElementById('toast-container');
             if (!container) return;
 
-            // Toast trùng nội dung đang hiển thị thì thay thế, không xếp chồng
             const key = `${type}|${message}`;
             Array.from(container.children).forEach(t => { if (t.dataset.key === key) t.remove(); });
             while (container.children.length >= 4) container.firstElementChild.remove();
@@ -572,7 +580,7 @@
             const icon = document.createElement('i');
             icon.className = `fa-solid ${iconClass} shrink-0 text-sm`;
             const span = document.createElement('span');
-            span.textContent = message; // textContent: thông báo lỗi từ GitHub không được chèn thành HTML
+            span.textContent = message; 
             toast.append(icon, span);
             container.appendChild(toast);
             setTimeout(() => { toast.remove(); }, isError ? 7000 : 4500);
@@ -593,7 +601,6 @@
             loadUsersFromGitHub();
         }
 
-        // ĐÃ KHẮC PHỤC: Sử dụng chuẩn Bearer để tương thích tốt với mọi loại PAT và bắt lỗi mạng local
         document.getElementById('btn-login').addEventListener('click', async () => {
             const owner = document.getElementById('auth-owner').value.trim();
             const repo = document.getElementById('auth-repo').value.trim();
@@ -655,7 +662,6 @@
             location.reload();
         });
 
-        // ===== ĐỒNG BỘ users.json VỚI GITHUB =====
         function ghHeaders(accept) {
             return { 'Authorization': `Bearer ${authConfig.token}`, 'Accept': accept || 'application/vnd.github.v3+json' };
         }
@@ -666,7 +672,6 @@
             return withRef ? `${base}?ref=${encodeURIComponent(GITHUB_BRANCH)}` : base;
         }
 
-        // Đổi phản hồi lỗi của GitHub thành thông báo tiếng Việt, nêu rõ nguyên nhân
         async function describeGitHubError(res) {
             let detail = '';
             try { detail = (await res.json()).message || ''; } catch (e) { }
@@ -679,12 +684,10 @@
             return `GitHub trả về lỗi HTTP ${res.status}` + (detail ? `: ${detail}` : '');
         }
 
-        // Chỉ dùng 2 trạng thái: Active / Inactive ("Đang triển khai" cũ được chuyển thành Active)
         function normalizeStatus(st) {
             return (st === 'Active' || st === 'Đang triển khai') ? 'Active' : 'Inactive';
         }
 
-        // ===== MÃ HÓA MẬT KHẨU: bcrypt thật, cùng cấu trúc "$2b$10$" + 53 ký tự như file cũ =====
         const BCRYPT_RE = /^\$2[aby]\$\d{2}\$[./A-Za-z0-9]{53}$/;
 
         function getBcrypt() {
@@ -693,11 +696,17 @@
 
         function hashPassword(raw) {
             const bc = getBcrypt();
-            // bcryptjs sinh tiền tố $2a$ -> đổi sang $2b$ cho giống hash của backend (thuật toán tương thích)
-            return bc.hashSync(raw, bc.genSaltSync(10)).replace(/^\$2a\$/, () => '$2b$');
+            return new Promise((resolve, reject) => {
+                bc.genSalt(10, (e1, salt) => {
+                    if (e1) return reject(e1);
+                    bc.hash(raw, salt, (e2, hash) => {
+                        if (e2) return reject(e2);
+                        resolve(hash.replace(/^\$2a\$/, () => '$2b$'));
+                    });
+                });
+            });
         }
 
-        // Dựng mảng tài khoản đúng cấu trúc users.json (đủ trường, đúng thứ tự, không có trường nội bộ)
         function serializeUsers() {
             return usersData.map(u => {
                 const o = {};
@@ -706,13 +715,11 @@
                     else if (k === 'status') o.status = normalizeStatus(u.status);
                     else o[k] = (u[k] === undefined || u[k] === null) ? '' : u[k];
                 });
-                // giữ lại các trường lạ (nếu repo có thêm) để không bị mất dữ liệu khi xuất
                 Object.keys(u).forEach(k => { if (!(k in o) && !k.startsWith('_')) o[k] = u[k]; });
                 return o;
             });
         }
 
-        // Tải về file users.json (đúng cấu trúc, thụt lề 2 khoảng trắng)
         function exportUsersJson() {
             if (!usersData.length || (!usersLoadedFromGitHub && usersFileExists !== false)) {
                 showToast('Chưa có dữ liệu users.json từ GitHub để xuất. Hãy bấm "Tải dữ liệu" đến khi thành công.', 'error');
@@ -743,16 +750,14 @@
             if (b) b.textContent = text;
         }
 
-        // Lấy users.json tại đường dẫn cố định assets/data/users.json (nhánh main)
         async function findUsersFile() {
             const res = await fetch(ghContentsUrl(USERS_FILE_PATH), { headers: ghHeaders(), cache: 'no-store' });
             if (res.ok) return { path: USERS_FILE_PATH, data: await res.json() };
-            if (res.status !== 404) throw new Error(await describeGitHubError(res)); // 401/403... không phải do sai đường dẫn
+            if (res.status !== 404) throw new Error(await describeGitHubError(res));
             return null;
         }
 
         async function readFileContent(found) {
-            // File lớn hơn 1MB thì GitHub không trả nội dung base64, phải lấy bản raw
             if (found.data.content && found.data.encoding === 'base64') return b64_to_utf8(found.data.content);
             const res = await fetch(ghContentsUrl(found.path), { headers: ghHeaders('application/vnd.github.raw+json'), cache: 'no-store' });
             if (!res.ok) throw new Error(await describeGitHubError(res));
@@ -801,7 +806,6 @@
                     ? 'Không kết nối được tới GitHub (mất mạng hoặc bị chặn). Kiểm tra kết nối rồi bấm Tải dữ liệu lại.'
                     : err.message;
                 showToast(`Không tải được users.json: ${msg}`, 'error');
-                // Giữ nguyên dữ liệu đang có; chỉ dùng dữ liệu mẫu khi chưa có gì để hiển thị
                 if (!usersData.length) usersData = JSON.parse(JSON.stringify(SAMPLE_USERS));
             } finally {
                 isLoadingUsers = false;
@@ -816,7 +820,6 @@
         document.getElementById('btn-publish-github').addEventListener('click', async () => {
             if (!authConfig) return;
 
-            // Chặn ghi đè nhầm: dữ liệu mẫu (do tải lỗi) không được phép đẩy lên GitHub
             if (!usersLoadedFromGitHub && usersFileExists !== false) {
                 showToast('Chưa đồng bộ được users.json từ GitHub nên không thể xuất bản (tránh ghi đè bằng dữ liệu mẫu). Hãy bấm "Tải dữ liệu" đến khi thành công.', 'error');
                 return;
@@ -908,10 +911,19 @@
         }
 
         function updateStats(data) {
-            document.getElementById('stat-total').innerText = data.length;
-            document.getElementById('tab-users-count').innerText = data.length;
-            document.getElementById('stat-active').innerText = data.filter(u => u.status === 'Active').length;
-            document.getElementById('stat-inactive').innerText = data.filter(u => u.status === 'Inactive').length;
+            const total = data.length;
+            const active = data.filter(u => u.status === 'Active').length;
+            const inactive = data.filter(u => u.status === 'Inactive').length;
+
+            document.getElementById('stat-total').innerText = total;
+            document.getElementById('stat-total-mob').innerText = total;
+            document.getElementById('tab-users-count').innerText = total;
+
+            document.getElementById('stat-active').innerText = active;
+            document.getElementById('stat-active-mob').innerText = active;
+
+            document.getElementById('stat-inactive').innerText = inactive;
+            document.getElementById('stat-inactive-mob').innerText = inactive;
         }
 
         function renderUI(data) {
@@ -1074,50 +1086,82 @@
             document.getElementById('userModal').classList.add('hidden');
         }
 
-        function saveUser(event) {
-            event.preventDefault();
-            const idVal = document.getElementById('userId').value;
-            const rawPassword = document.getElementById('formRawPassword').value;
+        let isSavingUser = false;
 
-            const existingUser = idVal ? usersData.find(u => u.id === parseInt(idVal)) : null;
-            let finalPasswordHash = "$2b$10$Mhg7uk2abtNcK8/yqU1ZFOzT7mPAdzbjK9zPJMX18cF/yalhrIpSa";
-            if (existingUser) finalPasswordHash = existingUser.passwordHash;
-            if (rawPassword.trim() !== '') {
-                if (!getBcrypt()) {
-                    showToast('Chưa tải được thư viện mã hóa bcrypt (cần kết nối internet). Chưa thể đổi mật khẩu, hãy tải lại trang rồi thử lại.', 'error');
+        async function saveUser(event) {
+            event.preventDefault();
+            if (isSavingUser) return; 
+            isSavingUser = true;
+
+            const btnSave = document.querySelector('#userForm button[type="submit"]');
+            const oldBtnHtml = btnSave.innerHTML;
+            btnSave.disabled = true;
+
+            try {
+                const idVal = document.getElementById('userId').value;
+                const rawPassword = document.getElementById('formRawPassword').value;
+                const username = document.getElementById('formUsername').value.trim();
+                const existingUser = idVal ? usersData.find(u => u.id === parseInt(idVal)) : null;
+
+                if (idVal && !existingUser) {
+                    showToast('Không tìm thấy tài khoản cần cập nhật. Hãy tải lại dữ liệu rồi thử lại.', 'error');
                     return;
                 }
-                finalPasswordHash = hashPassword(rawPassword);
+
+                const duplicate = usersData.find(u => (u.username || '').toLowerCase() === username.toLowerCase() && String(u.id) !== String(idVal));
+                if (duplicate) {
+                    showToast(`Username "${username}" đã tồn tại (ID #${duplicate.id}). Để đổi mật khẩu hãy bấm nút Sửa ở tài khoản đó.`, 'error');
+                    return;
+                }
+
+                let finalPasswordHash = "$2b$10$Mhg7uk2abtNcK8/yqU1ZFOzT7mPAdzbjK9zPJMX18cF/yalhrIpSa";
+                if (existingUser) finalPasswordHash = existingUser.passwordHash;
+                if (rawPassword.trim() !== '') {
+                    if (!getBcrypt()) {
+                        showToast('Chưa tải được thư viện mã hóa bcrypt (cần kết nối internet). Chưa thể đổi mật khẩu, hãy tải lại trang rồi thử lại.', 'error');
+                        return;
+                    }
+                    btnSave.innerHTML = `<i class="fa-solid fa-arrows-rotate fa-spin text-xs"></i> Đang mã hóa...`;
+                    finalPasswordHash = await hashPassword(rawPassword);
+                }
+
+                const userData = {
+                    ...(existingUser || {}),
+                    id: existingUser ? existingUser.id : (usersData.length ? Math.max(...usersData.map(u => u.id)) + 1 : 1),
+                    username: username,
+                    passwordHash: finalPasswordHash,
+                    role: document.getElementById('formRole').value,
+                    permission: document.getElementById('formPermission').value,
+                    avatarLink: existingUser ? (existingUser.avatarLink || "") : "",
+                    fullName: document.getElementById('formFullName').value.trim(),
+                    phone: document.getElementById('formPhone').value.trim(),
+                    position: document.getElementById('formPosition').value.trim(),
+                    discipline: document.getElementById('formDiscipline').value.trim(),
+                    projects: document.getElementById('formProjects').value.trim(),
+                    company: document.getElementById('formCompany').value.trim(),
+                    status: document.getElementById('formStatus').value
+                };
+
+                if (existingUser) {
+                    const index = usersData.findIndex(u => u.id === existingUser.id);
+                    if (index !== -1) usersData[index] = userData;
+                    else usersData.push(userData);
+                } else {
+                    usersData.push(userData);
+                }
+
+                populateFilterDropdowns();
+                applyFiltersAndSort();
+                closeModal();
+                showToast('Đã lưu thay đổi vào bộ nhớ tạm. Hãy nhấn "Xuất bản GitHub" để đồng bộ lên repo!');
+            } catch (err) {
+                console.error(err);
+                showToast(`Lưu thất bại: ${err && err.message ? err.message : err}`, 'error');
+            } finally {
+                isSavingUser = false;
+                btnSave.disabled = false;
+                btnSave.innerHTML = oldBtnHtml;
             }
-
-            const userData = {
-                ...(existingUser || {}),
-                id: idVal ? parseInt(idVal) : (usersData.length ? Math.max(...usersData.map(u => u.id)) + 1 : 1),
-                username: document.getElementById('formUsername').value.trim(),
-                passwordHash: finalPasswordHash,
-                role: document.getElementById('formRole').value,
-                permission: document.getElementById('formPermission').value,
-                avatarLink: existingUser ? (existingUser.avatarLink || "") : "",
-                fullName: document.getElementById('formFullName').value.trim(),
-                phone: document.getElementById('formPhone').value.trim(),
-                position: document.getElementById('formPosition').value.trim(),
-                discipline: document.getElementById('formDiscipline').value.trim(),
-                projects: document.getElementById('formProjects').value.trim(),
-                company: document.getElementById('formCompany').value.trim(),
-                status: document.getElementById('formStatus').value
-            };
-
-            if (idVal) {
-                const index = usersData.findIndex(u => u.id === parseInt(idVal));
-                if (index !== -1) usersData[index] = userData;
-            } else {
-                usersData.push(userData);
-            }
-
-            populateFilterDropdowns();
-            applyFiltersAndSort();
-            closeModal();
-            showToast('Đã lưu thay đổi vào bộ nhớ tạm. Hãy nhấn "Xuất bản GitHub" để đồng bộ lên repo!');
         }
 
         function deleteUser(id) {
