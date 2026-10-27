@@ -22,6 +22,61 @@
 
     <!-- Custom Style Sheet -->
     <link rel="stylesheet" href="style.css">
+    <style>
+        /* Thu hồi file */
+        .badge-recalled {
+            display: inline-flex; align-items: center; gap: 4px; cursor: help;
+            background: rgba(245, 158, 11, 0.15); color: #f59e0b;
+            border: 1px solid rgba(245, 158, 11, 0.45);
+            padding: 2px 7px; border-radius: 4px; font-size: 0.62rem; font-weight: 700;
+            white-space: nowrap;
+        }
+        tr.is-recalled .file-code { text-decoration: line-through; opacity: 0.6; }
+        tr.is-recalled td:not(.action-btns) { opacity: 0.7; }
+        .dropdown-content button.recall-item { color: #f59e0b; }
+
+        /* Nút bộ lọc ẩn/hiện tệp thu hồi */
+        .btn-filter-toggle {
+            height: 32px;
+            width: 34px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-card);
+            color: var(--text-heading);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .btn-filter-toggle:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        .btn-filter-toggle.active {
+            background: rgba(245, 158, 11, 0.15);
+            color: #f59e0b;
+            border-color: rgba(245, 158, 11, 0.5);
+        }
+
+        /* Đồng bộ kích thước các ô thao tác */
+        td.action-btns .btn-open-file,
+        td.action-btns .btn-icon,
+        td.action-btns .badge-issue,
+        td.action-btns .badge-recalled {
+            box-sizing: border-box;
+            height: 26px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+            vertical-align: middle;
+        }
+        td.action-btns .btn-open-file { min-width: 38px; padding: 0 10px; }
+        td.action-btns .gate-btn { min-width: 64px; padding: 0 10px; gap: 5px; }
+        td.action-btns .icon-only { width: 30px; min-width: 30px; padding: 0; }
+        td.action-btns .dropdown { display: inline-flex; vertical-align: middle; }
+    </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -225,6 +280,13 @@
 
                         <div class="toolbar-right-group">
                             <div class="filters-wrapper">
+                                <!-- NÚT BỘ LỌC ẨN/HIỆN FILE THU HỒI -->
+                                <button class="btn-filter-toggle" id="toggleRecallFilterBtn" onclick="toggleHideRecalledFiles()" title="Bật/Tắt ẩn các file đã bị thu hồi">
+                                    <svg class="svg-icon-sm" id="recallFilterIcon" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+                                    </svg>
+                                </button>
+
                                 <select class="select-filter" id="stateFilter" onchange="applyFilters()">
                                     <option value="ALL">Tất cả Containers</option>
                                     <option value="01_WIP">01_WIP</option>
@@ -497,7 +559,7 @@
                         <path
                             d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z" />
                     </svg>
-                    Document & Model Viewer
+                    Chi tiết tài liệu
                 </div>
                 <div class="close-btn" onclick="closeModal('viewModal')">✕</div>
             </div>
@@ -508,7 +570,7 @@
                     style="margin-top: 5px; background: var(--bg-input); padding: 7px; border-radius: 6px; border: 1px solid var(--border-color);">
                     <div
                         style="font-size: 0.62rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; margin-bottom: 2px;">
-                        ĐƯỜNG DẪN KHO CDE:</div>
+                        ĐƯỜNG DẪN DỮ LIỆU CDE:</div>
                     <span id="viewFilePath"
                         style="font-family: 'Consolas', monospace; color: var(--primary); word-break: break-all; font-weight: 550; font-size: 0.72rem;">...</span>
                 </div>
@@ -527,8 +589,10 @@
                 </div>
 
                 <div style="margin-top: 12px; display: flex; justify-content: space-between; align-items: center;">
+                    <button class="btn btn-outline" id="viewOpen3dBtn" style="display:none;"
+                        onclick="open3DViewer(document.getElementById('viewFilePath').innerText)">Xem 3D</button>
                     <button class="btn btn-outline" onclick="copyViewPath()">Copy Path</button>
-                    <button class="btn btn-primary" onclick="closeModal('viewModal')">Đóng Viewer</button>
+                    <button class="btn btn-primary" onclick="closeModal('viewModal')">Đóng</button>
                 </div>
             </div>
         </div>
@@ -577,8 +641,8 @@
                     style="margin-top: 8px; display: flex; align-items: center; gap: 6px; font-size: 0.72rem; color: var(--text-heading);">
                     <input type="checkbox" id="gateSyncToIssue" checked
                         style="cursor: pointer; accent-color: var(--primary);">
-                    <label for="gateSyncToIssue" style="cursor: pointer; font-weight: 500;">Tự động tạo Issue / QA-QC từ
-                        ghi chú này</label>
+                    <label for="gateSyncToIssue" style="cursor: pointer; font-weight: 500;">Thêm ghi chú này vào Issue /
+                        QA-QC của file</label>
                 </div>
 
                 <div style="margin-top: 12px; text-align: right; display: flex; justify-content: flex-end; gap: 6px;">
@@ -666,7 +730,7 @@
 
     <div class="toast-container" id="toastContainer"></div>
 
-    <!-- JAVASCRIPT XỬ LÝ TỐI ƯU & KHẮC PHỤC LỖI KHÔNG MỞ ĐƯỢC CHAT -->
+    <!-- JAVASCRIPT XỬ LÝ TỐI ƯU -->
     <script>
         let DATA_SERVER_API = localStorage.getItem('cde_api_url') || (
             window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
@@ -679,6 +743,8 @@
         let currentExt = "pdf";
         let currentActiveFilePath = "";
         let serverIssuesDB = {};
+        let serverRecallsDB = {};
+        let hideRecalledFilesFlag = false; // Trạng thái bộ lọc ẩn file thu hồi
 
         let currentUserRole = '';
         let currentUserPermission = '';
@@ -737,7 +803,6 @@
 
         function navBottomAction(action, btn) {
             if (action === 'chat') {
-                // Trạng thái active của nút Chat do chat-client.js tự đồng bộ khi mở/đóng (kể cả vuốt xuống để đóng)
                 if (window.CdeChat) {
                     CdeChat.toggle();
                 } else {
@@ -804,9 +869,10 @@
             try {
                 await loadUserPermissions();
 
-                const [filesRes, issuesRes] = await Promise.all([
+                const [filesRes, issuesRes, recallsRes] = await Promise.all([
                     fetch(`${DATA_SERVER_API}/api/cde-files`),
-                    fetch(`${DATA_SERVER_API}/api/issues`)
+                    fetch(`${DATA_SERVER_API}/api/issues`),
+                    fetch(`${DATA_SERVER_API}/api/recalls`).catch(() => null)
                 ]);
 
                 if (!filesRes.ok) throw new Error("Không kết nối được server file");
@@ -814,6 +880,9 @@
                 const flatItems = await filesRes.json();
                 if (issuesRes.ok) {
                     serverIssuesDB = await issuesRes.json();
+                }
+                if (recallsRes && recallsRes.ok) {
+                    serverRecallsDB = await recallsRes.json();
                 }
 
                 virtualTreeData = buildTreeFromFlatList(flatItems);
@@ -927,23 +996,35 @@
             if (window.innerWidth <= 768) closeMobileSidebar();
         }
 
-        function openWithLocalApp(itemPath) {
+        function open3DViewer(itemPath) {
             if (!itemPath) return;
+            window.open(`viewer-ifc.html?path=${encodeURIComponent(itemPath)}`, '_blank');
+        }
 
+        function buildFileUrl(itemPath) {
             let relFromBim = String(itemPath).replace(/^database\/bim-vdc\/?/, '');
             let parts = relFromBim.split('/');
-            let encodedParts = parts.map(p => encodeURIComponent(p));
-            let fileUrl = `${DATA_SERVER_API}/files/${encodedParts.join('/')}`;
-            let fileName = parts[parts.length - 1] || 'file';
+            return {
+                url: `${DATA_SERVER_API}/files/${parts.map(p => encodeURIComponent(p)).join('/')}`,
+                fileName: parts[parts.length - 1] || 'file'
+            };
+        }
 
-            let link = document.createElement("a");
-            link.href = fileUrl;
-            link.download = fileName;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+        // TỰ ĐỘNG MỞ 3D ĐỐI VỚI FILE IFC VÀ REVIT KHI BẤM "MỞ"
+        function openWithLocalApp(itemPath) {
+            if (!itemPath) return;
+            if (/\.(ifc|rvt|rfa|rte)$/i.test(String(itemPath))) {
+                open3DViewer(itemPath);
+                return;
+            }
 
-            showToast(`Đã mở tệp "${fileName}".`);
+            const { url, fileName } = buildFileUrl(itemPath);
+            const win = window.open(url, '_blank', 'noopener');
+            if (!win) {
+                showToast("⚠️ Trình duyệt chặn popup. Hãy cho phép mở tab mới cho trang này!");
+                return;
+            }
+            showToast(`Đã mở tệp "${fileName}" ở tab mới.`);
         }
 
         function countFilesInFolder(node) {
@@ -1321,26 +1402,166 @@
             return null;
         }
 
+        function getRecalledDB() {
+            return serverRecallsDB || {};
+        }
+
+        function escapeAttr(str) {
+            return String(str).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        }
+
+        function formatRecallTime(iso) {
+            try { return new Date(iso).toLocaleString('vi-VN'); } catch (e) { return iso; }
+        }
+
+        function refreshRowActions(row) {
+            if (!row) return;
+            const path = row.getAttribute('data-path');
+            const state = row.getAttribute('data-state');
+            const cell = row.querySelector('.action-btns');
+            if (cell) cell.innerHTML = getActionButtons(state, path);
+            row.classList.toggle('is-recalled', !!getRecalledDB()[path]);
+        }
+
+        async function recallFile(btn) {
+            const row = btn.closest('tr');
+            const path = row.getAttribute('data-path');
+            const state = row.getAttribute('data-state');
+            const fileName = row.querySelector('.file-code').innerText;
+
+            if (typeof checkActionPermission !== 'function' || !checkActionPermission('UPLOAD', state)) {
+                showToast("⚠️ Chỉ người có quyền tải file lên (Read & Write) mới được thu hồi tệp tin này!");
+                return;
+            }
+
+            const reason = prompt(`Lý do thu hồi file:\n${fileName}`, '');
+            if (reason === null) return;
+            if (!reason.trim()) {
+                showToast("⚠️ Vui lòng nhập lý do thu hồi!");
+                return;
+            }
+
+            try {
+                const res = await fetch(`${DATA_SERVER_API}/api/recalls/recall`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('access_token') || ''}` },
+                    body: JSON.stringify({ filePath: path, reason: reason.trim() })
+                });
+                const data = await res.json();
+                if (!data.success) {
+                    showToast("Lỗi thu hồi: " + (data.error || "Thất bại"));
+                    return;
+                }
+                serverRecallsDB[path] = data.recall;
+                refreshRowActions(row);
+                applyFilters();
+                cdeSyncChannel.postMessage({ type: 'REFRESH_CDE_DATA' });
+                showToast(`Đã thu hồi tệp "${fileName}".`);
+            } catch (err) {
+                showToast("Không kết nối được server CDE!");
+            }
+        }
+
+        async function restoreRecalledFile(btn) {
+            const row = btn.closest('tr');
+            const path = row.getAttribute('data-path');
+            const fileName = row.querySelector('.file-code').innerText;
+
+            if (typeof checkActionPermission !== 'function' || !checkActionPermission('UPLOAD', row.getAttribute('data-state'))) {
+                showToast("⚠️ Chỉ người có quyền tải file lên (Read & Write) mới được hủy thu hồi tệp tin này!");
+                return;
+            }
+
+            if (!confirm(`Hủy thu hồi và cho phép sử dụng lại tệp này?\n${fileName}`)) return;
+
+            try {
+                const res = await fetch(`${DATA_SERVER_API}/api/recalls/restore`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('access_token') || ''}` },
+                    body: JSON.stringify({ filePath: path })
+                });
+                const data = await res.json();
+                if (!data.success) {
+                    showToast("Lỗi hủy thu hồi: " + (data.error || "Thất bại"));
+                    return;
+                }
+                delete serverRecallsDB[path];
+                refreshRowActions(row);
+                applyFilters();
+                cdeSyncChannel.postMessage({ type: 'REFRESH_CDE_DATA' });
+                showToast(`Đã hủy thu hồi tệp "${fileName}".`);
+            } catch (err) {
+                showToast("Không kết nối được server CDE!");
+            }
+        }
+
+        // BẬT / TẮT ẨN CÁC FILE THU HỒI BẰNG ICON
+        function toggleHideRecalledFiles() {
+            hideRecalledFilesFlag = !hideRecalledFilesFlag;
+            const btn = document.getElementById('toggleRecallFilterBtn');
+            const icon = document.getElementById('recallFilterIcon');
+            
+            if (hideRecalledFilesFlag) {
+                btn.classList.add('active');
+                btn.title = "Đang ẨN file thu hồi (Bấm để HIỆN lại)";
+                // Eye-slash Icon
+                icon.innerHTML = `<path d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.44-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78l3.15 3.15.02-.17c0-1.66-1.34-3-3-3l-.17.02z"/>`;
+                showToast("Đã ẩn các file bị thu hồi khỏi bảng!");
+            } else {
+                btn.classList.remove('active');
+                btn.title = "Đang HIỆN tất cả file (Bấm để ẨN file thu hồi)";
+                // Eye Icon
+                icon.innerHTML = `<path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>`;
+                showToast("Đã hiện tất cả file!");
+            }
+            applyFilters();
+        }
+
         function getActionButtons(state, relativePath) {
             const hasGatePermission = typeof checkActionPermission === 'function'
                 ? checkActionPermission('GATE_APPROVAL', state)
                 : true;
 
+            const recallInfo = getRecalledDB()[relativePath];
+            const isRecalled = !!recallInfo;
+
+            const lockSvg = `<svg class="svg-icon-sm" viewBox="0 0 24 24" fill="currentColor" style="width:12px; height:12px; margin-left:3px;"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>`;
+
             let gateBtn = '';
-            if (state === '01_WIP' && hasGatePermission) {
-                gateBtn = `<button class="btn-icon" onclick="openGateModal(this)" title="Chuyển Gate 1">Gate 1</button>`;
+            if (state === '04_ARCHIVE') {
+                gateBtn = `<button class="btn-icon gate-btn" disabled style="opacity:0.55; cursor:not-allowed; display:inline-flex; align-items:center; justify-content:center;" title="Đã lưu trữ - hoàn tất các cổng phê duyệt">
+                    Gate ${lockSvg}
+                </button>`;
+            } else if (isRecalled) {
+                // FILE BỊ THU HỒI -> KHÓA NÚT GATE
+                gateBtn = `<button class="btn-icon gate-btn" disabled style="opacity:0.4; cursor:not-allowed; display:inline-flex; align-items:center; justify-content:center;" title="File đã bị thu hồi">
+                    Gate ${lockSvg}
+                </button>`;
+            } else if (state === '01_WIP' && hasGatePermission) {
+                gateBtn = `<button class="btn-icon gate-btn" onclick="openGateModal(this)" title="Chuyển Gate 1">Gate 1</button>`;
             } else if (state === '02_SHARED' && hasGatePermission) {
-                gateBtn = `<button class="btn-icon" onclick="openGateModal(this)" title="Chuyển Gate 2">Gate 2</button>`;
+                gateBtn = `<button class="btn-icon gate-btn" onclick="openGateModal(this)" title="Chuyển Gate 2">Gate 2</button>`;
             } else if (state === '03_PUBLISHED' && hasGatePermission) {
-                gateBtn = `<button class="btn-icon" onclick="openGateModal(this)" title="Chuyển Gate 3">Gate 3</button>`;
+                gateBtn = `<button class="btn-icon gate-btn" onclick="openGateModal(this)" title="Chuyển Gate 3">Gate 3</button>`;
             } else {
-                gateBtn = `<button class="btn-icon" disabled style="opacity:0.4; cursor:not-allowed;">Gate</button>`;
+                gateBtn = `<button class="btn-icon gate-btn" disabled style="opacity:0.4; cursor:not-allowed; display:inline-flex; align-items:center; justify-content:center;" title="Tài khoản không có quyền chuyển Gate">
+                    Gate ${lockSvg}
+                </button>`;
             }
 
             const safePath = String(relativePath || '').replace(/'/g, "\\'");
             let fileIssues = serverIssuesDB[relativePath] || [];
-            let issueBadge = fileIssues.length > 0
-                ? `<span class="badge badge-issue" onclick="openIssuesModal('${safePath}')">
+            const shortText = (t, n) => { t = String(t || '').replace(/\s+/g, ' ').trim(); return t.length > n ? t.slice(0, n) + '…' : t; };
+            const MAX_TIP_ISSUES = 5;
+            const issueTip = fileIssues.slice(0, MAX_TIP_ISSUES)
+                .map((it, i) => `${i + 1}. ${shortText(it.text, 100)}${(it.author || it.time) ? `\n    — ${[it.author, it.time].filter(Boolean).join(', ')}` : ''}`)
+                .join('\n')
+                + (fileIssues.length > MAX_TIP_ISSUES ? `\n… và ${fileIssues.length - MAX_TIP_ISSUES} issue khác` : '')
+                + '\n(Bấm để xem chi tiết)';
+
+            // TỆP THU HỒI: KHÓA NÚT ISSUE
+            let issueBadge = (fileIssues.length > 0 && !isRecalled)
+                ? `<span class="badge badge-issue" title="${escapeAttr(issueTip)}" onclick="openIssuesModal('${safePath}')">
                     <svg class="svg-icon-sm" viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z"/></svg> 
                     ${fileIssues.length} Issue</span>`
                 : '';
@@ -1352,47 +1573,76 @@
             const canShare = checkActionPermission('SHARE_LINK', state);
             const canIssue = checkActionPermission('CREATE_ISSUE', state);
             const canDelete = checkActionPermission('DELETE', state);
+            const canRecall = canUpload;
 
-            let dropdownItemsHtml = '';
-            if (canRename) {
-                dropdownItemsHtml += `<button onclick="openIsoRenameModal(this)">Đổi tên ISO 19650</button>`;
-            }
-            if (canUpload) {
-                dropdownItemsHtml += `<button onclick="uploadNewRevision(this)">Up phiên bản mới</button>`;
-            }
-            if (canHistory) {
-                dropdownItemsHtml += `<button onclick="viewVersionHistory(this)">Lịch sử Version</button>`;
-            }
-            if (canMetadata) {
-                dropdownItemsHtml += `<button onclick="editMetadata(this)">Sửa Metadata</button>`;
-            }
-            if (canShare) {
-                dropdownItemsHtml += `<button onclick="shareFile(this)">Chia sẻ Link</button>`;
-            }
-            if (canIssue) {
-                dropdownItemsHtml += `<button onclick="createIssuePrompt('${safePath}')">Tạo Issue / QA-QC</button>`;
-            }
-            if (canDelete) {
-                dropdownItemsHtml += `<button onclick="deleteRowFile(this)" style="color:#ef4444;">Xóa file</button>`;
+            // XÂY DỰNG MENU XỔ XUỐNG (ĐÃ BỎ NÚT "XEM 3D")
+            let dropdownItemsHtml = `<button onclick="previewFile(this)">Chi tiết</button>`;
+            
+            if (isRecalled) {
+                // TỆP THU HỒI -> KHÓA TẤT CẢ THAO TÁC, CHỈ GIỮ LẠI: HỦY THU HỒI VÀ XÓA FILE
+                dropdownItemsHtml = `<button onclick="previewFile(this)">Chi tiết</button>`;
+                if (canRecall) {
+                    dropdownItemsHtml += `<button class="recall-item" onclick="restoreRecalledFile(this)">Hủy thu hồi</button>`;
+                }
+                if (canDelete) {
+                    dropdownItemsHtml += `<button onclick="deleteRowFile(this)" style="color:#ef4444;">Xóa file</button>`;
+                }
+            } else {
+                // TỆP BÌNH THƯỜNG
+                if (canRename) {
+                    dropdownItemsHtml += `<button onclick="openIsoRenameModal(this)">Đổi tên ISO 19650</button>`;
+                }
+                if (canUpload) {
+                    dropdownItemsHtml += `<button onclick="uploadNewRevision(this)">Up phiên bản mới</button>`;
+                }
+                if (canHistory) {
+                    dropdownItemsHtml += `<button onclick="viewVersionHistory(this)">Lịch sử Version</button>`;
+                }
+                if (canMetadata) {
+                    dropdownItemsHtml += `<button onclick="editMetadata(this)">Sửa Metadata</button>`;
+                }
+                if (canShare) {
+                    dropdownItemsHtml += `<button onclick="shareFile(this)">Chia sẻ Link</button>`;
+                }
+                if (canIssue) {
+                    dropdownItemsHtml += `<button onclick="createIssuePrompt('${safePath}')">Tạo Issue / QA-QC</button>`;
+                }
+                if (canRecall && state !== '04_ARCHIVE') {
+                    dropdownItemsHtml += `<button class="recall-item" onclick="recallFile(this)">Thu hồi</button>`;
+                }
+                if (canDelete) {
+                    dropdownItemsHtml += `<button onclick="deleteRowFile(this)" style="color:#ef4444;">Xóa file</button>`;
+                }
             }
 
-            let dropdownHtml = dropdownItemsHtml !== '' ? `
+            let dropdownHtml = `
                 <div class="dropdown">
-                    <button class="btn-icon" onclick="toggleActionDropdown(event, this)">⋮</button>
+                    <button class="btn-icon icon-only" onclick="toggleActionDropdown(event, this)">⋮</button>
                     <div class="dropdown-content">
                         ${dropdownItemsHtml}
                     </div>
                 </div>
-            ` : '';
+            `;
+
+            let recallBadge = isRecalled
+                ? `<span class="badge-recalled" title="${escapeAttr(`Thu hồi bởi ${recallInfo.by} lúc ${formatRecallTime(recallInfo.at)}\nLý do: ${recallInfo.reason}`)}">⟲ Thu hồi</span>`
+                : '';
+
+            // KHÓA NÚT TẢI VỀ KHI FILE BỊ THU HỒI
+            let downloadBtnHtml = isRecalled
+                ? `<button class="btn-icon icon-only" disabled style="opacity:0.4; cursor:not-allowed;" title="File bị thu hồi không thể tải về">
+                    <svg class="svg-icon-sm" viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+                   </button>`
+                : `<button class="btn-icon icon-only" onclick="downloadFile(this)">
+                    <svg class="svg-icon-sm" viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+                   </button>`;
 
             return `
                 <button class="btn-open-file" onclick="openWithLocalApp('${safePath}')">Mở</button>
-                <button class="btn-icon" onclick="previewFile(this)">View</button>
                 ${gateBtn}
-                <button class="btn-icon" onclick="downloadFile(this)">
-                    <svg class="svg-icon-sm" viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
-                </button>
+                ${downloadBtnHtml}
                 ${issueBadge}
+                ${recallBadge}
                 ${dropdownHtml}
             `;
         }
@@ -1657,6 +1907,12 @@
             document.getElementById('viewFilePath').innerText = row.getAttribute('data-path');
             document.getElementById('viewFileState').innerText = row.children[2].innerText;
             document.getElementById('viewFileRev').innerText = row.children[4].innerText;
+            const btn3d = document.getElementById('viewOpen3dBtn');
+            if (btn3d) btn3d.style.display = /\.ifc$/i.test(row.getAttribute('data-path') || '') ? '' : 'none';
+            const recallInfo = getRecalledDB()[row.getAttribute('data-path')];
+            if (recallInfo) {
+                document.getElementById('viewFileState').innerText += ` | ⟲ ĐÃ THU HỒI bởi ${recallInfo.by} (${formatRecallTime(recallInfo.at)}) - Lý do: ${recallInfo.reason}`;
+            }
             openModal('viewModal');
         }
 
@@ -1815,6 +2071,7 @@
             tr.setAttribute('data-suitability', suit);
             tr.setAttribute('data-discipline', disc);
             tr.setAttribute('data-path', relativePath);
+            if (getRecalledDB()[relativePath]) tr.classList.add('is-recalled');
 
             tr.innerHTML = `
                 <td><span class="badge badge-prj">${prjCode}</span></td>
@@ -1828,6 +2085,7 @@
             tbody.appendChild(tr);
         }
 
+        // LỌC DANH SÁCH FILE KÈM ĐIỀU KIỆN ẨN FILE THU HỒI
         function applyFilters() {
             const searchInput = document.getElementById('searchInput');
             const stateFilter = document.getElementById('stateFilter');
@@ -1849,14 +2107,16 @@
                 const prj = row.getAttribute('data-project') || '';
                 const state = row.getAttribute('data-state') || '';
                 const suit = row.getAttribute('data-suitability') || '';
+                const isRecalled = row.classList.contains('is-recalled');
                 const text = row.innerText.toLowerCase();
 
                 let matchesProj = (projVal === 'ALL' || prj === projVal);
                 let matchesState = (stateVal === 'ALL' || state === stateVal);
                 let matchesSuit = (suitVal === 'ALL' || suit === suitVal);
                 let matchesSearch = (!query || text.includes(query));
+                let matchesRecall = (!hideRecalledFilesFlag || !isRecalled);
 
-                if (matchesProj && matchesState && matchesSuit && matchesSearch) {
+                if (matchesProj && matchesState && matchesSuit && matchesSearch && matchesRecall) {
                     row.style.display = '';
                     if (state === '01_WIP') wipCount++;
                     else if (state === '02_SHARED') sharedCount++;
@@ -1903,7 +2163,6 @@
         }
 
         function openModal(id) {
-            // Trên điện thoại: thu khung chat lại để không che cửa sổ vừa mở
             if (window.CdeChat && window.innerWidth <= 1024) CdeChat.close();
             if (id === 'uploadModal') populateUploadFolderOptions();
             const el = document.getElementById(id);
@@ -2039,10 +2298,8 @@
                 };
             }
 
-            // Tải dữ liệu kho CDE
             reloadDatabaseData();
 
-            // KÍCH HOẠT VÀ KHỞI TẠO HỆ THỐNG CHAT REALTIME
             if (window.CdeChat) {
                 window.CdeChat.init({
                     apiBase: () => DATA_SERVER_API,

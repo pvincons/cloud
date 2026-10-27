@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Xem 3D - IFC Viewer | CDE Master</title>
+    <style>
+        :root {
+            --bg: #0b1220;
+            --panel: #111a2e;
+            --border: #1f2a44;
+            --text: #e2e8f0;
+            --muted: #94a3b8;
+            --primary: #38bdf8;
+            --danger: #ef4444;
+        }
+
+        :root[data-theme="light"] {
+            --bg: #ffffff;
+            --panel: #f8fafc;
+            --border: #cbd5e1;
+            --text: #0f172a;
+            --muted: #64748b;
+            --primary: #0284c7;
+        }
+
+        * { box-sizing: border-box; }
+
+        html, body {
+            height: 100%;
+            margin: 0;
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            font-size: 13px;
+            overflow: hidden;
+        }
+
+        #topbar {
+            position: absolute; top: 0; left: 0; right: 0; height: 44px;
+            display: flex; align-items: center; gap: 8px; padding: 0 12px;
+            background: var(--panel); border-bottom: 1px solid var(--border); z-index: 10;
+        }
+
+        #title {
+            flex: 1; min-width: 0; font-family: Consolas, 'Courier New', monospace; font-weight: 600;
+            overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+        }
+
+        .tb-btn {
+            height: 28px; padding: 0 10px; border-radius: 6px; cursor: pointer;
+            background: transparent; color: var(--text); border: 1px solid var(--border);
+            font-size: 12px; font-weight: 600; white-space: nowrap;
+            display: inline-flex; align-items: center; text-decoration: none;
+        }
+        .tb-btn:hover { border-color: var(--primary); color: var(--primary); }
+        .tb-btn.active { background: var(--primary); border-color: var(--primary); color: #04202e; }
+
+        #recallBadge {
+            display: none; padding: 3px 9px; border-radius: 5px; font-size: 11px; font-weight: 700;
+            background: rgba(245, 158, 11, .15); color: #f59e0b; border: 1px solid rgba(245, 158, 11, .5);
+            white-space: nowrap; cursor: help;
+        }
+
+        #stage { position: absolute; top: 44px; left: 0; right: 0; bottom: 0; }
+        #stage canvas { display: block; width: 100%; height: 100%; outline: none; }
+
+        #overlay {
+            position: absolute; top: 44px; left: 0; right: 0; bottom: 0; z-index: 20;
+            display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px;
+            background: var(--bg); padding: 20px; text-align: center;
+        }
+        #overlayMsg { max-width: 560px; line-height: 1.6; }
+        #overlayMsg.error { color: var(--danger); }
+        #overlayHint { max-width: 560px; color: var(--muted); font-size: 12px; line-height: 1.6; }
+        #progressWrap { width: min(420px, 80vw); height: 8px; border-radius: 4px; background: var(--border); overflow: hidden; }
+        #progressBar { height: 100%; width: 0%; background: var(--primary); transition: width .15s; }
+
+        #info {
+            position: absolute; right: 12px; top: 56px; width: 310px; max-height: 65%; overflow: auto;
+            background: var(--panel); border: 1px solid var(--border); border-radius: 8px;
+            padding: 10px 12px; display: none; z-index: 8; box-shadow: 0 6px 24px rgba(0, 0, 0, .35);
+        }
+        #info h4 { margin: 0 0 6px; font-size: 12px; color: var(--primary); text-transform: uppercase; letter-spacing: .04em; }
+        #info .row { display: flex; gap: 8px; padding: 3px 0; border-bottom: 1px dashed var(--border); }
+        #info .k { color: var(--muted); min-width: 82px; flex-shrink: 0; }
+        #info .v { word-break: break-word; font-family: Consolas, monospace; font-size: 12px; }
+
+        #hint {
+            position: absolute; left: 12px; bottom: 10px; z-index: 6; color: var(--muted); font-size: 11px;
+            background: color-mix(in srgb, var(--panel) 80%, transparent); padding: 4px 8px; border-radius: 6px;
+            border: 1px solid var(--border); pointer-events: none;
+        }
+
+        #stats {
+            position: absolute; right: 12px; bottom: 10px; z-index: 6; color: var(--muted); font-size: 11px;
+            background: color-mix(in srgb, var(--panel) 80%, transparent); padding: 4px 8px; border-radius: 6px;
+            border: 1px solid var(--border); pointer-events: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="topbar">
+        <div id="title">Đang tải…</div>
+        <span id="recallBadge">⟲ ĐÃ THU HỒI</span>
+        <button class="tb-btn" id="btnFit" title="Phóng to và đưa toàn bộ công trình vừa khít với màn hình">Vừa công trình</button>
+        <button class="tb-btn" id="btnTheme" title="Chuyển đổi màu nền Tối / Sáng">Nền: Tối</button>
+        <button class="tb-btn active" id="btnGrid" title="Bật/tắt lưới nền">Lưới</button>
+        <button class="tb-btn" id="btnWire" title="Bật/tắt khung dây">Khung dây</button>
+        <a class="tb-btn" id="btnDownload" href="#" title="Tải file IFC về máy">Tải về</a>
+        <button class="tb-btn" id="btnClose" title="Đóng tab">Đóng</button>
+    </div>
+
+    <div id="stage"></div>
+
+    <div id="overlay">
+        <div id="overlayMsg">Đang khởi tạo viewer…</div>
+        <div id="progressWrap"><div id="progressBar"></div></div>
+        <div id="overlayHint"></div>
+    </div>
+
+    <div id="info"></div>
+    <div id="hint">Chuột trái: xoay · Chuột phải: dịch · Lăn chuột: phóng to/thu nhỏ · Bấm vào cấu kiện để xem thông tin</div>
+    <div id="stats"></div>
+
+    <!-- Bước 1: Khai báo import map -->
+    <script>
+        (function () {
+            const theme = localStorage.getItem('cde_theme') || 'dark';
+            if (theme === 'light') document.documentElement.setAttribute('data-theme', 'light');
+
+            const API = localStorage.getItem('cde_api_url') || (
+                (location.hostname === 'localhost' || location.hostname === '127.0.0.1')
+                    ? 'http://localhost:3000'
+                    : 'https://api.pvincons.cloud'
+            );
+            window.__CDE_API = API;
+
+            const map = document.createElement('script');
+            map.type = 'importmap';
+            map.textContent = JSON.stringify({
+                imports: {
+                    'three': API + '/vendor/three/build/three.module.js',
+                    'three/addons/': API + '/vendor/three/examples/jsm/',
+                    'web-ifc': API + '/vendor/web-ifc/web-ifc-api.js'
+                }
+            });
+            document.head.appendChild(map);
+        })();
+    </script>
+
+    <!-- Bước 2 (module): Dựng Viewer -->
+    <script type="module">
+        const API = window.__CDE_API;
+        const $ = (id) => document.getElementById(id);
+
+        const overlay = $('overlay'), overlayMsg = $('overlayMsg'), overlayHint = $('overlayHint');
+        const progressWrap = $('progressWrap'), progressBar = $('progressBar');
+
+        function setStatus(msg, percent) {
+            overlayMsg.className = '';
+            overlayMsg.textContent = msg;
+            if (typeof percent === 'number') {
+                progressWrap.style.display = '';
+                progressBar.style.width = Math.max(0, Math.min(100, percent)) + '%';
+            }
+        }
+
+        function showError(msg, hint) {
+            overlay.style.display = 'flex';
+            progressWrap.style.display = 'none';
+            overlayMsg.className = 'error';
+            overlayMsg.textContent = msg;
+            overlayHint.textContent = hint || '';
+        }
+
+        $('btnClose').onclick = () => { window.close(); };
+
+        // ---------- 1. Đường dẫn file ----------
+        const relPath = new URLSearchParams(location.search).get('path') || '';
+        const normalized = relPath.replace(/\\/g, '/');
+        if (!/^database\/bim-vdc\//.test(normalized) || normalized.split('/').includes('..') || !/\.ifc$/i.test(normalized)) {
+            showError('Đường dẫn file không hợp lệ hoặc không phải file .ifc.', 'Hãy mở lại từ bảng MIR (mục Xem 3D trong menu ⋮ của file .ifc).');
+            throw new Error('invalid path');
+        }
+
+        const parts = normalized.replace(/^database\/bim-vdc\/?/, '').split('/');
+        const fileName = parts[parts.length - 1];
+        const fileUrl = `${API}/files/${parts.map(encodeURIComponent).join('/')}`;
+
+        document.title = `Xem 3D - ${fileName}`;
+        $('title').textContent = fileName;
+        $('title').title = normalized;
+        $('btnDownload').href = fileUrl;
+        $('btnDownload').setAttribute('download', fileName);
+
+        // Kiểm tra thu hồi
+        fetch(`${API}/api/recalls`).then(r => r.ok ? r.json() : {}).then(db => {
+            const info = db[normalized];
+            if (info) {
+                const badge = $('recallBadge');
+                badge.style.display = 'inline-block';
+                badge.title = `Thu hồi bởi ${info.by} lúc ${new Date(info.at).toLocaleString('vi-VN')}\nLý do: ${info.reason}`;
+            }
+        }).catch(() => { });
+
+        // ---------- 2. Nạp thư viện ----------
+        let THREE, OrbitControls, WebIFC;
+        try {
+            setStatus('Đang nạp thư viện 3D…', 5);
+            THREE = await import('three');
+            ({ OrbitControls } = await import('three/addons/controls/OrbitControls.js'));
+            WebIFC = await import('web-ifc');
+        } catch (err) {
+            console.error(err);
+            showError('Không nạp được thư viện xem 3D từ server.', 'Địa chỉ server đang dùng: ' + API);
+            throw err;
+        }
+
+        // ---------- 3. Khởi tạo cảnh 3D ----------
+        const stage = $('stage');
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+        renderer.setSize(stage.clientWidth, stage.clientHeight);
+        stage.appendChild(renderer.domElement);
+
+        const scene = new THREE.Scene();
+
+        const camera = new THREE.PerspectiveCamera(45, stage.clientWidth / stage.clientHeight, 0.1, 10000);
+        camera.position.set(30, 30, 30);
+
+        const controls = new OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.08;   // Độ mượt và quán tính điều hướng tối ưu
+        controls.rotateSpeed = 1.0;
+        controls.panSpeed = 1.2;
+        controls.zoomSpeed = 1.5;
+
+        scene.add(new THREE.AmbientLight(0xffffff, 1.4));
+        const sun = new THREE.DirectionalLight(0xffffff, 2.2);
+        sun.position.set(60, 100, 40);
+        scene.add(sun);
+        const fill = new THREE.DirectionalLight(0xffffff, 0.8);
+        fill.position.set(-60, 40, -50);
+        scene.add(fill);
+
+        const modelGroup = new THREE.Group();
+        scene.add(modelGroup);
+
+        let grid = null;
+
+        // Xử lý đổi màu nền Tối / Sáng
+        function applyTheme(isLight) {
+            const bgHex = isLight ? 0xffffff : 0x0b1220;
+            const gridHex = isLight ? 0xc2d1e0 : 0x1f2a44;
+            
+            scene.background = new THREE.Color(bgHex);
+            document.documentElement.setAttribute('data-theme', isLight ? 'light' : 'dark');
+            localStorage.setItem('cde_theme', isLight ? 'light' : 'dark');
+            $('btnTheme').textContent = isLight ? 'Nền: Trắng' : 'Nền: Tối';
+
+            if (grid) {
+                scene.remove(grid);
+                const size = grid.userData.size || 100;
+                grid = new THREE.GridHelper(size, 40, 0x38bdf8, gridHex);
+                grid.position.copy(grid.userData.center || new THREE.Vector3());
+                grid.visible = $('btnGrid').classList.contains('active');
+                scene.add(grid);
+            }
+        }
+
+        const isInitiallyLight = localStorage.getItem('cde_theme') === 'light';
+        applyTheme(isInitiallyLight);
+
+        $('btnTheme').onclick = () => {
+            const isNowLight = document.documentElement.getAttribute('data-theme') !== 'light';
+            applyTheme(isNowLight);
+        };
+
+        function resize() {
+            const w = stage.clientWidth, h = stage.clientHeight;
+            renderer.setSize(w, h);
+            camera.aspect = w / h;
+            camera.updateProjectionMatrix();
+        }
+        window.addEventListener('resize', resize);
+
+        (function loop() {
+            requestAnimationFrame(loop);
+            controls.update();
+            renderer.render(scene, camera);
+        })();
+
+        // ---------- 4. Tải file IFC ----------
+        async function download(url) {
+            const res = await fetch(url);
+            if (!res.ok) throw new Error(`Không tải được file (HTTP ${res.status}).`);
+            const total = Number(res.headers.get('Content-Length')) || 0;
+            const reader = res.body.getReader();
+            const chunks = [];
+            let got = 0;
+            for (; ;) {
+                const { done, value } = await reader.read();
+                if (done) break;
+                chunks.push(value);
+                got += value.length;
+                const mb = (got / 1048576).toFixed(1);
+                if (total) setStatus(`Đang tải file… ${mb} / ${(total / 1048576).toFixed(1)} MB`, 10 + (got / total) * 40);
+                else setStatus(`Đang tải file… ${mb} MB`, 30);
+            }
+            const out = new Uint8Array(got);
+            let off = 0;
+            for (const c of chunks) { out.set(c, off); off += c.length; }
+            return out;
+        }
+
+        let data;
+        try {
+            data = await download(fileUrl);
+        } catch (err) {
+            console.error(err);
+            showError(err.message || 'Không tải được file IFC.', 'Kiểm tra lại kết nối server CDE.');
+            throw err;
+        }
+
+        // ---------- 5. Đọc IFC bằng web-ifc ----------
+        const ifcApi = new WebIFC.IfcAPI();
+        let modelID = -1;
+        const materials = new Map();
+        const pickables = [];
+        let triCount = 0;
+
+        function getMaterial(c) {
+            const key = [c.x, c.y, c.z, c.w].map(n => n.toFixed(3)).join('|');
+            let m = materials.get(key);
+            if (!m) {
+                m = new THREE.MeshLambertMaterial({
+                    color: new THREE.Color().setRGB(c.x, c.y, c.z, THREE.SRGBColorSpace),
+                    side: THREE.DoubleSide,
+                    transparent: c.w < 0.999,
+                    opacity: c.w,
+                    depthWrite: c.w >= 0.999
+                });
+                materials.set(key, m);
+            }
+            return m;
+        }
+
+        try {
+            setStatus('Đang khởi tạo bộ đọc IFC…', 55);
+            ifcApi.SetWasmPath(`${API}/vendor/web-ifc/`, true);
+            await ifcApi.Init();
+
+            setStatus('Đang phân tích mô hình…', 65);
+            await new Promise(r => setTimeout(r, 30));
+            modelID = ifcApi.OpenModel(data, { COORDINATE_TO_ORIGIN: true });
+            data = null;
+
+            setStatus('Đang dựng hình học 3D…', 80);
+            await new Promise(r => setTimeout(r, 30));
+
+            ifcApi.StreamAllMeshes(modelID, (flatMesh) => {
+                const geoms = flatMesh.geometries;
+                for (let i = 0; i < geoms.size(); i++) {
+                    const placed = geoms.get(i);
+                    const geom = ifcApi.GetGeometry(modelID, placed.geometryExpressID);
+                    const verts = ifcApi.GetVertexArray(geom.GetVertexData(), geom.GetVertexDataSize());
+                    const index = ifcApi.GetIndexArray(geom.GetIndexData(), geom.GetIndexDataSize());
+                    if (!verts.length || !index.length) { geom.delete(); continue; }
+
+                    const buffer = new THREE.InterleavedBuffer(Float32Array.from(verts), 6);
+                    const bg = new THREE.BufferGeometry();
+                    bg.setAttribute('position', new THREE.InterleavedBufferAttribute(buffer, 3, 0));
+                    bg.setAttribute('normal', new THREE.InterleavedBufferAttribute(buffer, 3, 3));
+                    bg.setIndex(new THREE.BufferAttribute(Uint32Array.from(index), 1));
+
+                    const mesh = new THREE.Mesh(bg, getMaterial(placed.color));
+                    mesh.matrix.fromArray(placed.flatTransformation);
+                    mesh.matrixAutoUpdate = false;
+                    mesh.userData.expressID = flatMesh.expressID;
+                    modelGroup.add(mesh);
+                    pickables.push(mesh);
+                    triCount += index.length / 3;
+                    geom.delete();
+                }
+            });
+        } catch (err) {
+            console.error(err);
+            showError('Không đọc được file IFC này.', err.message || err);
+            throw err;
+        }
+
+        if (!pickables.length) {
+            showError('File IFC không chứa hình học 3D để hiển thị.', 'Hãy kiểm tra lại cấu hình xuất IFC từ phần mềm gốc.');
+            throw new Error('empty model');
+        }
+
+        // ---------- 6. Tính toán Khung nhìn (Fit View) & Lưới Nền ----------
+        modelGroup.updateMatrixWorld(true);
+        
+        const box = new THREE.Box3();
+        pickables.forEach(mesh => {
+            mesh.geometry.computeBoundingBox();
+            const b = mesh.geometry.boundingBox.clone();
+            b.applyMatrix4(mesh.matrixWorld);
+            box.union(b);
+        });
+
+        const size = box.getSize(new THREE.Vector3());
+        const center = box.getCenter(new THREE.Vector3());
+        const maxDim = Math.max(size.x, size.y, size.z) || 10;
+
+        const gridDim = Math.ceil(maxDim * 1.8);
+        const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+        grid = new THREE.GridHelper(gridDim, 40, 0x38bdf8, isLight ? 0xc2d1e0 : 0x1f2a44);
+        grid.position.set(center.x, box.min.y, center.z);
+        grid.userData = { size: gridDim, center: grid.position.clone() };
+        scene.add(grid);
+
+        function fitView() {
+            const fov = camera.fov * (Math.PI / 180);
+            let distance = Math.abs(maxDim / Math.sin(fov / 2)) * 0.75;
+            
+            camera.position.set(center.x + distance * 0.7, center.y + distance * 0.6, center.z + distance * 0.7);
+            
+            camera.near = Math.max(distance / 100, 0.1);
+            camera.far = distance * 10;
+            camera.updateProjectionMatrix();
+
+            controls.target.copy(center);
+            controls.update();
+        }
+        
+        fitView();
+
+        $('stats').textContent = `${pickables.length.toLocaleString('vi-VN')} cấu kiện · ${Math.round(triCount).toLocaleString('vi-VN')} tam giác`;
+        overlay.style.display = 'none';
+
+        $('btnFit').onclick = fitView;
+        $('btnGrid').onclick = (e) => { 
+            if (grid) {
+                grid.visible = !grid.visible; 
+                e.currentTarget.classList.toggle('active', grid.visible); 
+            }
+        };
+        $('btnWire').onclick = (e) => {
+            const on = !e.currentTarget.classList.contains('active');
+            e.currentTarget.classList.toggle('active', on);
+            materials.forEach(m => { m.wireframe = on; });
+            highlightMat.wireframe = on;
+        };
+
+        // ---------- 7. Chọn cấu kiện & xem thông tin ----------
+        const raycaster = new THREE.Raycaster();
+        const pointer = new THREE.Vector2();
+        const highlightMat = new THREE.MeshLambertMaterial({ color: 0xffc107, emissive: 0x553b00, side: THREE.DoubleSide });
+        let selectedExpressID = null;
+        const originalMaterial = new Map();
+
+        function clearSelection() {
+            originalMaterial.forEach((mat, mesh) => { mesh.material = mat; });
+            originalMaterial.clear();
+            selectedExpressID = null;
+            $('info').style.display = 'none';
+        }
+
+        function selectElement(expressID) {
+            clearSelection();
+            selectedExpressID = expressID;
+            pickables.forEach(mesh => {
+                if (mesh.userData.expressID === expressID) {
+                    originalMaterial.set(mesh, mesh.material);
+                    mesh.material = highlightMat;
+                }
+            });
+            showInfo(expressID);
+        }
+
+        function val(x) {
+            if (x === null || x === undefined) return '';
+            if (typeof x === 'object' && 'value' in x) return String(x.value ?? '');
+            return String(x);
+        }
+
+        function showInfo(expressID) {
+            const panel = $('info');
+            panel.replaceChildren();
+            const h = document.createElement('h4');
+            h.textContent = 'Thông tin cấu kiện';
+            panel.appendChild(h);
+
+            const rows = [];
+            try {
+                const line = ifcApi.GetLine(modelID, expressID);
+                let typeName = '';
+                try { typeName = ifcApi.GetNameFromTypeCode(ifcApi.GetLineType(modelID, expressID)); } catch (e) { }
+                rows.push(['Loại IFC', typeName]);
+                rows.push(['Tên', val(line.Name)]);
+                rows.push(['Mô tả', val(line.Description)]);
+                rows.push(['ObjectType', val(line.ObjectType)]);
+                rows.push(['Tag', val(line.Tag)]);
+                rows.push(['GlobalId', val(line.GlobalId)]);
+            } catch (e) {
+                rows.push(['Lỗi', 'Không đọc được thuộc tính']);
+            }
+            rows.push(['ExpressID', String(expressID)]);
+
+            rows.filter(r => r[1] !== '').forEach(([k, v]) => {
+                const row = document.createElement('div'); row.className = 'row';
+                const kk = document.createElement('div'); kk.className = 'k'; kk.textContent = k;
+                const vv = document.createElement('div'); vv.className = 'v'; vv.textContent = v;
+                row.append(kk, vv);
+                panel.appendChild(row);
+            });
+            panel.style.display = 'block';
+        }
+
+        let downPos = null;
+        renderer.domElement.addEventListener('pointerdown', (e) => { downPos = { x: e.clientX, y: e.clientY }; });
+        renderer.domElement.addEventListener('pointerup', (e) => {
+            if (!downPos || Math.hypot(e.clientX - downPos.x, e.clientY - downPos.y) > 4) return;
+            if (e.button !== 0) return;
+            const rect = renderer.domElement.getBoundingClientRect();
+            pointer.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+            pointer.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+            raycaster.setFromCamera(pointer, camera);
+            const hits = raycaster.intersectObjects(pickables, false);
+            if (hits.length) selectElement(hits[0].object.userData.expressID);
+            else clearSelection();
+        });
+        window.addEventListener('keydown', (e) => { if (e.key === 'Escape') clearSelection(); });
+
+        window.addEventListener('beforeunload', () => {
+            try { if (modelID >= 0) ifcApi.CloseModel(modelID); } catch (e) { }
+        });
+    </script>
+</body>
+
+</html>
