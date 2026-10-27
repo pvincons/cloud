@@ -7,6 +7,7 @@
     <title>Super Admin - Quản lý Phân quyền Portal</title>
 
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bcryptjs/2.4.3/bcrypt.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body {
@@ -678,8 +679,22 @@
             return `GitHub trả về lỗi HTTP ${res.status}` + (detail ? `: ${detail}` : '');
         }
 
+        // Chỉ dùng 2 trạng thái: Active / Inactive ("Đang triển khai" cũ được chuyển thành Active)
         function normalizeStatus(st) {
             return (st === 'Active' || st === 'Đang triển khai') ? 'Active' : 'Inactive';
+        }
+
+        // ===== MÃ HÓA MẬT KHẨU: bcrypt thật, cùng cấu trúc "$2b$10$" + 53 ký tự như file cũ =====
+        const BCRYPT_RE = /^\$2[aby]\$\d{2}\$[./A-Za-z0-9]{53}$/;
+
+        function getBcrypt() {
+            return (window.dcodeIO && window.dcodeIO.bcrypt) || window.bcrypt || null;
+        }
+
+        function hashPassword(raw) {
+            const bc = getBcrypt();
+            // bcryptjs sinh tiền tố $2a$ -> đổi sang $2b$ cho giống hash của backend (thuật toán tương thích)
+            return bc.hashSync(raw, bc.genSaltSync(10)).replace(/^\$2a\$/, () => '$2b$');
         }
 
         // Dựng mảng tài khoản đúng cấu trúc users.json (đủ trường, đúng thứ tự, không có trường nội bộ)
@@ -688,7 +703,7 @@
                 const o = {};
                 USER_FIELDS.forEach(k => {
                     if (k === 'id') o.id = Number(u.id);
-                    else if (k === 'status') o.status = (u._rawStatus !== undefined && normalizeStatus(u._rawStatus) === u.status) ? u._rawStatus : u.status;
+                    else if (k === 'status') o.status = normalizeStatus(u.status);
                     else o[k] = (u[k] === undefined || u[k] === null) ? '' : u[k];
                 });
                 // giữ lại các trường lạ (nếu repo có thêm) để không bị mất dữ liệu khi xuất
@@ -770,11 +785,14 @@
                     usersLoadedFromGitHub = true;
                     usersData = content.map(u => ({
                         ...u,
-                        _rawStatus: u.status, // giữ giá trị status gốc (VD "Đang triển khai") để xuất lại đúng như file
                         status: normalizeStatus(u.status)
                     }));
                     updatePathLabels();
                     showToast(`Đã tải ${usersData.length} tài khoản từ GitHub (${found.path}).`);
+                    const badHash = usersData.filter(u => !BCRYPT_RE.test(u.passwordHash || ''));
+                    if (badHash.length) {
+                        showToast(`${badHash.length} tài khoản có passwordHash sai định dạng nên không đăng nhập được: ${badHash.map(u => u.username).join(', ')}. Bấm Sửa và đặt lại mật khẩu để tạo hash đúng.`, 'error');
+                    }
                 }
             } catch (err) {
                 console.error(err);
@@ -1065,7 +1083,11 @@
             let finalPasswordHash = "$2b$10$Mhg7uk2abtNcK8/yqU1ZFOzT7mPAdzbjK9zPJMX18cF/yalhrIpSa";
             if (existingUser) finalPasswordHash = existingUser.passwordHash;
             if (rawPassword.trim() !== '') {
-                finalPasswordHash = `$2b$10$${btoa(rawPassword).substring(0, 10)}...HASHED...${rawPassword.length}`;
+                if (!getBcrypt()) {
+                    showToast('Chưa tải được thư viện mã hóa bcrypt (cần kết nối internet). Chưa thể đổi mật khẩu, hãy tải lại trang rồi thử lại.', 'error');
+                    return;
+                }
+                finalPasswordHash = hashPassword(rawPassword);
             }
 
             const userData = {
