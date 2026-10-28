@@ -744,7 +744,7 @@
         let currentActiveFilePath = "";
         let serverIssuesDB = {};
         let serverRecallsDB = {};
-        let hideRecalledFilesFlag = false;
+        let hideRecalledFilesFlag = false; // Trạng thái bộ lọc ẩn file thu hồi
 
         let currentUserRole = '';
         let currentUserPermission = '';
@@ -996,28 +996,9 @@
             if (window.innerWidth <= 768) closeMobileSidebar();
         }
 
-        // ===============================================================
-        // CẬP NHẬT HÀM MỞ 3D IFC QUA THATOPEN ENGINE WEB VIEWER (CÁCH 1)
-        // ===============================================================
         function open3DViewer(itemPath) {
             if (!itemPath) return;
-
-            // 1. Chuyển đổi đường dẫn file trong CDE thành URL tuyệt đối trỏ tới Backend
-            let relFromBim = String(itemPath).replace(/^database\/bim-vdc\/?/, '');
-            let parts = relFromBim.split('/');
-            let encodedPath = parts.map(p => encodeURIComponent(p)).join('/');
-            let fullFileUrl = `${DATA_SERVER_API}/files/${encodedPath}`;
-
-            // 2. Trỏ tới Web Viewer trực tuyến của ThatOpen kèm theo tham số ?model=URL_FILE
-            let viewerUrl = `https://thatopen.github.io/engine_web-ifc/?model=${encodeURIComponent(fullFileUrl)}`;
-
-            // 3. Mở tab mới
-            const win = window.open(viewerUrl, '_blank', 'noopener');
-            if (!win) {
-                showToast("⚠️ Trình duyệt chặn popup! Vui lòng cho phép mở tab mới.");
-                return;
-            }
-            showToast("Đang mở file IFC trên Web Viewer...");
+            window.open(`viewer-ifc.html?path=${encodeURIComponent(itemPath)}`, '_blank');
         }
 
         function buildFileUrl(itemPath) {
@@ -1029,6 +1010,7 @@
             };
         }
 
+        // TỰ ĐỘNG MỞ 3D ĐỐI VỚI FILE IFC VÀ REVIT KHI BẤM "MỞ"
         function openWithLocalApp(itemPath) {
             if (!itemPath) return;
             if (/\.(ifc|rvt|rfa|rte)$/i.test(String(itemPath))) {
@@ -1513,6 +1495,7 @@
             }
         }
 
+        // BẬT / TẮT ẨN CÁC FILE THU HỒI BẰNG ICON
         function toggleHideRecalledFiles() {
             hideRecalledFilesFlag = !hideRecalledFilesFlag;
             const btn = document.getElementById('toggleRecallFilterBtn');
@@ -1521,11 +1504,13 @@
             if (hideRecalledFilesFlag) {
                 btn.classList.add('active');
                 btn.title = "Đang ẨN file thu hồi (Bấm để HIỆN lại)";
+                // Eye-slash Icon
                 icon.innerHTML = `<path d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.44-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78l3.15 3.15.02-.17c0-1.66-1.34-3-3-3l-.17.02z"/>`;
                 showToast("Đã ẩn các file bị thu hồi khỏi bảng!");
             } else {
                 btn.classList.remove('active');
                 btn.title = "Đang HIỆN tất cả file (Bấm để ẨN file thu hồi)";
+                // Eye Icon
                 icon.innerHTML = `<path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>`;
                 showToast("Đã hiện tất cả file!");
             }
@@ -1548,6 +1533,7 @@
                     Gate ${lockSvg}
                 </button>`;
             } else if (isRecalled) {
+                // FILE BỊ THU HỒI -> KHÓA NÚT GATE
                 gateBtn = `<button class="btn-icon gate-btn" disabled style="opacity:0.4; cursor:not-allowed; display:inline-flex; align-items:center; justify-content:center;" title="File đã bị thu hồi">
                     Gate ${lockSvg}
                 </button>`;
@@ -1573,6 +1559,7 @@
                 + (fileIssues.length > MAX_TIP_ISSUES ? `\n… và ${fileIssues.length - MAX_TIP_ISSUES} issue khác` : '')
                 + '\n(Bấm để xem chi tiết)';
 
+            // TỆP THU HỒI: KHÓA NÚT ISSUE
             let issueBadge = (fileIssues.length > 0 && !isRecalled)
                 ? `<span class="badge badge-issue" title="${escapeAttr(issueTip)}" onclick="openIssuesModal('${safePath}')">
                     <svg class="svg-icon-sm" viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z"/></svg> 
@@ -1588,9 +1575,11 @@
             const canDelete = checkActionPermission('DELETE', state);
             const canRecall = canUpload;
 
+            // XÂY DỰNG MENU XỔ XUỐNG (ĐÃ BỎ NÚT "XEM 3D")
             let dropdownItemsHtml = `<button onclick="previewFile(this)">Chi tiết</button>`;
             
             if (isRecalled) {
+                // TỆP THU HỒI -> KHÓA TẤT CẢ THAO TÁC, CHỈ GIỮ LẠI: HỦY THU HỒI VÀ XÓA FILE
                 dropdownItemsHtml = `<button onclick="previewFile(this)">Chi tiết</button>`;
                 if (canRecall) {
                     dropdownItemsHtml += `<button class="recall-item" onclick="restoreRecalledFile(this)">Hủy thu hồi</button>`;
@@ -1599,6 +1588,7 @@
                     dropdownItemsHtml += `<button onclick="deleteRowFile(this)" style="color:#ef4444;">Xóa file</button>`;
                 }
             } else {
+                // TỆP BÌNH THƯỜNG
                 if (canRename) {
                     dropdownItemsHtml += `<button onclick="openIsoRenameModal(this)">Đổi tên ISO 19650</button>`;
                 }
@@ -1638,6 +1628,7 @@
                 ? `<span class="badge-recalled" title="${escapeAttr(`Thu hồi bởi ${recallInfo.by} lúc ${formatRecallTime(recallInfo.at)}\nLý do: ${recallInfo.reason}`)}">⟲ Thu hồi</span>`
                 : '';
 
+            // KHÓA NÚT TẢI VỀ KHI FILE BỊ THU HỒI
             let downloadBtnHtml = isRecalled
                 ? `<button class="btn-icon icon-only" disabled style="opacity:0.4; cursor:not-allowed;" title="File bị thu hồi không thể tải về">
                     <svg class="svg-icon-sm" viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
@@ -2094,6 +2085,7 @@
             tbody.appendChild(tr);
         }
 
+        // LỌC DANH SÁCH FILE KÈM ĐIỀU KIỆN ẨN FILE THU HỒI
         function applyFilters() {
             const searchInput = document.getElementById('searchInput');
             const stateFilter = document.getElementById('stateFilter');
