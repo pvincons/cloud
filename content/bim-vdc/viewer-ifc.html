@@ -1,570 +1,460 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Xem 3D - IFC Viewer | CDE Master</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Xem 3D – IFC</title>
 <style>
-:root{--bg:#0b1220;--panel:#111a2e;--border:#1f2a44;--text:#e2e8f0;--muted:#94a3b8;--primary:#38bdf8;--danger:#ef4444;--g1:#2b3754;--g2:#0b1220;--tool:rgba(17,26,46,.95)}
-:root[data-theme=light]{--bg:#fff;--panel:#f8fafc;--border:#cbd5e1;--text:#0f172a;--muted:#64748b;--primary:#0284c7;--g1:#fff;--g2:#c5d0df;--tool:rgba(248,250,252,.96)}
-*{box-sizing:border-box}
-html,body{height:100%;margin:0;background:var(--bg);color:var(--text);font:13px 'Segoe UI',Tahoma,sans-serif;overflow:hidden}
-#topbar{position:absolute;top:0;left:0;right:0;height:44px;display:flex;align-items:center;gap:8px;padding:0 12px;background:var(--panel);border-bottom:1px solid var(--border);z-index:10}
-#title{flex:1;min-width:0;font:600 13px Consolas,'Courier New',monospace;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.tb-btn{height:28px;padding:0 10px;border-radius:6px;cursor:pointer;background:transparent;color:var(--text);border:1px solid var(--border);font-size:12px;font-weight:600;white-space:nowrap;display:inline-flex;align-items:center;text-decoration:none}
-.tb-btn:hover{border-color:var(--primary);color:var(--primary)}
-#recallBadge{display:none;padding:3px 9px;border-radius:5px;font-size:11px;font-weight:700;background:rgba(245,158,11,.15);color:#f59e0b;border:1px solid rgba(245,158,11,.5);white-space:nowrap;cursor:help}
-#stage{position:absolute;top:44px;left:0;right:0;bottom:0;background:radial-gradient(ellipse at 50% 35%,var(--g1),var(--g2))}
-#stage canvas{display:block;width:100%;height:100%;outline:none}
-#overlay{position:absolute;top:44px;left:0;right:0;bottom:0;z-index:20;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;background:var(--bg);padding:20px;text-align:center}
-#overlayMsg{max-width:560px;line-height:1.6}#overlayMsg.error{color:var(--danger)}
-#overlayHint{max-width:560px;color:var(--muted);font-size:12px;line-height:1.6}
-#progressWrap{width:min(420px,80vw);height:8px;border-radius:4px;background:var(--border);overflow:hidden}
-#progressBar{height:100%;width:0;background:var(--primary);transition:width .15s}
-.panel{position:absolute;background:var(--tool);border:1px solid var(--border);border-radius:8px;box-shadow:0 6px 24px rgba(0,0,0,.3);z-index:8;display:none;backdrop-filter:blur(6px)}
-#browser{left:12px;top:56px;bottom:62px;width:280px;flex-direction:column}
-#browser h4,#props h4{margin:0;padding:9px 12px;font-size:12px;color:var(--primary);text-transform:uppercase;letter-spacing:.04em}
-#q{margin:0 10px 6px;padding:6px 8px;border-radius:6px;border:1px solid var(--border);background:var(--bg);color:var(--text)}
-#tree{flex:1;overflow:auto;padding:0 4px 8px}
-.tn{display:flex;align-items:center;gap:4px;padding:3px 6px;cursor:pointer;white-space:nowrap;border-radius:4px}
-.tn:hover{background:rgba(148,163,184,.15)}.tn.sel{background:rgba(56,189,248,.28)}
-.tn .car{width:12px;text-align:center;color:var(--muted)}.tn span:last-child{overflow:hidden;text-overflow:ellipsis}
-.kids{margin-left:12px}
-#props{right:12px;top:150px;bottom:62px;width:310px;overflow:auto;padding-bottom:8px}
-#props details{border-top:1px solid var(--border)}
-#props summary{padding:6px 12px;cursor:pointer;font-weight:600;color:var(--muted)}
-.row{display:flex;gap:8px;padding:3px 12px;border-bottom:1px dashed var(--border)}
-.k{color:var(--muted);min-width:96px;max-width:110px;flex-shrink:0}
-.v{word-break:break-word;font:12px Consolas,monospace}
-#tools{position:absolute;left:50%;bottom:12px;transform:translateX(-50%);display:flex;gap:2px;padding:4px;border-radius:10px;background:var(--tool);border:1px solid var(--border);z-index:9;max-width:96vw;overflow-x:auto;box-shadow:0 6px 24px rgba(0,0,0,.3)}
-.t{width:34px;height:34px;flex:none;display:grid;place-items:center;border:0;border-radius:7px;background:transparent;color:var(--text);cursor:pointer}
-.t:hover{background:rgba(148,163,184,.2)}.t.on{background:var(--primary);color:#04202e}
-.t svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
-.sep{width:1px;background:var(--border);margin:4px 3px;flex:none}
-#pop{left:50%;bottom:62px;transform:translateX(-50%);padding:10px 14px;min-width:270px;flex-direction:column;gap:8px}
-#pop label{display:flex;align-items:center;gap:8px;cursor:pointer}
-#pop .r{display:flex;align-items:center;gap:8px}#pop input[type=range]{flex:1}
-#pop b{font-size:12px;color:var(--primary)}
-#vc{position:absolute;right:16px;top:56px;width:84px;height:84px;perspective:320px;z-index:7}
-#cube{width:44px;height:44px;margin:20px;position:relative;transform-style:preserve-3d}
-.cf{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;background:var(--tool);border:1px solid var(--muted);color:var(--text);cursor:pointer;user-select:none}
-.cf:hover{background:var(--primary);color:#04202e}
-#mlabel{position:absolute;display:none;z-index:7;padding:3px 7px;background:rgba(0,0,0,.8);color:#fff;border-radius:4px;font-size:12px;pointer-events:none;transform:translate(-50%,-130%);white-space:nowrap}
-#hint,#stats{position:absolute;bottom:62px;z-index:6;color:var(--muted);font-size:11px;background:var(--tool);padding:4px 8px;border-radius:6px;border:1px solid var(--border);pointer-events:none}
-#hint{left:12px;display:none}#stats{right:12px}
-@media(min-width:1100px){#hint{display:block;bottom:10px}#stats{bottom:10px}}
+:root{--bg:#0d1217;--p:#151c24;--p2:#1b242e;--ln:#26323e;--tx:#d6dee7;--mu:#8696a7;--ac:#35c2b0;--hl:#ffb03a}
+*{box-sizing:border-box}html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--tx);font:13px/1.45 "Segoe UI",system-ui,sans-serif;display:grid;grid-template:48px 1fr/290px 1fr 330px;overflow:hidden}
+header{grid-column:1/-1;display:flex;align-items:center;gap:14px;padding:0 14px;background:var(--p);border-bottom:1px solid var(--ln)}
+header h1{font-size:14px;margin:0;font-weight:600;white-space:nowrap}
+#meta{color:var(--mu);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1}
+#meta b{color:var(--ac);font-weight:600}
+button,.btn{background:var(--p2);color:var(--tx);border:1px solid var(--ln);border-radius:6px;padding:5px 11px;font:inherit;cursor:pointer}
+button:hover,.btn:hover{border-color:var(--ac)}button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--ac);outline-offset:1px}
+button.on{background:var(--ac);color:#05211d;border-color:var(--ac)}
+aside{background:var(--p);overflow:hidden;display:flex;flex-direction:column;min-height:0}
+#L{border-right:1px solid var(--ln)}#R{border-left:1px solid var(--ln)}
+.tabs{display:flex;border-bottom:1px solid var(--ln)}
+.tabs button{flex:1;border:0;border-radius:0;background:none;padding:9px;color:var(--mu)}
+.tabs button.on{color:var(--tx);box-shadow:inset 0 -2px var(--ac);background:none}
+#q{margin:8px;padding:6px 9px;background:var(--bg);border:1px solid var(--ln);border-radius:6px;color:var(--tx);font:inherit}
+.pane{overflow:auto;flex:1;padding:0 6px 12px}
+ul.tr,ul.tr ul{list-style:none;margin:0;padding-left:14px}ul.tr{padding:0}
+.r{display:flex;align-items:center;gap:5px;padding:2px 3px;border-radius:4px}.r:hover{background:var(--p2)}
+.ar{width:12px;color:var(--mu);cursor:pointer;font-weight:400;user-select:none}
+.lb{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer}
+.r i{color:var(--mu);font-style:normal;font-size:11px}
+input[type=checkbox]{accent-color:var(--ac);margin:0}
+main{position:relative;min-height:0}
+#cv{display:block;width:100%;height:100%;outline:none}
+#bar{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);display:flex;gap:6px;flex-wrap:wrap;justify-content:center;background:#151c24ee;border:1px solid var(--ln);padding:7px;border-radius:10px;max-width:96%}
+#bar .sp{width:1px;background:var(--ln)}
+#bar label{display:flex;align-items:center;gap:5px;color:var(--mu)}
+#bar select,#bar input[type=range]{background:var(--bg);color:var(--tx);border:1px solid var(--ln);border-radius:6px;padding:4px}
+#bar input[type=range]{width:90px;padding:0}
+#st{position:absolute;left:12px;top:10px;color:var(--mu);font-size:12px;pointer-events:none}
+#busy,#drop{position:absolute;inset:0;display:none;align-items:center;justify-content:center;background:#0d1217cc;font-size:15px;z-index:5}
+#busy.on,#drop.on{display:flex}#drop{border:2px dashed var(--ac);margin:10px;inset:0}
+#toast{position:absolute;top:12px;right:12px;background:var(--p2);border:1px solid var(--ln);padding:8px 12px;border-radius:8px;display:none;max-width:420px}
+#toast.on{display:block}#toast.e{border-color:#e5534b}
+#empty{position:absolute;inset:0;display:flex;flex-direction:column;gap:10px;align-items:center;justify-content:center;color:var(--mu);text-align:center;pointer-events:none}
+#empty b{color:var(--tx);font-size:16px}
+#props{overflow:auto;flex:1;padding:10px}
+#props h2{font-size:14px;margin:0 0 2px;word-break:break-word}
+details{border-top:1px solid var(--ln);padding:6px 0}summary{cursor:pointer;font-weight:600;padding:2px 0}
+table{width:100%;border-collapse:collapse;font-size:12px;margin-top:4px}
+th{text-align:left;color:var(--mu);font-weight:400;width:42%;vertical-align:top;padding:2px 8px 2px 0}
+td{word-break:break-word;padding:2px 0}
+.mu{color:var(--mu)}
+#cv{touch-action:none}.pane,#props{overscroll-behavior:contain}
+.cl,.mob-btn{display:none}
+@media(max-width:900px){
+ body{grid-template:48px 1fr/1fr;height:100dvh;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
+ header{gap:8px;padding:0 10px}header h1{display:none}.mob-btn{display:inline-block}
+ #L,#R{position:fixed;z-index:20;transition:transform .2s;box-shadow:0 0 30px #000a}
+ #L{top:48px;bottom:0;left:0;width:min(88vw,340px);transform:translateX(-105%)}
+ #R{left:0;right:0;bottom:0;height:46dvh;border:0;border-top:1px solid var(--ln);border-radius:14px 14px 0 0;transform:translateY(105%)}
+ body.tr #L,body.pr #R{transform:none}body.tr #bar,body.pr #bar{display:none}
+ .cl{display:block;margin:6px 8px 0 auto}
+ #bar{flex-wrap:nowrap;justify-content:flex-start;overflow-x:auto;left:8px;right:8px;transform:none;max-width:none;bottom:calc(10px + env(safe-area-inset-bottom));scrollbar-width:none;padding:6px}
+ #bar>*{flex:none}#bar input[type=range]{width:120px}
+ button,.btn{min-height:40px}input[type=checkbox]{width:20px;height:20px}
+ .r{padding:5px 3px}.ar{width:24px;text-align:center;font-size:16px}
+ #q{font-size:16px}#st{font-size:11px}#toast{left:12px;max-width:none}
+}
 </style>
-</head>
-<body>
-<div id="topbar">
-  <div id="title">Đang tải…</div>
-  <span id="recallBadge">⟲ ĐÃ THU HỒI</span>
-  <a class="tb-btn" id="btnDownload" href="#" title="Tải file IFC về máy">Tải về</a>
-  <button class="tb-btn" id="btnClose" title="Đóng tab">Đóng</button>
-</div>
-<div id="stage"></div>
-<div id="overlay"><div id="overlayMsg">Đang khởi tạo viewer…</div><div id="progressWrap"><div id="progressBar"></div></div><div id="overlayHint"></div></div>
-<div id="browser" class="panel"><h4>Cây mô hình</h4><input id="q" placeholder="Tìm theo tên cấu kiện…"><div id="tree"></div></div>
-<div id="props" class="panel"></div>
-<div id="vc"><div id="cube"></div></div>
-<div id="mlabel"></div>
-<div id="pop" class="panel"></div>
-<div id="tools"></div>
-<div id="hint">Trái: xoay · Giữa/Phải: dịch · Lăn: thu phóng · Bấm: chọn (Shift: chọn thêm) · Nhấp đúp: phóng tới cấu kiện</div>
-<div id="stats"></div>
-
 <script>
-(function () {
-  if ((localStorage.getItem('cde_theme') || 'dark') === 'light') document.documentElement.setAttribute('data-theme', 'light');
-  const API = localStorage.getItem('cde_api_url') || ((location.hostname === 'localhost' || location.hostname === '127.0.0.1') ? 'http://localhost:3000' : 'https://api.pvincons.cloud');
-  window.__CDE_API = API;
-  const map = document.createElement('script');
-  map.type = 'importmap';
-  map.textContent = JSON.stringify({ imports: {
-    'three': API + '/vendor/three/build/three.module.js',
-    'three/addons/': API + '/vendor/three/examples/jsm/',
-    'web-ifc': API + '/vendor/web-ifc/web-ifc-api.js' } });
-  document.head.appendChild(map);
+/* Xác định server dữ liệu (cùng server.js của CDE): ?api= > origin của ?file= > cde_api_url > mặc định.
+   Thư viện lấy từ <server>/vendor/... (npm i three@0.160.0 web-ifc@0.0.57), nếu không có thì dùng CDN. */
+(function(){
+ var q=new URLSearchParams(location.search),f=q.get('file')||q.get('url')||q.get('src')||q.get('path')||'',o=null;
+ try{if(/^https?:\/\//i.test(f))o=new URL(f).origin}catch(e){}
+ var local=['localhost','127.0.0.1'].indexOf(location.hostname)>-1;
+ var api=(q.get('api')||o||localStorage.getItem('cde_api_url')||(local?'http://localhost:3000':'https://api.pvincons.cloud')).replace(/\/+$/,'');
+ window.API=api;
+ var C='https://cdn.jsdelivr.net/npm/',ok=false;
+ try{var x=new XMLHttpRequest();x.open('HEAD',api+'/vendor/three/build/three.module.js',false);x.send();
+  ok=x.status==200&&!/html/.test(x.getResponseHeader('content-type')||'');}catch(e){}
+ var t=ok?api+'/vendor/three/':C+'three@0.160.0/',w=ok?api+'/vendor/web-ifc/':C+'web-ifc@0.0.57/';
+ window.WASM=w;
+ var s=document.createElement('script');s.type='importmap';
+ s.textContent=JSON.stringify({imports:{'three':t+'build/three.module.js','three/addons/':t+'examples/jsm/','web-ifc':w+'web-ifc-api.js'}});
+ document.head.appendChild(s);
 })();
 </script>
+</head>
+<body>
+<header>
+ <h1>Xem 3D · IFC</h1>
+ <div id="meta">Chưa mở file</div>
+ <button class="mob-btn" id="mTr">Cấu trúc</button><button class="mob-btn" id="mPr">Thuộc tính</button>
+ <label class="btn">Mở file IFC<input id="file" type="file" accept=".ifc" hidden></label>
+</header>
+
+<aside id="L">
+ <button class="cl">Đóng</button>
+ <div class="tabs"><button class="on" data-t="tree">Cấu trúc</button><button data-t="cls">Lớp IFC</button></div>
+ <input id="q" placeholder="Tìm theo tên, Revit ID, GlobalId rồi nhấn Enter">
+ <div class="pane" id="tree"><ul class="tr" id="trl"></ul></div>
+ <div class="pane" id="cls" hidden></div>
+</aside>
+
+<main>
+ <canvas id="cv" tabindex="0"></canvas>
+ <div id="st"></div>
+ <div id="empty"><b>Kéo thả file .ifc vào đây</b><span>Tối ưu cho IFC xuất từ Revit 2027 (IFC4 / IFC2x3)</span></div>
+ <div id="bar">
+  <button data-v="iso">Phối cảnh</button><button data-v="top">Trên</button><button data-v="front">Trước</button><button data-v="right">Phải</button>
+  <span class="sp"></span>
+  <button id="bFit" title="F">Vừa khung</button><button id="bHide" title="H">Ẩn</button><button id="bIso" title="I">Cô lập</button><button id="bAll" title="A">Hiện hết</button><button id="bX" title="X">Xuyên thấu</button><button id="bM" title="Chọn nhiều đối tượng">Chọn nhiều</button>
+  <span class="sp"></span>
+  <label>Cắt <select id="ax"><option value="0">Tắt</option><option value="2">Cao độ</option><option value="1">Trục X</option><option value="3">Trục Z</option></select></label>
+  <input id="cs" type="range" min="0" max="1000" value="1000" aria-label="Vị trí mặt cắt"><label><input id="ci" type="checkbox">Đảo</label>
+ </div>
+ <div id="busy"></div><div id="drop">Thả file IFC để mở</div><div id="toast"></div>
+</main>
+
+<aside id="R"><button class="cl">Đóng</button><div id="props"><p class="mu">Bấm vào đối tượng trong mô hình để xem thuộc tính. Giữ Ctrl để chọn nhiều.</p></div></aside>
 
 <script type="module">
-const API = window.__CDE_API;
-const $ = (id) => document.getElementById(id);
-const overlay = $('overlay'), overlayMsg = $('overlayMsg'), overlayHint = $('overlayHint'), progressWrap = $('progressWrap'), progressBar = $('progressBar');
-function setStatus(msg, p) { overlayMsg.className = ''; overlayMsg.textContent = msg; if (typeof p === 'number') { progressWrap.style.display = ''; progressBar.style.width = Math.max(0, Math.min(100, p)) + '%'; } }
-function showError(msg, hint) { overlay.style.display = 'flex'; progressWrap.style.display = 'none'; overlayMsg.className = 'error'; overlayMsg.textContent = msg; overlayHint.textContent = hint || ''; }
-$('btnClose').onclick = () => window.close();
+import * as THREE from 'three';
+import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
+import * as WM from 'web-ifc';
+const W=WM.IfcAPI?WM:(WM.default||WM);
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const val=x=>x&&typeof x==='object'&&'value' in x?x.value:x;
+const tick=()=>new Promise(r=>setTimeout(r,40));
+const P=Math.PI,cv=$('#cv');
 
-// ---------- 1. Đường dẫn file ----------
-const normalized = (new URLSearchParams(location.search).get('path') || '').replace(/\\/g, '/');
-if (!/^database\/bim-vdc\//.test(normalized) || normalized.split('/').includes('..') || !/\.ifc$/i.test(normalized)) {
-  showError('Đường dẫn file không hợp lệ hoặc không phải file .ifc.', 'Hãy mở lại từ bảng MIR (nút Xem 3D của file .ifc).');
-  throw new Error('invalid path');
+/* ---------- Three ---------- */
+const mobile=matchMedia('(pointer:coarse)').matches||innerWidth<900,narrow=()=>matchMedia('(max-width:900px)').matches;
+const renderer=new THREE.WebGLRenderer({canvas:cv,antialias:!mobile,powerPreference:'high-performance'});
+const PR=Math.min(devicePixelRatio,mobile?1.5:2);renderer.setPixelRatio(PR);
+const scene=new THREE.Scene();scene.background=new THREE.Color(0x0d1217);
+const cam=new THREE.PerspectiveCamera(45,1,.1,1000);
+const controls=new OrbitControls(cam,cv);
+Object.assign(controls,{enableDamping:true,zoomToCursor:true,screenSpacePanning:true});
+scene.add(new THREE.AmbientLight(0xffffff,.4*P),new THREE.HemisphereLight(0xdfe9ff,0x3a404c,.3*P));
+const sun=new THREE.DirectionalLight(0xffffff,.55*P);sun.position.set(.4,.8,1);cam.add(sun);scene.add(cam);
+/* màu IFC là sRGB → đổi sang tuyến tính trong shader để giữ đúng màu Revit */
+const lam=o=>{const m=new THREE.MeshLambertMaterial({vertexColors:true,side:THREE.DoubleSide,...o});
+ m.onBeforeCompile=s=>{s.fragmentShader=s.fragmentShader.replace('#include <color_fragment>','diffuseColor.rgb*=pow(vColor,vec3(2.2));')};return m};
+const matO=lam({polygonOffset:true,polygonOffsetFactor:1,polygonOffsetUnits:1});
+const matT=lam({transparent:true,opacity:.35,depthWrite:false});
+const hlMat=new THREE.MeshBasicMaterial({color:0xffb03a,transparent:true,opacity:.55,side:THREE.DoubleSide,depthTest:false});
+/* chọn đối tượng bằng GPU (1 pixel) – nhanh với mô hình Revit lớn */
+const pickMat=new THREE.ShaderMaterial({clipping:true,side:THREE.DoubleSide,
+ vertexShader:'#include <clipping_planes_pars_vertex>\nattribute vec3 pickColor;varying vec3 vC;void main(){vC=pickColor;vec4 mvPosition=modelViewMatrix*vec4(position,1.);gl_Position=projectionMatrix*mvPosition;\n#include <clipping_planes_vertex>\n}',
+ fragmentShader:'#include <clipping_planes_pars_fragment>\nvarying vec3 vC;void main(){\n#include <clipping_planes_fragment>\ngl_FragColor=vec4(vC,1.);}'});
+const pickScene=new THREE.Scene(),rt=new THREE.WebGLRenderTarget(1,1),pb=new Uint8Array(4);
+let dirty=true;
+controls.addEventListener('change',()=>dirty=true);
+(function loop(){requestAnimationFrame(loop);if(controls.update()||dirty){dirty=false;renderer.render(scene,cam)}})();
+const host=cv.parentElement;
+const rs=()=>{const w=host.clientWidth,h=host.clientHeight;renderer.setSize(w,h,false);cam.aspect=w/h;cam.updateProjectionMatrix();dirty=true};
+new ResizeObserver(rs).observe(host);
+/* mô hình nặng: hạ độ phân giải khi đang xoay/zoom, trả lại nét khi dừng */
+let triN=0,lr,multi=false;
+const setPR=v=>{if(renderer.getPixelRatio()!==v){renderer.setPixelRatio(v);rs()}};
+controls.addEventListener('start',()=>{clearTimeout(lr);if(triN>3e5)setPR(mobile?.7:1)});
+controls.addEventListener('end',()=>{clearTimeout(lr);lr=setTimeout(()=>setPR(PR),250)});
+
+/* ---------- Trạng thái ---------- */
+let api,mid=-1,els=new Map(),byN=[],bk={},org=null,MB=new THREE.Box3(),kids=new Map(),par=new Map(),rel=null,lu='mm',
+    idxS=null,sel=new Set(),meshes=[],ov=[],xray=false,hasM=new Map();
+const HIDE0=()=>new Set([W.IFCSPACE,W.IFCOPENINGELEMENT,W.IFCVIRTUALELEMENT]); /* Revit xuất IfcSpace/Opening: ẩn mặc định */
+const tn=t=>api.GetNameFromTypeCode(t);
+const busy=t=>{const b=$('#busy');b.textContent=t||'';b.classList.toggle('on',!!t)};
+const toast=(t,e)=>{const x=$('#toast');x.textContent=t;x.className='on'+(e?' e':'');clearTimeout(toast.h);toast.h=setTimeout(()=>x.className='',e?9000:3500)};
+const tv=new THREE.Vector3();
+
+async function init(){api=new W.IfcAPI();api.SetWasmPath(window.WASM,true);await api.Init()}
+const ready=init();
+
+/* ---------- Nạp file ---------- */
+function clearModel(){
+ [...meshes,...ov].forEach(m=>{scene.remove(m);m.geometry.dispose()});meshes=[];ov=[];
+ pickScene.clear();if(mid>=0)try{api.CloseModel(mid)}catch(e){}
+ mid=-1;els=new Map();byN=[];bk={};org=null;rel=null;idxS=null;sel=new Set();hasM=new Map();kids=new Map();par=new Map();
+ $('#trl').innerHTML='';$('#cls').innerHTML='';MB=new THREE.Box3();
+ $('#props').innerHTML='<p class="mu">Bấm vào đối tượng trong mô hình để xem thuộc tính.</p>';
 }
-const parts = normalized.replace(/^database\/bim-vdc\/?/, '').split('/');
-const fileName = parts[parts.length - 1];
-const fileUrl = `${API}/files/${parts.map(encodeURIComponent).join('/')}`;
-document.title = `Xem 3D - ${fileName}`;
-$('title').textContent = fileName; $('title').title = normalized;
-$('btnDownload').href = fileUrl; $('btnDownload').setAttribute('download', fileName);
-
-fetch(`${API}/api/recalls`).then(r => r.ok ? r.json() : {}).then(db => {
-  const i = db[normalized];
-  if (i) { const b = $('recallBadge'); b.style.display = 'inline-block'; b.title = `Thu hồi bởi ${i.by} lúc ${new Date(i.at).toLocaleString('vi-VN')}\nLý do: ${i.reason}`; }
-}).catch(() => {});
-
-// ---------- 2. Nạp thư viện ----------
-let THREE, OrbitControls, WebIFC;
-try {
-  setStatus('Đang nạp thư viện 3D…', 5);
-  THREE = await import('three');
-  ({ OrbitControls } = await import('three/addons/controls/OrbitControls.js'));
-  WebIFC = await import('web-ifc');
-} catch (err) { console.error(err); showError('Không nạp được thư viện xem 3D từ server.', 'Địa chỉ server đang dùng: ' + API); throw err; }
-
-// ---------- 3. Cảnh 3D ----------
-const stage = $('stage');
-const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' });
-renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 2));
-stage.appendChild(renderer.domElement);
-const scene = new THREE.Scene();
-const persp = new THREE.PerspectiveCamera(45, 1, 0.1, 10000), ortho = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 10000);
-let camera = persp, orthoH = 10, dirty = true;
-const redraw = () => { dirty = true; };
-persp.position.set(30, 30, 30);
-
-const controls = new OrbitControls(camera, renderer.domElement);
-Object.assign(controls, { enableDamping: true, dampingFactor: 0.08, zoomSpeed: 1.5, panSpeed: 1.2, screenSpacePanning: true });
-controls.mouseButtons = { LEFT: THREE.MOUSE.ROTATE, MIDDLE: THREE.MOUSE.PAN, RIGHT: THREE.MOUSE.PAN };
-controls.touches = { ONE: THREE.TOUCH.ROTATE, TWO: THREE.TOUCH.DOLLY_PAN };
-controls.addEventListener('change', redraw);
-
-scene.add(new THREE.HemisphereLight(0xffffff, 0x8899aa, 1.1));
-const sun = new THREE.DirectionalLight(0xffffff, 2.0); sun.position.set(60, 100, 40); scene.add(sun);
-const fill = new THREE.DirectionalLight(0xffffff, 0.9); fill.position.set(-60, 40, -50); scene.add(fill);
-
-// Revit/IFC dùng trục Z hướng lên -> xoay về Y-up của three.js
-const modelGroup = new THREE.Group(); modelGroup.rotation.x = -Math.PI / 2; scene.add(modelGroup);
-let grid = null, box = null;
-
-function resize() {
-  const w = stage.clientWidth, h = stage.clientHeight, a = w / h;
-  renderer.setSize(w, h);
-  persp.aspect = a; persp.updateProjectionMatrix();
-  Object.assign(ortho, { left: -orthoH * a, right: orthoH * a, top: orthoH, bottom: -orthoH }); ortho.updateProjectionMatrix();
-  redraw();
+const mk=k=>({k,pos:[],nor:[],col:[],pid:[],idx:[],vc:0,ic:0,list:[]});
+function add(id,v,ix,m,c){
+ let el=els.get(id);
+ if(!el){el={id,n:els.size+1,type:api.GetLineType(mid,id),o:null,t:null,vis:true};els.set(id,el);byN[el.n]=el}
+ const k=c.w<.99?'t':'o',B=bk[k],nv=v.length/6;
+ if(!org)org=[m[12],m[13],m[14]];
+ const p=new Float32Array(nv*3),nr=new Float32Array(nv*3),co=new Uint8Array(nv*3),pi=new Uint8Array(nv*3);
+ const r=c.x*255,g=c.y*255,b=c.z*255,n=el.n;
+ for(let j=0;j<nv;j++){const x=v[6*j],y=v[6*j+1],z=v[6*j+2],a=v[6*j+3],d=v[6*j+4],e=v[6*j+5],q=3*j;
+  p[q]=m[0]*x+m[4]*y+m[8]*z+m[12]-org[0];p[q+1]=m[1]*x+m[5]*y+m[9]*z+m[13]-org[1];p[q+2]=m[2]*x+m[6]*y+m[10]*z+m[14]-org[2];
+  nr[q]=m[0]*a+m[4]*d+m[8]*e;nr[q+1]=m[1]*a+m[5]*d+m[9]*e;nr[q+2]=m[2]*a+m[6]*d+m[10]*e;
+  co[q]=r;co[q+1]=g;co[q+2]=b;pi[q]=n&255;pi[q+1]=(n>>8)&255;pi[q+2]=n>>16}
+ const det=m[0]*(m[5]*m[10]-m[6]*m[9])-m[4]*(m[1]*m[10]-m[2]*m[9])+m[8]*(m[1]*m[6]-m[2]*m[5]);
+ const ii=new Uint32Array(ix.length);
+ for(let i=0;i<ix.length;i+=3){if(det<0){ii[i]=ix[i]+B.vc;ii[i+1]=ix[i+2]+B.vc;ii[i+2]=ix[i+1]+B.vc}else{ii[i]=ix[i]+B.vc;ii[i+1]=ix[i+1]+B.vc;ii[i+2]=ix[i+2]+B.vc}}
+ B.pos.push(p);B.nor.push(nr);B.col.push(co);B.pid.push(pi);B.idx.push(ii);
+ if(!el[k]){el[k]={s:B.ic,c:0};B.list.push(el)}
+ el[k].c+=ii.length;B.vc+=nv;B.ic+=ii.length;
 }
-addEventListener('resize', resize); resize();
-
-function makeGrid() {
-  if (grid) { scene.remove(grid); grid.geometry.dispose(); }
-  if (!box) return;
-  const light = document.documentElement.getAttribute('data-theme') === 'light';
-  const size = Math.ceil(Math.max(box.max.x - box.min.x, box.max.z - box.min.z) * 1.8) || 100;
-  const vis = grid ? grid.visible : true;
-  grid = new THREE.GridHelper(size, 40, 0x38bdf8, light ? 0xaebccd : 0x3a4868);
-  const c = box.getCenter(new THREE.Vector3()); grid.position.set(c.x, box.min.y, c.z); grid.visible = vis;
-  scene.add(grid); redraw();
+const cat=(a,T)=>{const r=new T(a.reduce((s,x)=>s+x.length,0));let o=0;for(const x of a){r.set(x,o);o+=x.length}return r};
+function build(){
+ const D={};
+ for(const k of ['o','t']){const B=bk[k];if(!B.ic)continue;D[k]={pos:cat(B.pos,Float32Array),nor:cat(B.nor,Float32Array),col:cat(B.col,Uint8Array),pid:cat(B.pid,Uint8Array),idx:cat(B.idx,Uint32Array)};
+  B.pos=B.nor=B.col=B.pid=B.idx=null;
+  const a=D[k].pos;for(let i=0;i<a.length;i+=3)MB.expandByPoint(tv.set(a[i],a[i+1],a[i+2]))}
+ const c=MB.getCenter(new THREE.Vector3());
+ for(const k in D){const a=D[k].pos;for(let i=0;i<a.length;i+=3){a[i]-=c.x;a[i+1]-=c.y;a[i+2]-=c.z}}
+ MB.min.sub(c);MB.max.sub(c);
+ const hide=HIDE0();for(const e of els.values())e.vis=!hide.has(e.type);
+ for(const k in D){const B=bk[k],d=D[k],g=new THREE.BufferGeometry();
+  g.setAttribute('position',new THREE.BufferAttribute(d.pos,3));g.setAttribute('normal',new THREE.BufferAttribute(d.nor,3));
+  g.setAttribute('color',new THREE.BufferAttribute(d.col,3,true));g.setAttribute('pickColor',new THREE.BufferAttribute(d.pid,3,true));
+  B.full=d.idx;B.geo=g;g.setIndex(new THREE.BufferAttribute(d.idx.slice(),1).setUsage(THREE.DynamicDrawUsage));
+  const m=new THREE.Mesh(g,k==='o'?matO:matT);m.frustumCulled=false;if(k==='t')m.renderOrder=1;scene.add(m);meshes.push(m);
+  const pm=new THREE.Mesh(g,pickMat);pm.frustumCulled=false;pickScene.add(pm)}
+ refresh();
+ const r=MB.getBoundingSphere(new THREE.Sphere()).radius||1;
+ cam.near=Math.max(r/400,.01);cam.far=r*30;cam.updateProjectionMatrix();
+ go(MB,new THREE.Vector3(1,.8,1));
 }
-function applyTheme(light) {
-  document.documentElement.setAttribute('data-theme', light ? 'light' : 'dark');
-  localStorage.setItem('cde_theme', light ? 'light' : 'dark');
-  makeGrid();
+function refresh(){
+ let vis=0;
+ for(const k in bk){const B=bk[k];if(!B.geo)continue;let o=0;const a=B.geo.index.array;
+  for(const el of B.list){if(!el.vis)continue;const r=el[k];a.set(B.full.subarray(r.s,r.s+r.c),o);o+=r.c}
+  B.geo.index.needsUpdate=true;B.geo.setDrawRange(0,o);vis+=o/3}
+ dirty=true;stat();
+}
+const stat=()=>{let v=0;for(const e of els.values())if(e.vis)v++;$('#st').textContent=els.size?`Hiển thị ${v}/${els.size} đối tượng · đã chọn ${sel.size}`:''};
+
+async function load(buf,name){
+ await ready;busy(mobile&&buf.byteLength>120e6?'Đang đọc file lớn… có thể chậm hoặc thiếu RAM':'Đang đọc file IFC…');await tick();
+ try{
+  clearModel();$('#empty').style.display='none';
+  mid=api.OpenModel(new Uint8Array(buf),{COORDINATE_TO_ORIGIN:true});
+  bk={o:mk('o'),t:mk('t')};busy('Đang dựng hình học…');await tick();
+  api.StreamAllMeshes(mid,m=>{const gs=m.geometries;
+   for(let i=0;i<gs.size();i++){const pg=gs.get(i),g=api.GetGeometry(mid,pg.geometryExpressID);
+    add(m.expressID,api.GetVertexArray(g.GetVertexData(),g.GetVertexDataSize()),api.GetIndexArray(g.GetIndexData(),g.GetIndexDataSize()),pg.flatTransformation,pg.color);g.delete()}});
+  if(!els.size)throw new Error('File không có hình học 3D nào.');
+  busy('Đang tạo cây cấu trúc…');await tick();
+  build();units();spatial();buildTree();buildCls();info(name);
+ }catch(e){console.error(e);toast('Không mở được file IFC: '+(e.message||e),1);$('#empty').style.display=''}
+ busy('');
+}
+function info(name){
+ let app='',sch='';try{sch=api.GetModelSchema(mid)}catch(e){}
+ try{const a=api.GetLineIDsWithType(mid,W.IFCAPPLICATION);if(a.size()){const L=api.GetLine(mid,a.get(0));app=(val(L.ApplicationFullName)||'')+' '+(val(L.Version)||'')}}catch(e){}
+ let tri=0;for(const k in bk)if(bk[k].ic)tri+=bk[k].ic/3;triN=tri;
+ $('#meta').innerHTML=`<b>${esc(name)}</b> · ${esc(sch)} · ${esc(app.trim()||'không rõ phần mềm')} · ${els.size.toLocaleString()} đối tượng · ${Math.round(tri).toLocaleString()} tam giác · đơn vị ${lu}`;
+ document.title=name+' – Xem 3D';
+}
+function units(){lu='m';try{const u=api.GetLineIDsWithType(mid,W.IFCSIUNIT);
+ for(let i=0;i<u.size();i++){const L=api.GetLine(mid,u.get(i));if(val(L.UnitType)==='LENGTHUNIT'){const p=val(L.Prefix);lu=p==='MILLI'?'mm':p==='CENTI'?'cm':'m'}}}catch(e){}}
+
+/* ---------- Cấu trúc không gian ---------- */
+function spatial(){
+ for(const [T,a,b] of [[W.IFCRELAGGREGATES,'RelatingObject','RelatedObjects'],[W.IFCRELCONTAINEDINSPATIALSTRUCTURE,'RelatingStructure','RelatedElements']]){
+  const ids=api.GetLineIDsWithType(mid,T);
+  for(let i=0;i<ids.size();i++){const L=api.GetLine(mid,ids.get(i)),p=L[a].value;
+   for(const h of L[b]){if(!kids.has(p))kids.set(p,[]);kids.get(p).push(h.value);par.set(h.value,p)}}}
+}
+const has=id=>{if(hasM.has(id))return hasM.get(id);const r=els.has(id)||(kids.get(id)||[]).some(has);hasM.set(id,r);return r};
+const desc=(id,o=[])=>{if(els.has(id))o.push(id);for(const c of kids.get(id)||[])desc(c,o);return o};
+const SP=()=>new Set([W.IFCPROJECT,W.IFCSITE,W.IFCBUILDING,W.IFCBUILDINGSTOREY]);
+const nm=id=>{try{return val(api.GetLine(mid,id).Name)||''}catch(e){return ''}};
+function row(ul,label,sub,ids,load,open){
+ let mm;const i0=ids;ids=()=>mm||(mm=i0());
+ const li=document.createElement('li');
+ li.innerHTML='<div class="r"><b class="ar">'+(load?'▸':'')+'</b><input type="checkbox" data-v><span class="lb"></span><i>'+(sub||'')+'</i></div><ul hidden></ul>';
+ const r=li.firstChild,c=li.lastChild,cb=r.querySelector('input'),ar=r.querySelector('.ar'),lb=r.querySelector('.lb');
+ lb.textContent=label;lb.title=label;cb._f=ids;cb.checked=ids().some(i=>els.get(i)?.vis);
+ cb.onchange=()=>setVis(ids(),cb.checked);
+ lb.onclick=e=>select(ids(),e.ctrlKey||e.metaKey);lb.ondblclick=()=>fit(ids());
+ const tg=()=>{if(!load)return;if(!c.dataset.l){load(c);c.dataset.l=1}c.hidden=!c.hidden;ar.textContent=c.hidden?'▸':'▾'};
+ ar.onclick=tg;if(open)tg();ul.appendChild(li);
+}
+function node(id,ul,open){
+ const t=api.GetLineType(mid,id),sp=SP();let ch=(kids.get(id)||[]).filter(has);
+ const S=ch.filter(c=>sp.has(api.GetLineType(mid,c))),O=ch.filter(c=>!sp.has(api.GetLineType(mid,c)));
+ const el=n=>{try{return +val(api.GetLine(mid,n).Elevation)||0}catch(e){return 0}};
+ S.sort((a,b)=>el(a)-el(b));
+ const load=ch.length?c=>{S.forEach(x=>node(x,c,false));
+  const g=new Map();O.forEach(x=>{const k=api.GetLineType(mid,x);if(!g.has(k))g.set(k,[]);g.get(k).push(x)});
+  g.forEach((ids,k)=>row(c,tn(k),ids.length,()=>ids.flatMap(i=>desc(i)),cc=>ids.forEach(x=>node(x,cc,false)),false))}:null;
+ row(ul,nm(id)||tn(t),'',()=>desc(id),load,open);
+}
+function buildTree(){
+ const ul=$('#trl'),p=api.GetLineIDsWithType(mid,W.IFCPROJECT);
+ if(p.size()){const pid=p.get(0);node(pid,ul,true);
+  const f=ul.firstChild.querySelector('ul');
+  const walk=(c,d)=>{if(d>2)return;[...c.children].forEach(li=>{li.querySelector('.ar').click();walk(li.lastChild,d+1)})};
+  walk(f,0)}
+ const orph=[...els.keys()].filter(i=>{let x=i;while(par.has(x))x=par.get(x);return api.GetLineType(mid,x)!==W.IFCPROJECT});
+ if(orph.length)row(ul,'Không thuộc cấu trúc',orph.length,()=>orph,c=>orph.forEach(x=>node(x,c,false)),false);
+}
+function buildCls(){
+ const g=new Map();for(const e of els.values()){if(!g.has(e.type))g.set(e.type,[]);g.get(e.type).push(e.id)}
+ const ul=document.createElement('ul');ul.className='tr';
+ [...g].sort((a,b)=>b[1].length-a[1].length).forEach(([t,ids])=>row(ul,tn(t),ids.length,()=>ids,null,false));
+ $('#cls').appendChild(ul);
+}
+let su=0;const syncUI=()=>{if(su)return;su=requestAnimationFrame(()=>{su=0;$$('input[data-v]').forEach(i=>i.checked=i._f().some(x=>els.get(x)?.vis))})};
+function setVis(ids,b){for(const i of ids){const e=els.get(i);if(e)e.vis=b}refresh();syncUI()}
+
+/* ---------- Chọn & thuộc tính ---------- */
+function select(ids,add){
+ if(!add)sel=new Set();for(const i of ids){if(!els.has(i))continue;if(add&&sel.has(i))sel.delete(i);else sel.add(i)}
+ ov.forEach(m=>{scene.remove(m);m.geometry.dispose()});ov=[];
+ for(const k in bk){const B=bk[k];if(!B.geo)continue;const A=B.geo.attributes.position.array,out=[];
+  for(const id of sel){const r=els.get(id)?.[k];if(!r)continue;for(let i=r.s;i<r.s+r.c;i++){const v=B.full[i]*3;out.push(A[v],A[v+1],A[v+2])}}
+  if(!out.length)continue;const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(out,3));
+  const m=new THREE.Mesh(g,hlMat);m.renderOrder=5;m.frustumCulled=false;scene.add(m);ov.push(m)}
+ dirty=true;stat();
+ const last=[...sel].pop();
+ if(narrow()){document.body.classList.remove('tr');document.body.classList.toggle('pr',last!==undefined)}
+ if(last!==undefined)try{props(last)}catch(e){console.error(e);$('#props').innerHTML='<p class="mu">Không đọc được thuộc tính.</p>'}
+ else $('#props').innerHTML='<p class="mu">Bấm vào đối tượng trong mô hình để xem thuộc tính.</p>';
+}
+function pick(cx,cy){
+ const r=cv.getBoundingClientRect(),c=new THREE.Color(),a=renderer.getClearAlpha();renderer.getClearColor(c);
+ cam.setViewOffset(r.width,r.height,cx-r.left,cy-r.top,1,1);
+ renderer.setRenderTarget(rt);renderer.setClearColor(0,1);renderer.clear();renderer.render(pickScene,cam);
+ renderer.readRenderTargetPixels(rt,0,0,1,1,pb);renderer.setRenderTarget(null);renderer.setClearColor(c,a);cam.clearViewOffset();dirty=true;
+ const n=pb[0]|pb[1]<<8|pb[2]<<16;return n&&byN[n]?byN[n].id:null;
+}
+let dn=null,lastTap=0;const tp=new Set();
+cv.addEventListener('pointerdown',e=>{tp.add(e.pointerId);dn=tp.size===1?[e.clientX,e.clientY,performance.now()]:null});
+cv.addEventListener('pointercancel',e=>tp.delete(e.pointerId));
+cv.addEventListener('pointerup',e=>{tp.delete(e.pointerId);
+ if(!dn||!els.size||Math.hypot(e.clientX-dn[0],e.clientY-dn[1])>8||performance.now()-dn[2]>500)return;dn=null;
+ const id=pick(e.clientX,e.clientY),ctl=e.ctrlKey||e.metaKey||multi,now=performance.now();
+ if(id===null){if(!ctl)select([]);return}
+ if(e.pointerType==='touch'&&now-lastTap<350&&sel.has(id))fit([id]);else select([id],ctl);lastTap=now});
+cv.addEventListener('dblclick',e=>{const id=pick(e.clientX,e.clientY);if(id!==null)fit([id])});
+
+const fmt=(x,u)=>{if(x==null)return '';const v=val(x);if(v===true||v==='T'||v==='.T.')return 'Có';if(v===false||v==='F'||v==='.F.')return 'Không';
+ if(typeof v==='number'){const t=x.label||'';return +v.toFixed(3)+(u||(/AREA/.test(t)?' m²':/VOLUME/.test(t)?' m³':/LENGTH/.test(t)?' '+lu:''))}return v??''};
+function relIdx(){
+ if(rel)return;rel={p:new Map(),t:new Map(),m:new Map()};
+ for(const [T,k,key] of [[W.IFCRELDEFINESBYPROPERTIES,'RelatingPropertyDefinition','p'],[W.IFCRELDEFINESBYTYPE,'RelatingType','t'],[W.IFCRELASSOCIATESMATERIAL,'RelatingMaterial','m']]){
+  const ids=api.GetLineIDsWithType(mid,T);
+  for(let i=0;i<ids.size();i++){const L=api.GetLine(mid,ids.get(i)),tg=L[k];if(!tg)continue;
+   const t=Array.isArray(tg)?tg.map(h=>h.value):[tg.value];
+   for(const o of L.RelatedObjects){const m=rel[key],id=o.value;if(key==='p'){if(!m.has(id))m.set(id,[]);m.get(id).push(...t)}else m.set(id,t[0])}}}
+}
+function ps(d){
+ const L=api.GetLine(mid,d),rows=[];
+ for(const h of [...(L.HasProperties||[]),...(L.Quantities||[])]){const q=api.GetLine(mid,h.value);let s;
+  if(q.EnumerationValues)s=q.EnumerationValues.map(x=>fmt(x)).join(', ');
+  else if(q.ListValues)s=q.ListValues.map(x=>fmt(x)).join(', ');
+  else if(q.UpperBoundValue||q.LowerBoundValue)s=fmt(q.LowerBoundValue)+' – '+fmt(q.UpperBoundValue);
+  else if(q.LengthValue!=null)s=fmt(q.LengthValue,' '+lu);
+  else if(q.AreaValue!=null)s=fmt(q.AreaValue,' m²');
+  else if(q.VolumeValue!=null)s=fmt(q.VolumeValue,' m³');
+  else if(q.WeightValue!=null)s=fmt(q.WeightValue,' kg');
+  else if(q.CountValue!=null)s=fmt(q.CountValue);
+  else s=fmt(q.NominalValue);
+  rows.push([val(q.Name),s])}
+ return{n:val(L.Name)||'Pset',rows};
+}
+function mats(id,d=0,o=new Set()){
+ if(!id||d>5)return o;const L=api.GetLine(mid,id);if(!L)return o;
+ if(api.GetLineType(mid,id)===W.IFCMATERIAL){o.add(val(L.Name));return o}
+ for(const k of ['ForLayerSet','ForProfileSet','Material'])if(L[k])mats(L[k].value,d+1,o);
+ for(const k of ['MaterialLayers','Materials','MaterialConstituents','MaterialProfiles'])for(const h of L[k]||[])mats(h.value,d+1,o);
+ return o;
+}
+function props(id){
+ relIdx();const el=els.get(id),L=api.GetLine(mid,id),name=val(L.Name)||'(không tên)',pt=String(name).split(':');
+ const R=(a,b)=>b!==undefined&&b!==null&&b!==''?`<tr><th>${a}</th><td>${esc(b)}</td></tr>`:'';
+ const S=(t,body,open)=>body?`<details ${open?'open':''}><summary>${esc(t)}</summary><table>${body}</table></details>`:'';
+ const T=rows=>rows.map(r=>R(r[0],r[1])).join('');
+ let h=`<h2>${esc(name)}</h2><div class="mu">${esc(tn(el.type))}${sel.size>1?` · +${sel.size-1} đối tượng khác`:''}</div>`;
+ let g=R('Lớp IFC',tn(el.type)+(val(L.PredefinedType)?' · '+val(L.PredefinedType):''))+R('Revit ElementId (Tag)',val(L.Tag))+R('GlobalId',val(L.GlobalId))+R('ObjectType',val(L.ObjectType))+R('Mô tả',val(L.Description));
+ if(pt.length>=3)g+=R('Family',pt[0])+R('Type',pt.slice(1,-1).join(':'));
+ const p=par.get(id);if(p){let x=p;while(x&&api.GetLineType(mid,x)!==W.IFCBUILDINGSTOREY)x=par.get(x);if(x)g+=R('Tầng / Level',nm(x))}
+ h+=S('Thông tin chung',g,true);
+ const m=[...mats(rel.m.get(id))].filter(Boolean);if(m.length)h+=S('Vật liệu',m.map(x=>R('',x)).join(''),true);
+ for(const d of rel.p.get(id)||[]){const s=ps(d);if(s.rows.length)h+=S(s.n,T(s.rows),false)}
+ const ty=rel.t.get(id);if(ty){const TL=api.GetLine(mid,ty);h+=`<div class="mu" style="margin-top:8px">Loại: ${esc(val(TL.Name)||'')}</div>`;
+  for(const hh of TL.HasPropertySets||[]){const s=ps(hh.value);if(s.rows.length)h+=S(s.n+' (loại)',T(s.rows),false)}}
+ $('#props').innerHTML=h;
 }
 
-(function loop() {
-  requestAnimationFrame(loop);
-  const ch = controls.update();
-  if (ch || dirty) { dirty = false; renderer.render(scene, camera); updCube(); updMeasure(); }
+/* ---------- Camera ---------- */
+function bbox(ids){const b=new THREE.Box3();
+ for(const k in bk){const B=bk[k];if(!B.geo)continue;const A=B.geo.attributes.position.array;
+  for(const id of ids){const r=els.get(id)?.[k];if(!r)continue;for(let i=r.s;i<r.s+r.c;i++){const v=B.full[i]*3;b.expandByPoint(tv.set(A[v],A[v+1],A[v+2]))}}}return b}
+function go(b,d){
+ if(b.isEmpty())return;const c=b.getCenter(new THREE.Vector3()),r=b.getBoundingSphere(new THREE.Sphere()).radius||1;
+ d=(d||cam.position.clone().sub(controls.target)).clone().normalize();
+ cam.position.copy(c).addScaledVector(d,r/Math.sin(cam.fov*P/360)*1.05);controls.target.copy(c);controls.update();dirty=true;
+}
+const fit=ids=>go(ids&&ids.length?bbox(ids):MB);
+const VIEWS={iso:[1,.8,1],top:[0,1,.001],front:[0,.12,1],right:[1,.12,0]};
+$$('[data-v]').forEach(b=>{if(b.tagName==='BUTTON')b.onclick=()=>go(MB,new THREE.Vector3(...VIEWS[b.dataset.v]))});
+
+/* ---------- Công cụ ---------- */
+const sels=()=>[...sel];
+function hideSel(){if(!sel.size)return;setVis(sels(),false);select([])}
+function isoSel(){if(!sel.size)return;for(const e of els.values())e.vis=sel.has(e.id);refresh();syncUI()}
+function showAll(){const h=HIDE0();for(const e of els.values())e.vis=!h.has(e.type);refresh();syncUI()}
+function xr(){xray=!xray;$('#bX').classList.toggle('on',xray);Object.assign(matO,{transparent:xray,opacity:xray?.22:1,depthWrite:!xray});matO.needsUpdate=true;dirty=true}
+$('#bFit').onclick=()=>fit(sels());$('#bHide').onclick=hideSel;$('#bIso').onclick=isoSel;$('#bAll').onclick=showAll;$('#bX').onclick=xr;
+const B=document.body.classList;
+$('#mTr').onclick=()=>{B.remove('pr');B.toggle('tr')};$('#mPr').onclick=()=>{B.remove('tr');B.toggle('pr')};
+$$('.cl').forEach(b=>b.onclick=()=>B.remove('tr','pr'));
+$('#bM').onclick=e=>{multi=!multi;e.currentTarget.classList.toggle('on',multi)};
+const pl=new THREE.Plane();
+function clip(){
+ const a=+$('#ax').value;if(!a||MB.isEmpty()){renderer.clippingPlanes=[];dirty=true;return}
+ const i=a-1,mn=MB.min.getComponent(i),mx=MB.max.getComponent(i),c0=mn+(mx-mn)*$('#cs').value/1000,s=$('#ci').checked?-1:1;
+ pl.normal.set(0,0,0).setComponent(i,-s);pl.constant=s*c0;renderer.clippingPlanes=[pl];dirty=true;
+}
+$('#ax').onchange=clip;$('#cs').oninput=clip;$('#ci').onchange=clip;
+addEventListener('keydown',e=>{if(/INPUT|SELECT/.test(e.target.tagName))return;const k=e.key.toLowerCase();
+ if(k==='f')fit(sels());else if(k==='h')hideSel();else if(k==='i')isoSel();else if(k==='a')showAll();else if(k==='x')xr();else if(e.key==='Escape')select([])});
+$$('.tabs button').forEach(b=>b.onclick=()=>{$$('.tabs button').forEach(x=>x.classList.toggle('on',x===b));$('#tree').hidden=b.dataset.t!=='tree';$('#cls').hidden=b.dataset.t!=='cls'});
+$('#q').onkeydown=async e=>{
+ if(e.key!=='Enter'||!els.size)return;const q=e.target.value.trim().toLowerCase();if(!q)return;
+ e.target.blur();busy('Đang tìm…');await tick();const hit=[];
+ if(!idxS){idxS=new Map();let n=0;for(const id of els.keys()){const L=api.GetLine(mid,id);idxS.set(id,[val(L.Name),val(L.Tag),val(L.GlobalId)].join(' ').toLowerCase());
+  if(++n%2000===0){busy(`Đang lập chỉ mục… ${Math.round(n/els.size*100)}%`);await tick()}}}
+ for(const [id,t] of idxS)if(t.includes(q))hit.push(id);
+ busy('');for(const i of hit){els.get(i).vis=true}refresh();syncUI();select(hit);if(hit.length)fit(hit);toast(`Tìm thấy ${hit.length} đối tượng`);
+};
+
+/* ---------- Mở file: nút, kéo thả, ?file= ---------- */
+const readFile=f=>f.arrayBuffer().then(b=>load(b,f.name));
+$('#file').onchange=e=>e.target.files[0]&&readFile(e.target.files[0]);
+['dragenter','dragover'].forEach(t=>addEventListener(t,e=>{e.preventDefault();$('#drop').classList.add('on')}));
+['dragleave','drop'].forEach(t=>addEventListener(t,e=>{e.preventDefault();if(t==='drop'||e.target===$('#drop'))$('#drop').classList.remove('on')}));
+addEventListener('drop',e=>{const f=e.dataTransfer.files[0];if(f)readFile(f)});
+const q=new URLSearchParams(location.search),src=q.get('file')||q.get('url')||q.get('src')||q.get('path');
+/* Chấp nhận cả URL đầy đủ lẫn đường dẫn dạng "database/bim-vdc/..." (tương thích mir.html cũ) */
+function resolveSrc(s){
+ if(/^https?:\/\//i.test(s))return s;
+ const m=s.match(/^\/?database\/bim-vdc\/?(.*)$/);
+ return m?`${window.API}/files/${m[1].split('/').map(encodeURIComponent).join('/')}`:s;
+}
+if(src)(async()=>{
+ const name=q.get('name')||decodeURIComponent(src.split('?')[0].split('/').pop());
+ if(!/\.ifc$/i.test(name)){toast('Trình xem này chỉ mở được file .ifc. Với Revit (.rvt), hãy xuất sang IFC từ Revit 2027.',1);return}
+ busy('Đang tải file…');
+ try{const r=await fetch(resolveSrc(src));if(!r.ok)throw new Error(r.status===404?'không tìm thấy file trên server (404)':'HTTP '+r.status);
+  const tot=+r.headers.get('content-length')||0;let buf;
+  if(r.body&&tot&&!r.headers.get('content-encoding')){const rd=r.body.getReader(),out=new Uint8Array(tot);let n=0;
+   for(;;){const{done,value}=await rd.read();if(done)break;out.set(value,n);n+=value.length;busy(`Đang tải file… ${Math.round(n/tot*100)}% (${(n/1048576).toFixed(0)}/${(tot/1048576).toFixed(0)} MB)`)}
+   buf=out.buffer}else buf=await r.arrayBuffer();
+  await load(buf,name)}
+ catch(e){busy('');toast('Không tải được file: '+(e.message||e),1)}
 })();
-
-// ---------- 4. Tải file ----------
-async function download(url) {
-  const res = await fetch(url);
-  if (!res.ok) throw new Error(`Không tải được file (HTTP ${res.status}).`);
-  const total = Number(res.headers.get('Content-Length')) || 0, reader = res.body.getReader(), chunks = []; let got = 0;
-  for (;;) {
-    const { done, value } = await reader.read(); if (done) break;
-    chunks.push(value); got += value.length;
-    const mb = (got / 1048576).toFixed(1);
-    if (total) setStatus(`Đang tải file… ${mb} / ${(total / 1048576).toFixed(1)} MB`, 10 + (got / total) * 40); else setStatus(`Đang tải file… ${mb} MB`, 30);
-  }
-  const out = new Uint8Array(got); let off = 0;
-  for (const c of chunks) { out.set(c, off); off += c.length; }
-  return out;
-}
-let data;
-try { data = await download(fileUrl); }
-catch (err) { console.error(err); showError(err.message || 'Không tải được file IFC.', 'Kiểm tra lại kết nối server CDE.'); throw err; }
-
-// ---------- 5. Đọc IFC (tối ưu cho Revit) ----------
-const ifcApi = new WebIFC.IfcAPI();
-let modelID = -1, triCount = 0;
-const materials = new Map(), geomCache = new Map(), pickables = [], meshByID = new Map(), typeOf = new Map(), typeNames = new Map();
-const tName = (code) => { let n = typeNames.get(code); if (!n) { try { n = ifcApi.GetNameFromTypeCode(code); } catch (e) { n = 'IFC'; } typeNames.set(code, n); } return n; };
-const SKIP = new Set(['IFCOPENINGELEMENT', 'IFCOPENINGSTANDARDCASE', 'IFCANNOTATION', 'IFCGRID']);
-
-function getMaterial(c) {
-  const key = [c.x, c.y, c.z, c.w].map(n => n.toFixed(3)).join('|');
-  let m = materials.get(key);
-  if (!m) {
-    m = new THREE.MeshLambertMaterial({ color: new THREE.Color().setRGB(c.x, c.y, c.z, THREE.SRGBColorSpace), side: THREE.DoubleSide, transparent: c.w < 0.999, opacity: c.w, depthWrite: c.w >= 0.999 });
-    materials.set(key, m);
-  }
-  return m;
-}
-try {
-  setStatus('Đang khởi tạo bộ đọc IFC…', 55);
-  ifcApi.SetWasmPath(`${API}/vendor/web-ifc/`, true);
-  await ifcApi.Init();
-  setStatus('Đang phân tích mô hình…', 65);
-  await new Promise(r => setTimeout(r, 30));
-  modelID = ifcApi.OpenModel(data, { COORDINATE_TO_ORIGIN: true });
-  data = null;
-  setStatus('Đang dựng hình học 3D…', 80);
-  await new Promise(r => setTimeout(r, 30));
-
-  ifcApi.StreamAllMeshes(modelID, (flat) => {
-    const eid = flat.expressID;
-    let tn; try { tn = tName(ifcApi.GetLineType(modelID, eid)); } catch (e) { tn = 'IFC'; }
-    if (SKIP.has(tn)) return;
-    const geoms = flat.geometries;
-    for (let i = 0; i < geoms.size(); i++) {
-      const placed = geoms.get(i);
-      let bg = geomCache.get(placed.geometryExpressID);   // Revit lặp lại family -> dùng chung geometry
-      const geom = ifcApi.GetGeometry(modelID, placed.geometryExpressID);
-      if (!bg) {
-        const verts = ifcApi.GetVertexArray(geom.GetVertexData(), geom.GetVertexDataSize());
-        const index = ifcApi.GetIndexArray(geom.GetIndexData(), geom.GetIndexDataSize());
-        if (!verts.length || !index.length) { geom.delete(); continue; }
-        const buf = new THREE.InterleavedBuffer(Float32Array.from(verts), 6);
-        bg = new THREE.BufferGeometry();
-        bg.setAttribute('position', new THREE.InterleavedBufferAttribute(buf, 3, 0));
-        bg.setAttribute('normal', new THREE.InterleavedBufferAttribute(buf, 3, 3));
-        bg.setIndex(new THREE.BufferAttribute(Uint32Array.from(index), 1));
-        bg.computeBoundingBox();
-        geomCache.set(placed.geometryExpressID, bg);
-      }
-      const mesh = new THREE.Mesh(bg, getMaterial(placed.color));
-      mesh.matrix.fromArray(placed.flatTransformation); mesh.matrixAutoUpdate = false;
-      mesh.userData = { id: eid, type: tn, base: mesh.matrix.clone() };
-      modelGroup.add(mesh); pickables.push(mesh);
-      (meshByID.get(eid) || meshByID.set(eid, []).get(eid)).push(mesh);
-      typeOf.set(eid, tn);
-      triCount += bg.index.count / 3;
-      geom.delete();
-    }
-  });
-} catch (err) { console.error(err); showError('Không đọc được file IFC này.', err.message || err); throw err; }
-if (!pickables.length) { showError('File IFC không chứa hình học 3D để hiển thị.', 'Hãy kiểm tra lại cấu hình xuất IFC từ phần mềm gốc.'); throw new Error('empty model'); }
-
-// ---------- 6. Khung nhìn ----------
-modelGroup.updateMatrixWorld(true);
-box = new THREE.Box3();
-pickables.forEach(m => box.union(m.geometry.boundingBox.clone().applyMatrix4(m.matrixWorld)));
-let viewDir = new THREE.Vector3(0.7, 0.6, 0.7).normalize();
-function boxOf(ids) {
-  const b = new THREE.Box3();
-  ids.forEach(id => (meshByID.get(id) || []).forEach(m => { if (m.visible) b.union(m.geometry.boundingBox.clone().applyMatrix4(m.matrixWorld)); }));
-  return b;
-}
-function fitBox(b, keepDir = true) {
-  if (!b || b.isEmpty()) b = box;
-  const c = b.getCenter(new THREE.Vector3()), s = b.getSize(new THREE.Vector3()), r = Math.max(s.x, s.y, s.z) || 10;
-  const d = Math.abs(r / Math.sin(persp.fov * Math.PI / 360)) * 0.75;
-  if (keepDir) viewDir.copy(camera.position).sub(controls.target).normalize();
-  camera.position.copy(c).addScaledVector(viewDir, d);
-  if (camera === ortho) { orthoH = r * 0.7; ortho.zoom = 1; resize(); }
-  persp.near = ortho.near = Math.max(d / 500, 0.01); persp.far = ortho.far = d * 30;
-  persp.updateProjectionMatrix(); ortho.updateProjectionMatrix();
-  controls.target.copy(c); controls.update(); redraw();
-}
-const fitIds = (ids) => fitBox(boxOf(ids));
-makeGrid(); fitBox(box, false);
-applyTheme(localStorage.getItem('cde_theme') === 'light');
-$('stats').textContent = `${meshByID.size.toLocaleString('vi-VN')} cấu kiện · ${Math.round(triCount).toLocaleString('vi-VN')} tam giác`;
-overlay.style.display = 'none';
-
-// ViewCube
-const cube = $('cube');
-[['TRƯỚC', 'translateZ(22px)', [0, 0, 1]], ['SAU', 'rotateY(180deg) translateZ(22px)', [0, 0, -1]], ['PHẢI', 'rotateY(90deg) translateZ(22px)', [1, 0, 0]],
- ['TRÁI', 'rotateY(-90deg) translateZ(22px)', [-1, 0, 0]], ['TRÊN', 'rotateX(90deg) translateZ(22px)', [0, 1, 0.0001]], ['DƯỚI', 'rotateX(-90deg) translateZ(22px)', [0, -1, 0.0001]]
-].forEach(([t, tf, n]) => {
-  const f = document.createElement('div'); f.className = 'cf'; f.textContent = t; f.style.transform = tf;
-  f.onclick = () => { viewDir.set(...n).normalize(); fitBox(boxOf(sel.size ? [...sel] : [...meshByID.keys()]), false); };
-  cube.appendChild(f);
-});
-const _m = new THREE.Matrix4(), _q = new THREE.Quaternion();
-function updCube() {
-  _m.makeRotationFromQuaternion(_q.copy(camera.quaternion).invert()); const e = _m.elements;
-  cube.style.transform = `matrix3d(${e[0]},${-e[1]},${e[2]},0,${-e[4]},${e[5]},${-e[6]},0,${e[8]},${-e[9]},${e[10]},0,0,0,0,1)`;
-}
-
-// ---------- 7. Chọn / ẩn / cô lập ----------
-const hl = new THREE.MeshLambertMaterial({ color: 0x2d8cff, emissive: 0x0a3a73, side: THREE.DoubleSide });
-const sel = new Set(), hidden = new Set(), orig = new Map(), rowByID = new Map();
-let iso = null, showSpaces = false, propsOn = true;
-
-function updVis() {
-  pickables.forEach(m => { const u = m.userData; m.visible = !hidden.has(u.id) && (!iso || iso.has(u.id)) && (showSpaces || u.type !== 'IFCSPACE'); });
-  redraw();
-}
-function paint() {
-  orig.forEach((mat, m) => { m.material = mat; }); orig.clear();
-  sel.forEach(id => (meshByID.get(id) || []).forEach(m => { orig.set(m, m.material); m.material = hl; }));
-  rowByID.forEach(r => r.classList.remove('sel'));
-  let first = null;
-  sel.forEach(id => { const r = rowByID.get(id); if (r) { r.classList.add('sel'); first = first || r; } });
-  if (first) first.scrollIntoView({ block: 'nearest' });
-  showInfo(); redraw();
-}
-function setSel(ids, add) {
-  if (!add) sel.clear();
-  if (add && ids.length === 1 && sel.has(ids[0])) sel.delete(ids[0]); else ids.forEach(i => sel.add(i));
-  paint();
-}
-const val = (x) => (x == null ? '' : (typeof x === 'object' && 'value' in x) ? String(x.value ?? '') : String(x));
-const nameOf = (id) => { try { return val(ifcApi.GetLine(modelID, id, false).Name) || ('#' + id); } catch (e) { return '#' + id; } };
-const pretty = (t) => { t = t.replace(/^IFC/i, ''); return t.charAt(0) + t.slice(1).toLowerCase(); };
-
-// ---------- 8. Bảng thuộc tính ----------
-const props = $('props');
-function section(title, rows, open) {
-  rows = rows.filter(r => r[1] !== ''); if (!rows.length) return;
-  const d = document.createElement('details'); d.open = !!open;
-  const s = document.createElement('summary'); s.textContent = title; d.appendChild(s);
-  rows.forEach(([k, v]) => {
-    const r = document.createElement('div'); r.className = 'row';
-    const a = document.createElement('div'); a.className = 'k'; a.textContent = k; a.title = k;
-    const b = document.createElement('div'); b.className = 'v'; b.textContent = v;
-    r.append(a, b); d.appendChild(r);
-  });
-  props.appendChild(d);
-}
-function psetRows(sets) {
-  (sets || []).forEach(ps => {
-    const name = val(ps.Name) || 'Pset';
-    const items = ps.HasProperties || ps.Quantities || [];
-    const rows = items.map(p => {
-      if (p.NominalValue !== undefined) return [val(p.Name), val(p.NominalValue)];
-      const k = Object.keys(p).find(k => /Value$/.test(k) && k !== 'NominalValue');
-      const u = { LengthValue: ' m', AreaValue: ' m²', VolumeValue: ' m³', WeightValue: ' kg' }[k] || '';
-      let v = k ? p[k] : ''; if (v && typeof v === 'object') v = v.value;
-      return [val(p.Name), typeof v === 'number' ? (+v.toFixed(4)) + u : val(v)];
-    });
-    section(name, rows, /^(Pset_.*Common|Constraints|Dimensions|Identity Data|Other)$/i.test(name));
-  });
-}
-function showInfo() {
-  props.replaceChildren(); $('props').style.display = 'none';
-  if (!sel.size || !propsOn) return;
-  const h = document.createElement('h4'); h.textContent = sel.size > 1 ? `Đã chọn ${sel.size} cấu kiện` : 'Thông tin cấu kiện'; props.appendChild(h);
-  props.style.display = 'block';
-  if (sel.size > 1) return;
-  const id = [...sel][0];
-  try {
-    const l = ifcApi.GetLine(modelID, id);
-    section('Nhận dạng', [['Loại IFC', typeOf.get(id) || ''], ['Tên', val(l.Name)], ['Mô tả', val(l.Description)], ['ObjectType', val(l.ObjectType)], ['Tag', val(l.Tag)], ['GlobalId', val(l.GlobalId)], ['ExpressID', String(id)]], true);
-  } catch (e) { section('Nhận dạng', [['ExpressID', String(id)]], true); }
-  try { psetRows(ifcApi.GetPropertySets(modelID, id, true)); } catch (e) { }
-  try { const t = ifcApi.GetTypeProperties(modelID, id, true); (t || []).forEach(tp => { section('Type: ' + (val(tp.Name) || ''), [['Tên type', val(tp.Name)], ['Mô tả', val(tp.Description)]], false); psetRows(tp.HasPropertySets); }); } catch (e) { }
-}
-
-// ---------- 9. Cây mô hình ----------
-const treeEl = $('tree');
-function mk(n) {
-  const t = typeof n.type === 'number' ? tName(n.type) : String(n.type);
-  let kids = (n.children || []).map(mk).filter(Boolean);
-  const own = meshByID.has(n.expressID);
-  const ids = [...(own ? [n.expressID] : []), ...kids.flatMap(k => k.ids)];
-  if (!ids.length) return null;
-  if (/STOREY|SPACE/.test(t)) {          // gom theo loại cấu kiện (Tường, Sàn, Cột…)
-    const g = {}, out = [];
-    kids.forEach(x => { if (x.kids.length) out.push(x); else (g[x.t] = g[x.t] || []).push(x); });
-    for (const k in g) out.push({ cat: pretty(k), t: k, ids: g[k].flatMap(x => x.ids), kids: g[k] });
-    kids = out;
-  }
-  return { id: n.expressID, t, own, ids, kids };
-}
-function row(n, host, depth) {
-  const w = document.createElement('div'), r = document.createElement('div'); r.className = 'tn';
-  const car = document.createElement('span'); car.className = 'car'; car.textContent = n.kids.length ? '▸' : '';
-  const lb = document.createElement('span'); lb.textContent = n.cat ? `${n.cat} (${n.ids.length})` : nameOf(n.id); lb.title = lb.textContent;
-  r.append(car, lb); w.appendChild(r); host.appendChild(w);
-  if (n.own && !n.cat) rowByID.set(n.id, r);
-  let k = null;
-  const toggle = () => {
-    if (!n.kids.length) return;
-    if (!k) { k = document.createElement('div'); k.className = 'kids'; n.kids.forEach(c => row(c, k, depth + 1)); w.appendChild(k); car.textContent = '▾'; return; }
-    const open = k.style.display === 'none'; k.style.display = open ? '' : 'none'; car.textContent = open ? '▾' : '▸';
-  };
-  car.onclick = (e) => { e.stopPropagation(); toggle(); };
-  r.onclick = (e) => setSel(n.ids, e.shiftKey || e.ctrlKey);
-  r.ondblclick = () => fitIds(n.ids);
-  if (depth < 3 && n.kids.length && !/STOREY/.test(n.t)) toggle();
-}
-function buildTree() {
-  treeEl.replaceChildren(); rowByID.clear();
-  let root;
-  try { root = mk(ifcApi.GetSpatialStructure(modelID, false)); } catch (e) { root = null; }
-  if (!root) {   // dự phòng: gom theo loại
-    const g = {}; meshByID.forEach((_, id) => (g[typeOf.get(id)] = g[typeOf.get(id)] || []).push({ id, t: typeOf.get(id), own: true, ids: [id], kids: [] }));
-    root = { id: 0, t: 'IFCPROJECT', ids: [...meshByID.keys()], kids: Object.keys(g).map(k => ({ cat: pretty(k), t: k, ids: g[k].map(x => x.id), kids: g[k] })) };
-    root.own = false; root.cat = 'Mô hình';
-  }
-  row(root, treeEl, 0);
-}
-buildTree();
-let nameIdx = null;
-$('q').oninput = (e) => {
-  const q = e.target.value.trim().toLowerCase();
-  if (!q) return buildTree();
-  nameIdx = nameIdx || [...meshByID.keys()].map(id => [id, nameOf(id).toLowerCase()]);
-  treeEl.replaceChildren(); rowByID.clear();
-  nameIdx.filter(x => x[1].includes(q) || (typeOf.get(x[0]) || '').toLowerCase().includes(q)).slice(0, 300)
-    .forEach(([id]) => row({ id, t: typeOf.get(id), own: true, ids: [id], kids: [] }, treeEl, 9));
-};
-
-// ---------- 10. Chuột: chọn, đo ----------
-const raycaster = new THREE.Raycaster(), ptr = new THREE.Vector2();
-let downPos = null, measuring = false;
-const mpts = [], mLabel = $('mlabel');
-const mLine = new THREE.Line(new THREE.BufferGeometry(), new THREE.LineBasicMaterial({ color: 0xffc107, depthTest: false }));
-mLine.renderOrder = 999; mLine.frustumCulled = false; mLine.visible = false; scene.add(mLine);
-function hitAt(e) {
-  const r = renderer.domElement.getBoundingClientRect();
-  ptr.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
-  raycaster.setFromCamera(ptr, camera);
-  const pl = renderer.clippingPlanes;
-  return raycaster.intersectObjects(pickables.filter(m => m.visible), false).find(h => pl.every(p => p.distanceToPoint(h.point) >= 0));
-}
-function updMeasure() {
-  if (!mpts.length) { mLabel.style.display = 'none'; return; }
-  const p = mpts.length === 2 ? mpts[0].clone().add(mpts[1]).multiplyScalar(0.5) : mpts[0];
-  const v = p.clone().project(camera);
-  mLabel.style.display = v.z < 1 ? 'block' : 'none';
-  mLabel.style.left = ((v.x + 1) / 2 * stage.clientWidth) + 'px'; mLabel.style.top = ((1 - v.y) / 2 * stage.clientHeight + 44) + 'px';
-}
-function measureClick(pt) {
-  if (mpts.length >= 2) mpts.length = 0;
-  mpts.push(pt.clone());
-  if (mpts.length === 2) {
-    mLine.geometry.setFromPoints(mpts); mLine.visible = true;
-    const d = mpts[1].clone().sub(mpts[0]);   // Revit: X = x, Y = -z, Z = y
-    mLabel.textContent = `${d.length().toFixed(3)} m  (ΔX ${Math.abs(d.x).toFixed(3)} · ΔY ${Math.abs(d.z).toFixed(3)} · ΔZ ${Math.abs(d.y).toFixed(3)})`;
-  } else { mLine.visible = false; mLabel.textContent = 'Chọn điểm thứ hai…'; }
-  redraw();
-}
-const cv = renderer.domElement;
-cv.addEventListener('pointerdown', e => { downPos = { x: e.clientX, y: e.clientY }; });
-cv.addEventListener('pointerup', e => {
-  if (!downPos || e.button !== 0 || Math.hypot(e.clientX - downPos.x, e.clientY - downPos.y) > 4) return;
-  const h = hitAt(e);
-  if (measuring) { if (h) measureClick(h.point); return; }
-  if (h) setSel([h.object.userData.id], e.shiftKey || e.ctrlKey); else if (!e.shiftKey) { sel.clear(); paint(); }
-});
-cv.addEventListener('dblclick', () => { if (sel.size) fitIds([...sel]); });
-
-// ---------- 11. Mặt cắt & tách rời ----------
-const AXES = [['X', [1, 0, 0], 'x'], ['Y', [0, 0, 1], 'z'], ['Z', [0, 1, 0], 'y']];
-const secs = AXES.map(() => ({ on: false, t: 0.5, flip: false }));
-renderer.clippingPlanes = [];
-function applySection() {
-  renderer.clippingPlanes = secs.flatMap((s, i) => {
-    if (!s.on) return [];
-    const [, v, ax] = AXES[i], p = box.min[ax] + (box.max[ax] - box.min[ax]) * s.t, n = new THREE.Vector3(...v);
-    return [new THREE.Plane(s.flip ? n : n.negate(), s.flip ? -p : p)];
-  });
-  redraw();
-}
-let exK = 0, exReady = false;
-function explode(k) {
-  if (!exReady) {
-    const lc = new THREE.Box3();
-    pickables.forEach(m => { m.userData.c = m.geometry.boundingBox.clone().applyMatrix4(m.userData.base).getCenter(new THREE.Vector3()); lc.expandByPoint(m.userData.c); });
-    const c0 = lc.getCenter(new THREE.Vector3());
-    pickables.forEach(m => { m.userData.dir = m.userData.c.clone().sub(c0); });
-    exReady = true;
-  }
-  const t = new THREE.Matrix4();
-  pickables.forEach(m => { const d = m.userData.dir; m.matrix.copy(m.userData.base).premultiply(t.makeTranslation(d.x * k, d.y * k, d.z * k)); });
-  redraw();
-}
-
-// ---------- 12. Thanh công cụ ----------
-const IC = {
-  browser: 'M4 6h16M4 12h16M4 18h16', props: 'M5 4h14v16H5zM9 9h6M9 13h6',
-  orbit: 'M20 12a8 8 0 1 1-3-6.2M20 4v5h-5', pan: 'M12 3v18M3 12h18M12 3l-3 3M12 3l3 3M12 21l-3-3M12 21l3-3M3 12l3-3M3 12l3 3M21 12l-3-3M21 12l-3 3',
-  zoom: 'M11 4a7 7 0 1 0 0 14 7 7 0 0 0 0-14zM16 16l5 5M8 11h6M11 8v6', fit: 'M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5M9 9h6v6H9z',
-  persp: 'M3 19l4-13h10l4 13zM7 6l-4 13M17 6l4 13', section: 'M3 15l9-5 9 5-9 5zM12 3v7', measure: 'M3 16L16 3l5 5L8 21zM7 12l2 2M10 9l2 2M13 6l2 2',
-  explode: 'M12 8V3M12 16v5M8 12H3M16 12h5M12 10a2 2 0 1 0 0 4 2 2 0 0 0 0-4', isolate: 'M12 3l9 5v8l-9 5-9-5V8zM12 12l9-4M12 12v9M12 12L3 8',
-  hide: 'M3 3l18 18M10 6a9 9 0 0 1 11 6 9 9 0 0 1-3 4M6 8a9 9 0 0 0-3 4 9 9 0 0 0 11 6', showall: 'M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12zM12 9a3 3 0 1 0 0 6 3 3 0 0 0 0-6',
-  settings: 'M12 9a3 3 0 1 0 0 6 3 3 0 0 0 0-6M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2'
-};
-const TOOLS = [['browser', 'Cây mô hình (B)'], ['props', 'Thuộc tính (P)'], '|', ['orbit', 'Xoay'], ['pan', 'Dịch'], ['zoom', 'Thu phóng'], '|', ['fit', 'Vừa công trình (F)'], ['persp', 'Phối cảnh / Trực giao'], '|',
-  ['section', 'Mặt cắt'], ['measure', 'Đo khoảng cách'], ['explode', 'Tách rời'], '|', ['isolate', 'Cô lập (I)'], ['hide', 'Ẩn (H)'], ['showall', 'Hiện tất cả (A)'], '|', ['settings', 'Cài đặt']];
-const B = {}, tools = $('tools'), pop = $('pop');
-TOOLS.forEach(t => {
-  if (t === '|') { const s = document.createElement('div'); s.className = 'sep'; tools.appendChild(s); return; }
-  const b = document.createElement('button'); b.className = 't'; b.title = t[1];
-  b.innerHTML = `<svg viewBox="0 0 24 24"><path d="${IC[t[0]]}"/></svg>`;   // chuỗi tĩnh, tin cậy
-  b.onclick = () => ACT[t[0]](); B[t[0]] = b; tools.appendChild(b);
-});
-const on = (n, v) => B[n].classList.toggle('on', v);
-const chk = (label, v, fn) => { const l = document.createElement('label'), i = document.createElement('input'); i.type = 'checkbox'; i.checked = v; i.onchange = () => fn(i.checked); l.append(i, label); return l; };
-const rng = (v, fn, max = 1) => { const i = document.createElement('input'); i.type = 'range'; i.min = 0; i.max = max; i.step = 0.005; i.value = v; i.oninput = () => fn(+i.value); return i; };
-let popName = '';
-function openPop(name) {
-  const same = popName === name; popName = same ? '' : name;
-  ['section', 'explode', 'settings'].forEach(n => on(n, n === popName));
-  pop.replaceChildren(); pop.style.display = same ? 'none' : 'flex'; if (same) return;
-  const h = document.createElement('b'); pop.appendChild(h);
-  if (name === 'section') {
-    h.textContent = 'MẶT CẮT';
-    secs.forEach((s, i) => { const r = document.createElement('div'); r.className = 'r';
-      r.append(chk(AXES[i][0], s.on, v => { s.on = v; applySection(); }), rng(s.t, v => { s.t = v; applySection(); }), chk('Đảo', s.flip, v => { s.flip = v; applySection(); })); pop.appendChild(r); });
-  } else if (name === 'explode') {
-    h.textContent = 'TÁCH RỜI CẤU KIỆN'; pop.appendChild(rng(exK, v => { exK = v; explode(v * 1.5); }));
-  } else {
-    h.textContent = 'CÀI ĐẶT';
-    pop.append(chk('Nền sáng', document.documentElement.getAttribute('data-theme') === 'light', v => applyTheme(v)),
-      chk('Lưới nền', grid.visible, v => { grid.visible = v; redraw(); }),
-      chk('Khung dây', false, v => { materials.forEach(m => { m.wireframe = v; }); hl.wireframe = v; redraw(); }),
-      chk('Hiện phòng (IfcSpace)', showSpaces, v => { showSpaces = v; updVis(); }));
-  }
-}
-function setMode(btn, left, touch) { ['orbit', 'pan', 'zoom'].forEach(n => on(n, n === btn)); controls.mouseButtons.LEFT = left; controls.touches.ONE = touch; }
-const ACT = {
-  browser() { const p = $('browser'), o = p.style.display !== 'flex'; p.style.display = o ? 'flex' : 'none'; on('browser', o); },
-  props() { propsOn = !propsOn; on('props', propsOn); showInfo(); },
-  orbit: () => setMode('orbit', THREE.MOUSE.ROTATE, THREE.TOUCH.ROTATE),
-  pan: () => setMode('pan', THREE.MOUSE.PAN, THREE.TOUCH.PAN),
-  zoom: () => setMode('zoom', THREE.MOUSE.DOLLY, THREE.TOUCH.DOLLY_PAN),
-  fit: () => fitBox(sel.size ? boxOf([...sel]) : box),
-  persp() {
-    const d = camera.position.distanceTo(controls.target), dir = camera.position.clone().sub(controls.target).normalize(), isO = camera === ortho;
-    const nc = isO ? persp : ortho;
-    if (!isO) { orthoH = d * Math.tan(persp.fov * Math.PI / 360); ortho.zoom = 1; nc.position.copy(camera.position); }
-    else nc.position.copy(controls.target).addScaledVector(dir, orthoH / ortho.zoom / Math.tan(persp.fov * Math.PI / 360));
-    nc.quaternion.copy(camera.quaternion); camera = nc; controls.object = nc; resize(); controls.update(); on('persp', camera === ortho);
-  },
-  section: () => openPop('section'), explode: () => openPop('explode'), settings: () => openPop('settings'),
-  measure() { measuring = !measuring; on('measure', measuring); mpts.length = 0; mLine.visible = false; cv.style.cursor = measuring ? 'crosshair' : ''; redraw(); },
-  isolate() { if (sel.size) { iso = new Set(sel); } else iso = null; updVis(); },
-  hide() { sel.forEach(i => hidden.add(i)); sel.clear(); paint(); updVis(); },
-  showall() { hidden.clear(); iso = null; updVis(); }
-};
-on('orbit', true); on('props', true); ACT.browser();
-addEventListener('keydown', e => {
-  if (/INPUT|TEXTAREA/.test(e.target.tagName) || e.ctrlKey || e.metaKey) return;
-  const k = e.key.toLowerCase();
-  if (e.key === 'Escape') { sel.clear(); paint(); if (measuring) ACT.measure(); }
-  else if (k === 'f') ACT.fit(); else if (k === 'h') ACT.hide(); else if (k === 'i') ACT.isolate(); else if (k === 'a') ACT.showall();
-  else if (k === 'b') ACT.browser(); else if (k === 'p') ACT.props();
-});
-updVis();
-addEventListener('beforeunload', () => { try { if (modelID >= 0) ifcApi.CloseModel(modelID); } catch (e) { } });
 </script>
 </body>
 </html>
