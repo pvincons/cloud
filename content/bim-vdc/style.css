@@ -439,15 +439,6 @@ body {
     opacity: 0.9;
 }
 
-.btn-dark {
-    background-color: var(--bg-input);
-    color: var(--text-heading);
-}
-
-.btn-dark:hover {
-    border-color: var(--text-muted);
-}
-
 .btn-outline {
     background-color: transparent;
     color: var(--text-heading);
@@ -455,23 +446,6 @@ body {
 
 .btn-outline:hover {
     background-color: var(--bg-hover);
-    border-color: var(--text-muted);
-}
-
-.theme-toggle-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    padding: 5px 9px;
-    border-radius: 6px;
-    background-color: var(--bg-input);
-    border: 1px solid var(--border-color);
-    color: var(--text-heading);
-    font-size: 0.76rem;
-    cursor: pointer;
-}
-
-.theme-toggle-btn:hover {
     border-color: var(--text-muted);
 }
 

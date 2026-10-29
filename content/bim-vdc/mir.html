@@ -232,7 +232,7 @@
                     </svg> Chat
                 </button>
 
-                <button class="theme-toggle-btn" onclick="toggleTheme()" id="themeToggleBtn">
+                <button class="btn btn-outline" onclick="toggleTheme()" id="themeToggleBtn">
                     <span id="themeIcon" style="display:inline-flex; align-items:center;">
                         <svg class="svg-icon-sm" viewBox="0 0 24 24">
                             <path
@@ -249,14 +249,14 @@
                     </svg> Naming
                 </button>
 
-                <button class="btn btn-dark" onclick="openModal('uploadModal')">
+                <button class="btn btn-outline" onclick="openModal('uploadModal')">
                     <svg class="svg-icon-sm" viewBox="0 0 24 24">
                         <path d="M9 16h6v-6h4l-7-7-7 7h4zm-4 2h14v2H5z" />
                     </svg> Upload
                 </button>
 
                 <button class="btn btn-outline" onclick="handleLogout()" title="Đăng xuất tài khoản"
-                    style="color:#ef4444; border-color:rgba(239, 68, 68, 0.4);">
+                    style="color:#ef4444">
                     <svg class="svg-icon-sm" viewBox="0 0 24 24" style="fill:#ef4444;">
                         <path
                             d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z" />
@@ -1787,7 +1787,7 @@
             const userSession = JSON.parse(localStorage.getItem('currentUser') || '{}');
             const phoneInput = document.getElementById('phoneInput');
             if (phoneInput) {
-                phoneInput.value = userSession.phone || '0939751194';
+                phoneInput.value = userSession.phone || '';
             }
 
             openModal('otpSignModal');
