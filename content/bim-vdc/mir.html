@@ -25,15 +25,32 @@
     <style>
         /* Thu hồi file */
         .badge-recalled {
-            display: inline-flex; align-items: center; gap: 4px; cursor: help;
-            background: rgba(245, 158, 11, 0.15); color: #f59e0b;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            cursor: help;
+            background: rgba(245, 158, 11, 0.15);
+            color: #f59e0b;
             border: 1px solid rgba(245, 158, 11, 0.45);
-            padding: 2px 7px; border-radius: 4px; font-size: 0.62rem; font-weight: 700;
+            padding: 2px 7px;
+            border-radius: 4px;
+            font-size: 0.62rem;
+            font-weight: 700;
             white-space: nowrap;
         }
-        tr.is-recalled .file-code { text-decoration: line-through; opacity: 0.6; }
-        tr.is-recalled td:not(.action-btns) { opacity: 0.7; }
-        .dropdown-content button.recall-item { color: #f59e0b; }
+
+        tr.is-recalled .file-code {
+            text-decoration: line-through;
+            opacity: 0.6;
+        }
+
+        tr.is-recalled td:not(.action-btns) {
+            opacity: 0.7;
+        }
+
+        .dropdown-content button.recall-item {
+            color: #f59e0b;
+        }
 
         /* Nút bộ lọc ẩn/hiện tệp thu hồi */
         .btn-filter-toggle {
@@ -49,19 +66,47 @@
             cursor: pointer;
             transition: all 0.2s ease;
         }
+
         .btn-filter-toggle:hover {
             border-color: var(--primary);
             color: var(--primary);
         }
+
         .btn-filter-toggle.active {
             background: rgba(245, 158, 11, 0.15);
             color: #f59e0b;
             border-color: rgba(245, 158, 11, 0.5);
         }
 
+        /* Nút ký số xác thực Viettel */
+        td.action-btns .sign-btn {
+            box-sizing: border-box;
+            height: 26px;
+            min-width: 64px;
+            padding: 0 10px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            font-size: 0.72rem;
+            font-weight: 600;
+            gap: 5px;
+            line-height: 1;
+            vertical-align: middle;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        td.action-btns .sign-btn:hover:not(:disabled) {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
         /* Đồng bộ kích thước các ô thao tác */
         td.action-btns .btn-open-file,
         td.action-btns .btn-icon,
+        td.action-btns .sign-btn,
+        td.action-btns .gate-btn,
         td.action-btns .badge-issue,
         td.action-btns .badge-recalled {
             box-sizing: border-box;
@@ -72,10 +117,33 @@
             line-height: 1;
             vertical-align: middle;
         }
-        td.action-btns .btn-open-file { min-width: 38px; padding: 0 10px; }
-        td.action-btns .gate-btn { min-width: 64px; padding: 0 10px; gap: 5px; }
-        td.action-btns .icon-only { width: 30px; min-width: 30px; padding: 0; }
-        td.action-btns .dropdown { display: inline-flex; vertical-align: middle; }
+
+        td.action-btns .btn-open-file {
+            min-width: 38px;
+            padding: 0 10px;
+        }
+
+        td.action-btns .sign-btn {
+            min-width: 52px;
+            padding: 0 8px;
+        }
+
+        td.action-btns .gate-btn {
+            min-width: 64px;
+            padding: 0 10px;
+            gap: 5px;
+        }
+
+        td.action-btns .icon-only {
+            width: 30px;
+            min-width: 30px;
+            padding: 0;
+        }
+
+        td.action-btns .dropdown {
+            display: inline-flex;
+            vertical-align: middle;
+        }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -155,8 +223,9 @@
                             d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
                     </svg> Tài khoản
                 </button>
-                
-                <button class="btn btn-outline" data-chat-trigger onclick="navBottomAction('chat', this)" title="Chat nhóm online">
+
+                <button class="btn btn-outline" data-chat-trigger onclick="navBottomAction('chat', this)"
+                    title="Chat nhóm online">
                     <svg class="svg-icon-sm" viewBox="0 0 24 24">
                         <path
                             d="M21 6h-2v9H6v2c0 .55.45 1 1 1h11l4 4V7c0-.55-.45-1-1-1zm-4 6V3c0-.55-.45-1-1-1H3c-.55 0-1 .45-1 1v14l4-4h10c.55 0 1-.45 1-1z" />
@@ -281,9 +350,12 @@
                         <div class="toolbar-right-group">
                             <div class="filters-wrapper">
                                 <!-- NÚT BỘ LỌC ẨN/HIỆN FILE THU HỒI -->
-                                <button class="btn-filter-toggle" id="toggleRecallFilterBtn" onclick="toggleHideRecalledFiles()" title="Bật/Tắt ẩn các file đã bị thu hồi">
-                                    <svg class="svg-icon-sm" id="recallFilterIcon" viewBox="0 0 24 24" fill="currentColor">
-                                        <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+                                <button class="btn-filter-toggle" id="toggleRecallFilterBtn"
+                                    onclick="toggleHideRecalledFiles()" title="Bật/Tắt ẩn các file đã bị thu hồi">
+                                    <svg class="svg-icon-sm" id="recallFilterIcon" viewBox="0 0 24 24"
+                                        fill="currentColor">
+                                        <path
+                                            d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z" />
                                     </svg>
                                 </button>
 
@@ -521,7 +593,8 @@
             <div class="modal-header">
                 <div class="modal-title">
                     <svg class="svg-icon" viewBox="0 0 24 24">
-                        <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z" />
+                        <path
+                            d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z" />
                     </svg>
                     Sửa Metadata
                 </div>
@@ -545,6 +618,48 @@
                 <div style="margin-top: 16px; display: flex; justify-content: flex-end; gap: 8px;">
                     <button class="btn btn-outline" onclick="closeModal('metadataModal')">Hủy</button>
                     <button class="btn btn-primary" onclick="saveMetadata()">Lưu</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL XÁC THỰC OTP KÝ SỐ VIETTEL MYSIGN -->
+    <div class="modal" id="otpSignModal">
+        <div class="modal-content" style="max-width: 400px;">
+            <div class="modal-header">
+                <div class="modal-title">
+                    <svg class="svg-icon" viewBox="0 0 24 24" style="color: var(--primary);">
+                        <path
+                            d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z" />
+                    </svg>
+                    Xác Thực Ký Số Qua OTP Viettel
+                </div>
+                <div class="close-btn" onclick="closeModal('otpSignModal')">✕</div>
+            </div>
+            <div style="font-size: 0.78rem; line-height: 1.5;">
+                <p><strong>Tệp tin:</strong> <span id="otpSignFileName" class="file-code"
+                        style="word-break: break-all;">...</span></p>
+
+                <div style="margin-top: 10px;">
+                    <label style="font-weight: 600; font-size: 0.72rem; display: block; margin-bottom: 4px; color: var(--text-heading);">Số điện thoại nhận OTP:</label>
+                    <div style="display: flex; gap: 6px;">
+                        <input type="text" id="phoneInput" placeholder="Nhập số điện thoại..."
+                            style="flex: 1; padding: 7px 10px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-input); color: var(--text-heading); font-size: 0.8rem; font-weight: 600;">
+                        <button class="btn btn-outline" onclick="requestOtpCode()" style="white-space: nowrap; font-size: 0.75rem;">Gửi mã OTP</button>
+                    </div>
+                </div>
+
+                <div style="margin-top: 12px;">
+                    <label
+                        style="font-weight: 600; font-size: 0.72rem; display: block; margin-bottom: 4px; color: var(--text-heading);">Nhập
+                        mã OTP (6 chữ số):</label>
+                    <input type="text" id="otpCodeInput" maxlength="6" placeholder="Ví dụ: 885921"
+                        style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-input); color: var(--text-heading); font-size: 0.9rem; letter-spacing: 2px; text-align: center; font-weight: 700;">
+                </div>
+
+                <div style="margin-top: 16px; display: flex; justify-content: flex-end; gap: 6px;">
+                    <button class="btn btn-outline" onclick="closeModal('otpSignModal')">Hủy bỏ</button>
+                    <button class="btn btn-primary" onclick="verifyAndExecuteSign()">Xác Nhận Ký Số</button>
                 </div>
             </div>
         </div>
@@ -584,8 +699,7 @@
                         <path
                             d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z" />
                     </svg>
-                    <p style="font-weight: 550; color: var(--text-heading); text-align: center;">Mô phỏng Trình xem 3D
-                        BIM / Bản vẽ PDF</p>
+                    <p style="font-weight: 550; color: var(--text-heading); text-align: center;">Trình xem bản vẽ / Mô hình CDE</p>
                 </div>
 
                 <div style="margin-top: 12px; display: flex; justify-content: space-between; align-items: center;">
@@ -744,7 +858,7 @@
         let currentActiveFilePath = "";
         let serverIssuesDB = {};
         let serverRecallsDB = {};
-        let hideRecalledFilesFlag = false; // Trạng thái bộ lọc ẩn file thu hồi
+        let hideRecalledFilesFlag = false;
 
         let currentUserRole = '';
         let currentUserPermission = '';
@@ -786,7 +900,7 @@
             if (accountModal && !accountModal.classList.contains('hidden')) {
                 toggleAccountModal(false);
             }
-            ['issuesModal', 'isoRenameModal', 'metadataModal', 'viewModal', 'gateModal', 'namingModal', 'uploadModal'].forEach(id => {
+            ['issuesModal', 'isoRenameModal', 'metadataModal', 'viewModal', 'otpSignModal', 'gateModal', 'namingModal', 'uploadModal'].forEach(id => {
                 closeModal(id);
             });
         }
@@ -794,6 +908,7 @@
         function handleLogout() {
             if (confirm("Bạn có chắc chắn muốn đăng xuất khỏi hệ thống không?")) {
                 localStorage.removeItem('currentUser');
+                localStorage.removeItem('access_token');
                 showToast("Đang đăng xuất...");
                 setTimeout(() => {
                     window.location.href = '../../../index.html';
@@ -998,7 +1113,10 @@
 
         function open3DViewer(itemPath) {
             if (!itemPath) return;
-            window.open(`viewer-ifc.html?path=${encodeURIComponent(itemPath)}`, '_blank');
+            const { url, fileName } = buildFileUrl(itemPath);
+            const viewerUrl = `viewer-ifc.html?file=${encodeURIComponent(url)}&name=${encodeURIComponent(fileName)}`;
+            const win = window.open(viewerUrl, '_blank');
+            if (!win) showToast("⚠️ Trình duyệt chặn popup. Hãy cho phép mở tab mới cho trang này!");
         }
 
         function buildFileUrl(itemPath) {
@@ -1010,20 +1128,20 @@
             };
         }
 
-        // TỰ ĐỘNG MỞ 3D ĐỐI VỚI FILE IFC VÀ REVIT KHI BẤM "MỞ"
         function openWithLocalApp(itemPath) {
             if (!itemPath) return;
-            if (/\.(ifc|rvt|rfa|rte)$/i.test(String(itemPath))) {
+            if (/\.ifc$/i.test(String(itemPath))) {
                 open3DViewer(itemPath);
                 return;
             }
 
             const { url, fileName } = buildFileUrl(itemPath);
-            const win = window.open(url, '_blank', 'noopener');
+            const win = window.open(url, '_blank');
             if (!win) {
                 showToast("⚠️ Trình duyệt chặn popup. Hãy cho phép mở tab mới cho trang này!");
                 return;
             }
+            try { win.opener = null; } catch (e) { }
             showToast(`Đã mở tệp "${fileName}" ở tab mới.`);
         }
 
@@ -1163,23 +1281,7 @@
                 if (perm && perm.toUpperCase() === 'NO ACCESS') {
                     return true;
                 }
-            } else {
-                const roleMatrix = {
-                    'ADMIN': { '01_WIP': 'Full Control', '02_SHARED': 'Full Control', '03_PUBLISHED': 'Full Control', '04_ARCHIVE': 'Full Control' },
-                    'MASTER': { '01_WIP': 'Full Control', '02_SHARED': 'Full Control', '03_PUBLISHED': 'Full Control', '04_ARCHIVE': 'Full Control' },
-                    'MANAGEMENT': { '01_WIP': 'No Access', '02_SHARED': 'Full Control', '03_PUBLISHED': 'Full Control', '04_ARCHIVE': 'Read & Write' },
-                    'DESIGNER': { '01_WIP': 'Full Control', '02_SHARED': 'Read & Write', '03_PUBLISHED': 'Read-Only', '04_ARCHIVE': 'No Access' },
-                    'CONTRACTOR': { '01_WIP': 'No Access', '02_SHARED': 'Read-Only', '03_PUBLISHED': 'Read & Write', '04_ARCHIVE': 'No Access' },
-                    'INTERNAL': { '01_WIP': 'No Access', '02_SHARED': 'Read-Only', '03_PUBLISHED': 'Read-Only', '04_ARCHIVE': 'No Access' }
-                };
-
-                let pKey = currentUserPermission || currentUserRole;
-                let rolePerms = roleMatrix[pKey] || roleMatrix[currentUserRole];
-                if (rolePerms && rolePerms[targetContainer] && rolePerms[targetContainer].toUpperCase() === 'NO ACCESS') {
-                    return true;
-                }
             }
-
             return false;
         }
 
@@ -1495,26 +1597,44 @@
             }
         }
 
-        // BẬT / TẮT ẨN CÁC FILE THU HỒI BẰNG ICON
         function toggleHideRecalledFiles() {
             hideRecalledFilesFlag = !hideRecalledFilesFlag;
             const btn = document.getElementById('toggleRecallFilterBtn');
             const icon = document.getElementById('recallFilterIcon');
-            
+
             if (hideRecalledFilesFlag) {
                 btn.classList.add('active');
                 btn.title = "Đang ẨN file thu hồi (Bấm để HIỆN lại)";
-                // Eye-slash Icon
                 icon.innerHTML = `<path d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.44-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78l3.15 3.15.02-.17c0-1.66-1.34-3-3-3l-.17.02z"/>`;
                 showToast("Đã ẩn các file bị thu hồi khỏi bảng!");
             } else {
                 btn.classList.remove('active');
                 btn.title = "Đang HIỆN tất cả file (Bấm để ẨN file thu hồi)";
-                // Eye Icon
                 icon.innerHTML = `<path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>`;
                 showToast("Đã hiện tất cả file!");
             }
             applyFilters();
+        }
+
+        function canUserSign(state) {
+            if (isUserAdmin) return true;
+            let perm = '';
+            if (typeof getIso19650Permissions === 'function') {
+                perm = (getIso19650Permissions(state) || '').toUpperCase();
+            } else {
+                const roleMatrix = {
+                    'ADMIN': { '01_WIP': 'Full Control', '02_SHARED': 'Full Control', '03_PUBLISHED': 'Full Control', '04_ARCHIVE': 'Full Control' },
+                    'MASTER': { '01_WIP': 'Full Control', '02_SHARED': 'Full Control', '03_PUBLISHED': 'Full Control', '04_ARCHIVE': 'Full Control' },
+                    'MANAGEMENT': { '01_WIP': 'No Access', '02_SHARED': 'Full Control', '03_PUBLISHED': 'Full Control', '04_ARCHIVE': 'Read & Write' },
+                    'DESIGNER': { '01_WIP': 'Full Control', '02_SHARED': 'Read & Write', '03_PUBLISHED': 'Read-Only', '04_ARCHIVE': 'No Access' },
+                    'CONTRACTOR': { '01_WIP': 'No Access', '02_SHARED': 'Read-Only', '03_PUBLISHED': 'Read & Write', '04_ARCHIVE': 'No Access' },
+                    'INTERNAL': { '01_WIP': 'No Access', '02_SHARED': 'Read-Only', '03_PUBLISHED': 'Read-Only', '04_ARCHIVE': 'No Access' }
+                };
+                let pKey = currentUserPermission || currentUserRole;
+                let rolePerms = roleMatrix[pKey] || roleMatrix[currentUserRole] || {};
+                perm = (rolePerms[state] || '').toUpperCase();
+            }
+            return perm === 'FULL CONTROL' || perm === 'READ & WRITE';
         }
 
         function getActionButtons(state, relativePath) {
@@ -1524,8 +1644,21 @@
 
             const recallInfo = getRecalledDB()[relativePath];
             const isRecalled = !!recallInfo;
+            const isSignable = /\.(pdf|ifc)$/i.test(relativePath);
 
             const lockSvg = `<svg class="svg-icon-sm" viewBox="0 0 24 24" fill="currentColor" style="width:12px; height:12px; margin-left:3px;"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>`;
+
+            let signBtn = '';
+            if (isSignable) {
+                const canSign = canUserSign(state);
+                if (isRecalled) {
+                    signBtn = `<button class="btn-icon sign-btn" disabled style="opacity:0.4; cursor:not-allowed;" title="File đã bị thu hồi">Ký số ${lockSvg}</button>`;
+                } else if (canSign) {
+                    signBtn = `<button class="btn-icon sign-btn" onclick="openOtpSignModal(this)" title="Ký số xác thực OTP Viettel">Ký số</button>`;
+                } else {
+                    signBtn = `<button class="btn-icon sign-btn" disabled style="opacity:0.4; cursor:not-allowed;" title="Chỉ tài khoản Full Control hoặc Read & Write mới được ký số">Ký số ${lockSvg}</button>`;
+                }
+            }
 
             let gateBtn = '';
             if (state === '04_ARCHIVE') {
@@ -1533,7 +1666,6 @@
                     Gate ${lockSvg}
                 </button>`;
             } else if (isRecalled) {
-                // FILE BỊ THU HỒI -> KHÓA NÚT GATE
                 gateBtn = `<button class="btn-icon gate-btn" disabled style="opacity:0.4; cursor:not-allowed; display:inline-flex; align-items:center; justify-content:center;" title="File đã bị thu hồi">
                     Gate ${lockSvg}
                 </button>`;
@@ -1559,7 +1691,6 @@
                 + (fileIssues.length > MAX_TIP_ISSUES ? `\n… và ${fileIssues.length - MAX_TIP_ISSUES} issue khác` : '')
                 + '\n(Bấm để xem chi tiết)';
 
-            // TỆP THU HỒI: KHÓA NÚT ISSUE
             let issueBadge = (fileIssues.length > 0 && !isRecalled)
                 ? `<span class="badge badge-issue" title="${escapeAttr(issueTip)}" onclick="openIssuesModal('${safePath}')">
                     <svg class="svg-icon-sm" viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z"/></svg> 
@@ -1575,11 +1706,9 @@
             const canDelete = checkActionPermission('DELETE', state);
             const canRecall = canUpload;
 
-            // XÂY DỰNG MENU XỔ XUỐNG (ĐÃ BỎ NÚT "XEM 3D")
             let dropdownItemsHtml = `<button onclick="previewFile(this)">Chi tiết</button>`;
-            
+
             if (isRecalled) {
-                // TỆP THU HỒI -> KHÓA TẤT CẢ THAO TÁC, CHỈ GIỮ LẠI: HỦY THU HỒI VÀ XÓA FILE
                 dropdownItemsHtml = `<button onclick="previewFile(this)">Chi tiết</button>`;
                 if (canRecall) {
                     dropdownItemsHtml += `<button class="recall-item" onclick="restoreRecalledFile(this)">Hủy thu hồi</button>`;
@@ -1588,7 +1717,6 @@
                     dropdownItemsHtml += `<button onclick="deleteRowFile(this)" style="color:#ef4444;">Xóa file</button>`;
                 }
             } else {
-                // TỆP BÌNH THƯỜNG
                 if (canRename) {
                     dropdownItemsHtml += `<button onclick="openIsoRenameModal(this)">Đổi tên ISO 19650</button>`;
                 }
@@ -1628,7 +1756,6 @@
                 ? `<span class="badge-recalled" title="${escapeAttr(`Thu hồi bởi ${recallInfo.by} lúc ${formatRecallTime(recallInfo.at)}\nLý do: ${recallInfo.reason}`)}">⟲ Thu hồi</span>`
                 : '';
 
-            // KHÓA NÚT TẢI VỀ KHI FILE BỊ THU HỒI
             let downloadBtnHtml = isRecalled
                 ? `<button class="btn-icon icon-only" disabled style="opacity:0.4; cursor:not-allowed;" title="File bị thu hồi không thể tải về">
                     <svg class="svg-icon-sm" viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
@@ -1639,12 +1766,107 @@
 
             return `
                 <button class="btn-open-file" onclick="openWithLocalApp('${safePath}')">Mở</button>
+                ${signBtn}
                 ${gateBtn}
                 ${downloadBtnHtml}
                 ${issueBadge}
                 ${recallBadge}
                 ${dropdownHtml}
             `;
+        }
+
+        let signTargetRow = null;
+
+        function openOtpSignModal(btn) {
+            signTargetRow = btn.closest('tr');
+            const fileName = signTargetRow.querySelector('.file-code').innerText;
+            document.getElementById('otpSignFileName').innerText = fileName;
+            document.getElementById('otpCodeInput').value = '';
+            
+            // Tự động điền số điện thoại từ thông tin user nếu có
+            const userSession = JSON.parse(localStorage.getItem('currentUser') || '{}');
+            const phoneInput = document.getElementById('phoneInput');
+            if (phoneInput) {
+                phoneInput.value = userSession.phone || '0939751194';
+            }
+
+            openModal('otpSignModal');
+        }
+
+        async function requestOtpCode() {
+            const phoneNumber = document.getElementById('phoneInput').value.trim();
+            if (!phoneNumber) {
+                showToast("⚠️ Vui lòng nhập số điện thoại nhận OTP!");
+                return;
+            }
+
+            showToast("Đang yêu cầu gửi mã OTP Viettel...");
+
+            try {
+                const res = await fetch(`${DATA_SERVER_API}/api/viettel-request-otp`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        serialNumber: '5404fffeb7033fb33297df876aad4d93',
+                        phoneNumber: phoneNumber 
+                    })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    showToast(data.message || "Mã OTP đã được gửi về số điện thoại!");
+                } else {
+                    showToast("Lỗi gửi OTP: " + (data.error || "Thất bại"));
+                }
+            } catch (err) {
+                showToast("Không kết nối được dịch vụ OTP Viettel!");
+            }
+        }
+
+        async function verifyAndExecuteSign() {
+            if (!signTargetRow) return;
+            const filePath = signTargetRow.getAttribute('data-path');
+            const otpCode = document.getElementById('otpCodeInput').value.trim();
+            const phoneNumber = document.getElementById('phoneInput').value.trim();
+
+            if (!phoneNumber) {
+                showToast("⚠️ Vui lòng nhập số điện thoại!");
+                return;
+            }
+
+            if (!otpCode || otpCode.length !== 6) {
+                showToast("⚠️ Vui lòng nhập đúng 6 chữ số mã OTP!");
+                return;
+            }
+
+            showToast("Đang xác thực OTP & Ký số...");
+
+            try {
+                const response = await fetch(`${DATA_SERVER_API}/api/viettel-verify-and-sign`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('access_token') || ''}`
+                    },
+                    body: JSON.stringify({
+                        filePath: filePath,
+                        otpCode: otpCode,
+                        phoneNumber: phoneNumber,
+                        serialNumber: '5404fffeb7033fb33297df876aad4d93'
+                    })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    showToast(`✓ ${data.message}`);
+                    closeModal('otpSignModal');
+                    cdeSyncChannel.postMessage({ type: 'REFRESH_CDE_DATA' });
+                    reloadDatabaseData();
+                } else {
+                    showToast("Lỗi xác thực: " + (data.error || "Mã OTP không chính xác!"));
+                }
+            } catch (err) {
+                showToast("Không kết nối được hệ thống xác thực Viettel CA!");
+            }
         }
 
         function createIssuePrompt(filePath) {
@@ -2085,7 +2307,6 @@
             tbody.appendChild(tr);
         }
 
-        // LỌC DANH SÁCH FILE KÈM ĐIỀU KIỆN ẨN FILE THU HỒI
         function applyFilters() {
             const searchInput = document.getElementById('searchInput');
             const stateFilter = document.getElementById('stateFilter');
@@ -2309,4 +2530,5 @@
         });
     </script>
 </body>
+
 </html>
