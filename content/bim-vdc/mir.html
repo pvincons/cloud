@@ -34,7 +34,8 @@
     <link rel="stylesheet" href="style.css">
     <style>
         /* Hiệu ứng đồng bộ highlight giữa cây thư mục và bảng panel */
-        .tree-node-item.highlighted, tr.highlight-row {
+        .tree-node-item.highlighted,
+        tr.highlight-row {
             background-color: #1e293b !important;
             border-color: var(--primary) !important;
             transition: all 0.3s ease;
@@ -654,40 +655,59 @@
                 <div class="close-btn" onclick="closeModal('otpSignModal')">✕</div>
             </div>
             <div style="font-size: 0.78rem; line-height: 1.5;">
-                <p style="margin-bottom: 6px;"><strong>Tệp tin chọn ký:</strong> <span id="otpSignFileName" class="file-code"
-                        style="word-break: break-all;">...</span></p>
+                <p style="margin-bottom: 6px;"><strong>Tệp tin chọn ký:</strong> <span id="otpSignFileName"
+                        class="file-code" style="word-break: break-all;">...</span></p>
 
-                <div style="background: var(--bg-input); padding: 10px; border-radius: 6px; border: 1px solid var(--border-color); margin-top: 8px;">
+                <div
+                    style="background: var(--bg-input); padding: 10px; border-radius: 6px; border: 1px solid var(--border-color); margin-top: 8px;">
                     <div style="margin-bottom: 8px;">
-                        <label style="font-weight: 600; font-size: 0.72rem; display: block; margin-bottom: 2px; color: var(--text-heading);">Tài khoản MySign (User ID):</label>
-                        <input type="text" id="mysignUserIdInput" placeholder="Ví dụ: MST_0100109106-998..."
-                            style="width: 100%; padding: 6px 8px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-heading); font-size: 0.78rem; font-weight: 600;">
+                        <label
+                            style="font-weight: 600; font-size: 0.72rem; display: block; margin-bottom: 2px; color: var(--text-heading);">Tài
+                            khoản MySign (User ID):</label>
+                        <div style="display: flex; gap: 6px;">
+                            <input type="text" id="mysignUserIdInput" placeholder="Nhập số điện thoại/ID..."
+                                style="flex: 1; padding: 6px 8px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-heading); font-size: 0.78rem; font-weight: 600;">
+                            <button class="btn btn-outline" type="button" onclick="fetchViettelCertificates()"
+                                style="white-space: nowrap; font-size: 0.72rem;">Nạp CTS</button>
+                        </div>
                     </div>
 
                     <div style="margin-bottom: 8px;">
-                        <label style="font-weight: 600; font-size: 0.72rem; display: block; margin-bottom: 2px; color: var(--text-heading);">Chứng thư số (Credential ID):</label>
-                        <select id="mysignCredentialSelect" style="width: 100%; padding: 6px 8px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-heading); font-size: 0.75rem;">
-                            <option value="">-- Đang nạp danh sách CTS... --</option>
+                        <label
+                            style="font-weight: 600; font-size: 0.72rem; display: block; margin-bottom: 2px; color: var(--text-heading);">Chứng
+                            thư số (Credential ID):</label>
+                        <select id="mysignCredentialSelect"
+                            style="width: 100%; padding: 6px 8px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-heading); font-size: 0.75rem;">
+                            <option value="">-- Bấm nút "Nạp CTS" ở trên để lấy danh sách --</option>
                         </select>
                     </div>
 
                     <div>
-                        <label style="font-weight: 600; font-size: 0.72rem; display: block; margin-bottom: 2px; color: var(--text-heading);">SĐT / Thông tin liên hệ xác thực:</label>
-                        <input type="text" id="phoneInput" placeholder="Nhập số điện thoại..." readonly
-                            style="width: 100%; padding: 6px 8px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-muted); font-size: 0.78rem;">
+                        <label
+                            style="font-weight: 600; font-size: 0.72rem; display: block; margin-bottom: 2px; color: var(--text-heading);">SĐT
+                            / Thông tin liên hệ xác thực:</label>
+                        <!-- Đã xóa chữ readonly và đổi màu chữ thành text-heading để người dùng tự nhập tự do -->
+                        <input type="text" id="phoneInput" placeholder="Nhập số điện thoại xác thực..."
+                            style="width: 100%; padding: 6px 8px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-heading); font-size: 0.78rem; font-weight: 600;">
                     </div>
                 </div>
 
-                <div style="margin-top: 10px; display: flex; align-items: center; gap: 6px; font-size: 0.72rem; color: var(--text-heading);">
-                    <input type="checkbox" id="mysignEnableExtension" style="cursor: pointer; accent-color: var(--primary);">
-                    <label for="mysignEnableExtension" style="cursor: pointer; font-weight: 500;">Đăng ký lưu phiên tự động ký (Auto Sign / Register Extension)</label>
+                <div
+                    style="margin-top: 10px; display: flex; align-items: center; gap: 6px; font-size: 0.72rem; color: var(--text-heading);">
+                    <input type="checkbox" id="mysignEnableExtension"
+                        style="cursor: pointer; accent-color: var(--primary);">
+                    <label for="mysignEnableExtension" style="cursor: pointer; font-weight: 500;">Đăng ký lưu phiên tự
+                        động ký (Auto Sign / Register Extension)</label>
                 </div>
 
-                <div id="mysignStatusInfo" style="margin-top: 8px; padding: 6px 8px; border-radius: 6px; font-size: 0.7rem; display: none;"></div>
+                <div id="mysignStatusInfo"
+                    style="margin-top: 8px; padding: 6px 8px; border-radius: 6px; font-size: 0.7rem; display: none;">
+                </div>
 
                 <div style="margin-top: 16px; display: flex; justify-content: flex-end; gap: 6px;">
                     <button class="btn btn-outline" onclick="closeModal('otpSignModal')">Hủy bỏ</button>
-                    <button class="btn btn-primary" id="executeSignBtn" onclick="verifyAndExecuteSign()">Xác Nhận Ký Số MySign</button>
+                    <button class="btn btn-primary" id="executeSignBtn" onclick="verifyAndExecuteSign()">Xác Nhận Ký Số
+                        MySign</button>
                 </div>
             </div>
         </div>
@@ -727,7 +747,8 @@
                         <path
                             d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z" />
                     </svg>
-                    <p style="font-weight: 550; color: var(--text-heading); text-align: center;">Trình xem bản vẽ / Mô hình CDE</p>
+                    <p style="font-weight: 550; color: var(--text-heading); text-align: center;">Trình xem bản vẽ / Mô
+                        hình CDE</p>
                 </div>
 
                 <div style="margin-top: 12px; display: flex; justify-content: space-between; align-items: center;">
@@ -1695,7 +1716,6 @@
                 return checkActionPermission(action, state);
             }
             if (isUserAdmin) return true;
-            // Fallback permission check when external permission.js is missing
             const perm = canUserSign(state);
             if (action === 'DELETE' || action === 'RENAME' || action === 'UPLOAD') {
                 return perm;
@@ -1841,61 +1861,64 @@
 
         let signTargetRow = null;
 
-        /* Mở Popup Ký số từ xa Viettel MySign (CSC Standard) */
+        /* Mở Popup Ký số từ xa Viettel MySign (CSC Standard) - Không gọi API tự động */
         async function openOtpSignModal(btn) {
             signTargetRow = btn.closest('tr');
             const fileName = signTargetRow.querySelector('.file-code').innerText;
             document.getElementById('otpSignFileName').innerText = fileName;
 
             const statusInfo = document.getElementById('mysignStatusInfo');
-            if (statusInfo) statusInfo.style.display = 'none';
+            if (statusInfo) {
+                statusInfo.style.display = 'none';
+                statusInfo.innerText = '';
+            }
 
-            const userSession = JSON.parse(localStorage.getItem('currentUser') || '{}');
-            const phoneInput = document.getElementById('phoneInput');
             const userIdInput = document.getElementById('mysignUserIdInput');
+            const phoneInput = document.getElementById('phoneInput');
             const credSelect = document.getElementById('mysignCredentialSelect');
 
-            let defaultUserId = userSession.username || 'MST_0100109106-998';
-            if (userIdInput) userIdInput.value = defaultUserId;
+            // Mặc định để trống hoàn toàn để người dùng tự nhập
+            if (userIdInput) userIdInput.value = '';
+            if (phoneInput) phoneInput.value = '';
 
-            if (phoneInput) {
-                let userPhone = userSession.phone || '';
-                try {
-                    const response = await fetch('../../../assets/data/users.json');
-                    if (response.ok) {
-                        const users = await response.json();
-                        const loggedUser = users.find(u => u.username === userSession.username);
-                        if (loggedUser && loggedUser.phone) {
-                            userPhone = loggedUser.phone;
-                        }
-                    }
-                } catch (err) {
-                    console.warn('Không thể đọc dữ liệu từ users.json:', err);
-                }
-                phoneInput.value = userPhone;
+            if (credSelect) {
+                credSelect.innerHTML = `<option value="">-- Bấm nút "Nạp CTS" ở trên để lấy danh sách --</option>`;
             }
 
             openModal('otpSignModal');
+        }
+
+        /* Chủ động gọi API lấy Chứng thư số dựa trên User ID người dùng nhập */
+        async function fetchViettelCertificates() {
+            const userIdInput = document.getElementById('mysignUserIdInput');
+            const credSelect = document.getElementById('mysignCredentialSelect');
+            const statusInfo = document.getElementById('mysignStatusInfo');
+
+            const inputUserId = userIdInput ? userIdInput.value.trim() : '';
+            if (!inputUserId) {
+                showToast("⚠️ Vui lòng nhập User ID hoặc số điện thoại MySign!");
+                return;
+            }
+
             showToast("Đang kết nối dịch vụ Viettel MySign...");
+            if (statusInfo) {
+                statusInfo.style.display = 'block';
+                statusInfo.style.background = 'rgba(59, 130, 246, 0.15)';
+                statusInfo.style.color = '#60a5fa';
+                statusInfo.innerText = "⏳ Đang kết nối và xác thực User ID...";
+            }
 
             try {
                 // Bước 1: Login lấy access_token phiên làm việc Viettel
                 const loginRes = await fetch(`${DATA_SERVER_API}/api/viettel/login`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ userId: defaultUserId })
+                    body: JSON.stringify({ userId: inputUserId })
                 });
 
                 const loginData = await loginRes.json();
                 if (!loginData.success || !loginData.access_token) {
-                    showToast("Lỗi đăng nhập Viettel MySign: " + (loginData.error || "Thất bại"));
-                    if (statusInfo) {
-                        statusInfo.style.display = 'block';
-                        statusInfo.style.background = 'rgba(239, 68, 68, 0.15)';
-                        statusInfo.style.color = '#ef4444';
-                        statusInfo.innerText = "Lỗi kết nối Viettel MySign: " + (loginData.error || "Không thể khởi tạo phiên");
-                    }
-                    return;
+                    throw new Error(loginData.error || "Không thể khởi tạo phiên đăng nhập với User ID này");
                 }
 
                 currentAccessToken = loginData.access_token;
@@ -1921,14 +1944,25 @@
                         credSelect.appendChild(opt);
                     });
                     currentCredentialId = listData.credentialIDs[0];
-                    showToast("Đã nạp danh sách Chứng thư số Viettel!");
+
+                    showToast("✓ Nạp danh sách Chứng thư số thành công!");
+                    if (statusInfo) {
+                        statusInfo.style.background = 'rgba(52, 211, 153, 0.15)';
+                        statusInfo.style.color = '#34d399';
+                        statusInfo.innerText = "✓ Kết nối thành công! Đã nạp danh sách Chứng thư số.";
+                    }
                 } else {
                     if (credSelect) credSelect.innerHTML = `<option value="">-- Không tìm thấy Chứng thư số --</option>`;
-                    showToast("Tài khoản chưa được cấp Chứng thư số Viettel!");
+                    throw new Error("Tài khoản chưa được cấp Chứng thư số hoạt động");
                 }
             } catch (err) {
                 console.error("Lỗi kết nối Viettel MySign:", err);
-                showToast("Không kết nối được cổng dịch vụ Viettel Remote Signing!");
+                showToast("Lỗi: " + err.message);
+                if (statusInfo) {
+                    statusInfo.style.display = 'rgba(239, 68, 68, 0.15)';
+                    statusInfo.style.color = '#ef4444';
+                    statusInfo.innerText = "✕ Lỗi: " + err.message;
+                }
             }
         }
 
@@ -2476,7 +2510,7 @@
             /* Hiệu ứng chọn/click dòng bảng panel -> highlight file tương ứng bên cây thư mục */
             tr.onclick = (e) => {
                 if (e.target.closest('button') || e.target.closest('.dropdown')) return;
-                
+
                 document.querySelectorAll('#cdeMasterTable tbody tr').forEach(r => r.classList.remove('highlight-row'));
                 tr.classList.add('highlight-row');
 
