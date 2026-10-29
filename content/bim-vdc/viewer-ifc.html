@@ -952,7 +952,7 @@ function handleMeasurePoint(pt){
   dot.renderOrder = 10;
   measureLineGroup.add(dot);
 
-  if (measurePoints.length === 2) {
+if (measurePoints.length === 2) {
     const p1 = measurePoints[0], p2 = measurePoints[1];
     const dist = p1.distanceTo(p2);
     
@@ -962,8 +962,8 @@ function handleMeasurePoint(pt){
     line.renderOrder = 10;
     measureLineGroup.add(line);
 
-    const factor = lu === 'mm' ? 1 : (lu === 'cm' ? 10 : 1000);
-    const distMm = (dist * factor).toFixed(0);
+    // Sửa trực tiếp hệ số quy đổi từ mét sang milimét (1m = 1000mm)
+    const distMm = (dist * 1000).toFixed(0);
 
     toast(`Khoảng cách đo: ${distMm} mm`);
     measurePoints = [];
