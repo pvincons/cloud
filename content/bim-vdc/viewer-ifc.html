@@ -47,7 +47,6 @@ main{position:relative;min-height:0;min-width:0}
   z-index:4;
 }
 #bar::-webkit-scrollbar{display:none}
-/* 2 dòng cố định; nếu cửa sổ quá hẹp thì cuộn ngang thay vì rớt thành 3 dòng */
 #bar .row{display:flex;flex-wrap:nowrap;align-items:center;gap:6px;margin-inline:auto;flex-shrink:0}
 #bar .grp{display:flex;align-items:center;justify-content:center;flex-wrap:nowrap;flex-shrink:0;gap:4px;padding:2px 4px;border-radius:8px;background:rgba(255,255,255,0.04)}
 #bar label{display:flex;align-items:center;gap:3px;color:var(--mu);font-size:11.5px;flex-shrink:0}
@@ -57,8 +56,7 @@ main{position:relative;min-height:0;min-width:0}
 #bar label svg{flex-shrink:0;color:var(--mu)}
 @media(min-width:901px) and (max-width:1300px){body{grid-template-columns:260px minmax(0,1fr) 300px}}
 #bar button,.btn-bar{padding:3px 7px;font-size:11.5px;border-radius:5px}
-/* Desktop: luôn 2 dòng. Vùng 3D đủ rộng (>=1260px) thì hiện đầy đủ chữ như điện thoại;
-   hẹp hơn thì tự thu thành icon (tên nằm trong tooltip) để vẫn vừa 2 dòng */
+
 main{container-type:inline-size;container-name:vp}
 @media(min-width:901px){
  #bar .tx{display:none}
@@ -88,7 +86,6 @@ th{text-align:left;color:var(--mu);font-weight:400;width:42%;vertical-align:top;
 td{word-break:break-word;padding:2px 0}
 .mu{color:var(--mu)}
 
-/* Comment Box & Color Box */
 .cmt-card{background:var(--p2);border:1px solid var(--ln);border-radius:6px;padding:8px;margin-top:8px;min-width:0;max-width:100%;overflow:hidden}
 .cmt-card .meta{font-size:11px;color:var(--mu);margin-bottom:4px;display:flex;justify-content:space-between;align-items:baseline;gap:8px;min-width:0}
 .cmt-card .meta>:first-child{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -105,11 +102,9 @@ td{word-break:break-word;padding:2px 0}
 #cv{touch-action:none}.pane,#props{overscroll-behavior:contain}
 .cl,.mob-btn,.fab,#scrim{display:none}
 
-/* Tối ưu Mobile Layout & Swipe Navigation */
 @media(max-width:900px){
  body{grid-template:48px minmax(0,1fr)/minmax(0,1fr);height:100dvh;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
  header{gap:8px;padding:0 10px}header h1{display:none}
- /* Panel trượt mượt từ mép màn hình (GPU transform + easing kiểu "lướt") */
  #L,#R{position:fixed;z-index:20;visibility:hidden;will-change:transform;box-shadow:none;
   transition:transform .42s cubic-bezier(.22,1,.36,1),visibility 0s linear .42s,box-shadow .42s ease}
  #L{top:48px;bottom:0;left:0;width:min(88vw,340px);transform:translate3d(-102%,0,0)}
@@ -117,11 +112,9 @@ td{word-break:break-word;padding:2px 0}
  body.tr #L,body.pr #R{visibility:visible;box-shadow:0 0 30px #000a;transition-delay:0s,0s,0s}
  body.tr #L{transform:translate3d(0,0,0)}
  body.pr #R{transform:translate3d(0,0,0)}
- /* Lớp phủ mờ phía sau panel – bấm vào để đóng */
  #scrim{display:block;position:fixed;left:0;right:0;top:48px;bottom:0;z-index:19;background:rgba(2,6,14,.5);
   backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px);opacity:0;pointer-events:none;transition:opacity .42s ease}
  body.tr #scrim,body.pr #scrim{opacity:1;pointer-events:auto}
- /* 2 nút kính mờ (chỉ icon): trái = Cấu trúc, phải = Thuộc tính */
  .fab{display:flex;align-items:center;justify-content:center;position:absolute;z-index:4;width:46px;height:46px;min-height:46px;padding:0;border-radius:16px;
   bottom:calc(72px + env(safe-area-inset-bottom));color:#fff;
   background:linear-gradient(135deg,rgba(255,255,255,.24),rgba(255,255,255,.06));
@@ -198,7 +191,6 @@ td{word-break:break-word;padding:2px 0}
   <span>Hỗ trợ xuất từ Revit 2027, AutoCAD, Tekla, Archicad (IFC4 / IFC2x3)</span>
  </div>
  
- <!-- Nút kính mờ mobile: Cấu trúc (trái) / Thuộc tính (phải) – chỉ hiện icon -->
  <button class="fab fab-l" id="fabTr" type="button" title="Cấu trúc" aria-label="Cấu trúc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12h-8"/><path d="M21 6H8"/><path d="M21 18h-8"/><path d="M3 6v4c0 1.1.9 2 2 2h3"/><path d="M3 10v6c0 1.1.9 2 2 2h3"/></svg></button>
  <button class="fab fab-r" id="fabPr" type="button" title="Thuộc tính" aria-label="Thuộc tính"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11h4"/><path d="M12 16h4"/><path d="M8 11h.01"/><path d="M8 16h.01"/></svg></button>
 
@@ -212,8 +204,10 @@ td{word-break:break-word;padding:2px 0}
   <div class="grp">
    <button data-v="iso" title="Phối cảnh"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg><span class="tx">Phối cảnh</span></button>
    <button data-v="top" title="Mặt bằng (X-Y)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/></svg><span class="tx">Trên</span></button>
-   <button data-v="front" title="Mặt đứng (X-Z)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18"/></svg><span class="tx">Trước</span></button>
-   <button data-v="right" title="Mặt bên (Y-Z)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M15 3v18"/></svg><span class="tx">Phải</span></button>
+   <button data-v="front" title="Mặt đứng Trước (X-Z)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18"/></svg><span class="tx">Trước</span></button>
+   <button data-v="back" title="Mặt đứng Sau (X-Z)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M15 3v18"/></svg><span class="tx">Sau</span></button>
+   <button data-v="left" title="Mặt bên Trái (Y-Z)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18"/></svg><span class="tx">Trái</span></button>
+   <button data-v="right" title="Mặt bên Phải (Y-Z)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M15 3v18"/></svg><span class="tx">Phải</span></button>
    <button id="bFit" title="Đưa mô hình vào giữa màn hình [F]"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg><span class="tx">Vừa khung</span></button>
    <button id="bZoom" title="Kính lúp: Zoom cận cảnh vào đối tượng chọn [Z]"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="11" y1="8" x2="11" y2="14"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg><span class="tx">Zoom</span></button>
    <button id="bGrid" title="Bật/Tắt Lưới cao độ mặt đất [G]"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18M15 3v18"/></svg><span class="tx">Lưới 3D</span></button>
@@ -629,7 +623,6 @@ function pick(cx,cy){
  const n=pb[0]|pb[1]<<8|pb[2]<<16;return n&&byN[n]?byN[n].id:null;
 }
 
-/* Xử lý 3D Raycasting lấy tọa độ World cho Công cụ Đo đạc */
 function getRaycastIntersectPoint(cx, cy) {
   const rect = cv.getBoundingClientRect();
   const mouse = new THREE.Vector2(
@@ -651,7 +644,6 @@ cv.addEventListener('pointercancel',e=>tp.delete(e.pointerId));
 cv.addEventListener('pointerup',e=>{tp.delete(e.pointerId);
  if(!dn||!els.size||Math.hypot(e.clientX-dn[0],e.clientY-dn[1])>8||performance.now()-dn[2]>500)return;dn=null;
  
- // Ưu tiên xử lý Đo đạc 3D
  if (measureMode) {
    const pt = getRaycastIntersectPoint(e.clientX, e.clientY);
    if (pt) handleMeasurePoint(pt);
@@ -712,7 +704,6 @@ function props(id){
  const m=[...mats(rel.m.get(id))].filter(Boolean);if(m.length)h+=S('Vật liệu',m.map(x=>R('',x)).join(''),true);
  for(const d of rel.p.get(id)||[]){const s=ps(d);if(s.rows.length)h+=S(s.n,T(s.rows),false)}
 
- /* Custom Color Override */
  let colorHtml = `<div class="cmt-card">
   <b>Tô màu đè tùy chỉnh:</b>
   <div class="color-picker-row">
@@ -791,15 +782,13 @@ function applyColorsToBuffer(){
     if(!r) continue;
     let colorObj = customColors.get(el.id);
     
-    // Ưu tiên: Tô màu Ý kiến BCF
     if(colorCmtMode){
       let L; try{ L = api.GetLine(mid, el.id); }catch(e){}
       const gid = L ? val(L.GlobalId) : '';
       if(commentsStore.has(gid) && commentsStore.get(gid).length > 0){
-        colorObj = {r: 0.98, g: 0.55, b: 0.1}; // Màu Cam nổi bật
+        colorObj = {r: 0.98, g: 0.55, b: 0.1};
       }
     }
-    // Tiếp theo: Tô màu Lớp IFC
     else if(!colorObj && colorCatMode){
       const catHex = IFC_CATEGORY_COLORS[el.type];
       if(catHex !== undefined){
@@ -917,14 +906,18 @@ const zoomMagnify=ids=>{
   }
 };
 
-const VIEWS={iso:[1,.8,1],top:[0,1,.001],front:[0,.12,1],right:[1,.12,0]};
+/* Định nghĩa hướng nhìn camera */
+const VIEWS={
+  iso:  [1, .8, 1],
+  top:  [0, 1, .001],
+  front:[0, .12, 1],
+  back: [0, .12, -1],
+  left: [-1, .12, 0],
+  right:[1, .12, 0]
+};
 $$('[data-v]').forEach(b=>{if(b.tagName==='BUTTON')b.onclick=()=>go(MB,new THREE.Vector3(...VIEWS[b.dataset.v]))});
 
-/* ==========================================================================
-   ----------------- CÔNG CỤ NÂNG CAO XỬ LÝ TRÌNH XEM 3D -----------------
-   ========================================================================== */
-
-/* 1. CHẾ ĐỘ ĐO KHOẢNG CÁCH 3D CHUẨN KIẾN TRÚC (ĐƠN VỊ MM) */
+/* ---------- Công cụ Đo đạc 3D ---------- */
 let measureMode = false, measurePoints = [], measureLineGroup = new THREE.Group();
 scene.add(measureLineGroup);
 
@@ -952,7 +945,6 @@ function resetMeasure(){
 function handleMeasurePoint(pt){
   measurePoints.push(pt);
   
-  // Tạo điểm marker 3D tại vị trí điểm click
   const dotGeo = new THREE.SphereGeometry(0.12, 16, 16);
   const dotMat = new THREE.MeshBasicMaterial({color: 0xffb03a, depthTest: false});
   const dot = new THREE.Mesh(dotGeo, dotMat);
@@ -964,20 +956,17 @@ function handleMeasurePoint(pt){
     const p1 = measurePoints[0], p2 = measurePoints[1];
     const dist = p1.distanceTo(p2);
     
-    // Đường thẳng đo 3D
     const lineGeo = new THREE.BufferGeometry().setFromPoints([p1, p2]);
     const lineMat = new THREE.LineBasicMaterial({color: 0xffb03a, linewidth: 3, depthTest: false});
     const line = new THREE.Line(lineGeo, lineMat);
     line.renderOrder = 10;
     measureLineGroup.add(line);
 
-    // Tính toán chuẩn hóa về đơn vị mm (Kiến trúc Việt Nam)
-    // Nếu đơn vị gốc của IFC là 'mm' (lu === 'mm'), khoảng cách dist đã là mm. Nếu 'cm' -> *10, nếu 'm' -> *1000.
     const factor = lu === 'mm' ? 1 : (lu === 'cm' ? 10 : 1000);
     const distMm = (dist * factor).toFixed(0);
 
     toast(`Khoảng cách đo: ${distMm} mm`);
-    measurePoints = []; // Đặt lại để đo tiếp
+    measurePoints = [];
   } else {
     toast('Đã ghi nhận điểm 1. Hãy bấm chọn điểm thứ 2');
   }
@@ -985,7 +974,6 @@ function handleMeasurePoint(pt){
 }
 $('#bMeasure').onclick = toggleMeasureMode;
 
-/* 2. TÔ MÀU THEO TRẠNG THÁI Ý KIẾN PHỐI HỢP (COLORIZE BY COMMENTS) */
 let colorCmtMode = false;
 $('#bColorCmt').onclick = e => {
   colorCmtMode = !colorCmtMode;
@@ -994,7 +982,6 @@ $('#bColorCmt').onclick = e => {
   toast(colorCmtMode ? 'Đã tô màu nổi bật các cấu kiện có Ý kiến phối hợp' : 'Đã tắt tô màu ý kiến');
 };
 
-/* 3. LỌC NHANH BỘ MÔN / LỚP IFC (QUICK CATEGORY FILTER) */
 function loadCategoryFilter(){
   const selCat = $('#selCatFilter');
   selCat.innerHTML = '<option value="all">Tất cả Bộ môn</option>';
@@ -1024,7 +1011,6 @@ $('#selCatFilter').onchange = e => {
   }
 };
 
-/* 4. CHIA SẺ GÓC NHÌN (COPY VIEWPOINT URL) */
 $('#bShare').onclick = () => {
   const cp = cam.position, ct = controls.target;
   const viewData = `${cp.x.toFixed(2)},${cp.y.toFixed(2)},${cp.z.toFixed(2)},${ct.x.toFixed(2)},${ct.y.toFixed(2)},${ct.z.toFixed(2)}`;
@@ -1139,7 +1125,6 @@ const togglePanel=n=>{B.remove(n==='tr'?'pr':'tr');B.toggle(n)};
 $$('.cl').forEach(b=>b.onclick=()=>B.remove('tr','pr'));
 $('#scrim').onclick=()=>B.remove('tr','pr');
 
-/* ---------- Làm mới mô hình (Reset): đưa mô hình & công cụ về trạng thái ban đầu ---------- */
 function resetModel(){
  if(!els.size){toast('Chưa có mô hình để làm mới',1);return}
  B.remove('tr','pr');
