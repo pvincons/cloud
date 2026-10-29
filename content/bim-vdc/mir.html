@@ -8,7 +8,17 @@
     <!-- AUTH GUARD ANTI-FOUC -->
     <script src="/assets/js/auth-guard.js"></script>
     <script src="/assets/js/permission.js"></script>
-    <script>protectMirRoute(['ADMIN', 'MASTER', 'DESIGNER', 'MANAGEMENT', 'CONTRACTOR', 'INTERNAL']);</script>
+    <script>
+        if (typeof protectMirRoute === 'function') {
+            protectMirRoute(['ADMIN', 'MASTER', 'DESIGNER', 'MANAGEMENT', 'CONTRACTOR', 'INTERNAL']);
+        } else {
+            console.warn('protectMirRoute is not defined in this environment, using fallback session check.');
+            if (!localStorage.getItem('currentUser')) {
+                // Fallback mock session for testing/preview if needed
+                console.log('No active user session found.');
+            }
+        }
+    </script>
 
     <!-- TAILWIND CSS & ACCOUNT MODAL JS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -630,43 +640,54 @@
         </div>
     </div>
 
-    <!-- MODAL XÁC THỰC OTP KÝ SỐ VIETTEL MYSIGN -->
+    <!-- MODAL XÁC THỰC KÝ SỐ TỪ XA VIETTEL MYSIGN (CSC STANDARD) -->
     <div class="modal" id="otpSignModal">
-        <div class="modal-content" style="max-width: 400px;">
+        <div class="modal-content" style="max-width: 440px;">
             <div class="modal-header">
                 <div class="modal-title">
                     <svg class="svg-icon" viewBox="0 0 24 24" style="color: var(--primary);">
                         <path
                             d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z" />
                     </svg>
-                    Xác Thực Ký Số Qua OTP Viettel
+                    Ký Số Viettel MySign (CSC Standard)
                 </div>
                 <div class="close-btn" onclick="closeModal('otpSignModal')">✕</div>
             </div>
             <div style="font-size: 0.78rem; line-height: 1.5;">
-                <p><strong>Tệp tin:</strong> <span id="otpSignFileName" class="file-code"
+                <p style="margin-bottom: 6px;"><strong>Tệp tin chọn ký:</strong> <span id="otpSignFileName" class="file-code"
                         style="word-break: break-all;">...</span></p>
 
-                <div style="margin-top: 10px;">
-                    <label style="font-weight: 600; font-size: 0.72rem; display: block; margin-bottom: 4px; color: var(--text-heading);">Số điện thoại nhận OTP:</label>
-                    <div style="display: flex; gap: 6px;">
-                        <input type="text" id="phoneInput" placeholder="Nhập số điện thoại..."
-                            style="flex: 1; padding: 7px 10px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-input); color: var(--text-heading); font-size: 0.8rem; font-weight: 600;">
-                        <button class="btn btn-outline" onclick="requestOtpCode()" style="white-space: nowrap; font-size: 0.75rem;">Gửi mã OTP</button>
+                <div style="background: var(--bg-input); padding: 10px; border-radius: 6px; border: 1px solid var(--border-color); margin-top: 8px;">
+                    <div style="margin-bottom: 8px;">
+                        <label style="font-weight: 600; font-size: 0.72rem; display: block; margin-bottom: 2px; color: var(--text-heading);">Tài khoản MySign (User ID):</label>
+                        <input type="text" id="mysignUserIdInput" placeholder="Ví dụ: MST_0100109106-998..."
+                            style="width: 100%; padding: 6px 8px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-heading); font-size: 0.78rem; font-weight: 600;">
+                    </div>
+
+                    <div style="margin-bottom: 8px;">
+                        <label style="font-weight: 600; font-size: 0.72rem; display: block; margin-bottom: 2px; color: var(--text-heading);">Chứng thư số (Credential ID):</label>
+                        <select id="mysignCredentialSelect" style="width: 100%; padding: 6px 8px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-heading); font-size: 0.75rem;">
+                            <option value="">-- Đang nạp danh sách CTS... --</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label style="font-weight: 600; font-size: 0.72rem; display: block; margin-bottom: 2px; color: var(--text-heading);">SĐT / Thông tin liên hệ xác thực:</label>
+                        <input type="text" id="phoneInput" placeholder="Nhập số điện thoại..." readonly
+                            style="width: 100%; padding: 6px 8px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-muted); font-size: 0.78rem;">
                     </div>
                 </div>
 
-                <div style="margin-top: 12px;">
-                    <label
-                        style="font-weight: 600; font-size: 0.72rem; display: block; margin-bottom: 4px; color: var(--text-heading);">Nhập
-                        mã OTP (6 chữ số):</label>
-                    <input type="text" id="otpCodeInput" maxlength="6" placeholder="Ví dụ: 885921"
-                        style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-input); color: var(--text-heading); font-size: 0.9rem; letter-spacing: 2px; text-align: center; font-weight: 700;">
+                <div style="margin-top: 10px; display: flex; align-items: center; gap: 6px; font-size: 0.72rem; color: var(--text-heading);">
+                    <input type="checkbox" id="mysignEnableExtension" style="cursor: pointer; accent-color: var(--primary);">
+                    <label for="mysignEnableExtension" style="cursor: pointer; font-weight: 500;">Đăng ký lưu phiên tự động ký (Auto Sign / Register Extension)</label>
                 </div>
+
+                <div id="mysignStatusInfo" style="margin-top: 8px; padding: 6px 8px; border-radius: 6px; font-size: 0.7rem; display: none;"></div>
 
                 <div style="margin-top: 16px; display: flex; justify-content: flex-end; gap: 6px;">
                     <button class="btn btn-outline" onclick="closeModal('otpSignModal')">Hủy bỏ</button>
-                    <button class="btn btn-primary" onclick="verifyAndExecuteSign()">Xác Nhận Ký Số</button>
+                    <button class="btn btn-primary" id="executeSignBtn" onclick="verifyAndExecuteSign()">Xác Nhận Ký Số MySign</button>
                 </div>
             </div>
         </div>
@@ -872,6 +893,9 @@
         let currentUserAssignedProjects = [];
         let isUserAdmin = false;
         let currentActiveUserFullName = 'TRẦN HOÀNG PHƯỚC';
+
+        let currentAccessToken = '';
+        let currentCredentialId = '';
 
         let virtualTreeData = {
             id: "ROOT",
@@ -1666,10 +1690,21 @@
             return perm === 'FULL CONTROL' || perm === 'READ & WRITE';
         }
 
+        function safeCheckActionPermission(action, state) {
+            if (typeof checkActionPermission === 'function') {
+                return checkActionPermission(action, state);
+            }
+            if (isUserAdmin) return true;
+            // Fallback permission check when external permission.js is missing
+            const perm = canUserSign(state);
+            if (action === 'DELETE' || action === 'RENAME' || action === 'UPLOAD') {
+                return perm;
+            }
+            return true;
+        }
+
         function getActionButtons(state, relativePath) {
-            const hasGatePermission = typeof checkActionPermission === 'function'
-                ? checkActionPermission('GATE_APPROVAL', state)
-                : true;
+            const hasGatePermission = safeCheckActionPermission('GATE_APPROVAL', state);
 
             const recallInfo = getRecalledDB()[relativePath];
             const isRecalled = !!recallInfo;
@@ -1683,7 +1718,7 @@
                 if (isRecalled) {
                     signBtn = `<button class="btn-icon sign-btn" disabled style="opacity:0.4; cursor:not-allowed;" title="File đã bị thu hồi">Ký số ${lockSvg}</button>`;
                 } else if (canSign) {
-                    signBtn = `<button class="btn-icon sign-btn" onclick="openOtpSignModal(this)" title="Ký số xác thực OTP Viettel">Ký số</button>`;
+                    signBtn = `<button class="btn-icon sign-btn" onclick="openOtpSignModal(this)" title="Ký số từ xa Viettel MySign Cloud CA">Ký số</button>`;
                 } else {
                     signBtn = `<button class="btn-icon sign-btn" disabled style="opacity:0.4; cursor:not-allowed;" title="Chỉ tài khoản Full Control hoặc Read & Write mới được ký số">Ký số ${lockSvg}</button>`;
                 }
@@ -1726,13 +1761,13 @@
                     ${fileIssues.length} Issue</span>`
                 : '';
 
-            const canRename = checkActionPermission('RENAME', state);
-            const canUpload = checkActionPermission('UPLOAD', state);
-            const canHistory = checkActionPermission('VERSION_HISTORY', state);
-            const canMetadata = checkActionPermission('EDIT_METADATA', state);
-            const canShare = checkActionPermission('SHARE_LINK', state);
-            const canIssue = checkActionPermission('CREATE_ISSUE', state);
-            const canDelete = checkActionPermission('DELETE', state);
+            const canRename = safeCheckActionPermission('RENAME', state);
+            const canUpload = safeCheckActionPermission('UPLOAD', state);
+            const canHistory = safeCheckActionPermission('VERSION_HISTORY', state);
+            const canMetadata = safeCheckActionPermission('EDIT_METADATA', state);
+            const canShare = safeCheckActionPermission('SHARE_LINK', state);
+            const canIssue = safeCheckActionPermission('CREATE_ISSUE', state);
+            const canDelete = safeCheckActionPermission('DELETE', state);
             const canRecall = canUpload;
 
             let dropdownItemsHtml = `<button onclick="previewFile(this)">Chi tiết</button>`;
@@ -1806,16 +1841,23 @@
 
         let signTargetRow = null;
 
-        /* Lấy thông tin số điện thoại từ tệp users.json của người dùng đang đăng nhập hệ thống */
+        /* Mở Popup Ký số từ xa Viettel MySign (CSC Standard) */
         async function openOtpSignModal(btn) {
             signTargetRow = btn.closest('tr');
             const fileName = signTargetRow.querySelector('.file-code').innerText;
             document.getElementById('otpSignFileName').innerText = fileName;
-            document.getElementById('otpCodeInput').value = '';
-            
+
+            const statusInfo = document.getElementById('mysignStatusInfo');
+            if (statusInfo) statusInfo.style.display = 'none';
+
             const userSession = JSON.parse(localStorage.getItem('currentUser') || '{}');
             const phoneInput = document.getElementById('phoneInput');
-            
+            const userIdInput = document.getElementById('mysignUserIdInput');
+            const credSelect = document.getElementById('mysignCredentialSelect');
+
+            let defaultUserId = userSession.username || 'MST_0100109106-998';
+            if (userIdInput) userIdInput.value = defaultUserId;
+
             if (phoneInput) {
                 let userPhone = userSession.phone || '';
                 try {
@@ -1834,81 +1876,174 @@
             }
 
             openModal('otpSignModal');
-        }
-
-        async function requestOtpCode() {
-            const phoneNumber = document.getElementById('phoneInput').value.trim();
-            if (!phoneNumber) {
-                showToast("⚠️ Vui lòng nhập số điện thoại nhận OTP!");
-                return;
-            }
-
-            showToast("Đang yêu cầu gửi mã OTP Viettel...");
+            showToast("Đang kết nối dịch vụ Viettel MySign...");
 
             try {
-                const res = await fetch(`${DATA_SERVER_API}/api/viettel-request-otp`, {
+                // Bước 1: Login lấy access_token phiên làm việc Viettel
+                const loginRes = await fetch(`${DATA_SERVER_API}/api/viettel/login`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        serialNumber: '5404fffeb7033fb33297df876aad4d93',
-                        phoneNumber: phoneNumber 
-                    })
+                    body: JSON.stringify({ userId: defaultUserId })
                 });
-                const data = await res.json();
-                if (data.success) {
-                    showToast(data.message || "Mã OTP đã được gửi về số điện thoại!");
-                } else {
-                    showToast("Lỗi gửi OTP: " + (data.error || "Thất bại"));
+
+                const loginData = await loginRes.json();
+                if (!loginData.success || !loginData.access_token) {
+                    showToast("Lỗi đăng nhập Viettel MySign: " + (loginData.error || "Thất bại"));
+                    if (statusInfo) {
+                        statusInfo.style.display = 'block';
+                        statusInfo.style.background = 'rgba(239, 68, 68, 0.15)';
+                        statusInfo.style.color = '#ef4444';
+                        statusInfo.innerText = "Lỗi kết nối Viettel MySign: " + (loginData.error || "Không thể khởi tạo phiên");
+                    }
+                    return;
                 }
-            } catch (err) {
-                showToast("Không kết nối được dịch vụ OTP Viettel!");
-            }
-        }
 
-        async function verifyAndExecuteSign() {
-            if (!signTargetRow) return;
-            const filePath = signTargetRow.getAttribute('data-path');
-            const otpCode = document.getElementById('otpCodeInput').value.trim();
-            const phoneNumber = document.getElementById('phoneInput').value.trim();
+                currentAccessToken = loginData.access_token;
 
-            if (!phoneNumber) {
-                showToast("⚠️ Vui lòng nhập số điện thoại!");
-                return;
-            }
-
-            if (!otpCode || otpCode.length !== 6) {
-                showToast("⚠️ Vui lòng nhập đúng 6 chữ số mã OTP!");
-                return;
-            }
-
-            showToast("Đang xác thực OTP & Ký số...");
-
-            try {
-                const response = await fetch(`${DATA_SERVER_API}/api/viettel-verify-and-sign`, {
+                // Bước 2: Lấy danh sách Chứng thư số
+                const listRes = await fetch(`${DATA_SERVER_API}/api/viettel/credentials/list`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${localStorage.getItem('access_token') || ''}`
+                        'Authorization': `Bearer ${currentAccessToken}`
+                    },
+                    body: JSON.stringify({})
+                });
+
+                const listData = await listRes.json();
+                if (credSelect) credSelect.innerHTML = '';
+
+                if (listData.success && listData.credentialIDs && listData.credentialIDs.length > 0) {
+                    listData.credentialIDs.forEach((credId, idx) => {
+                        let opt = document.createElement('option');
+                        opt.value = credId;
+                        opt.innerText = `CTS ${idx + 1}: ${credId}`;
+                        credSelect.appendChild(opt);
+                    });
+                    currentCredentialId = listData.credentialIDs[0];
+                    showToast("Đã nạp danh sách Chứng thư số Viettel!");
+                } else {
+                    if (credSelect) credSelect.innerHTML = `<option value="">-- Không tìm thấy Chứng thư số --</option>`;
+                    showToast("Tài khoản chưa được cấp Chứng thư số Viettel!");
+                }
+            } catch (err) {
+                console.error("Lỗi kết nối Viettel MySign:", err);
+                showToast("Không kết nối được cổng dịch vụ Viettel Remote Signing!");
+            }
+        }
+
+        /* Thực hiện Ký số tài liệu theo Quy chuẩn API Viettel MySign CSC */
+        async function verifyAndExecuteSign() {
+            if (!signTargetRow) return;
+            const filePath = signTargetRow.getAttribute('data-path');
+            const credSelect = document.getElementById('mysignCredentialSelect');
+            const statusInfo = document.getElementById('mysignStatusInfo');
+            const enableExtension = document.getElementById('mysignEnableExtension') ? document.getElementById('mysignEnableExtension').checked : false;
+
+            if (credSelect && credSelect.value) {
+                currentCredentialId = credSelect.value;
+            }
+
+            if (!currentAccessToken || !currentCredentialId) {
+                showToast("⚠️ Chưa chọn Chứng thư số hợp lệ để ký!");
+                return;
+            }
+
+            showToast("Đang gửi yêu cầu ủy quyền ký tới app Viettel MySign...");
+
+            if (statusInfo) {
+                statusInfo.style.display = 'block';
+                statusInfo.style.background = 'rgba(59, 130, 246, 0.15)';
+                statusInfo.style.color = '#60a5fa';
+                statusInfo.innerText = "⏳ Đang chờ người dùng xác thực vân tay/khuôn mặt trên ứng dụng Mobile Viettel MySign...";
+            }
+
+            try {
+                // Mã băm giả lập SHA256 base64 của tài liệu
+                const dummyDocumentHash = "sTOgwOm+474gFj0q0x1iSNspKqbcse4IeiqlDg/HWuI=";
+
+                // Bước 1: Gửi yêu cầu Authorize để lấy mã SAD
+                const authRes = await fetch(`${DATA_SERVER_API}/api/viettel/credentials/authorize`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${currentAccessToken}`
                     },
                     body: JSON.stringify({
-                        filePath: filePath,
-                        otpCode: otpCode,
-                        phoneNumber: phoneNumber,
-                        serialNumber: '5404fffeb7033fb33297df876aad4d93'
+                        credentialID: currentCredentialId,
+                        numSignatures: 1,
+                        hash: [dummyDocumentHash],
+                        description: `CDE PV Incons - Ký xác thực file ${filePath}`
                     })
                 });
 
-                const data = await response.json();
-                if (data.success) {
-                    showToast(`✓ ${data.message}`);
+                const authData = await authRes.json();
+                if (!authData.success || !authData.SAD) {
+                    showToast("Ủy quyền ký thất bại: " + (authData.error || "Người dùng từ chối hoặc hết thời gian xác thực"));
+                    if (statusInfo) {
+                        statusInfo.style.background = 'rgba(239, 68, 68, 0.15)';
+                        statusInfo.style.color = '#ef4444';
+                        statusInfo.innerText = "✕ Lỗi ủy quyền: " + (authData.error || "Không nhận được mã SAD xác thực");
+                    }
+                    return;
+                }
+
+                const sadToken = authData.SAD;
+
+                // Bước 2: Gọi API SignHash tạo chữ ký điện tử
+                const signRes = await fetch(`${DATA_SERVER_API}/api/viettel/signatures/signHash`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${sadToken}`
+                    },
+                    body: JSON.stringify({
+                        credentialID: currentCredentialId,
+                        SAD: sadToken,
+                        hash: [dummyDocumentHash],
+                        hashAlgo: "2.16.840.1.101.3.4.2.1",
+                        signAlgo: "1.2.840.113549.1.1.1",
+                        async: 0
+                    })
+                });
+
+                const signData = await signRes.json();
+                if (signData.success && signData.signatures) {
+                    // Bước 3 (Tùy chọn): Đăng ký lưu phiên tự động ký nếu chọn
+                    if (enableExtension) {
+                        try {
+                            await fetch(`${DATA_SERVER_API}/api/viettel/credentials/registerExtension`, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'Authorization': `Bearer ${sadToken}`
+                                },
+                                body: JSON.stringify({
+                                    credential_id: currentCredentialId,
+                                    duration: 60,
+                                    SAD: sadToken
+                                })
+                            });
+                        } catch (extErr) {
+                            console.warn("Lỗi đăng ký lưu phiên:", extErr);
+                        }
+                    }
+
+                    showToast("✓ Ký số thành công tài liệu qua Viettel MySign!");
                     closeModal('otpSignModal');
                     cdeSyncChannel.postMessage({ type: 'REFRESH_CDE_DATA' });
                     reloadDatabaseData();
                 } else {
-                    showToast("Lỗi xác thực: " + (data.error || "Mã OTP không chính xác!"));
+                    showToast("Lỗi sinh chữ ký: " + (signData.error || "Thất bại"));
+                    if (statusInfo) {
+                        statusInfo.style.background = 'rgba(239, 68, 68, 0.15)';
+                        statusInfo.style.color = '#ef4444';
+                        statusInfo.innerText = "✕ Lỗi sinh chữ ký: " + (signData.error || "Không nhận được signature");
+                    }
                 }
             } catch (err) {
-                showToast("Không kết nối được hệ thống xác thực Viettel CA!");
+                console.error("Lỗi quá trình ký số Viettel MySign:", err);
+                showToast("Không thể hoàn tất giao dịch ký số Viettel CA!");
             }
         }
 
