@@ -8,7 +8,7 @@
  * Kiểm tra quyền truy cập vào tab MIR / Workflow dựa trên Role của tài khoản
  * @param {Array<string>} customAllowedRoles - Danh sách các role được phép truy cập (Tùy chọn)
  */
-function protectMirRoute(customAllowedRoles = ['ADMIN', 'MASTER', 'MANAGEMENT', 'DESIGNER', 'CONTRACTOR', 'INTERNAL']) {
+function protectMirRoute(customAllowedRoles = ['ADMIN', 'MASTER', 'MANAGEMENT', 'DESIGNER', 'CONTRACTOR']) {   // Có thể mở rộng danh sách permission được phép truy cập
     try {
         const userSession = JSON.parse(localStorage.getItem('currentUser') || '{}');
         const userRole = (userSession.role || '').toUpperCase();
@@ -72,12 +72,6 @@ function getIso19650Permissions(zone) {
             'WIP': 'No Access',
             'SHARED': 'Read-Only',
             'PUBLISHED': 'Read & Write',
-            'ARCHIVE': 'No Access'
-        },
-        'INTERNAL': {
-            'WIP': 'No Access',
-            'SHARED': 'Read-Only',
-            'PUBLISHED': 'Read-Only',
             'ARCHIVE': 'No Access'
         }
     };

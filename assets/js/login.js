@@ -31,9 +31,10 @@ document.getElementById('loginForm')?.addEventListener('submit', async function 
     }
   };
 
-  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwnudZdtcWdcNaBX-y_f_9KO15drju3bOC9aiK1Pr1YdIKs2FJZDE15g46QPPkIvrD0/exec';
+  // const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwnudZdtcWdcNaBX-y_f_9KO15drju3bOC9aiK1Pr1YdIKs2FJZDE15g46QPPkIvrD0/exec';
   let userData = null;
-  let tokenData = 'FALLBACK_SHEETS_TOKEN_2026';
+  // let tokenData = 'FALLBACK_SHEETS_TOKEN_2026';
+  let tokenData = ''; // Nếu dùng google sheets làm hệ thống xác thực, token này phải được coment
 
   try {
     // Trỏ trực tiếp về cổng 3000 sau khi gộp chung server.js
@@ -59,7 +60,7 @@ document.getElementById('loginForm')?.addEventListener('submit', async function 
     }
 
   } catch (primaryError) {
-    console.warn('⚠️ Server chính không phản hồi, đang chuyển hướng dữ liệu xác thực...', primaryError);
+    console.warn('⚠️ Server xác thực không phản hồi...', primaryError);
 
     try {
       const scriptResponse = await fetch(SCRIPT_URL, {
