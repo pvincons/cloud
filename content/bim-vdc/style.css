@@ -1119,3 +1119,148 @@ body {
     border-radius: 6px;
     font-size: 0.75rem;
 }
+
+/* Hiệu ứng đồng bộ highlight giữa cây thư mục và bảng panel */
+.tree-node-item.highlighted,
+tr.highlight-row {
+    background-color: var(--bg-hover) !important;
+    border-color: var(--primary) !important;
+    transition: all 0.3s ease;
+}
+
+/* Thu hồi file */
+.badge-recalled {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    cursor: help;
+    background: rgba(245, 158, 11, 0.15);
+    color: #f59e0b;
+    border: 1px solid rgba(245, 158, 11, 0.45);
+    padding: 2px 7px;
+    border-radius: 4px;
+    font-size: 0.62rem;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+/* Badge Đã ký số */
+.badge-signed {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: rgba(16, 185, 129, 0.15);
+    color: #10b981;
+    border: 1px solid rgba(16, 185, 129, 0.45);
+    padding: 2px 7px;
+    border-radius: 4px;
+    font-size: 0.62rem;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+tr.is-recalled .file-code {
+    text-decoration: line-through;
+    opacity: 0.6;
+}
+
+tr.is-recalled td:not(.action-btns) {
+    opacity: 0.7;
+}
+
+.dropdown-content button.recall-item {
+    color: #f59e0b;
+}
+
+/* Nút bộ lọc ẩn/hiện tệp thu hồi */
+.btn-filter-toggle {
+    height: 32px;
+    width: 34px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
+    background: var(--bg-card);
+    color: var(--text-heading);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-filter-toggle:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+.btn-filter-toggle.active {
+    background: rgba(245, 158, 11, 0.15);
+    color: #f59e0b;
+    border-color: rgba(245, 158, 11, 0.5);
+}
+
+/* Nút ký số xác thực Viettel */
+td.action-btns .sign-btn {
+    box-sizing: border-box;
+    height: 26px;
+    min-width: 64px;
+    padding: 0 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    gap: 5px;
+    line-height: 1;
+    vertical-align: middle;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+td.action-btns .sign-btn:hover:not(:disabled) {
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+/* Đồng bộ kích thước các ô thao tác */
+td.action-btns .btn-open-file,
+td.action-btns .btn-icon,
+td.action-btns .sign-btn,
+td.action-btns .gate-btn,
+td.action-btns .badge-issue,
+td.action-btns .badge-recalled {
+    box-sizing: border-box;
+    height: 26px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    vertical-align: middle;
+}
+
+td.action-btns .btn-open-file {
+    min-width: 38px;
+    padding: 0 10px;
+}
+
+td.action-btns .sign-btn {
+    min-width: 52px;
+    padding: 0 8px;
+}
+
+td.action-btns .gate-btn {
+    min-width: 64px;
+    padding: 0 10px;
+    gap: 5px;
+}
+
+td.action-btns .icon-only {
+    width: 30px;
+    min-width: 30px;
+    padding: 0;
+}
+
+td.action-btns .dropdown {
+    display: inline-flex;
+    vertical-align: middle;
+}
