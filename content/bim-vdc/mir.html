@@ -568,11 +568,13 @@
 
                 <div id="mysignDocInfo"
                     style="display:none; margin-top: 8px; padding: 8px 10px; border-radius: 6px; border: 1px dashed var(--primary); background: var(--bg-input);">
-                    <div style="font-size: 0.68rem; color: var(--text-muted);">Mã tài liệu (đối chiếu với mã hiển thị trên app VNPT SmartCA):</div>
+                    <div style="font-size: 0.68rem; color: var(--text-muted);">Mã tài liệu (đối chiếu với mã hiển thị
+                        trên app VNPT SmartCA):</div>
                     <div id="mysignDocId"
                         style="font-family: monospace; font-size: 1rem; font-weight: 700; letter-spacing: 0.5px; color: var(--text-heading); user-select: all;">
                     </div>
-                    <div style="display: flex; justify-content: space-between; font-size: 0.66rem; color: var(--text-muted); margin-top: 2px;">
+                    <div
+                        style="display: flex; justify-content: space-between; font-size: 0.66rem; color: var(--text-muted); margin-top: 2px;">
                         <span id="mysignDocHash"></span>
                         <span id="mysignCountdown"></span>
                     </div>
@@ -584,7 +586,8 @@
 
                 <div style="margin-top: 16px; display: flex; justify-content: flex-end; gap: 6px;">
                     <button class="btn btn-outline" onclick="cancelSmartCaSign()">Hủy bỏ</button>
-                    <button class="btn btn-primary" id="executeSignBtn" onclick="verifyAndExecuteSign()">Xác Nhận Ký Số VNPT</button>
+                    <button class="btn btn-primary" id="executeSignBtn" onclick="verifyAndExecuteSign()">Xác Nhận Ký Số
+                        VNPT</button>
                 </div>
             </div>
         </div>
@@ -1874,139 +1877,139 @@
             el.innerText = `Chủ thể: ${cert.cert_subject || '-'}\nHiệu lực: ${smartCaFmtDate(cert.cert_valid_from)} → ${smartCaFmtDate(cert.cert_valid_to)}\nSerial: ${cert.serial_number}`;
         }
 
-        /* 1. Nạp danh sách chứng thư số từ VNPT SmartCA (v1/credentials/get_certificate) */
+        // Nạp danh sách Credential từ VNPT SmartCA[cite: 14, 16]
         async function fetchSmartCaCertificates() {
-            const userIdInput = document.getElementById('mysignUserIdInput');
-            const credSelect = document.getElementById('mysignCredentialSelect');
-
-            const inputUserId = userIdInput ? userIdInput.value.trim() : '';
-            if (!inputUserId) {
-                showToast("⚠️ Vui lòng nhập số CCCD/CMND hoặc mã số thuế thuê bao SmartCA!");
-                return;
-            }
-
-            showToast("Đang kết nối dịch vụ VNPT SmartCA...");
-            smartCaSetStatus('info', "⏳ Đang kết nối và lấy Chứng thư số VNPT...");
+            showToast("Đang kết nối danh sách chứng thư số SmartCA...");
+            smartCaSetStatus('info', "⏳ Đang tải danh sách chứng thư số...");
 
             try {
-                const data = await smartCaRequest('/api/smartca/credentials/get_certificate', { userId: inputUserId });
-                if (!data.success || !data.data || !data.data.user_certificates) {
-                    throw new Error(data.error || "Không tìm thấy chứng thư số cho tài khoản này");
+                const token = localStorage.getItem('access_token') || '';
+                const res = await fetch(`${DATA_SERVER_API}/api/smartca/credentials/list`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify({})
+                });
+                const data = await res.json();
+                if (!data.success || !data.content) {
+                    throw new Error(data.error || "Không thể lấy danh sách credential");
                 }
 
-                smartCaCerts = Array.isArray(data.data.user_certificates) ? data.data.user_certificates : [data.data.user_certificates];
+                const credIds = Array.isArray(data.content) ? data.content : [data.content];
+                smartCaCerts = [];
+                const credSelect = document.getElementById('mysignCredentialSelect');
                 credSelect.innerHTML = '';
 
-                let usableCount = 0;
-                smartCaCerts.forEach(cert => {
-                    const opt = document.createElement('option');
-                    opt.value = cert.serial_number;
-                    const cn = smartCaCommonName(cert.cert_subject);
-                    const label = `[${cert.service_type || cert.service_name || 'SmartCA'}] ${cn ? cn + ' - ' : ''}HSD ${smartCaFmtDate(cert.cert_valid_to)} - ...${String(cert.serial_number).slice(-8)}`;
-                    if (cert.usable) {
-                        usableCount++;
-                        opt.textContent = label;
-                    } else {
-                        opt.textContent = label + ` (${cert.cert_status && !/đang hoạt động/i.test(cert.cert_status) ? cert.cert_status : 'hết hạn'})`;
-                        opt.disabled = true;
+                for (let credId of credIds) {
+                    // Lấy chi tiết thông tin credential[cite: 16]
+                    const infoRes = await fetch(`${DATA_SERVER_API}/api/smartca/credentials/info`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                        body: JSON.stringify({ credentialId: credId, certificates: 'chain', certInfo: true, authInfo: true })
+                    });
+                    const infoData = await infoRes.json();
+                    if (infoData.success && infoData.content) {
+                        const c = infoData.content;
+                        smartCaCerts.push({ credentialId: credId, ...c });
+                        const opt = document.createElement('option');
+                        opt.value = credId;
+                        const certObj = c.cert || {};
+                        opt.textContent = `Credential: ${credId.slice(0, 8)}... (${certObj.subjectDN || c.authMode || 'Active'})`;
+                        credSelect.appendChild(opt);
                     }
-                    credSelect.appendChild(opt);
-                });
-
-                if (!usableCount) {
-                    throw new Error("Thuê bao không có chứng thư số nào đang hoạt động và còn hạn!");
                 }
 
-                const firstUsable = smartCaCerts.find(c => c.usable);
-                credSelect.value = firstUsable.serial_number;
+                if (smartCaCerts.length === 0) {
+                    throw new Error("Không tìm thấy chứng thư số hợp lệ nào!");
+                }
+
                 updateSmartCaCertDetail();
-                showToast("✓ Nạp danh sách Chứng thư số VNPT thành công!");
-                smartCaSetStatus('ok', `✓ Kết nối thành công! Có ${usableCount} chứng thư số có thể dùng để ký.`);
+                showToast("✓ Nạp danh sách chứng thư số thành công!");
+                smartCaSetStatus('ok', `✓ Đã nạp thành công ${smartCaCerts.length} chứng thư số.`);
             } catch (err) {
-                console.error("Lỗi kết nối VNPT SmartCA:", err);
+                console.error("Lỗi nạp chứng thư SmartCA:", err);
                 showToast("Lỗi: " + err.message);
                 smartCaSetStatus('err', "✕ Lỗi: " + err.message);
             }
         }
 
-        /* 2. Gửi yêu cầu ký hash, hiển thị mã tài liệu (doc_id) và chờ xác nhận trên App SmartCA */
+        // Gửi yêu cầu ký Hash & Bắt đầu Polling trạng thái[cite: 18, 20]
         async function verifyAndExecuteSign() {
             if (!signTargetRow || smartCaSignInFlight) return;
             const filePath = signTargetRow.getAttribute('data-path');
-            const userIdInput = document.getElementById('mysignUserIdInput');
             const credSelect = document.getElementById('mysignCredentialSelect');
+            const credentialId = credSelect ? credSelect.value : '';
 
-            const userId = userIdInput ? userIdInput.value.trim() : '';
-            const serialNumber = credSelect ? credSelect.value : '';
-
-            if (!userId || !serialNumber) {
-                showToast("⚠️ Vui lòng nhập ID thuê bao và chọn Chứng thư số!");
+            if (!credentialId) {
+                showToast("⚠️ Vui lòng chọn chứng thư số cần ký!");
                 return;
             }
 
             smartCaStopTimers();
             smartCaSetBusy(true);
             const session = smartCaSession;
-            showToast("Đang gửi yêu cầu ký đến VNPT SmartCA...");
-            smartCaSetStatus('info', "⏳ Đang gửi yêu cầu ký đến VNPT SmartCA...");
+            showToast("Đang gửi yêu cầu ký hash đến VNPT SmartCA...");
+            smartCaSetStatus('info', "⏳ Đang gửi yêu cầu ký...");
 
             try {
-                const data = await smartCaRequest('/api/smartca/signatures/sign', { userId, serialNumber, filePath });
-                if (session !== smartCaSession) return;   // người dùng đã đóng/mở popup khác
-                if (!data.success || !data.tran_code) {
+                const token = localStorage.getItem('access_token') || '';
+                const res = await fetch(`${DATA_SERVER_API}/api/smartca/signatures/signhash`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify({ credentialId, filePath })
+                });
+                const data = await res.json();
+                if (session !== smartCaSession) return;
+                if (!data.success || !data.content || !data.content.tranId) {
                     throw new Error(data.error || "Không thể khởi tạo giao dịch ký số");
                 }
 
-                // doc_id phải hiển thị đồng thời ở đây và trên app SmartCA (yêu cầu của VNPT)
+                const tranId = data.content.tranId;
                 const docInfo = document.getElementById('mysignDocInfo');
                 if (docInfo) {
-                    document.getElementById('mysignDocId').innerText = data.doc_id || '';
-                    document.getElementById('mysignDocHash').innerText = data.hash_sha256 ? ('SHA-256: ' + data.hash_sha256.slice(0, 16) + '…' + data.hash_sha256.slice(-8)) : '';
+                    document.getElementById('mysignDocId').innerText = tranId;
+                    document.getElementById('mysignDocHash').innerText = 'Trạng thái: Chờ xác nhận trên App';
                     docInfo.style.display = 'block';
                 }
-                smartCaSetStatus('wait', `⏳ Đã gửi thông báo tới App VNPT SmartCA. Hãy mở app, đối chiếu mã tài liệu ${data.doc_id} rồi bấm xác nhận...`);
+                smartCaSetStatus('wait', `⏳ Đã gửi thông báo tới App VNPT SmartCA. Vui lòng mở ứng dụng di động để xác nhận giao dịch...`);
 
                 const startedAt = Date.now();
-                const countdownEl = document.getElementById('mysignCountdown');
-                smartCaCountdownTimer = setInterval(() => {
-                    const left = Math.max(0, Math.round((SMARTCA_MAX_WAIT_MS - (Date.now() - startedAt)) / 1000));
-                    if (countdownEl) countdownEl.innerText = `Còn ${Math.floor(left / 60)}:${String(left % 60).padStart(2, '0')}`;
-                }, 1000);
-
-                const finishFail = (msg) => {
-                    smartCaStopTimers();
-                    smartCaSetBusy(false);
-                    showToast("⚠️ " + msg);
-                    smartCaSetStatus('err', "✕ " + msg);
-                };
-
                 const poll = async () => {
                     smartCaPollTimer = null;
                     if (session !== smartCaSession) return;
                     try {
-                        const st = await smartCaRequest('/api/smartca/signatures/status', { tranCode: data.tran_code });
+                        const stRes = await fetch(`${DATA_SERVER_API}/api/smartca/signatures/gettraninfo`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                            body: JSON.stringify({ tranId })
+                        });
+                        const stData = await stRes.json();
                         if (session !== smartCaSession) return;
 
-                        if (st.state === 'done') {
-                            smartCaStopTimers();
-                            smartCaSetBusy(false);
-                            showToast("✓ Ký số VNPT SmartCA thành công!");
-                            smartCaSetStatus('ok', "✓ Giao dịch hoàn tất! Đã lưu chữ ký vào hệ thống.");
-                            setTimeout(() => closeModal('otpSignModal'), 1500);
-                            cdeSyncChannel.postMessage({ type: 'REFRESH_CDE_DATA' });
-                            reloadDatabaseData();
-                            return;
-                        }
-                        if (st.state === 'failed' || (st.success === false && st.state !== 'pending')) {
-                            finishFail(st.error || "Giao dịch ký số không thành công!");
-                            return;
+                        if (stData.success && stData.content) {
+                            const statusDesc = stData.content.tranStatusDesc || '';
+                            if (stData.content.tranStatus === 1 || statusDesc === 'SUCCESS') {
+                                smartCaStopTimers();
+                                smartCaSetBusy(false);
+                                showToast("✓ Ký số VNPT SmartCA thành công!");
+                                smartCaSetStatus('ok', "✓ Giao dịch hoàn tất! Đã lưu chữ ký thành công.");
+                                setTimeout(() => closeModal('otpSignModal'), 1500);
+                                cdeSyncChannel.postMessage({ type: 'REFRESH_CDE_DATA' });
+                                reloadDatabaseData();
+                                return;
+                            }
+                            if (stData.content.tranStatus === 4002 || stData.content.tranStatus === 4004 || statusDesc.includes('REJECTED') || statusDesc.includes('FAILED')) {
+                                throw new Error("Giao dịch bị từ chối hoặc thất bại trên ứng dụng di động!");
+                            }
                         }
                     } catch (e) {
-                        // Lỗi mạng tạm thời: tiếp tục thử lại cho tới khi hết hạn
+                        console.warn("Polling status warning:", e.message);
                     }
 
                     if (Date.now() - startedAt > SMARTCA_MAX_WAIT_MS) {
-                        finishFail("Quá thời gian chờ xác nhận trên ứng dụng VNPT SmartCA. Vui lòng thực hiện lại.");
+                        smartCaStopTimers();
+                        smartCaSetBusy(false);
+                        showToast("⚠️ Quá thời gian chờ xác nhận giao dịch.");
+                        smartCaSetStatus('err', "✕ Quá thời gian chờ xác nhận trên app.");
                         return;
                     }
                     smartCaPollTimer = setTimeout(poll, SMARTCA_POLL_MS);
@@ -2014,13 +2017,12 @@
                 smartCaPollTimer = setTimeout(poll, SMARTCA_POLL_MS);
 
             } catch (err) {
-                console.error("Lỗi ký số VNPT SmartCA:", err);
+                console.error("Lỗi ký số:", err);
                 smartCaSetBusy(false);
                 showToast("Lỗi: " + err.message);
                 smartCaSetStatus('err', "✕ Lỗi: " + err.message);
             }
         }
-
         /* Tải "gói chữ ký" (.json: hash + chữ ký + chứng thư + chuỗi chứng thư) của 1 tệp đã ký */
         async function downloadSmartCaSignature(filePath) {
             try {
