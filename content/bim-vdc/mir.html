@@ -14,7 +14,6 @@
         } else {
             console.warn('protectMirRoute is not defined in this environment, using fallback session check.');
             if (!localStorage.getItem('currentUser')) {
-                // Fallback mock session for testing/preview if needed
                 console.log('No active user session found.');
             }
         }
@@ -239,7 +238,6 @@
 
                         <div class="toolbar-right-group">
                             <div class="filters-wrapper">
-                                <!-- NÚT BỘ LỌC ẨN/HIỆN TỆP THU HỒI -->
                                 <button class="btn-filter-toggle" id="toggleRecallFilterBtn"
                                     onclick="toggleHideRecalledFiles()" title="Bật/Tắt ẩn các file đã bị thu hồi">
                                     <svg class="svg-icon-sm" id="recallFilterIcon" viewBox="0 0 24 24"
@@ -513,7 +511,7 @@
         </div>
     </div>
 
-    <!-- MODAL XÁC THỰC KÝ SỐ TỪ XA VIETTEL MYSIGN (CSC STANDARD) -->
+    <!-- MODAL XÁC THỰC KÝ SỐ TỪ XA VNPT SMARTCA (CSC & 769 STANDARD) -->
     <div class="modal" id="otpSignModal">
         <div class="modal-content" style="max-width: 440px;">
             <div class="modal-header">
@@ -522,7 +520,7 @@
                         <path
                             d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z" />
                     </svg>
-                    Ký Số Viettel MySign (CSC Standard)
+                    Ký Số VNPT SmartCA (CSC Standard)
                 </div>
                 <div class="close-btn" onclick="closeModal('otpSignModal')">✕</div>
             </div>
@@ -535,35 +533,26 @@
                     <div style="margin-bottom: 8px;">
                         <label
                             style="font-weight: 600; font-size: 0.72rem; display: block; margin-bottom: 2px; color: var(--text-heading);">Tài
-                            khoản MySign (User ID):</label>
+                            khoản VNPT SmartCA (CCCD / MST):</label>
                         <div style="display: flex; gap: 6px;">
-                            <input type="text" id="mysignUserIdInput" placeholder="Nhập số điện thoại/ID..."
+                            <input type="text" id="mysignUserIdInput" placeholder="Nhập số CCCD/CMND/MST..."
                                 style="flex: 1; padding: 6px 8px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-heading); font-size: 0.78rem; font-weight: 600;">
                             <button class="btn btn-outline" type="button" onclick="fetchViettelCertificates()"
-                                style="white-space: nowrap; font-size: 0.72rem;">Nạp CTS</button>
+                                style="white-space: nowrap; font-size: 0.72rem;">Nạp CTS VNPT</button>
                         </div>
                     </div>
 
                     <div style="margin-bottom: 0;">
                         <label
                             style="font-weight: 600; font-size: 0.72rem; display: block; margin-bottom: 2px; color: var(--text-heading);">Chứng
-                            thư số (Credential ID):</label>
+                            thư số (Serial Number):</label>
                         <select id="mysignCredentialSelect"
                             style="width: 100%; padding: 6px 8px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-heading); font-size: 0.75rem;">
-                            <option value="">-- Bấm nút "Nạp CTS" ở trên để lấy danh sách --</option>
+                            <option value="">-- Bấm nút "Nạp CTS VNPT" ở trên để lấy danh sách --</option>
                         </select>
                     </div>
                 </div>
 
-                <div
-                    style="margin-top: 10px; display: flex; align-items: center; gap: 6px; font-size: 0.72rem; color: var(--text-heading);">
-                    <input type="checkbox" id="mysignEnableExtension"
-                        style="cursor: pointer; accent-color: var(--primary);">
-                    <label for="mysignEnableExtension" style="cursor: pointer; font-weight: 500;">Đăng ký lưu phiên tự
-                        động ký (Auto Sign / Register Extension)</label>
-                </div>
-
-                <!-- YÊU CẦU: Thêm dòng ghi chú xác thực sinh trắc học -->
                 <div
                     style="margin-top: 8px; font-size: 0.72rem; color: var(--text-muted); font-style: italic; display: flex; align-items: center; gap: 4px;">
                     <svg class="svg-icon-sm" viewBox="0 0 24 24"
@@ -571,7 +560,7 @@
                         <path fill="currentColor"
                             d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z" />
                     </svg>
-                    <span>* Xác thực bằng sinh trắc học qua ứng dụng Viettel MySign</span>
+                    <span>* Xác thực giao dịch trực tiếp qua ứng dụng di động VNPT SmartCA</span>
                 </div>
 
                 <div id="mysignStatusInfo"
@@ -580,8 +569,7 @@
 
                 <div style="margin-top: 16px; display: flex; justify-content: flex-end; gap: 6px;">
                     <button class="btn btn-outline" onclick="closeModal('otpSignModal')">Hủy bỏ</button>
-                    <button class="btn btn-primary" id="executeSignBtn" onclick="verifyAndExecuteSign()">Xác Nhận Ký Số
-                        MySign</button>
+                    <button class="btn btn-primary" id="executeSignBtn" onclick="verifyAndExecuteSign()">Xác Nhận Ký Số VNPT</button>
                 </div>
             </div>
         </div>
@@ -790,8 +778,7 @@
         let isUserAdmin = false;
         let currentActiveUserFullName = 'TRẦN HOÀNG PHƯỚC';
 
-        let currentAccessToken = '';
-        let currentCredentialId = '';
+        let currentSmartCaTranCode = '';
 
         let virtualTreeData = {
             id: "ROOT",
@@ -915,7 +902,7 @@
                     fetch(`${DATA_SERVER_API}/api/cde-files`),
                     fetch(`${DATA_SERVER_API}/api/issues`),
                     fetch(`${DATA_SERVER_API}/api/recalls`).catch(() => null),
-                    fetch(`${DATA_SERVER_API}/api/viettel/signatures`, {
+                    fetch(`${DATA_SERVER_API}/api/smartca/signatures`, {
                         headers: { 'Authorization': `Bearer ${localStorage.getItem('access_token') || ''}` }
                     }).catch(() => null)
                 ]);
@@ -1354,7 +1341,6 @@
             if (window.innerWidth <= 768) closeMobileSidebar();
         }
 
-        /* Hiệu ứng chọn file trên cây thư mục -> hover/highlight dòng tương ứng trong bảng panel */
         function selectFileTreeNode(node, element) {
             document.querySelectorAll('.tree-node-item').forEach(el => el.classList.remove('active', 'highlighted'));
             element.classList.add('active', 'highlighted');
@@ -1623,7 +1609,7 @@
                 if (isRecalled) {
                     signBtn = `<button class="btn-icon sign-btn" disabled style="opacity:0.4; cursor:not-allowed;" title="File đã bị thu hồi">Ký số ${lockSvg}</button>`;
                 } else if (canSign) {
-                    signBtn = `<button class="btn-icon sign-btn" onclick="openOtpSignModal(this)" title="Ký số từ xa Viettel MySign Cloud CA">Ký số</button>`;
+                    signBtn = `<button class="btn-icon sign-btn" onclick="openOtpSignModal(this)" title="Ký số từ xa VNPT SmartCA (CSC Standard)">Ký số</button>`;
                 } else {
                     signBtn = `<button class="btn-icon sign-btn" disabled style="opacity:0.4; cursor:not-allowed;" title="Chỉ tài khoản Full Control hoặc Read & Write mới được ký số">Ký số ${lockSvg}</button>`;
                 }
@@ -1734,7 +1720,7 @@
                    </button>`;
 
             let signedBadge = isSigned
-                ? `<span class="badge-signed" title="Đã ký số bởi ${signatureRecord.signedBy || 'Hệ thống'} lúc ${new Date(signatureRecord.signedAt || Date.now()).toLocaleString('vi-VN')}">✓ Đã ký</span>`
+                ? `<span class="badge-signed" title="Đã ký số bởi ${signatureRecord.signedBy || 'Hệ thống'} lúc ${new Date(signatureRecord.signedAt || Date.now()).toLocaleString('vi-VN')}">✓ Đã ký VNPT</span>`
                 : '';
 
             return `
@@ -1751,7 +1737,7 @@
 
         let signTargetRow = null;
 
-        /* Mở Popup Ký số từ xa Viettel MySign (CSC Standard) - Không gọi API tự động */
+        /* Mở Popup Ký số từ xa VNPT SmartCA */
         async function openOtpSignModal(btn) {
             signTargetRow = btn.closest('tr');
             const fileName = signTargetRow.querySelector('.file-code').innerText;
@@ -1766,17 +1752,16 @@
             const userIdInput = document.getElementById('mysignUserIdInput');
             const credSelect = document.getElementById('mysignCredentialSelect');
 
-            // Mặc định để trống để người dùng tự nhập User ID MySign
             if (userIdInput) userIdInput.value = '';
 
             if (credSelect) {
-                credSelect.innerHTML = `<option value="">-- Bấm nút "Nạp CTS" ở trên để lấy danh sách --</option>`;
+                credSelect.innerHTML = `<option value="">-- Bấm nút "Nạp CTS VNPT" ở trên để lấy danh sách --</option>`;
             }
 
             openModal('otpSignModal');
         }
 
-        /* Chủ động gọi API lấy Chứng thư số dựa trên User ID người dùng nhập */
+        /* 1. Nạp danh sách chứng thư số từ VNPT SmartCA */
         async function fetchViettelCertificates() {
             const userIdInput = document.getElementById('mysignUserIdInput');
             const credSelect = document.getElementById('mysignCredentialSelect');
@@ -1784,23 +1769,22 @@
 
             const inputUserId = userIdInput ? userIdInput.value.trim() : '';
             if (!inputUserId) {
-                showToast("⚠️ Vui lòng nhập User ID hoặc số điện thoại MySign!");
+                showToast("⚠️ Vui lòng nhập số CCCD/CMND hoặc mã số thuế thuê bao SmartCA!");
                 return;
             }
 
             const cdeToken = localStorage.getItem('access_token') || '';
 
-            showToast("Đang kết nối dịch vụ Viettel MySign...");
+            showToast("Đang kết nối dịch vụ VNPT SmartCA...");
             if (statusInfo) {
                 statusInfo.style.display = 'block';
                 statusInfo.style.background = 'rgba(59, 130, 246, 0.15)';
                 statusInfo.style.color = '#60a5fa';
-                statusInfo.innerText = "⏳ Đang kết nối và xác thực User ID...";
+                statusInfo.innerText = "⏳ Đang kết nối và lấy Chứng thư số VNPT...";
             }
 
             try {
-                // Bước 1: Login lấy access_token phiên làm việc Viettel (kèm CDE Token)
-                const loginRes = await fetch(`${DATA_SERVER_API}/api/viettel/login`, {
+                const res = await fetch(`${DATA_SERVER_API}/api/smartca/credentials/get_certificate`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -1809,47 +1793,30 @@
                     body: JSON.stringify({ userId: inputUserId })
                 });
 
-                const loginData = await loginRes.json();
-                if (!loginData.success || !loginData.access_token) {
-                    throw new Error(loginData.error || "Không thể khởi tạo phiên đăng nhập với User ID này");
-                }
-
-                currentAccessToken = loginData.access_token;
-
-                // Bước 2: Lấy danh sách Chứng thư số (kèm CDE Token)
-                const listRes = await fetch(`${DATA_SERVER_API}/api/viettel/credentials/list`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${cdeToken}`
-                    },
-                    body: JSON.stringify({ access_token: currentAccessToken })
-                });
-
-                const listData = await listRes.json();
+                const data = await res.json();
                 if (credSelect) credSelect.innerHTML = '';
 
-                if (listData.success && listData.credentialIDs && listData.credentialIDs.length > 0) {
-                    listData.credentialIDs.forEach((credId, idx) => {
+                if (data.success && data.data && data.data.user_certificates) {
+                    const certs = Array.isArray(data.data.user_certificates) ? data.data.user_certificates : [data.data.user_certificates];
+                    
+                    certs.forEach((cert, idx) => {
                         let opt = document.createElement('option');
-                        opt.value = credId;
-                        opt.innerText = `CTS ${idx + 1}: ${credId}`;
+                        opt.value = cert.serial_number;
+                        opt.innerText = `[${cert.service_name || 'SmartCA'}] Serial: ${cert.serial_number.slice(0, 16)}... (${cert.cert_status})`;
                         credSelect.appendChild(opt);
                     });
-                    currentCredentialId = listData.credentialIDs[0];
 
-                    showToast("✓ Nạp danh sách Chứng thư số thành công!");
+                    showToast("✓ Nạp danh sách Chứng thư số VNPT thành công!");
                     if (statusInfo) {
                         statusInfo.style.background = 'rgba(52, 211, 153, 0.15)';
                         statusInfo.style.color = '#34d399';
-                        statusInfo.innerText = "✓ Kết nối thành công! Đã nạp danh sách Chứng thư số.";
+                        statusInfo.innerText = "✓ Kết nối thành công! Đã nạp Chứng thư số VNPT SmartCA.";
                     }
                 } else {
-                    if (credSelect) credSelect.innerHTML = `<option value="">-- Không tìm thấy Chứng thư số --</option>`;
-                    throw new Error("Tài khoản chưa được cấp Chứng thư số hoạt động");
+                    throw new Error(data.error || "Không tìm thấy chứng thư số hoạt động cho tài khoản này");
                 }
             } catch (err) {
-                console.error("Lỗi kết nối Viettel MySign:", err);
+                console.error("Lỗi kết nối VNPT SmartCA:", err);
                 showToast("Lỗi: " + err.message);
                 if (statusInfo) {
                     statusInfo.style.background = 'rgba(239, 68, 68, 0.15)';
@@ -1859,116 +1826,107 @@
             }
         }
 
-        /* Thực hiện Ký số tài liệu theo Quy chuẩn API Viettel MySign CSC */
+        /* 2. Gửi yêu cầu ký Hash và chờ xác nhận qua App SmartCA */
         async function verifyAndExecuteSign() {
             if (!signTargetRow) return;
             const filePath = signTargetRow.getAttribute('data-path');
+            const userIdInput = document.getElementById('mysignUserIdInput');
             const credSelect = document.getElementById('mysignCredentialSelect');
             const statusInfo = document.getElementById('mysignStatusInfo');
-            const enableExtension = document.getElementById('mysignEnableExtension') ? document.getElementById('mysignEnableExtension').checked : false;
 
-            if (credSelect && credSelect.value) {
-                currentCredentialId = credSelect.value;
-            }
+            const userId = userIdInput ? userIdInput.value.trim() : '';
+            const serialNumber = credSelect ? credSelect.value : '';
 
-            if (!currentAccessToken || !currentCredentialId) {
-                showToast("⚠️ Chưa chọn Chứng thư số hợp lệ để ký!");
-                return;
-            }
-            if (!filePath) {
-                showToast("⚠️ Không xác định được đường dẫn tệp cần ký!");
+            if (!userId || !serialNumber) {
+                showToast("⚠️ Vui lòng nhập ID thuê bao và chọn Chứng thư số!");
                 return;
             }
 
             const cdeToken = localStorage.getItem('access_token') || '';
 
-            showToast("Đang gửi yêu cầu ủy quyền ký tới app Viettel MySign...");
-
+            showToast("Đang gửi yêu cầu ký đến VNPT SmartCA...");
             if (statusInfo) {
                 statusInfo.style.display = 'block';
                 statusInfo.style.background = 'rgba(59, 130, 246, 0.15)';
                 statusInfo.style.color = '#60a5fa';
-                statusInfo.innerText = "⏳ Đang chờ người dùng xác thực sinh trắc học trên ứng dụng Mobile Viettel MySign...";
+                statusInfo.innerText = "⏳ Đang gửi yêu cầu... Vui lòng mở ứng dụng VNPT SmartCA trên điện thoại để xác nhận ký!";
             }
 
             try {
-                // Bước 1: Gửi yêu cầu Authorize để lấy mã SAD (kèm CDE Token)
-                const authRes = await fetch(`${DATA_SERVER_API}/api/viettel/credentials/authorize`, {
+                const res = await fetch(`${DATA_SERVER_API}/api/smartca/signatures/sign`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${cdeToken}`
                     },
                     body: JSON.stringify({
-                        credentialID: currentCredentialId,
-                        numSignatures: 1,
-                        filePath: filePath,
-                        description: `CDE PV Incons - Ký xác thực sinh trắc học file ${filePath}`
+                        userId: userId,
+                        serialNumber: serialNumber,
+                        filePath: filePath
                     })
                 });
 
-                const authData = await authRes.json();
-                if (!authData.success || !authData.SAD) {
-                    throw new Error(authData.error || "Người dùng từ chối hoặc hết thời gian xác thực sinh trắc học");
+                const data = await res.json();
+                if (!data.success) {
+                    throw new Error(data.error || "Không thể khởi tạo giao dịch ký số");
                 }
 
-                const sadToken = authData.SAD;
+                currentSmartCaTranCode = data.tran_code || (data.data ? data.data.tran_code : '');
+                
+                if (statusInfo) {
+                    statusInfo.style.background = 'rgba(245, 158, 11, 0.15)';
+                    statusInfo.style.color = '#f59e0b';
+                    statusInfo.innerText = "⏳ Đã gửi thông báo xác thực tới App SmartCA. Đang chờ bạn bấm xác nhận trên điện thoại...";
+                }
 
-                // Bước 2: Gọi API SignHash tạo chữ ký điện tử và lưu vào database/signer (kèm CDE Token)
-                const signRes = await fetch(`${DATA_SERVER_API}/api/viettel/signatures/signHash`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${cdeToken}`
-                    },
-                    body: JSON.stringify({
-                        credentialID: currentCredentialId,
-                        SAD: sadToken,
-                        filePath: filePath,
-                        hashAlgo: "2.16.840.1.101.3.4.2.1",
-                        signAlgo: "1.2.840.113549.1.1.1",
-                        async: 0
-                    })
-                });
+                // Tự động kiểm tra trạng thái giao dịch sau mỗi 4 giây
+                let pollCount = 0;
+                const pollInterval = setInterval(async () => {
+                    pollCount++;
+                    try {
+                        const statusRes = await fetch(`${DATA_SERVER_API}/api/smartca/signatures/status`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${cdeToken}`
+                            },
+                            body: JSON.stringify({
+                                tranCode: currentSmartCaTranCode,
+                                filePath: filePath,
+                                userId: userId
+                            })
+                        });
+                        const statusData = await statusRes.json();
+                        
+                        if (statusData.success) {
+                            clearInterval(pollInterval);
+                            showToast("✓ Ký số VNPT SmartCA thành công!");
+                            if (statusInfo) {
+                                statusInfo.style.background = 'rgba(52, 211, 153, 0.15)';
+                                statusInfo.style.color = '#34d399';
+                                statusInfo.innerText = "✓ Giao dịch hoàn tất! Đã lưu chữ ký vào hệ thống.";
+                            }
+                            setTimeout(() => closeModal('otpSignModal'), 1500);
+                            cdeSyncChannel.postMessage({ type: 'REFRESH_CDE_DATA' });
+                            reloadDatabaseData();
+                        }
+                    } catch (e) {
+                        // Vẫn đang chờ người dùng xác thực trên app
+                    }
 
-                const signData = await signRes.json();
-                if (signData.success) {
-                    // Bước 3 (Tùy chọn): Đăng ký lưu phiên tự động ký nếu chọn
-                    if (enableExtension) {
-                        try {
-                            await fetch(`${DATA_SERVER_API}/api/viettel/credentials/registerExtension`, {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                    'Authorization': `Bearer ${cdeToken}`
-                                },
-                                body: JSON.stringify({
-                                    credential_id: currentCredentialId,
-                                    duration: 60,
-                                    SAD: sadToken
-                                })
-                            });
-                        } catch (extErr) {
-                            console.warn("Lỗi đăng ký lưu phiên:", extErr);
+                    if (pollCount >= 15) {
+                        clearInterval(pollInterval);
+                        showToast("⚠️ Hết thời gian chờ xác nhận trên ứng dụng SmartCA!");
+                        if (statusInfo) {
+                            statusInfo.style.background = 'rgba(239, 68, 68, 0.15)';
+                            statusInfo.style.color = '#ef4444';
+                            statusInfo.innerText = "✕ Quá thời gian chờ xác thực trên App SmartCA.";
                         }
                     }
+                }, 4000);
 
-                    showToast("✓ Ký số thành công & Đã lưu bản ghi chữ ký vào hệ thống!");
-                    if (statusInfo) {
-                        statusInfo.style.background = 'rgba(52, 211, 153, 0.15)';
-                        statusInfo.style.color = '#34d399';
-                        statusInfo.innerText = "✓ Xác thực sinh trắc học và ký số thành công!";
-                    }
-                    setTimeout(() => {
-                        closeModal('otpSignModal');
-                    }, 1200);
-                    cdeSyncChannel.postMessage({ type: 'REFRESH_CDE_DATA' });
-                    reloadDatabaseData();
-                } else {
-                    throw new Error(signData.error || "Không nhận được signature từ server");
-                }
             } catch (err) {
-                console.error("Lỗi quá trình ký số Viettel MySign:", err);
+                console.error("Lỗi ký số VNPT SmartCA:", err);
                 showToast("Lỗi: " + err.message);
                 if (statusInfo) {
                     statusInfo.style.background = 'rgba(239, 68, 68, 0.15)';
@@ -2404,7 +2362,6 @@
             tr.setAttribute('data-path', relativePath);
             if (getRecalledDB()[relativePath]) tr.classList.add('is-recalled');
 
-            /* Hiệu ứng chọn/click dòng bảng panel -> highlight file tương ứng bên cây thư mục */
             tr.onclick = (e) => {
                 if (e.target.closest('button') || e.target.closest('.dropdown')) return;
 
