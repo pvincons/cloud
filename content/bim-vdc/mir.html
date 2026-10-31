@@ -536,8 +536,7 @@
                         <label
                             style="font-weight: 600; font-size: 0.72rem; display: block; margin-bottom: 2px; color: var(--text-heading);">Tài
                             khoản / Username SmartCA:</label>
-                        <input type="text" id="vnptUsernameInput" placeholder="CCCD/Email/Phone..."
-                            style="width: 100%; padding: 6px 8px; border-radius: 6px; border: 1px solid var(--border-color); 
+                        <input type="text" id="vnptUsernameInput" placeholder="CCCD/Email/Phone..." style="width: 100%; padding: 6px 8px; border-radius: 6px; border: 1px solid var(--border-color); 
                             background: var(--bg-card); color: var(--text-heading); font-size: 0.78rem;">
                     </div>
                     <div style="margin-bottom: 8px;">
@@ -545,9 +544,16 @@
                             style="font-weight: 600; font-size: 0.72rem; display: block; margin-bottom: 2px; color: var(--text-heading);">Mật
                             khẩu SmartCA:</label>
                         <div style="display: flex; gap: 6px;">
-                            <input type="password" id="vnptPasswordInput" placeholder="Nhập mật khẩu..."
-                                style="flex: 1; padding: 6px 8px; border-radius: 6px; border: 1px solid var(--border-color); 
-                                background: var(--bg-card); color: var(--text-heading); font-size: 0.78rem;">
+                            <div style="position: relative; flex: 1;">
+                                <input type="password" id="vnptPasswordInput" placeholder="Nhập mật khẩu..."
+                                    style="width: 100%; padding: 6px 30px 6px 8px; 
+                                border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-heading); font-size: 0.78rem;">
+                                <button type="button" onclick="toggleVnptPasswordVisibility()"
+                                    style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: none; border: none; padding: 0; color: var(--text-muted); cursor: pointer; display: flex; align-items: center;"
+                                    title="Ẩn/Hiện mật khẩu">
+                                    <i id="toggleVnptPasswordIcon" class="fa-solid fa-eye"></i>
+                                </button>
+                            </div>
                             <button class="btn btn-outline" type="button" onclick="fetchVnptTokenAndCredentials()"
                                 style="white-space: nowrap; font-size: 0.72rem;">Xác thực & Lấy CTS</button>
                         </div>
@@ -556,8 +562,7 @@
                         <label
                             style="font-weight: 600; font-size: 0.72rem; display: block; margin-bottom: 2px; color: var(--text-heading);">Chọn
                             Chứng thư số (Credential ID):</label>
-                        <select id="vnptCredentialSelect"
-                            style="width: 100%; padding: 6px 8px; border-radius: 6px; border: 1px solid var(--border-color); 
+                        <select id="vnptCredentialSelect" style="width: 100%; padding: 6px 8px; border-radius: 6px; border: 1px solid var(--border-color); 
                             background: var(--bg-card); color: var(--text-heading); font-size: 0.75rem;">
                             <option value="">-- Vui lòng xác thực tài khoản trước --</option>
                         </select>
@@ -1757,7 +1762,17 @@
             }
 
             document.getElementById('vnptUsernameInput').value = '';
-            document.getElementById('vnptPasswordInput').value = '';
+
+            // Reset ô password & icon về dạng ẩn ban đầu
+            const pwdInput = document.getElementById('vnptPasswordInput');
+            const icon = document.getElementById('toggleVnptPasswordIcon');
+            if (pwdInput) pwdInput.type = 'password';
+            if (icon) {
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+            if (pwdInput) pwdInput.value = '';
+
             document.getElementById('vnptCredentialSelect').innerHTML = `<option value="">-- Vui lòng xác thực tài khoản trước --</option>`;
 
             openModal('otpSignModal');
@@ -2653,6 +2668,23 @@
                 });
             }
         });
+
+        //Hàm ẩn hiện mật khẩu VNPT
+        function toggleVnptPasswordVisibility() {
+            const pwdInput = document.getElementById('vnptPasswordInput');
+            const icon = document.getElementById('toggleVnptPasswordIcon');
+            if (!pwdInput || !icon) return;
+
+            if (pwdInput.type === 'password') {
+                pwdInput.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                pwdInput.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
     </script>
 </body>
 
