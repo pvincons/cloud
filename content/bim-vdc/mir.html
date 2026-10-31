@@ -1812,16 +1812,18 @@
                 });
 
                 const listData = await listRes.json();
+                // VNPT SmartCA trả danh sách ID chứng thư trong trường "content" (tài liệu mục 5.2.1)
+                const credIds = Array.isArray(listData.content) ? listData.content : (listData.credentialIDs || []);
                 if (credSelect) credSelect.innerHTML = '';
 
-                if (listData.success && listData.credentialIDs && listData.credentialIDs.length > 0) {
-                    listData.credentialIDs.forEach((credId, idx) => {
+                if (listData.success && credIds.length > 0) {
+                    credIds.forEach((credId, idx) => {
                         let opt = document.createElement('option');
                         opt.value = credId;
                         opt.innerText = `Chứng thư số ${idx + 1}: ${credId}`;
                         credSelect.appendChild(opt);
                     });
-                    currentCredentialId = listData.credentialIDs[0];
+                    currentCredentialId = credIds[0];
 
                     showToast("✓ Nạp danh sách Chứng thư số thành công!");
                     if (statusInfo) {
@@ -1899,6 +1901,7 @@
                     statusInfo.innerText = `⏳ Đã tạo giao dịch (ID: ${tranId}). Đang chờ xác nhận trên app VNPT SmartCA...`;
                 }
 
+                let finished = false;
                 let pollCount = 0;
                 const maxPolls = 20;
                 const pollInterval = setInterval(async () => {
@@ -1919,7 +1922,8 @@
                         const tranData = await tranRes.json();
                         if (tranData.success && tranData.content) {
                             const status = tranData.content.tranStatus;
-                            if (status === 1 || status === 4000) {
+                            if (status === 1) {
+                                finished = true;
                                 clearInterval(pollInterval);
                                 showToast("✓ Ký số VNPT SmartCA thành công!");
                                 if (statusInfo) {
@@ -1930,13 +1934,31 @@
                                 setTimeout(() => closeModal('otpSignModal'), 1500);
                                 cdeSyncChannel.postMessage({ type: 'REFRESH_CDE_DATA' });
                                 reloadDatabaseData();
+                            } else if (status === 4000) {
+                                /* Đang chờ người ký xác nhận trên app VNPT SmartCA: tiếp tục kiểm tra */
+                            } else {
+                                const failMsg = {
+                                    4001: 'Giao dịch đã hết hạn xác nhận.',
+                                    4002: 'Người ký đã từ chối giao dịch.',
+                                    4003: 'Xác thực khóa ký thất bại.',
+                                    4004: 'Ký số thất bại.'
+                                }[status] || ('Giao dịch không thành công (mã ' + status + ').');
+                                finished = true;
+                                clearInterval(pollInterval);
+                                showToast("✕ " + failMsg);
+                                if (statusInfo) {
+                                    statusInfo.style.background = 'rgba(239, 68, 68, 0.15)';
+                                    statusInfo.style.color = '#ef4444';
+                                    statusInfo.innerText = "✕ " + failMsg;
+                                }
                             }
                         }
                     } catch (pollErr) {
                         console.warn("Lỗi kiểm tra trạng thái giao dịch:", pollErr);
                     }
 
-                    if (pollCount >= maxPolls) {
+                    if (!finished && pollCount >= maxPolls) {
+                        finished = true;
                         clearInterval(pollInterval);
                         if (statusInfo) {
                             statusInfo.style.background = 'rgba(239, 68, 68, 0.15)';
