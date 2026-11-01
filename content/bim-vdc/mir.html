@@ -1733,7 +1733,7 @@
                    </button>`;
 
             let signedBadge = isSigned
-                ? `<span class="badge-signed" title="Đã ký số bởi ${signatureRecord.signedBy || 'Hệ thống'} lúc ${new Date(signatureRecord.signedAt || Date.now()).toLocaleString('vi-VN')}">✓ Đã ký</span>`
+                ? `<span class="badge-signed" title="${signatureRecord.signatureCount > 1 ? signatureRecord.signatureCount + ' chữ ký số. Gần nhất: ' : 'Đã ký số bởi '}${signatureRecord.signedBy || 'Hệ thống'} lúc ${new Date(signatureRecord.signedAt || Date.now()).toLocaleString('vi-VN')}">✓ Đã ký${signatureRecord.signatureCount > 1 ? ' (' + signatureRecord.signatureCount + ')' : ''}</span>`
                 : '';
 
             return `
@@ -1945,7 +1945,9 @@
                                 if (statusInfo) {
                                     statusInfo.style.background = 'rgba(52, 211, 153, 0.15)';
                                     statusInfo.style.color = '#34d399';
-                                    statusInfo.innerText = "✓ Ký số thành công! Đã lưu chữ ký vào hệ thống CDE.";
+                                    statusInfo.innerText = tranData.embedded
+                                        ? "✓ Ký số thành công! Chữ ký số đã được nhúng vào tệp PDF."
+                                        : "✓ Ký số thành công! Đã ghi nhận chữ ký vào hệ thống CDE (tệp không phải PDF nên chữ ký không nhúng vào tệp được).";
                                 }
                                 setTimeout(() => closeModal('otpSignModal'), 1500);
                                 cdeSyncChannel.postMessage({ type: 'REFRESH_CDE_DATA' });
@@ -1967,6 +1969,17 @@
                                     statusInfo.style.color = '#ef4444';
                                     statusInfo.innerText = "✕ " + failMsg;
                                 }
+                            }
+                        } else if (!tranData.retry && (tranData.tranStatus === 1 || tranRes.status === 404)) {
+                            /* VNPT đã ký xong nhưng server không nhúng/ghi nhận được chữ ký (hoặc không có giao dịch): báo lỗi rõ ràng */
+                            finished = true;
+                            clearInterval(pollInterval);
+                            const embedErr = tranData.error || 'Không nhúng được chữ ký vào tệp.';
+                            showToast("✕ " + embedErr);
+                            if (statusInfo) {
+                                statusInfo.style.background = 'rgba(239, 68, 68, 0.15)';
+                                statusInfo.style.color = '#ef4444';
+                                statusInfo.innerText = "✕ " + embedErr;
                             }
                         }
                     } catch (pollErr) {
