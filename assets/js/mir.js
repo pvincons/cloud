@@ -21,6 +21,7 @@ let currentActiveUserFullName = 'TRẦN HOÀNG PHƯỚC';
 
 let currentAccessToken = '';
 let currentCredentialId = '';
+let fileTypeChartInstance = null;
 
 let virtualTreeData = {
     id: "ROOT",
@@ -104,6 +105,33 @@ function showToast(message) {
     toast.innerHTML = `<svg class="svg-icon-sm" viewBox="0 0 24 24" style="color:var(--primary);"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg> <span>${message}</span>`;
     container.appendChild(toast);
     setTimeout(() => toast.remove(), 3000);
+}
+
+/* 1. HÀM QUY ĐỔI DUNG LƯỢNG FILE */
+function formatFileSize(bytes) {
+    if (!bytes || isNaN(bytes) || bytes === 0) return '0 KB';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+}
+
+/* 2. NÚT ẨN / HIỆN CARD QUY CHUẨN ĐỊNH DANH ISO 19650-2 */
+function toggleNamingCard() {
+    const card = document.getElementById('namingRuleCard');
+    const icon = document.getElementById('namingToggleIcon');
+    const btn = document.querySelector('.btn-toggle-naming');
+    if (!card) return;
+
+    card.classList.toggle('collapsed');
+
+    if (card.classList.contains('collapsed')) {
+        if (icon) icon.className = 'fa-solid fa-chevron-down';
+        if (btn) btn.innerHTML = `<i class="fa-solid fa-chevron-down" id="namingToggleIcon"></i> Hiện quy chuẩn`;
+    } else {
+        if (icon) icon.className = 'fa-solid fa-chevron-up';
+        if (btn) btn.innerHTML = `<i class="fa-solid fa-chevron-up" id="namingToggleIcon"></i> Ẩn quy chuẩn`;
+    }
 }
 
 async function loadUserPermissions() {
@@ -205,6 +233,7 @@ function buildTreeFromFlatList(flatList) {
                     name: part,
                     path: accumPath,
                     type: isItemFile ? 'file' : 'folder',
+                    size: item.size || item.fileSize || 0,
                     expanded: true,
                     children: isItemFile ? undefined : []
                 };
@@ -1482,8 +1511,8 @@ function previewFile(btn) {
     let row = btn.closest('tr');
     document.getElementById('viewFileName').innerText = row.querySelector('.file-code').innerText;
     document.getElementById('viewFilePath').innerText = row.getAttribute('data-path');
-    document.getElementById('viewFileState').innerText = row.children[2].innerText;
-    document.getElementById('viewFileRev').innerText = row.children[4].innerText;
+    document.getElementById('viewFileState').innerText = row.children[3].innerText;
+    document.getElementById('viewFileRev').innerText = row.children[5].innerText;
     const btn3d = document.getElementById('viewOpen3dBtn');
     if (btn3d) btn3d.style.display = /\.ifc$/i.test(row.getAttribute('data-path') || '') ? '' : 'none';
     const recallInfo = getRecalledDB()[row.getAttribute('data-path')];
@@ -1550,7 +1579,7 @@ function saveMetadata() {
     const label = select.options[select.selectedIndex].text;
 
     metadataEditingRow.setAttribute('data-suitability', code);
-    metadataEditingRow.children[3].innerHTML = `<span class="badge badge-${code.toLowerCase()}">${label}</span>`;
+    metadataEditingRow.children[4].innerHTML = `<span class="badge badge-${code.toLowerCase()}">${label}</span>`;
 
     closeModal('metadataModal');
     metadataEditingRow = null;
@@ -1604,13 +1633,13 @@ function buildTableFromTree(node) {
 
     if (node.type === 'file') {
         if (isPathLocked(node.path)) return;
-        appendFileToTable(node.name, node.path);
+        appendFileToTable(node.name, node.path, node.size || 0);
     } else if (node.children) {
         node.children.forEach(child => buildTableFromTree(child));
     }
 }
 
-function appendFileToTable(fileName, relativePath) {
+function appendFileToTable(fileName, relativePath, fileSize = 0) {
     const tbody = document.getElementById('tableBody');
     if (!tbody) return;
     const upperPath = relativePath.toUpperCase();
@@ -1642,6 +1671,8 @@ function appendFileToTable(fileName, relativePath) {
     else if (fileName.includes('MEP') || fileName.includes('CODIEN')) disc = 'MEP';
     else if (fileName.includes('HVAC') || fileName.includes('THONGGIO')) disc = 'HVAC';
 
+    const formattedSize = formatFileSize(fileSize);
+
     const tr = document.createElement('tr');
     tr.setAttribute('data-project', prjCode);
     tr.setAttribute('data-state', state);
@@ -1667,6 +1698,7 @@ function appendFileToTable(fileName, relativePath) {
     tr.innerHTML = `
         <td><span class="badge badge-prj">${prjCode}</span></td>
         <td class="file-code" title="${relativePath}">${fileName}</td>
+        <td style="font-family: monospace; color: var(--text-muted); font-size: 0.7rem;">${formattedSize}</td>
         <td><span class="badge ${badgeClass}">${state}</span></td>
         <td><span class="badge badge-${suit.toLowerCase()}">${suitText}</span></td>
         <td><span class="rev-tag">${revText}</span></td>
@@ -1674,6 +1706,81 @@ function appendFileToTable(fileName, relativePath) {
         <td class="action-btns">${getActionButtons(state, relativePath)}</td>
     `;
     tbody.appendChild(tr);
+}
+
+/* 3. KHỞI TẠO VÀ CẬP NHẬT BIỂU ĐỒ NĂNG ĐỘNG CHART.JS (ĐÃ SỬA MÀU CHỮ DARK MODE TRẮNG TRỰC QUAN) */
+function initOrUpdateFileTypeChart(typeCounts) {
+    const canvas = document.getElementById('fileTypeChart');
+    if (!canvas || typeof Chart === 'undefined') return;
+
+    const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
+    const legendTextColor = currentTheme === 'dark' ? '#f1f5f9' : '#0f172a';
+
+    const labels = ['PDF', 'RVT', 'IFC', 'DWG', 'XML', 'Excel', 'Word', 'Khác'];
+    const dataValues = [
+        typeCounts.pdf || 0,
+        typeCounts.rvt || 0,
+        typeCounts.ifc || 0,
+        typeCounts.dwg || 0,
+        typeCounts.xml || 0,
+        typeCounts.excel || 0,
+        typeCounts.word || 0,
+        typeCounts.other || 0
+    ];
+
+    const bgColors = [
+        '#ef4444', // PDF - Red
+        '#38bdf8', // RVT - Light Blue
+        '#34d399', // IFC - Green
+        '#f59e0b', // DWG - Amber
+        '#a855f7', // XML - Purple
+        '#10b981', // Excel - Emerald
+        '#2563eb', // Word - Blue
+        '#64748b'  // Other - Slate
+    ];
+
+    if (fileTypeChartInstance) {
+        fileTypeChartInstance.data.datasets[0].data = dataValues;
+        fileTypeChartInstance.options.plugins.legend.labels.color = legendTextColor;
+        fileTypeChartInstance.update();
+    } else {
+        const ctx = canvas.getContext('2d');
+        fileTypeChartInstance = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: dataValues,
+                    backgroundColor: bgColors,
+                    borderWidth: 1,
+                    borderColor: 'transparent'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'right',
+                        labels: {
+                            color: legendTextColor,
+                            font: { size: 9, weight: '600' },
+                            boxWidth: 10,
+                            padding: 4
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function (context) {
+                                return ` ${context.label}: ${context.raw} files`;
+                            }
+                        }
+                    }
+                },
+                cutout: '65%'
+            }
+        });
+    }
 }
 
 function applyFilters() {
@@ -1692,6 +1799,7 @@ function applyFilters() {
     const rows = tbody.querySelectorAll('tr');
 
     let wipCount = 0, sharedCount = 0, pubCount = 0, arcCount = 0;
+    let typeCounts = { pdf: 0, rvt: 0, ifc: 0, dwg: 0, xml: 0, excel: 0, word: 0, other: 0 };
 
     rows.forEach(row => {
         const prj = row.getAttribute('data-project') || '';
@@ -1699,6 +1807,7 @@ function applyFilters() {
         const suit = row.getAttribute('data-suitability') || '';
         const isRecalled = row.classList.contains('is-recalled');
         const text = row.innerText.toLowerCase();
+        const fileName = (row.querySelector('.file-code') ? row.querySelector('.file-code').innerText : '').toLowerCase();
 
         let matchesProj = (projVal === 'ALL' || prj === projVal);
         let matchesState = (stateVal === 'ALL' || state === stateVal);
@@ -1712,6 +1821,16 @@ function applyFilters() {
             else if (state === '02_SHARED') sharedCount++;
             else if (state === '03_PUBLISHED') pubCount++;
             else if (state === '04_ARCHIVE') arcCount++;
+
+            // Phân loại đếm định dạng tệp tin
+            if (fileName.endsWith('.pdf')) typeCounts.pdf++;
+            else if (fileName.endsWith('.rvt')) typeCounts.rvt++;
+            else if (fileName.endsWith('.ifc')) typeCounts.ifc++;
+            else if (fileName.endsWith('.dwg') || fileName.endsWith('.dxf')) typeCounts.dwg++;
+            else if (fileName.endsWith('.xml')) typeCounts.xml++;
+            else if (fileName.endsWith('.xlsx') || fileName.endsWith('.xls')) typeCounts.excel++;
+            else if (fileName.endsWith('.docx') || fileName.endsWith('.doc')) typeCounts.word++;
+            else typeCounts.other++;
         } else {
             row.style.display = 'none';
         }
@@ -1726,6 +1845,9 @@ function applyFilters() {
     if (sharedEl) sharedEl.innerText = `${sharedCount} Files`;
     if (pubEl) pubEl.innerText = `${pubCount} Files`;
     if (arcEl) arcEl.innerText = `${arcCount} Files`;
+
+    // Cập nhật biểu đồ trực quan Chart.js
+    initOrUpdateFileTypeChart(typeCounts);
 }
 
 function toggleTheme() {
@@ -1734,6 +1856,7 @@ function toggleTheme() {
     document.documentElement.setAttribute('data-theme', newTheme);
     localStorage.setItem('cde_theme', newTheme);
     updateThemeUI(newTheme);
+    applyFilters();
 }
 
 function updateThemeUI(theme) {
