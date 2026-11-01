@@ -14,27 +14,24 @@
         } else {
             console.warn('protectMirRoute is not defined in this environment, using fallback session check.');
             if (!localStorage.getItem('currentUser')) {
-                // Fallback mock session for testing/preview if needed
                 console.log('No active user session found.');
             }
         }
     </script>
 
-    <!-- TAILWIND CSS & ACCOUNT MODAL JS -->
+    <!-- TAILWIND CSS & ACCOUNT MODAL JS & CHART.JS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
             darkMode: ['selector', '[data-theme="dark"]'],
         }
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="/assets/js/account-modal.js"></script>
     <script src="/assets/js/chat-client.js"></script>
 
     <!-- Custom Style Sheet -->
     <link rel="stylesheet" href="/assets/css/mir.css">
-    <style>
-        /* Styles website */
-    </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -157,30 +154,47 @@
         </div>
 
         <div class="content-area">
-            <div class="stats-grid">
-                <div class="stat-card" style="border-left: 3px solid var(--wip-color);">
-                    <div class="stat-title">01_WIP</div>
-                    <div class="stat-value" id="card-wip">0 Files</div>
-                    <div class="stat-desc">Nội bộ thiết kế</div>
+            <!-- HÀNG THỐNG KÊ & BIỂU ĐỒ (THU GỌN 4 THẺ TRẠNG THÁI VỀ PHÂN NỬA MÀN HÌNH) -->
+            <div class="dashboard-top-section">
+                <!-- 4 Card trạng thái thu gọn bên trái -->
+                <div class="stats-grid-compact">
+                    <div class="stat-card" style="border-left: 3px solid var(--wip-color);">
+                        <div class="stat-title">01_WIP</div>
+                        <div class="stat-value" id="card-wip">0 Files</div>
+                        <div class="stat-desc">Nội bộ thiết kế</div>
+                    </div>
+                    <div class="stat-card" style="border-left: 3px solid var(--shared-color);">
+                        <div class="stat-title">02_SHARED</div>
+                        <div class="stat-value" id="card-shared">0 Files</div>
+                        <div class="stat-desc">Phối hợp bộ môn</div>
+                    </div>
+                    <div class="stat-card" style="border-left: 3px solid var(--published-color);">
+                        <div class="stat-title">03_PUBLISHED</div>
+                        <div class="stat-value" id="card-pub">0 Files</div>
+                        <div class="stat-desc">Bản vẽ phát hành</div>
+                    </div>
+                    <div class="stat-card" style="border-left: 3px solid var(--archive-color);">
+                        <div class="stat-title">04_ARCHIVE</div>
+                        <div class="stat-value" id="card-arc">0 Files</div>
+                        <div class="stat-desc">Lưu trữ lịch sử</div>
+                    </div>
                 </div>
-                <div class="stat-card" style="border-left: 3px solid var(--shared-color);">
-                    <div class="stat-title">02_SHARED</div>
-                    <div class="stat-value" id="card-shared">0 Files</div>
-                    <div class="stat-desc">Phối hợp bộ môn</div>
-                </div>
-                <div class="stat-card" style="border-left: 3px solid var(--published-color);">
-                    <div class="stat-title">03_PUBLISHED</div>
-                    <div class="stat-value" id="card-pub">0 Files</div>
-                    <div class="stat-desc">Bản vẽ phát hành</div>
-                </div>
-                <div class="stat-card" style="border-left: 3px solid var(--archive-color);">
-                    <div class="stat-title">04_ARCHIVE</div>
-                    <div class="stat-value" id="card-arc">0 Files</div>
-                    <div class="stat-desc">Lưu trữ lịch sử</div>
+
+                <!-- Biểu đồ thống kê định dạng file bên phải -->
+                <div class="file-chart-card">
+                    <div class="chart-header">
+                        <span class="chart-title">
+                            <i class="fa-solid fa-chart-pie" style="color:var(--primary);"></i> Thống kê định dạng tệp
+                        </span>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="fileTypeChart"></canvas>
+                    </div>
                 </div>
             </div>
 
-            <div class="naming-rule-card">
+            <!-- CARD QUY CHUẨN ĐỊNH DANH ISO (CÓ NÚT ẨN/HIỆN GIAO DIỆN) -->
+            <div class="naming-rule-card" id="namingRuleCard">
                 <div class="naming-header">
                     <div class="naming-title">
                         <svg class="svg-icon-sm" viewBox="0 0 24 24">
@@ -188,8 +202,11 @@
                         </svg>
                         Quy Chuẩn Định Danh ISO 19650-2
                     </div>
+                    <button class="btn-toggle-naming" onclick="toggleNamingCard()" title="Ẩn/Hiện quy chuẩn định danh">
+                        <i class="fa-solid fa-chevron-up" id="namingToggleIcon"></i> Ẩn quy chuẩn
+                    </button>
                 </div>
-                <div class="naming-fields">
+                <div class="naming-fields" id="namingFieldsBody">
                     <div class="field-chip">
                         <div class="field-code">PROJECT</div>
                         <div class="field-label">Dự án</div>
@@ -279,6 +296,7 @@
                             <tr>
                                 <th>Dự Án</th>
                                 <th>Tên File ISO 19650</th>
+                                <th>Dung Lượng</th>
                                 <th>Container CDE</th>
                                 <th>Suitability</th>
                                 <th>Revision</th>
