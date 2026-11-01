@@ -1,5 +1,5 @@
 :root[data-theme="dark"] {
-    --primary: #38bdf8;
+    --primary: #0284c7;
     --primary-dark: #0284c7;
     --bg-dark: #090d16;
     --bg-sidebar: #070a12;
@@ -45,6 +45,7 @@
     --archive-color: #475569;
     --shadow-pro: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
 }
+
 
 * {
     box-sizing: border-box;
