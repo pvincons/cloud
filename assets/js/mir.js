@@ -532,23 +532,40 @@ function createTreeNodeElement(node) {
     let iconHtml = '';
     if (isFolder) {
         if (locked) {
-            iconHtml = `<span class="icon-lock" style="color:#eab308; display:inline-flex; align-items:center;" title="No Access"><svg class="svg-icon-sm" viewBox="0 0 24 24" fill="currentColor"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg></span>`;
+            iconHtml = `<span class="icon-lock" style="color:#eab308; display:inline-flex; align-items:center;" title="No Access"><svg viewBox="0 0 24 24" fill="currentColor" style="width:18px; height:18px;"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg></span>`;
         } else {
-            iconHtml = `<span class="icon-folder"><svg class="svg-icon-sm" viewBox="0 0 24 24"><path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/></svg></span>`;
+            // Icon thư mục màu vàng đặc (Solid Yellow) phóng to hơn một chút (18x18px)
+            if (node.expanded) {
+                iconHtml = `<span class="icon-folder" style="color:#eab308; display:inline-flex; align-items:center;">
+                    <svg viewBox="0 0 24 24" fill="currentColor" style="width:18px; height:18px;">
+                        <path d="M19 20H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h4l2 2h9a2 2 0 0 1 2 2v1H4v11l2.4-8h16.2l-2.8 9.3a2 2 0 0 1-1.8 1.4z"/>
+                    </svg>
+                </span>`;
+            } else {
+                iconHtml = `<span class="icon-folder" style="color:#eab308; display:inline-flex; align-items:center;">
+                    <svg viewBox="0 0 24 24" fill="currentColor" style="width:18px; height:18px;">
+                        <path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/>
+                    </svg>
+                </span>`;
+            }
         }
     } else {
-        iconHtml = `<span class="icon-file"><svg class="svg-icon-sm" viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg></span>`;
+        iconHtml = `<span class="icon-file" style="display:inline-flex; align-items:center;"><svg viewBox="0 0 24 24" style="width:18px; height:18px;"><path fill="currentColor" d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg></span>`;
     }
 
+    // Icon mũi tên Chevron đóng/mở phóng to hơn (16x16px)
+    let toggleIconSymbol = node.expanded 
+        ? `<svg viewBox="0 0 24 24" style="width:16px; height:16px;" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>`
+        : `<svg viewBox="0 0 24 24" style="width:16px; height:16px;" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>`;
+
     let toggleHtml = isFolder
-        ? `<span class="toggle-icon ${node.expanded ? '' : 'collapsed'}" onclick="toggleFolderExpand(event, '${node.id}')">${hasChildren ? '▼' : '•'}</span>`
-        : `<span class="toggle-icon" style="opacity:0;">•</span>`;
+        ? `<span class="toggle-icon ${node.expanded ? '' : 'collapsed'}" onclick="toggleFolderExpand(event, '${node.id}')" style="display:inline-flex; align-items:center; justify-content:center; width:18px;">${hasChildren ? toggleIconSymbol : '•'}</span>`
+        : `<span class="toggle-icon" style="opacity:0; width:18px;">•</span>`;
 
     let countBadgeHtml = isFolder && !locked ? `<span class="folder-file-count">${fileCount}</span>` : '';
 
-    // Đã loại bỏ hoàn toàn khối .node-actions chứa các nút thêm, sửa, xóa
     itemDiv.innerHTML = `
-        <div class="node-title">
+        <div class="node-title" style="display:flex; align-items:center; gap:6px;">
             ${toggleHtml}
             ${iconHtml}
             <span>${node.name}</span>
