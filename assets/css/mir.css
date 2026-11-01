@@ -79,7 +79,7 @@
     scrollbar-color: var(--border-color) transparent;
 }
 
-/* BỘ ẨN THANH CUỘN (HIDE SCROLLBAR) CHO POPUP TRƯỢT LÊN */
+/* BỘ ẨN THANH CUỘN CHO POPUP TRƯỢT LÊN */
 .no-scrollbar::-webkit-scrollbar {
     display: none;
 }
@@ -459,18 +459,26 @@ body {
     max-height: calc(100vh - 54px);
 }
 
-.stats-grid {
+/* BỐ CỤC THU GỌN CARD 50% + BIỂU ĐỒ THỐNG KÊ TỆP TIN */
+.dashboard-top-section {
+    display: flex;
+    gap: 12px;
+    align-items: stretch;
+    flex-shrink: 0;
+}
+
+.stats-grid-compact {
+    flex: 1;
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 10px;
-    flex-shrink: 0;
+    gap: 8px;
 }
 
 .stat-card {
     background: var(--bg-card);
     border: 1px solid var(--border-color);
     border-radius: 8px;
-    padding: 10px 12px;
+    padding: 8px 10px;
 }
 
 .stat-title {
@@ -482,31 +490,65 @@ body {
 }
 
 .stat-value {
-    font-size: 1.1rem;
+    font-size: 1.05rem;
     font-weight: 700;
     color: var(--text-heading);
     margin-top: 2px;
 }
 
 .stat-desc {
-    font-size: 0.65rem;
+    font-size: 0.62rem;
     color: var(--text-muted);
     margin-top: 1px;
 }
 
+.file-chart-card {
+    flex: 1;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 8px 12px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    max-height: 95px;
+}
+
+.chart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 4px;
+}
+
+.chart-title {
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: var(--text-heading);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.chart-wrapper {
+    position: relative;
+    height: 60px;
+    width: 100%;
+}
+
+/* CARD QUY CHUẨN ĐỊNH DANH ISO & NÚT TOGGLE ẨN/HIỆN */
 .naming-rule-card {
     background: var(--bg-card);
     border: 1px solid var(--border-color);
     border-radius: 8px;
     padding: 10px 12px;
     flex-shrink: 0;
+    transition: all 0.25s ease-in-out;
 }
 
 .naming-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 6px;
 }
 
 .naming-title {
@@ -518,10 +560,38 @@ body {
     gap: 5px;
 }
 
+.btn-toggle-naming {
+    background: transparent;
+    border: 1px solid var(--border-color);
+    color: var(--text-muted);
+    font-size: 0.65rem;
+    padding: 2px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    transition: all 0.2s ease;
+}
+
+.btn-toggle-naming:hover {
+    color: var(--primary);
+    border-color: var(--primary);
+}
+
 .naming-fields {
     display: flex;
     gap: 6px;
     flex-wrap: wrap;
+    margin-top: 6px;
+}
+
+.naming-rule-card.collapsed .naming-fields {
+    display: none;
+}
+
+.naming-rule-card.collapsed {
+    padding: 6px 12px;
 }
 
 .field-chip {
@@ -964,6 +1034,18 @@ body {
     }
 }
 
+@media (max-width: 900px) {
+    .dashboard-top-section {
+        flex-direction: column;
+    }
+    .file-chart-card {
+        max-height: 160px;
+    }
+    .chart-wrapper {
+        height: 120px;
+    }
+}
+
 @media (max-width: 768px) {
     .mobile-toggle-btn {
         display: inline-flex;
@@ -1012,7 +1094,7 @@ body {
         padding-bottom: 64px;
     }
 
-    .stats-grid {
+    .stats-grid-compact {
         grid-template-columns: repeat(4, 1fr);
         gap: 5px;
         overflow-x: auto;
@@ -1080,7 +1162,14 @@ body {
     }
 }
 
-/* Tùy chỉnh bổ sung cho modal đổi tên ISO gọn gàng và đẹp mắt */
+/* Ẩn khối biểu đồ thống kê tệp tin trên màn hình di động */
+@media (max-width: 768px) {
+    .file-chart-card {
+        display: none !important;
+    }
+}
+
+/* Modal đổi tên ISO */
 #isoRenameModal .modal-content {
     max-width: 650px;
     width: 92%;
@@ -1120,7 +1209,7 @@ body {
     font-size: 0.75rem;
 }
 
-/* Hiệu ứng đồng bộ highlight giữa cây thư mục và bảng panel */
+/* Hiệu ứng đồng bộ highlight */
 .tree-node-item.highlighted,
 tr.highlight-row {
     background-color: var(--bg-hover) !important;
@@ -1198,7 +1287,7 @@ tr.is-recalled td:not(.action-btns) {
     border-color: rgba(245, 158, 11, 0.5);
 }
 
-/* Nút ký số xác thực Viettel */
+/* Nút ký số */
 td.action-btns .sign-btn {
     box-sizing: border-box;
     height: 26px;
@@ -1264,3 +1353,4 @@ td.action-btns .dropdown {
     display: inline-flex;
     vertical-align: middle;
 }
+```
