@@ -498,6 +498,32 @@ function nodeNameEqualsOrContains(pathUpper, container) {
     return pathUpper === container || pathUpper.includes('/' + container + '/') || pathUpper.endsWith('/' + container);
 }
 
+function getFileTypeIcon(fileName) {
+    const extension = fileName.includes('.') ? fileName.split('.').pop().toLowerCase() : '';
+    const iconByExtension = {
+        pdf: { icon: 'fa-file-pdf', color: '#ef4444', label: 'PDF' },
+        ifc: { icon: 'fa-cubes', color: '#38bdf8', label: 'IFC' },
+        xml: { icon: 'fa-file-code', color: '#f97316', label: 'XML' },
+        xls: { icon: 'fa-file-excel', color: '#22c55e', label: 'Excel' },
+        xlsx: { icon: 'fa-file-excel', color: '#22c55e', label: 'Excel' },
+        csv: { icon: 'fa-file-csv', color: '#22c55e', label: 'CSV' },
+        doc: { icon: 'fa-file-word', color: '#3b82f6', label: 'Word' },
+        docx: { icon: 'fa-file-word', color: '#3b82f6', label: 'Word' },
+        dwg: { icon: 'fa-compass-drafting', color: '#a78bfa', label: 'DWG' },
+        dxf: { icon: 'fa-compass-drafting', color: '#a78bfa', label: 'DXF' },
+        rvt: { icon: 'fa-cubes', color: '#f97316', label: 'Revit' },
+        jpg: { icon: 'fa-file-image', color: '#e879f9', label: 'Ảnh' },
+        jpeg: { icon: 'fa-file-image', color: '#e879f9', label: 'Ảnh' },
+        png: { icon: 'fa-file-image', color: '#e879f9', label: 'Ảnh' },
+        zip: { icon: 'fa-file-zipper', color: '#fbbf24', label: 'Tệp nén' },
+        rar: { icon: 'fa-file-zipper', color: '#fbbf24', label: 'Tệp nén' },
+        txt: { icon: 'fa-file-lines', color: '#94a3b8', label: 'Văn bản' },
+        json: { icon: 'fa-file-code', color: '#fbbf24', label: 'JSON' }
+    };
+    const fileType = iconByExtension[extension] || { icon: 'fa-file', color: '#94a3b8', label: 'Tệp' };
+    return `<span class="icon-file" title="${fileType.label}" aria-label="${fileType.label}" style="display:inline-flex; align-items:center; justify-content:center; width:18px; color:${fileType.color};"><i class="fa-solid ${fileType.icon}" aria-hidden="true"></i></span>`;
+}
+
 function createTreeNodeElement(node) {
     const li = document.createElement('li');
     li.style.listStyle = 'none';
@@ -550,7 +576,7 @@ function createTreeNodeElement(node) {
             }
         }
     } else {
-        iconHtml = `<span class="icon-file" style="display:inline-flex; align-items:center;"><svg viewBox="0 0 24 24" style="width:18px; height:18px;"><path fill="currentColor" d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg></span>`;
+        iconHtml = getFileTypeIcon(node.name);
     }
 
     // Icon mũi tên Chevron đóng/mở phóng to hơn (16x16px)
