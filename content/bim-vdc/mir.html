@@ -605,6 +605,12 @@
                             <option value="">-- Vui lòng xác thực tài khoản trước --</option>
                         </select>
                     </div>
+                    <label
+                        style="display: flex; align-items: center; gap: 7px; margin: 8px 0 0; color: var(--text-heading); cursor: pointer;">
+                        <input type="checkbox" id="rememberVnptSession" checked
+                            onchange="setVnptSessionRetention(this.checked)">
+                        <span>Lưu giữ phiên đăng nhập VNPT đến khi đăng xuất CDE</span>
+                    </label>
                 </div>
 
                 <div
@@ -614,7 +620,7 @@
                         <path fill="currentColor"
                             d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z" />
                     </svg>
-                    <span>* Xác nhận ký số bằng sinh trắc học trên ứng dụng VNPT SmartCA. Phiên đăng nhập được giữ để ký nhiều lần và xóa khi đăng xuất CDE; mật khẩu không được lưu.</span>
+                    <span>* Xác nhận ký số bằng sinh trắc học trên ứng dụng VNPT SmartCA. Bỏ chọn để chỉ dùng phiên cho lần ký hiện tại; mật khẩu không được lưu.</span>
                 </div>
 
                 <div id="vnptSignStatusInfo"
