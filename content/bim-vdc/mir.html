@@ -175,16 +175,39 @@
                     </div>
                 </div>
 
-                <!-- Biểu đồ thống kê định dạng file bên phải -->
-                <div class="file-chart-card">
-                    <div class="chart-header">
-                        <span class="chart-title">
-                            <i class="fa-solid fa-chart-pie" style="color:var(--primary);"></i> Thống kê định dạng tệp
-                        </span>
-                    </div>
-                    <div class="chart-wrapper">
-                        <canvas id="fileTypeChart"></canvas>
-                    </div>
+                <div class="analytics-grid">
+                    <article class="analytics-card">
+                        <div class="chart-header">
+                            <span class="chart-title"><i class="fa-solid fa-hard-drive chart-icon-storage"></i> Dung lượng lưu trữ</span>
+                            <span class="chart-badge">CDE</span>
+                        </div>
+                        <div class="analytics-body">
+                            <div class="chart-wrapper"><canvas id="storageChart" aria-label="Dung lượng theo container CDE"></canvas></div>
+                            <p class="chart-note" id="storageChartNote">Tổng dung lượng trong danh sách hiện tại</p>
+                        </div>
+                    </article>
+                    <article class="analytics-card">
+                        <div class="chart-header">
+                            <span class="chart-title"><i class="fa-solid fa-chart-pie chart-icon-types"></i> Định dạng tệp</span>
+                            <span class="chart-badge">FILE</span>
+                        </div>
+                        <div class="analytics-body">
+                            <div class="chart-wrapper"><canvas id="fileTypeChart" aria-label="Thống kê định dạng tệp"></canvas></div>
+                            <p class="chart-note">Cơ cấu tệp trong danh sách hiện tại</p>
+                        </div>
+                    </article>
+                    <article class="analytics-card analytics-card-interactive" id="issueAnalyticsCard"
+                        role="button" tabindex="0" aria-pressed="false"
+                        title="Bấm để lọc tệp có ghi chú hoặc đã thu hồi">
+                        <div class="chart-header">
+                            <span class="chart-title"><i class="fa-solid fa-list-check chart-icon-issues"></i> Theo dõi QA/QC</span>
+                            <span class="chart-badge">ISSUE</span>
+                        </div>
+                        <div class="analytics-body">
+                            <div class="chart-wrapper"><canvas id="issueChart" aria-label="Thống kê tệp có ghi chú QA/QC"></canvas></div>
+                            <p class="chart-note" id="issueChartNote">Tệp có ghi chú hoặc đã thu hồi</p>
+                        </div>
+                    </article>
                 </div>
             </div>
 
