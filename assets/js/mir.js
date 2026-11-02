@@ -12,6 +12,7 @@ let serverIssuesDB = {};
 let serverRecallsDB = {};
 let serverSignaturesDB = {};
 let hideRecalledFilesFlag = false;
+let attentionFilesOnly = false;
 
 let currentUserRole = '';
 let currentUserPermission = '';
@@ -22,6 +23,8 @@ let currentActiveUserFullName = 'TRẦN HOÀNG PHƯỚC';
 let currentAccessToken = '';
 let currentCredentialId = '';
 let fileTypeChartInstance = null;
+let storageChartInstance = null;
+let issueChartInstance = null;
 
 let virtualTreeData = {
     id: "ROOT",
@@ -943,7 +946,7 @@ function getActionButtons(state, relativePath) {
         + (fileIssues.length > MAX_TIP_ISSUES ? `\n… và ${fileIssues.length - MAX_TIP_ISSUES} issue khác` : '')
         + '\n(Bấm để xem chi tiết)';
 
-    let issueBadge = (fileIssues.length > 0 && !isRecalled)
+    let issueBadge = fileIssues.length > 0
         ? `<span class="badge badge-issue" title="${escapeAttr(issueTip)}" onclick="openIssuesModal('${safePath}')">
             <svg class="svg-icon-sm" viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z"/></svg> 
             ${fileIssues.length} Issue</span>`
@@ -1711,6 +1714,7 @@ function appendFileToTable(fileName, relativePath, fileSize = 0) {
     tr.setAttribute('data-suitability', suit);
     tr.setAttribute('data-discipline', disc);
     tr.setAttribute('data-path', relativePath);
+    tr.setAttribute('data-size', Number(fileSize) || 0);
     if (getRecalledDB()[relativePath]) tr.classList.add('is-recalled');
 
     tr.onclick = (e) => {
@@ -1740,79 +1744,164 @@ function appendFileToTable(fileName, relativePath, fileSize = 0) {
     tbody.appendChild(tr);
 }
 
-/* 3. KHỞI TẠO VÀ CẬP NHẬT BIỂU ĐỒ NĂNG ĐỘNG CHART.JS (ĐÃ SỬA MÀU CHỮ DARK MODE TRẮNG TRỰC QUAN) */
-function initOrUpdateFileTypeChart(typeCounts) {
-    const canvas = document.getElementById('fileTypeChart');
-    if (!canvas || typeof Chart === 'undefined') return;
+const doughnutCenterText = {
+    id: 'doughnutCenterText',
+    afterDraw(chart, args, options) {
+        if (!options || !options.main) return;
+        const { ctx, chartArea } = chart;
+        if (!chartArea) return;
+        const x = (chartArea.left + chartArea.right) / 2;
+        const y = (chartArea.top + chartArea.bottom) / 2;
+        ctx.save();
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillStyle = options.color || '#f1f5f9';
+        ctx.font = '700 11px "Plus Jakarta Sans", sans-serif';
+        ctx.fillText(options.main, x, y - 4, chartArea.width * 0.9);
+        ctx.fillStyle = options.subColor || '#94a3b8';
+        ctx.font = '600 6px "Plus Jakarta Sans", sans-serif';
+        ctx.fillText(options.sub || '', x, y + 8, chartArea.width * 0.9);
+        ctx.restore();
+    }
+};
 
-    const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
-    const legendTextColor = currentTheme === 'dark' ? '#f1f5f9' : '#0f172a';
+function updateDoughnutChart(instance, canvasId, labels, values, colors, centerMain, centerSub, tooltipLabel, showLegend = false) {
+    const canvas = document.getElementById(canvasId);
+    if (!canvas || typeof Chart === 'undefined') return instance;
 
-    const labels = ['PDF', 'RVT', 'IFC', 'DWG', 'XML', 'Excel', 'Word', 'Khác'];
-    const dataValues = [
-        typeCounts.pdf || 0,
-        typeCounts.rvt || 0,
-        typeCounts.ifc || 0,
-        typeCounts.dwg || 0,
-        typeCounts.xml || 0,
-        typeCounts.excel || 0,
-        typeCounts.word || 0,
-        typeCounts.other || 0
-    ];
+    const hasData = values.some(value => value > 0);
+    const displayValues = hasData ? values : [1];
+    const displayLabels = hasData ? labels : ['Chưa có dữ liệu'];
+    const displayColors = hasData ? colors : ['#334155'];
+    const textColor = getComputedStyle(document.documentElement).getPropertyValue('--text-heading').trim() || '#f1f5f9';
+    const mutedColor = getComputedStyle(document.documentElement).getPropertyValue('--text-muted').trim() || '#94a3b8';
+    const data = {
+        labels: displayLabels,
+        datasets: [{
+            data: displayValues,
+            backgroundColor: displayColors,
+            borderWidth: 0,
+            hoverOffset: hasData ? 3 : 0
+        }]
+    };
 
-    const bgColors = [
-        '#ef4444', // PDF - Red
-        '#38bdf8', // RVT - Light Blue
-        '#34d399', // IFC - Green
-        '#f59e0b', // DWG - Amber
-        '#a855f7', // XML - Purple
-        '#10b981', // Excel - Emerald
-        '#2563eb', // Word - Blue
-        '#64748b'  // Other - Slate
-    ];
+    if (instance) {
+        instance.data = data;
+        instance.options.plugins.centerText = { main: centerMain, sub: centerSub, color: textColor, subColor: mutedColor };
+        instance.options.plugins.legend.display = showLegend && hasData;
+        instance.options.plugins.legend.labels.color = textColor;
+        instance.options.plugins.tooltip.enabled = hasData;
+        instance.options.plugins.tooltip.callbacks.label = tooltipLabel;
+        instance.update();
+        return instance;
+    }
 
-    if (fileTypeChartInstance) {
-        fileTypeChartInstance.data.datasets[0].data = dataValues;
-        fileTypeChartInstance.options.plugins.legend.labels.color = legendTextColor;
-        fileTypeChartInstance.update();
-    } else {
-        const ctx = canvas.getContext('2d');
-        fileTypeChartInstance = new Chart(ctx, {
-            type: 'doughnut',
-            data: {
-                labels: labels,
-                datasets: [{
-                    data: dataValues,
-                    backgroundColor: bgColors,
-                    borderWidth: 1,
-                    borderColor: 'transparent'
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'right',
-                        labels: {
-                            color: legendTextColor,
-                            font: { size: 9, weight: '600' },
-                            boxWidth: 10,
-                            padding: 4
-                        }
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: function (context) {
-                                return ` ${context.label}: ${context.raw} files`;
-                            }
-                        }
+    return new Chart(canvas.getContext('2d'), {
+        type: 'doughnut',
+        data,
+        plugins: [doughnutCenterText],
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: { duration: 450 },
+            layout: { padding: 1 },
+            plugins: {
+                centerText: { main: centerMain, sub: centerSub, color: textColor, subColor: mutedColor },
+                legend: {
+                    display: showLegend && hasData,
+                    position: 'right',
+                    labels: {
+                        color: textColor,
+                        font: { family: '"Plus Jakarta Sans", sans-serif', size: 8, weight: '600' },
+                        boxWidth: 7,
+                        boxHeight: 7,
+                        padding: 3,
+                        usePointStyle: true,
+                        pointStyle: 'circle'
                     }
                 },
-                cutout: '65%'
-            }
-        });
+                tooltip: {
+                    enabled: hasData,
+                    callbacks: { label: tooltipLabel }
+                }
+            },
+            cutout: '72%'
+        }
+    });
+}
+
+function formatCompactStorage(bytes) {
+    if (!bytes) return '0 KB';
+    const units = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+    const index = Math.min(Math.floor(Math.log(bytes) / Math.log(1024)), units.length - 1);
+    const value = bytes / Math.pow(1024, index);
+    return `${parseFloat(value.toFixed(index >= 2 ? 1 : 0))} ${units[index]}`;
+}
+
+function updateStorageChart(storageByState, totalBytes) {
+    const states = ['01_WIP', '02_SHARED', '03_PUBLISHED', '04_ARCHIVE'];
+    const values = states.map(state => storageByState[state] || 0);
+    const colors = ['#38bdf8', '#fbbf24', '#34d399', '#94a3b8'];
+    const note = document.getElementById('storageChartNote');
+    if (note) note.textContent = `Tổng ${formatCompactStorage(totalBytes)} · theo container`;
+    storageChartInstance = updateDoughnutChart(
+        storageChartInstance,
+        'storageChart',
+        states,
+        values,
+        colors,
+        formatCompactStorage(totalBytes),
+        totalBytes ? 'TỔNG DUNG LƯỢNG' : 'CHƯA CÓ DỮ LIỆU',
+        context => ` ${context.label}: ${formatFileSize(context.raw)}`,
+        true
+    );
+}
+
+function updateIssueChart(filesWithIssues, recalledFiles, recalledWithIssues, totalFiles, issueCount) {
+    const recalledWithoutIssues = Math.max(recalledFiles - recalledWithIssues, 0);
+    const otherFiles = Math.max(totalFiles - filesWithIssues - recalledWithoutIssues, 0);
+    const note = document.getElementById('issueChartNote');
+    const card = document.getElementById('issueAnalyticsCard');
+    const attentionCount = filesWithIssues + recalledWithoutIssues;
+    if (note) {
+        note.textContent = attentionFilesOnly
+            ? `Đang lọc · ${filesWithIssues} ghi chú · ${recalledFiles} thu hồi`
+            : `${filesWithIssues} tệp có ghi chú · ${recalledFiles} tệp thu hồi`;
     }
+    if (card) {
+        card.classList.toggle('is-active', attentionFilesOnly);
+        card.setAttribute('aria-pressed', String(attentionFilesOnly));
+    }
+    issueChartInstance = updateDoughnutChart(
+        issueChartInstance,
+        'issueChart',
+        ['Có ghi chú', 'Thu hồi · không ghi chú', 'Khác'],
+        [filesWithIssues, recalledWithoutIssues, otherFiles],
+        ['#fb7185', '#f59e0b', '#334155'],
+        String(attentionCount),
+        totalFiles ? 'CẦN THEO DÕI' : 'CHƯA CÓ DỮ LIỆU',
+        context => ` ${context.label}: ${context.raw} tệp`
+    );
+}
+
+function initOrUpdateFileTypeChart(typeCounts, totalFiles) {
+    const labels = ['PDF', 'RVT', 'IFC', 'DWG', 'XML', 'Excel', 'Word', 'Khác'];
+    const values = [
+        typeCounts.pdf || 0, typeCounts.rvt || 0, typeCounts.ifc || 0, typeCounts.dwg || 0,
+        typeCounts.xml || 0, typeCounts.excel || 0, typeCounts.word || 0, typeCounts.other || 0
+    ];
+    const colors = ['#ef4444', '#38bdf8', '#34d399', '#f59e0b', '#a855f7', '#10b981', '#2563eb', '#64748b'];
+    fileTypeChartInstance = updateDoughnutChart(
+        fileTypeChartInstance,
+        'fileTypeChart',
+        labels,
+        values,
+        colors,
+        String(totalFiles),
+        'TỔNG SỐ TỆP',
+        context => ` ${context.label}: ${context.raw} tệp`,
+        true
+    );
 }
 
 function applyFilters() {
@@ -1832,6 +1921,13 @@ function applyFilters() {
 
     let wipCount = 0, sharedCount = 0, pubCount = 0, arcCount = 0;
     let typeCounts = { pdf: 0, rvt: 0, ifc: 0, dwg: 0, xml: 0, excel: 0, word: 0, other: 0 };
+    const storageByState = { '01_WIP': 0, '02_SHARED': 0, '03_PUBLISHED': 0, '04_ARCHIVE': 0 };
+    let totalVisibleFiles = 0;
+    let totalStorageBytes = 0;
+    let filesWithIssues = 0;
+    let recalledFiles = 0;
+    let recalledWithIssues = 0;
+    let totalIssueCount = 0;
 
     rows.forEach(row => {
         const prj = row.getAttribute('data-project') || '';
@@ -1845,14 +1941,28 @@ function applyFilters() {
         let matchesState = (stateVal === 'ALL' || state === stateVal);
         let matchesSuit = (suitVal === 'ALL' || suit === suitVal);
         let matchesSearch = (!query || text.includes(query));
-        let matchesRecall = (!hideRecalledFilesFlag || !isRecalled);
+        let matchesRecall = (!hideRecalledFilesFlag || !isRecalled || attentionFilesOnly);
+        const fileIssues = serverIssuesDB[row.getAttribute('data-path')] || [];
+        const hasIssues = Array.isArray(fileIssues) && fileIssues.length > 0;
+        let matchesAttention = (!attentionFilesOnly || hasIssues || isRecalled);
 
-        if (matchesProj && matchesState && matchesSuit && matchesSearch && matchesRecall) {
+        if (matchesProj && matchesState && matchesSuit && matchesSearch && matchesRecall && matchesAttention) {
             row.style.display = '';
             if (state === '01_WIP') wipCount++;
             else if (state === '02_SHARED') sharedCount++;
             else if (state === '03_PUBLISHED') pubCount++;
             else if (state === '04_ARCHIVE') arcCount++;
+            totalVisibleFiles++;
+            const fileSize = Number(row.getAttribute('data-size')) || 0;
+            totalStorageBytes += fileSize;
+            if (Object.prototype.hasOwnProperty.call(storageByState, state)) storageByState[state] += fileSize;
+
+            if (isRecalled) recalledFiles++;
+            if (hasIssues) {
+                filesWithIssues++;
+                totalIssueCount += fileIssues.length;
+                if (isRecalled) recalledWithIssues++;
+            }
 
             // Phân loại đếm định dạng tệp tin
             if (fileName.endsWith('.pdf')) typeCounts.pdf++;
@@ -1879,7 +1989,17 @@ function applyFilters() {
     if (arcEl) arcEl.innerText = `${arcCount} Files`;
 
     // Cập nhật biểu đồ trực quan Chart.js
-    initOrUpdateFileTypeChart(typeCounts);
+    initOrUpdateFileTypeChart(typeCounts, totalVisibleFiles);
+    updateStorageChart(storageByState, totalStorageBytes);
+    updateIssueChart(filesWithIssues, recalledFiles, recalledWithIssues, totalVisibleFiles, totalIssueCount);
+}
+
+function toggleAttentionFiles() {
+    attentionFilesOnly = !attentionFilesOnly;
+    applyFilters();
+    showToast(attentionFilesOnly
+        ? "Đang lọc các tệp có ghi chú QA/QC hoặc đã thu hồi."
+        : "Đã bỏ lọc ghi chú và tệp thu hồi.");
 }
 
 function toggleTheme() {
@@ -2024,6 +2144,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const searchInput = document.getElementById('searchInput');
     if (searchInput) searchInput.value = '';
+
+    const issueCard = document.getElementById('issueAnalyticsCard');
+    if (issueCard) {
+        issueCard.addEventListener('click', toggleAttentionFiles);
+        issueCard.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                toggleAttentionFiles();
+            }
+        });
+    }
 
     const dropZone = document.getElementById('dropZone');
     const fileUploadInput = document.getElementById('fileUploadInput');
