@@ -176,7 +176,7 @@ td{word-break:break-word;padding:2px 0}
  <div class="pane" id="cls" hidden></div>
  <div class="pane" id="cmts" hidden>
    <div style="padding:6px;display:flex;gap:6px">
-     <button id="btnExportBcf" style="flex:1">Xuất BCF/JSON</button>
+     <button id="btnExportBcf" style="flex:1">Xuất BCF 2.1</button>
      <button id="btnSaveReview" style="flex:1" hidden title="Lưu ý kiến (.review.json) và file IFC đã đánh giá (_reviewed.ifc) vào thư mục của file trên CDE">Lưu IFC + đánh giá</button>
    </div>
    <div id="cmtList" style="padding:6px">Chưa có Ý kiến phối hợp nào</div>
@@ -286,7 +286,7 @@ bar.addEventListener('wheel', e => {
 
 /* ---------- Three.js Setup ---------- */
 const mobile=matchMedia('(pointer:coarse)').matches||innerWidth<900,narrow=()=>matchMedia('(max-width:900px)').matches;
-const renderer=new THREE.WebGLRenderer({canvas:cv,antialias:!mobile,powerPreference:'high-performance',preserveDrawingBuffer:true});
+const renderer=new THREE.WebGLRenderer({canvas:cv,antialias:!mobile,powerPreference:'high-performance'});
 const PR=Math.min(devicePixelRatio,mobile?1.5:2);renderer.setPixelRatio(PR);
 const scene=new THREE.Scene();scene.background=new THREE.Color(0x0b0f14);
 const cam=new THREE.PerspectiveCamera(45,1,.1,1000);
@@ -308,28 +308,30 @@ const lam=o=>{const m=new THREE.MeshLambertMaterial({vertexColors:true,side:THRE
  m.onBeforeCompile=s=>{s.fragmentShader=s.fragmentShader.replace('#include <color_fragment>','diffuseColor.rgb*=pow(vColor,vec3(2.2));')};return m};
 const matO=lam({polygonOffset:true,polygonOffsetFactor:1,polygonOffsetUnits:1});
 const matT=lam({transparent:true,opacity:.35,depthWrite:false});
-const hlMat=new THREE.MeshBasicMaterial({color:0xffb03a,transparent:true,opacity:.55,side:THREE.DoubleSide,depthTest:false});
+const hlMat=new THREE.MeshBasicMaterial({color:0xffb03a,transparent:true,opacity:.7,side:THREE.DoubleSide,polygonOffset:true,polygonOffsetFactor:-2,polygonOffsetUnits:-2}),hlGhost=new THREE.MeshBasicMaterial({color:0xffb03a,transparent:true,opacity:.18,side:THREE.DoubleSide,depthTest:false,depthWrite:false});
 
 const pickMat=new THREE.ShaderMaterial({clipping:true,side:THREE.DoubleSide,
  vertexShader:'#include <clipping_planes_pars_vertex>\nattribute vec3 pickColor;varying vec3 vC;void main(){vC=pickColor;vec4 mvPosition=modelViewMatrix*vec4(position,1.);gl_Position=projectionMatrix*mvPosition;\n#include <clipping_planes_vertex>\n}',
  fragmentShader:'#include <clipping_planes_pars_fragment>\nvarying vec3 vC;void main(){\n#include <clipping_planes_fragment>\ngl_FragColor=vec4(vC,1.);}'});
 const pickScene=new THREE.Scene(),rt=new THREE.WebGLRenderTarget(1,1),pb=new Uint8Array(4);
-let dirty=true;
+let dirty=true;const DOTS=[],dotScale=()=>{for(const d of DOTS)d.scale.setScalar(5*2*cam.position.distanceTo(d.position)*Math.tan(cam.fov*P/360)/Math.max(cv.clientHeight,1))};
 controls.addEventListener('change',()=>dirty=true);
-(function loop(){requestAnimationFrame(loop);if(controls.update()||dirty){dirty=false;renderer.render(scene,cam)}})();
+(function loop(){requestAnimationFrame(loop);if(controls.update()||dirty){dirty=false;dotScale();renderer.render(scene,cam)}})();
 const host=cv.parentElement;
 const rs=()=>{const w=host.clientWidth,h=host.clientHeight;renderer.setSize(w,h,false);cam.aspect=w/h;cam.updateProjectionMatrix();dirty=true};
 new ResizeObserver(rs).observe(host);
 
-let triN=0,lr,multi=false,wireframe=false,colorCatMode=false;
+let triN=0,lr,multi=false,wireframe=false,colorCatMode=false,LOD=false;
 const setPR=v=>{if(renderer.getPixelRatio()!==v){renderer.setPixelRatio(v);rs()}};
+let lt,SK=false;const lodOff=()=>{clearTimeout(lt);if(LOD){LOD=false;refresh()}};
 controls.addEventListener('start',()=>{clearTimeout(lr);if(triN>3e5)setPR(mobile?.7:1)});
+controls.addEventListener('change',()=>{if(SK||triN<=8e5)return;if(!LOD){LOD=true;refresh()}clearTimeout(lt);lt=setTimeout(lodOff,350)});
 controls.addEventListener('end',()=>{clearTimeout(lr);lr=setTimeout(()=>setPR(PR),250)});
 
 /* ---------- Trạng thái, Custom Color Override & Storeys ---------- */
 let api,mid=-1,els=new Map(),byN=[],bk={},org=null,MB=new THREE.Box3(),kids=new Map(),par=new Map(),rel=null,lu='mm',
     idxS=null,sel=new Set(),meshes=[],ov=[],xray=false,hasM=new Map();
-let commentsStore = new Map();
+let commentsStore = new Map(),GM=null;const W0=new THREE.Vector3();
 let CUR_REL = null;
 
 /* ---------- Người dùng đăng nhập & Phân quyền ISO 19650 ---------- */
@@ -388,7 +390,7 @@ const ready=init();
 function clearModel(){
  [...meshes,...ov].forEach(m=>{scene.remove(m);m.geometry.dispose()});meshes=[];ov=[];
  pickScene.clear();if(mid>=0)try{api.CloseModel(mid)}catch(e){}
- mid=-1;els=new Map();byN=[];bk={};org=null;rel=null;idxS=null;sel=new Set();hasM=new Map();kids=new Map();par=new Map();
+ mid=-1;els=new Map();byN=[];bk={};org=null;rel=null;idxS=null;GM=null;sel=new Set();hasM=new Map();kids=new Map();par=new Map();
  storeysList=[];customColors.clear();originalColors.clear();colorCatMode=false;commentsStore.clear();
  resetMeasure();
  colorCmtMode=false; $('#bColorCmt').classList.remove('on');
@@ -404,7 +406,7 @@ const mk=k=>({k,pos:[],nor:[],col:[],pid:[],idx:[],vc:0,ic:0,list:[]});
 function add(id,v,ix,m,c){
  let el=els.get(id);
  if(!el){
-  el={id,n:els.size+1,type:api.GetLineType(mid,id),o:null,t:null,vis:true,center:new THREE.Vector3()};
+  el={id,n:els.size+1,type:api.GetLineType(mid,id),o:null,t:null,vis:true,center:new THREE.Vector3(),mn:[1e9,1e9,1e9],mx:[-1e9,-1e9,-1e9]};
   els.set(id,el);byN[el.n]=el;
   originalColors.set(id, {r: c.x, g: c.y, b: c.z});
  }
@@ -412,13 +414,13 @@ function add(id,v,ix,m,c){
  if(!org)org=[m[12],m[13],m[14]];
  const p=new Float32Array(nv*3),nr=new Float32Array(nv*3),co=new Uint8Array(nv*3),pi=new Uint8Array(nv*3);
  const r=c.x*255,g=c.y*255,b=c.z*255,n=el.n;
- let sumX=0, sumY=0, sumZ=0;
+ let sumX=0, sumY=0, sumZ=0;const M0=el.mn,M1=el.mx;
  for(let j=0;j<nv;j++){
   const x=v[6*j],y=v[6*j+1],z=v[6*j+2],a=v[6*j+3],d=v[6*j+4],e=v[6*j+5],q=3*j;
   const px=m[0]*x+m[4]*y+m[8]*z+m[12]-org[0];
   const py=m[1]*x+m[5]*y+m[9]*z+m[13]-org[1];
   const pz=m[2]*x+m[6]*y+m[10]*z+m[14]-org[2];
-  p[q]=px;p[q+1]=py;p[q+2]=pz;
+  p[q]=px;p[q+1]=py;p[q+2]=pz;if(px<M0[0])M0[0]=px;if(py<M0[1])M0[1]=py;if(pz<M0[2])M0[2]=pz;if(px>M1[0])M1[0]=px;if(py>M1[1])M1[1]=py;if(pz>M1[2])M1[2]=pz;
   sumX+=px;sumY+=py;sumZ+=pz;
   nr[q]=m[0]*a+m[4]*d+m[8]*e;nr[q+1]=m[1]*a+m[5]*d+m[9]*e;nr[q+2]=m[2]*a+m[6]*d+m[10]*e;
   co[q]=r;co[q+1]=g;co[q+2]=b;pi[q]=n&255;pi[q+1]=(n>>8)&255;pi[q+2]=n>>16;
@@ -441,10 +443,10 @@ function build(){
  for(const k of ['o','t']){const B=bk[k];if(!B.ic)continue;D[k]={pos:cat(B.pos,Float32Array),nor:cat(B.nor,Float32Array),col:cat(B.col,Uint8Array),pid:cat(B.pid,Uint8Array),idx:cat(B.idx,Uint32Array)};
   B.pos=B.nor=B.col=B.pid=B.idx=null;
   const a=D[k].pos;for(let i=0;i<a.length;i+=3)MB.expandByPoint(tv.set(a[i],a[i+1],a[i+2]))}
- const c=MB.getCenter(new THREE.Vector3());
+ const c=MB.getCenter(new THREE.Vector3());W0.set(org[0]+c.x,org[1]+c.y,org[2]+c.z);
  for(const k in D){const a=D[k].pos;for(let i=0;i<a.length;i+=3){a[i]-=c.x;a[i+1]-=c.y;a[i+2]-=c.z}}
  MB.min.sub(c);MB.max.sub(c);
- const hide=HIDE0();for(const e of els.values()){e.vis=!hide.has(e.type);e.center.sub(c)}
+ const hide=HIDE0(),md=MB.getSize(new THREE.Vector3()).length();for(const e of els.values()){e.vis=!hide.has(e.type);e.center.sub(c);e.small=Math.hypot(e.mx[0]-e.mn[0],e.mx[1]-e.mn[1],e.mx[2]-e.mn[2])<md*.01}
  for(const k in D){const B=bk[k],d=D[k],g=new THREE.BufferGeometry();
   g.setAttribute('position',new THREE.BufferAttribute(d.pos,3));g.setAttribute('normal',new THREE.BufferAttribute(d.nor,3));
   g.setAttribute('color',new THREE.BufferAttribute(d.col,3,true));g.setAttribute('pickColor',new THREE.BufferAttribute(d.pid,3,true));
@@ -463,7 +465,7 @@ function build(){
 function refresh(){
  let vis=0;
  for(const k in bk){const B=bk[k];if(!B.geo)continue;let o=0;const a=B.geo.index.array;
-  for(const el of B.list){if(!el.vis)continue;const r=el[k];a.set(B.full.subarray(r.s,r.s+r.c),o);o+=r.c}
+  for(const el of B.list){if(!el.vis||(LOD&&el.small))continue;const r=el[k];a.set(B.full.subarray(r.s,r.s+r.c),o);o+=r.c}
   B.geo.index.needsUpdate=true;B.geo.setDrawRange(0,o);vis+=o/3}
  dirty=true;stat();
 }
@@ -607,7 +609,7 @@ function select(ids,add){
  for(const k in bk){const B=bk[k];if(!B.geo)continue;const A=B.geo.attributes.position.array,out=[];
   for(const id of sel){const r=els.get(id)?.[k];if(!r)continue;for(let i=r.s;i<r.s+r.c;i++){const v=B.full[i]*3;out.push(A[v],A[v+1],A[v+2])}}
   if(!out.length)continue;const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(out,3));
-  const m=new THREE.Mesh(g,hlMat);m.renderOrder=5;m.frustumCulled=false;scene.add(m);ov.push(m)}
+  const m=new THREE.Mesh(g,hlMat);m.renderOrder=5;m.frustumCulled=false;scene.add(m);ov.push(m);const m2=new THREE.Mesh(g,hlGhost);m2.renderOrder=6;m2.frustumCulled=false;scene.add(m2);ov.push(m2)}
  dirty=true;stat();
  const last=[...sel].pop();
  if(narrow()){document.body.classList.remove('tr');document.body.classList.toggle('pr',last!==undefined)}
@@ -615,7 +617,7 @@ function select(ids,add){
  else $('#props').innerHTML='<p class="mu">Bấm vào đối tượng trong mô hình để xem thuộc tính.</p>';
 }
 
-function pick(cx,cy){
+function pick(cx,cy){lodOff();
  const r=cv.getBoundingClientRect(),c=new THREE.Color(),a=renderer.getClearAlpha();renderer.getClearColor(c);
  cam.setViewOffset(r.width,r.height,cx-r.left,cy-r.top,1,1);
  renderer.setRenderTarget(rt);renderer.setClearColor(0,1);renderer.clear();renderer.render(pickScene,cam);
@@ -623,21 +625,18 @@ function pick(cx,cy){
  const n=pb[0]|pb[1]<<8|pb[2]<<16;return n&&byN[n]?byN[n].id:null;
 }
 
-function getRaycastIntersectPoint(cx, cy) {
-  const rect = cv.getBoundingClientRect();
-  const mouse = new THREE.Vector2(
-    ((cx - rect.left) / rect.width) * 2 - 1,
-    -((cy - rect.top) / rect.height) * 2 + 1
-  );
-  const raycaster = new THREE.Raycaster();
-  raycaster.setFromCamera(mouse, cam);
-  const intersects = raycaster.intersectObjects(meshes, false);
-  if (intersects.length > 0) {
-    return intersects[0].point;
-  }
-  return null;
-}
-
+function getRaycastIntersectPoint(cx,cy){
+ const id=pick(cx,cy);if(id===null)return null;
+ const r=cv.getBoundingClientRect(),rc=new THREE.Raycaster(),e=els.get(id),a=new THREE.Vector3(),b=new THREE.Vector3(),c=new THREE.Vector3(),o=new THREE.Vector3();
+ rc.setFromCamera(new THREE.Vector2((cx-r.left)/r.width*2-1,-((cy-r.top)/r.height)*2+1),cam);
+ let best=1e30,V=null;
+ for(const k in bk){const B=bk[k],g=e[k];if(!B.geo||!g)continue;const A=B.geo.attributes.position.array;
+  for(let i=g.s;i<g.s+g.c;i+=3){a.fromArray(A,B.full[i]*3);b.fromArray(A,B.full[i+1]*3);c.fromArray(A,B.full[i+2]*3);
+   if(rc.ray.intersectTriangle(a,b,c,false,o)){const d=rc.ray.origin.distanceToSquared(o);if(d<best){best=d;V=[o.clone(),a.clone(),b.clone(),c.clone()]}}}}
+ if(!V)return null;
+ let h=V[0],m=Math.sqrt(best)*.03;
+ for(let j=1;j<4;j++){const d=V[j].distanceTo(V[0]);if(d<m){m=d;h=V[j]}}
+ return h.clone()}
 let dn=null,lastTap=0;const tp=new Set();
 cv.addEventListener('pointerdown',e=>{tp.add(e.pointerId);dn=tp.size===1?[e.clientX,e.clientY,performance.now()]:null});
 cv.addEventListener('pointercancel',e=>tp.delete(e.pointerId));
@@ -723,7 +722,7 @@ function props(id){
   <b>Ghi chú / Ý kiến phối hợp BIM:</b>
   <div id="cmtItems">${cmts.map(c=>`<div class="cmt-item"><div class="meta"><span title="${esc(c.author)}">${esc(c.author)}</span><span>${esc(fmtTime(c))}</span></div><div class="cmt-txt">${esc(c.text)}</div></div>`).join('')}</div>
   ${whoHtml}
-  <textarea class="cmt-input" id="txtCmt" rows="2" placeholder="Nhập ghi chú cho cấu kiện này..."></textarea>
+  <div style="display:flex;gap:6px;margin-top:6px"><select id="cmtSt" style="flex:1;background:var(--bg);color:var(--tx);border:1px solid var(--ln);border-radius:4px;padding:4px"><option>Open</option><option>In Progress</option><option>Resolved</option><option>Closed</option></select><select id="cmtPr" style="flex:1;background:var(--bg);color:var(--tx);border:1px solid var(--ln);border-radius:4px;padding:4px"><option>Normal</option><option>High</option><option>Critical</option><option>Low</option></select></div><textarea class="cmt-input" id="txtCmt" rows="2" placeholder="Nhập ghi chú cho cấu kiện này..."></textarea>
   <button style="margin-top:6px;width:100%" id="btnAddCmt">Gửi Ý kiến phối hợp</button>
  </div>`;
  h += S('Ý kiến phối hợp & Phản hồi', cmtHtml, true);
@@ -748,7 +747,7 @@ function props(id){
     const u = getUser();
     if(!u){ toast('Bạn chưa đăng nhập – không thể gửi ý kiến. Vui lòng đăng nhập lại.', true); return; }
     const now = new Date();
-    const item = { cid: newCid(), author: userName(u), username: u.username||'', role: u.role||'', time: now.toLocaleTimeString('vi-VN'), at: now.toISOString(), text: txt, globalId: gid, name };
+    const item = { cid: newCid(), author: userName(u), username: u.username||'', role: u.role||'', time: now.toLocaleTimeString('vi-VN'), at: now.toISOString(), text: txt, globalId: gid, name, status: ($('#cmtSt')||{}).value||'Open', prio: ($('#cmtPr')||{}).value||'Normal', vp: curVP(), shot: snap() };
     if(!commentsStore.has(gid)) commentsStore.set(gid, []);
     commentsStore.get(gid).push(item);
     props(id);
@@ -822,7 +821,7 @@ function renderCommentsTab(){
  let html = '';
  commentsStore.forEach((list, gid) => {
    list.forEach(c => {
-     html += `<div class="cmt-card">
+     html += `<div class="cmt-card" data-g="${esc(c.globalId)}" data-c="${esc(c.cid||'')}" style="cursor:pointer" title="Bấm để bay tới góc nhìn">${shotImg(c)}<div class="mu">${esc(c.status||'Open')} · ${esc(c.prio||'Normal')}</div>
        <span class="cmt-obj" title="${esc(c.name)}">${esc(c.name)}</span>
        <div class="meta"><span title="${esc(c.author)}">${esc(c.author)}</span><span>${esc(fmtTime(c))}</span></div>
        <div class="cmt-txt">${esc(c.text)}</div>
@@ -830,6 +829,7 @@ function renderCommentsTab(){
    });
  });
  container.innerHTML = html;
+ container.querySelectorAll('.cmt-card[data-g]').forEach(d=>d.onclick=()=>goComment(d.dataset.g,d.dataset.c));
 }
 
 /* ---------- Lưu đánh giá CDE (ISO 19650) ---------- */
@@ -872,16 +872,47 @@ $('#btnSaveReview').onclick = async () => {
  finally{ btn.disabled=false; }
 };
 
-$('#btnExportBcf').onclick = () => {
-  if(!commentsStore.size){ toast('Chưa có ý kiến nào để xuất', true); return; }
-  const data = [];
-  commentsStore.forEach((list) => data.push(...list));
-  const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = `${(document.title||'BIM').replace(/ – .*$/,'').replace(/[\\/:*?"<>|]+/g,'_')}.review.json`;
-  a.click();
-};
+/* ---------- BCF 2.1 (zip) · Viewpoint · Snapshot ---------- */
+const xe=s=>esc(String(s??'').replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g,''));
+const ok3=a=>Array.isArray(a)&&a.length===3&&a.every(Number.isFinite);
+const curVP=()=>({p:cam.position.toArray(),t:controls.target.toArray(),u:new THREE.Vector3(0,1,0).applyQuaternion(cam.quaternion).toArray(),f:cam.fov});
+const snap=()=>{try{renderer.render(scene,cam);const w=480,t=document.createElement('canvas');t.width=w;t.height=Math.max(1,Math.round(w*cv.height/cv.width));t.getContext('2d').drawImage(cv,0,0,t.width,t.height);return t.toDataURL('image/jpeg',.7)}catch(e){return ''}};
+const JPG=/^data:image\/jpeg;base64,[A-Za-z0-9+\/=]+$/;
+const shotImg=c=>JPG.test(c.shot||'')?`<img src="${c.shot}" style="width:100%;border-radius:4px;margin-bottom:4px">`:'';
+const gidMap=()=>{if(!GM){GM=new Map();for(const id of els.keys()){try{GM.set(val(api.GetLine(mid,id).GlobalId),id)}catch(e){}}}return GM};
+function goComment(g,cid){
+ const c=(commentsStore.get(g)||[]).find(x=>x.cid===cid),id=gidMap().get(g);
+ if(id!==undefined){els.get(id).vis=true;refresh();select([id])}
+ if(c&&c.vp&&ok3(c.vp.p)&&ok3(c.vp.t)){cam.position.fromArray(c.vp.p);controls.target.fromArray(c.vp.t);controls.update();dirty=true}else if(id!==undefined)fit([id])}
+const crcT=(()=>{const t=new Uint32Array(256);for(let n=0;n<256;n++){let c=n;for(let k=0;k<8;k++)c=c&1?0xEDB88320^(c>>>1):c>>>1;t[n]=c>>>0}return t})();
+const crc32=u=>{let c=-1;for(let i=0;i<u.length;i++)c=crcT[(c^u[i])&255]^(c>>>8);return (~c)>>>0};
+function zip(files){
+ const te=new TextEncoder(),ch=[],cd=[];let off=0;
+ for(const f of files){const nm=te.encode(f.n),crc=crc32(f.d),h=new DataView(new ArrayBuffer(30)),c=new DataView(new ArrayBuffer(46));
+  h.setUint32(0,0x04034b50,true);h.setUint16(4,20,true);h.setUint16(6,0x0800,true);h.setUint16(12,33,true);h.setUint32(14,crc,true);h.setUint32(18,f.d.length,true);h.setUint32(22,f.d.length,true);h.setUint16(26,nm.length,true);
+  c.setUint32(0,0x02014b50,true);c.setUint16(4,20,true);c.setUint16(6,20,true);c.setUint16(8,0x0800,true);c.setUint16(14,33,true);c.setUint32(16,crc,true);c.setUint32(20,f.d.length,true);c.setUint32(24,f.d.length,true);c.setUint16(28,nm.length,true);c.setUint32(42,off,true);
+  ch.push(new Uint8Array(h.buffer),nm,f.d);cd.push(new Uint8Array(c.buffer),nm);off+=30+nm.length+f.d.length}
+ const cs=cd.reduce((s,x)=>s+x.length,0),e=new DataView(new ArrayBuffer(22));
+ e.setUint32(0,0x06054b50,true);e.setUint16(8,files.length,true);e.setUint16(10,files.length,true);e.setUint32(12,cs,true);e.setUint32(16,off,true);
+ return new Blob([...ch,...cd,new Uint8Array(e.buffer)],{type:'application/zip'})}
+$('#btnExportBcf').onclick=()=>{
+ if(!commentsStore.size){toast('Chưa có ý kiến nào để xuất',true);return}
+ const te=new TextEncoder(),H='<?xml version="1.0" encoding="UTF-8"?>\n',U=()=>crypto.randomUUID(),G=s=>/^[0-9a-f-]{36}$/i.test(s||'')?s:U(),
+  nm=(document.title||'BIM').replace(/ – .*$/,''),F=[],now=()=>new Date().toISOString(),
+  I=(v,o)=>{const a=o?v.clone().add(W0):v;return [a.x,-a.z,a.y]},f3=a=>`<X>${a[0].toFixed(4)}</X><Y>${a[1].toFixed(4)}</Y><Z>${a[2].toFixed(4)}</Z>`;
+ F.push({n:'bcf.version',d:te.encode(H+'<Version VersionId="2.1"><DetailedVersion>2.1</DetailedVersion></Version>')});
+ commentsStore.forEach((list,g)=>{
+  if(!list.length)return;
+  const L=list[list.length-1],tg=U();let cm='',vs='',n=0;
+  for(const c of list){let vg='';
+   if(c.vp&&ok3(c.vp.p)&&ok3(c.vp.t)){n++;vg=U();
+    const p=new THREE.Vector3().fromArray(c.vp.p),t=new THREE.Vector3().fromArray(c.vp.t),u=ok3(c.vp.u)?new THREE.Vector3().fromArray(c.vp.u):new THREE.Vector3(0,1,0),d=t.clone().sub(p).normalize();
+    F.push({n:`${tg}/viewpoint${n}.bcfv`,d:te.encode(H+`<VisualizationInfo Guid="${vg}"><Components><Selection><Component IfcGuid="${xe(g)}"/></Selection><Visibility DefaultVisibility="true"/></Components><PerspectiveCamera><CameraViewPoint>${f3(I(p,1))}</CameraViewPoint><CameraDirection>${f3(I(d))}</CameraDirection><CameraUpVector>${f3(I(u))}</CameraUpVector><FieldOfView>${(+c.vp.f||45).toFixed(1)}</FieldOfView></PerspectiveCamera></VisualizationInfo>`)});
+    let sn='';if(JPG.test(c.shot||'')){try{F.push({n:`${tg}/snapshot${n}.jpg`,d:Uint8Array.from(atob(c.shot.split(',')[1]),x=>x.charCodeAt(0))});sn=`<Snapshot>snapshot${n}.jpg</Snapshot>`}catch(e){}}
+    vs+=`<Viewpoints Guid="${vg}"><Viewpoint>viewpoint${n}.bcfv</Viewpoint>${sn}</Viewpoints>`}
+   cm+=`<Comment Guid="${G(c.cid)}"><Date>${xe(c.at||now())}</Date><Author>${xe(c.username||c.author)}</Author><Comment>${xe(c.text)}</Comment>${vg?`<Viewpoint Guid="${vg}"/>`:''}</Comment>`}
+  F.push({n:`${tg}/markup.bcf`,d:te.encode(H+`<Markup><Header><File><Filename>${xe(nm)}</Filename><Date>${now()}</Date></File></Header><Topic Guid="${tg}" TopicType="Issue" TopicStatus="${xe(L.status||'Open')}"><Title>${xe(L.name||g)}</Title><Priority>${xe(L.prio||'Normal')}</Priority><CreationDate>${xe(list[0].at||now())}</CreationDate><CreationAuthor>${xe(list[0].username||list[0].author)}</CreationAuthor></Topic>${cm}${vs}</Markup>`)})});
+ const a=document.createElement('a');a.href=URL.createObjectURL(zip(F));a.download=nm.replace(/[\\/:*?"<>|]+/g,'_')+'.bcf';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),4000);toast('Đã xuất BCF 2.1 (có viewpoint + ảnh chụp)')};
 
 /* ---------- Camera & Controls ---------- */
 function bbox(ids){const b=new THREE.Box3();
@@ -892,7 +923,7 @@ function go(b,d,scaleFactor=1.05){
  if(b.isEmpty())return;const c=b.getCenter(new THREE.Vector3()),r=b.getBoundingSphere(new THREE.Sphere()).radius||1;
  d=(d||cam.position.clone().sub(controls.target)).clone().normalize();
  cam.position.copy(c).addScaledVector(d, (r/Math.sin(cam.fov*P/360))*scaleFactor);
- controls.target.copy(c);controls.update();dirty=true;
+ controls.target.copy(c);SK=true;controls.update();SK=false;dirty=true;
 }
 const fit=ids=>go(ids&&ids.length?bbox(ids):MB);
 const zoomMagnify=ids=>{
@@ -920,6 +951,7 @@ $$('[data-v]').forEach(b=>{if(b.tagName==='BUTTON')b.onclick=()=>go(MB,new THREE
 /* ---------- Công cụ Đo đạc 3D ---------- */
 let measureMode = false, measurePoints = [], measureLineGroup = new THREE.Group();
 scene.add(measureLineGroup);
+const MEAS=[],ml=document.createElement('div');ml.style.cssText='position:absolute;left:12px;top:32px;color:#ffb03a;font-size:12px;pointer-events:none;white-space:pre';$('main').appendChild(ml);
 
 function toggleMeasureMode(){
   measureMode = !measureMode;
@@ -933,7 +965,7 @@ function toggleMeasureMode(){
 }
 
 function resetMeasure(){
-  measurePoints = [];
+  measurePoints = [];MEAS.length=0;DOTS.length=0;ml.textContent='';
   while(measureLineGroup.children.length > 0){
     const obj = measureLineGroup.children[0];
     if(obj.geometry) obj.geometry.dispose();
@@ -945,11 +977,11 @@ function resetMeasure(){
 function handleMeasurePoint(pt){
   measurePoints.push(pt);
   
-  const dotGeo = new THREE.SphereGeometry(0.12, 16, 16);
+  const dotGeo = new THREE.SphereGeometry(1,12,12);
   const dotMat = new THREE.MeshBasicMaterial({color: 0xffb03a, depthTest: false});
   const dot = new THREE.Mesh(dotGeo, dotMat);
   dot.position.copy(pt);
-  dot.renderOrder = 10;
+  dot.renderOrder = 10;DOTS.push(dot);dotScale();
   measureLineGroup.add(dot);
 
 if (measurePoints.length === 2) {
@@ -965,7 +997,7 @@ if (measurePoints.length === 2) {
     // Sửa trực tiếp hệ số quy đổi từ mét sang milimét (1m = 1000mm)
     const distMm = (dist * 1000).toFixed(0);
 
-    toast(`Khoảng cách đo: ${distMm} mm`);
+    const dx=Math.abs(p2.x-p1.x)*1000,dy=Math.abs(p2.z-p1.z)*1000,dz=Math.abs(p2.y-p1.y)*1000;MEAS.push(`#${MEAS.length+1}: ${distMm} mm (ΔX ${dx.toFixed(0)} · ΔY ${dy.toFixed(0)} · ΔZ ${dz.toFixed(0)})`);ml.textContent=MEAS.slice(-6).join('\n');toast(`Khoảng cách đo: ${distMm} mm · tự bắt đỉnh`);
     measurePoints = [];
   } else {
     toast('Đã ghi nhận điểm 1. Hãy bấm chọn điểm thứ 2');
