@@ -2011,6 +2011,14 @@ function toggleTheme() {
     applyFilters();
 }
 
+function resetSearchInput() {
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput && searchInput.value) {
+        searchInput.value = '';
+        applyFilters();
+    }
+}
+
 function updateThemeUI(theme) {
     const themeIcon = document.getElementById('themeIcon');
     const themeText = document.getElementById('themeText');
@@ -2142,8 +2150,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.documentElement.setAttribute('data-theme', savedTheme);
     updateThemeUI(savedTheme);
 
-    const searchInput = document.getElementById('searchInput');
-    if (searchInput) searchInput.value = '';
+    resetSearchInput();
 
     const issueCard = document.getElementById('issueAnalyticsCard');
     if (issueCard) {
@@ -2186,6 +2193,8 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+
+window.addEventListener('pageshow', resetSearchInput);
 
 function toggleVnptPasswordVisibility() {
     const pwdInput = document.getElementById('vnptPasswordInput');
