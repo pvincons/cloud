@@ -1072,10 +1072,41 @@ function toggleVnptLoginFields(show) {
     document.getElementById('vnptPasswordRow').style.display = show ? 'block' : 'none';
 }
 
+async function setVnptSessionRetention(retainSession) {
+    if (!vnptSessionReady) return;
+    try {
+        const response = await fetch(`${DATA_SERVER_API}/api/vnpt/session/retention`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('access_token') || ''}`
+            },
+            body: JSON.stringify({ retain_session: retainSession })
+        });
+        const data = await response.json();
+        if (!response.ok || !data.success) {
+            throw new Error(data.error || 'Không cập nhật được tùy chọn lưu phiên VNPT.');
+        }
+    } catch (error) {
+        console.error('Lỗi cập nhật tùy chọn phiên VNPT:', error);
+        showToast('Không cập nhật được tùy chọn lưu phiên VNPT: ' + error.message);
+    }
+}
+
+function clearVnptSessionOnServer() {
+    const cdeToken = localStorage.getItem('access_token') || '';
+    if (!cdeToken) return;
+    fetch(`${DATA_SERVER_API}/api/vnpt/session/logout`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${cdeToken}` }
+    }).catch(error => console.warn('Không thể xóa phiên VNPT tạm:', error));
+}
+
 async function openOtpSignModal(btn) {
     signTargetRow = btn.closest('tr');
     currentCredentialId = '';
     vnptSessionReady = false;
+    document.getElementById('rememberVnptSession').checked = true;
     const fileName = signTargetRow.querySelector('.file-code').innerText;
     document.getElementById('otpSignFileName').innerText = fileName;
 
@@ -1129,9 +1160,14 @@ async function fetchVnptTokenAndCredentials() {
     const usernameInput = document.getElementById('vnptUsernameInput').value.trim();
     const passwordInput = document.getElementById('vnptPasswordInput').value.trim();
     const statusInfo = document.getElementById('vnptSignStatusInfo');
+    const cdeToken = localStorage.getItem('access_token') || '';
 
     if (!usernameInput || !passwordInput) {
         showToast("⚠️ Vui lòng nhập đầy đủ Tài khoản và Mật khẩu VNPT SmartCA!");
+        return;
+    }
+    if (!cdeToken) {
+        showToast("Phiên đăng nhập CDE đã hết hạn. Vui lòng đăng nhập lại.");
         return;
     }
 
@@ -1150,7 +1186,11 @@ async function fetchVnptTokenAndCredentials() {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${cdeToken}`
             },
-            body: JSON.stringify({ username: usernameInput, password: passwordInput })
+            body: JSON.stringify({
+                username: usernameInput,
+                password: passwordInput,
+                retain_session: document.getElementById('rememberVnptSession').checked
+            })
         });
 
         const tokenData = await tokenRes.json();
@@ -1214,6 +1254,7 @@ async function executeVnptSignHash() {
             },
             body: JSON.stringify({
                 credentialId: currentCredentialId,
+                retain_session: document.getElementById('rememberVnptSession').checked,
                 filePath: filePath,
                 description: `CDE PV Incons - Ký số tài liệu ${filePath} qua VNPT SmartCA Production`
             })
@@ -1279,15 +1320,18 @@ async function executeVnptSignHash() {
                             statusInfo.innerText = "✕ " + failMsg;
                         }
                     }
-                } else if (!tranData.retry && (tranData.tranStatus === 1 || tranRes.status === 404)) {
+                } else if (!tranData.retry && (
+                    tranData.tranStatus === 1 ||
+                    [401, 403, 404].includes(tranRes.status)
+                )) {
                     finished = true;
                     clearInterval(pollInterval);
-                    const embedErr = tranData.error || 'Không nhúng được chữ ký vào tệp.';
-                    showToast("✕ " + embedErr);
+                    const pollError = tranData.error || 'Không thể xác thực hoặc tìm thấy giao dịch ký.';
+                    showToast("✕ " + pollError);
                     if (statusInfo) {
                         statusInfo.style.background = 'rgba(239, 68, 68, 0.15)';
                         statusInfo.style.color = '#ef4444';
-                        statusInfo.innerText = "✕ " + embedErr;
+                        statusInfo.innerText = "✕ " + pollError;
                     }
                 }
             } catch (pollErr) {
@@ -2073,6 +2117,12 @@ function openModal(id) {
 function closeModal(id) {
     const el = document.getElementById(id);
     if (el) el.classList.remove('active');
+    const rememberSession = document.getElementById('rememberVnptSession');
+    if (id === 'otpSignModal' && rememberSession && !rememberSession.checked) {
+        clearVnptSessionOnServer();
+        vnptSessionReady = false;
+        currentCredentialId = '';
+    }
 }
 
 function openGateModal(btnBtn) {
