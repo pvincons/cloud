@@ -2041,10 +2041,10 @@ function toggleTheme() {
 
 function resetSearchInput() {
     const searchInput = document.getElementById('searchInput');
-    if (searchInput && searchInput.value) {
-        searchInput.value = '';
-        applyFilters();
-    }
+    if (!searchInput) return;
+    const hadValue = !!searchInput.value;
+    searchInput.value = '';
+    if (hadValue) applyFilters();
 }
 
 function updateThemeUI(theme) {
@@ -2222,7 +2222,22 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-window.addEventListener('pageshow', resetSearchInput);
+window.addEventListener('pageshow', () => {
+    resetSearchInput();
+    window.setTimeout(resetSearchInput, 0);
+});
+window.addEventListener('load', resetSearchInput);
+
+document.addEventListener('DOMContentLoaded', () => {
+    const searchInput = document.getElementById('searchInput');
+    if (!searchInput) return;
+    searchInput.addEventListener('focus', () => {
+        searchInput.removeAttribute('readonly');
+    }, { once: true });
+    searchInput.addEventListener('pointerdown', () => {
+        searchInput.removeAttribute('readonly');
+    }, { once: true });
+});
 
 function toggleVnptPasswordVisibility() {
     const pwdInput = document.getElementById('vnptPasswordInput');
