@@ -20,8 +20,8 @@ let currentUserAssignedProjects = [];
 let isUserAdmin = false;
 let currentActiveUserFullName = 'TRẦN HOÀNG PHƯỚC';
 
-let currentAccessToken = '';
 let currentCredentialId = '';
+let vnptSessionReady = false;
 let fileTypeChartInstance = null;
 let storageChartInstance = null;
 let issueChartInstance = null;
@@ -65,14 +65,32 @@ function closeAllModals() {
     });
 }
 
-function handleLogout() {
+async function handleLogout() {
     if (confirm("Bạn có chắc chắn muốn đăng xuất khỏi hệ thống không?")) {
+        let vnptSessionCleared = false;
+        const cdeToken = localStorage.getItem('access_token') || '';
+        if (cdeToken) {
+            const controller = new AbortController();
+            const timeout = setTimeout(() => controller.abort(), 5000);
+            try {
+                const response = await fetch(`${DATA_SERVER_API}/api/vnpt/session/logout`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${cdeToken}` },
+                    signal: controller.signal
+                });
+                vnptSessionCleared = response.ok;
+            } catch (error) {
+                console.warn('Không thể xóa phiên VNPT trên server khi đăng xuất:', error);
+            } finally {
+                clearTimeout(timeout);
+            }
+        }
         localStorage.removeItem('currentUser');
         localStorage.removeItem('access_token');
-        showToast("Đang đăng xuất...");
+        showToast(vnptSessionCleared ? "Đã xóa phiên VNPT. Đang đăng xuất..." : "Đang đăng xuất; phiên VNPT trên server chưa được xác nhận xóa.");
         setTimeout(() => {
             window.location.href = '../../../index.html';
-        }, 600);
+        }, 1200);
     }
 }
 
@@ -1037,8 +1055,27 @@ function getActionButtons(state, relativePath) {
 
 let signTargetRow = null;
 
+function populateVnptCredentialList(credentialIds) {
+    const credSelect = document.getElementById('vnptCredentialSelect');
+    credSelect.innerHTML = '';
+    credentialIds.forEach((credentialId, index) => {
+        const option = document.createElement('option');
+        option.value = credentialId;
+        option.innerText = `Chứng thư số ${index + 1}: ${credentialId}`;
+        credSelect.appendChild(option);
+    });
+    currentCredentialId = credentialIds[0] || '';
+}
+
+function toggleVnptLoginFields(show) {
+    document.getElementById('vnptUsernameRow').style.display = show ? 'block' : 'none';
+    document.getElementById('vnptPasswordRow').style.display = show ? 'block' : 'none';
+}
+
 async function openOtpSignModal(btn) {
     signTargetRow = btn.closest('tr');
+    currentCredentialId = '';
+    vnptSessionReady = false;
     const fileName = signTargetRow.querySelector('.file-code').innerText;
     document.getElementById('otpSignFileName').innerText = fileName;
 
@@ -1060,22 +1097,43 @@ async function openOtpSignModal(btn) {
     if (pwdInput) pwdInput.value = '';
 
     document.getElementById('vnptCredentialSelect').innerHTML = `<option value="">-- Vui lòng xác thực tài khoản trước --</option>`;
+    toggleVnptLoginFields(true);
 
     openModal('otpSignModal');
+    try {
+        const response = await fetch(`${DATA_SERVER_API}/api/vnpt/session`, {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${localStorage.getItem('access_token') || ''}` }
+        });
+        const data = await response.json();
+        if (response.ok && data.success && Array.isArray(data.content) && data.content.length > 0) {
+            populateVnptCredentialList(data.content);
+            vnptSessionReady = true;
+            toggleVnptLoginFields(false);
+            if (statusInfo) {
+                statusInfo.style.display = 'block';
+                statusInfo.style.background = 'rgba(52, 211, 153, 0.15)';
+                statusInfo.style.color = '#34d399';
+                statusInfo.innerText = '✓ Phiên VNPT SmartCA đang hoạt động. Chứng thư số sẵn sàng cho lần ký tiếp theo.';
+            }
+        }
+    } catch (error) {
+        if (statusInfo) {
+            statusInfo.style.display = 'block';
+            statusInfo.innerText = 'Không kiểm tra được phiên VNPT. Bạn có thể xác thực lại tài khoản.';
+        }
+    }
 }
 
 async function fetchVnptTokenAndCredentials() {
     const usernameInput = document.getElementById('vnptUsernameInput').value.trim();
     const passwordInput = document.getElementById('vnptPasswordInput').value.trim();
-    const credSelect = document.getElementById('vnptCredentialSelect');
     const statusInfo = document.getElementById('vnptSignStatusInfo');
 
     if (!usernameInput || !passwordInput) {
         showToast("⚠️ Vui lòng nhập đầy đủ Tài khoản và Mật khẩu VNPT SmartCA!");
         return;
     }
-
-    const cdeToken = localStorage.getItem('access_token') || '';
 
     showToast("Đang kết nối VNPT SmartCA Production...");
     if (statusInfo) {
@@ -1096,44 +1154,19 @@ async function fetchVnptTokenAndCredentials() {
         });
 
         const tokenData = await tokenRes.json();
-        if (!tokenData.success || !tokenData.access_token) {
+        if (!tokenData.success || !Array.isArray(tokenData.content) || tokenData.content.length === 0) {
             throw new Error(tokenData.error || "Xác thực tài khoản VNPT SmartCA thất bại");
         }
-
-        currentAccessToken = tokenData.access_token;
-
-        const listRes = await fetch(`${DATA_SERVER_API}/api/vnpt/credentials/list`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${cdeToken}`
-            },
-            body: JSON.stringify({ access_token: currentAccessToken })
-        });
-
-        const listData = await listRes.json();
-        const credIds = Array.isArray(listData.content) ? listData.content : (listData.credentialIDs || []);
-        if (credSelect) credSelect.innerHTML = '';
-
-        if (listData.success && credIds.length > 0) {
-            credIds.forEach((credId, idx) => {
-                let opt = document.createElement('option');
-                opt.value = credId;
-                opt.innerText = `Chứng thư số ${idx + 1}: ${credId}`;
-                credSelect.appendChild(opt);
-            });
-            currentCredentialId = credIds[0];
-
-            showToast("✓ Nạp danh sách Chứng thư số thành công!");
-            if (statusInfo) {
-                statusInfo.style.background = 'rgba(52, 211, 153, 0.15)';
-                statusInfo.style.color = '#34d399';
-                statusInfo.innerText = "✓ Kết nối thành công! Đã nạp Chứng thư số.";
-            }
-        } else {
-            if (credSelect) credSelect.innerHTML = `<option value="">-- Không tìm thấy Chứng thư số --</option>`;
-            throw new Error("Tài khoản chưa được cấp Chứng thư số hoạt động.");
+        populateVnptCredentialList(tokenData.content);
+        vnptSessionReady = true;
+        toggleVnptLoginFields(false);
+        showToast("✓ Phiên VNPT đã sẵn sàng để ký nhiều lần!");
+        if (statusInfo) {
+            statusInfo.style.background = 'rgba(52, 211, 153, 0.15)';
+            statusInfo.style.color = '#34d399';
+            statusInfo.innerText = "✓ Đã xác thực và lưu phiên VNPT an toàn trên server.";
         }
+        document.getElementById('vnptPasswordInput').value = '';
     } catch (err) {
         console.error("Lỗi VNPT SmartCA:", err);
         showToast("Lỗi: " + err.message);
@@ -1155,16 +1188,14 @@ async function executeVnptSignHash() {
         currentCredentialId = credSelect.value;
     }
 
-    if (!currentAccessToken || !currentCredentialId) {
-        showToast("⚠️ Vui lòng xác thực tài khoản và chọn Chứng thư số trước!");
+    if (!vnptSessionReady || !currentCredentialId) {
+        showToast("⚠️ Vui lòng xác thực phiên VNPT hoặc chọn Chứng thư số trước!");
         return;
     }
     if (!filePath) {
         showToast("⚠️ Không xác định được đường dẫn tệp cần ký!");
         return;
     }
-
-    const cdeToken = localStorage.getItem('access_token') || '';
 
     showToast("Đang gửi yêu cầu ký Hash tới VNPT SmartCA...");
     if (statusInfo) {
@@ -1183,7 +1214,6 @@ async function executeVnptSignHash() {
             },
             body: JSON.stringify({
                 credentialId: currentCredentialId,
-                access_token: currentAccessToken,
                 filePath: filePath,
                 description: `CDE PV Incons - Ký số tài liệu ${filePath} qua VNPT SmartCA Production`
             })
@@ -1212,9 +1242,7 @@ async function executeVnptSignHash() {
                         'Authorization': `Bearer ${cdeToken}`
                     },
                     body: JSON.stringify({
-                        tranId: tranId,
-                        access_token: currentAccessToken,
-                        filePath: filePath
+                        tranId: tranId
                     })
                 });
                 const tranData = await tranRes.json();
@@ -1270,9 +1298,9 @@ async function executeVnptSignHash() {
                 finished = true;
                 clearInterval(pollInterval);
                 if (statusInfo) {
-                    statusInfo.style.background = 'rgba(239, 68, 68, 0.15)';
-                    statusInfo.style.color = '#ef4444';
-                    statusInfo.innerText = "⏱ Hết thời gian chờ xác nhận. Vui lòng kiểm tra lại ứng dụng VNPT SmartCA.";
+                    statusInfo.style.background = 'rgba(245, 158, 11, 0.15)';
+                    statusInfo.style.color = '#fbbf24';
+                    statusInfo.innerText = "⏱ Trình duyệt đã dừng chờ. CDE vẫn tiếp tục kiểm tra giao dịch ở nền và sẽ cập nhật tệp khi VNPT xác nhận.";
                 }
             }
         }, 3000);
