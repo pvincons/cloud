@@ -18,17 +18,56 @@
     <link rel="stylesheet" href="/assets/css/data.css">
     <style>
         /* Styles website */
+        /* Menu thao tác xổ xuống trên điện thoại (hiện bằng nút ⋮, ẩn từ màn hình >= 640px) */
+        #rowMenu { position: fixed; z-index: 9999; min-width: 190px; max-width: calc(100vw - 16px); padding: 4px;
+            background: #0f172a; border: 1px solid rgba(255,255,255,.12); border-radius: 10px; box-shadow: 0 12px 30px rgba(0,0,0,.5); }
+        #rowMenu .row-menu-item { display: flex; align-items: center; gap: 10px; width: 100%; padding: 10px 12px; border: 0; border-radius: 7px;
+            background: transparent; color: #e2e8f0; font-size: 13px; text-align: left; cursor: pointer; }
+        #rowMenu .row-menu-item i { width: 16px; text-align: center; }
+        #rowMenu .row-menu-item:hover, #rowMenu .row-menu-item:active { background: rgba(148,163,184,.18); }
+        #rowMenu .row-menu-item.danger { color: #fb7185; }
+        #rowMenu .row-menu-sep { height: 1px; margin: 3px 6px; background: rgba(255,255,255,.1); }
+        [data-theme="light"] #rowMenu { background: #fff; border-color: #e2e8f0; box-shadow: 0 12px 30px rgba(15,23,42,.18); }
+        [data-theme="light"] #rowMenu .row-menu-item { color: #0f172a; }
+        [data-theme="light"] #rowMenu .row-menu-item:hover, [data-theme="light"] #rowMenu .row-menu-item:active { background: #f1f5f9; }
+        [data-theme="light"] #rowMenu .row-menu-item.danger { color: #e11d48; }
+        [data-theme="light"] .row-menu-btn { background: #f1f5f9; color: #334155; border-color: #cbd5e1; }
     </style>
 
     <script>
+        // GIAO DIỆN SÁNG/TỐI ĐỒNG BỘ: dùng chung khoá 'cde_theme' với index.html (và mir.html)
+        const CDE_THEME_KEY = 'cde_theme';
+        function applyTheme(theme) {
+            theme = theme === 'light' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', theme);
+            document.documentElement.classList.toggle('dark', theme === 'dark');
+            return theme;
+        }
         (function () {
-            const savedTheme = localStorage.getItem('cde_data_theme') || 'dark';
-            document.documentElement.setAttribute('data-theme', savedTheme);
+            // Chuyển giá trị cũ ('cde_data_theme') sang khoá chung một lần, rồi bỏ khoá cũ
+            const legacy = localStorage.getItem('cde_data_theme');
+            if (legacy && !localStorage.getItem(CDE_THEME_KEY)) localStorage.setItem(CDE_THEME_KEY, legacy);
+            localStorage.removeItem('cde_data_theme');
+            applyTheme(localStorage.getItem(CDE_THEME_KEY) || 'dark');
         })();
+        // Khi nhấn đổi giao diện ở index/mir (tab khác), trang này tự đổi theo
+        window.addEventListener('storage', function (e) {
+            if (e.key === CDE_THEME_KEY && e.newValue) {
+                applyTheme(e.newValue);
+                if (typeof initThemeUI === 'function') initThemeUI();
+            }
+        });
+        // Quay lại trang bằng nút Back (trang lấy từ bộ nhớ đệm) vẫn cập nhật đúng giao diện
+        window.addEventListener('pageshow', function () {
+            applyTheme(localStorage.getItem(CDE_THEME_KEY) || 'dark');
+            if (typeof initThemeUI === 'function') initThemeUI();
+        });
     </script>
 </head>
 
 <body class="min-h-screen p-3 sm:p-4 md:p-8 flex flex-col justify-between">
+
+<div id="rowMenu" class="hidden" role="menu"></div>
 
     <!-- HEADER NAVIGATION -->
     <header
@@ -226,8 +265,8 @@
         function toggleTheme() {
             const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
             const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-            document.documentElement.setAttribute('data-theme', newTheme);
-            localStorage.setItem('cde_data_theme', newTheme);
+            applyTheme(newTheme);
+            localStorage.setItem(CDE_THEME_KEY, newTheme);
             initThemeUI();
         }
 
@@ -368,7 +407,57 @@
             renderFileList(fetchedItems);
         }
 
+        // ===== MENU THAO TÁC XỔ XUỐNG (điện thoại) =====
+        function escAttr(v) {
+            return String(v ?? '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        }
+        function closeRowMenu() {
+            const m = document.getElementById('rowMenu');
+            if (m) { m.classList.add('hidden'); m.dataset.owner = ''; }
+        }
+        function openRowMenu(btn, ev) {
+            ev.stopPropagation();
+            const m = document.getElementById('rowMenu');
+            const owner = btn.dataset.path;
+            if (!m.classList.contains('hidden') && m.dataset.owner === owner) { closeRowMenu(); return; }
+            const { path, name, url } = btn.dataset, isDir = btn.dataset.dir === '1';
+            const entries = [
+                isDir ? { i: 'fa-folder-open', t: 'Vào thư mục', f: () => navigateTo(path) }
+                      : { i: 'fa-eye', t: 'Xem', f: () => window.open(url, '_blank') },
+                ...(isDir ? [] : [{ i: 'fa-download', t: 'Tải về', f: () => {
+                    const a = document.createElement('a'); a.href = url; a.download = ''; a.target = '_blank';
+                    document.body.appendChild(a); a.click(); a.remove();
+                } }]),
+                { i: 'fa-link', t: 'Copy link', f: () => copyLink(url, name) },
+                { i: 'fa-pen-to-square', t: 'Đổi tên', f: () => renameItem(path, name) },
+                { i: 'fa-copy', t: 'Copy', f: () => copyToClipboard(path, name, 'copy') },
+                { i: 'fa-scissors', t: 'Cut (di chuyển)', f: () => copyToClipboard(path, name, 'move') },
+                'sep',
+                { i: 'fa-trash-can', t: 'Xóa', danger: true, f: () => deleteItem(path, name) }
+            ];
+            m.innerHTML = '';
+            entries.forEach(en => {
+                if (en === 'sep') { const d = document.createElement('div'); d.className = 'row-menu-sep'; m.appendChild(d); return; }
+                const b = document.createElement('button');
+                b.type = 'button'; b.className = 'row-menu-item' + (en.danger ? ' danger' : ''); b.setAttribute('role', 'menuitem');
+                b.innerHTML = `<i class="fa-solid ${en.i}"></i><span>${en.t}</span>`;
+                b.addEventListener('click', e => { e.stopPropagation(); closeRowMenu(); en.f(); });
+                m.appendChild(b);
+            });
+            m.dataset.owner = owner;
+            m.style.visibility = 'hidden'; m.classList.remove('hidden');
+            const r = btn.getBoundingClientRect(), w = m.offsetWidth, h = m.offsetHeight;
+            const left = Math.max(8, Math.min(r.right - w, window.innerWidth - w - 8));
+            const top = (r.bottom + 4 + h > window.innerHeight - 8) ? Math.max(8, r.top - h - 4) : r.bottom + 4;
+            m.style.left = left + 'px'; m.style.top = top + 'px'; m.style.visibility = '';
+        }
+        document.addEventListener('click', e => { if (!e.target.closest('#rowMenu')) closeRowMenu(); });
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') closeRowMenu(); });
+        window.addEventListener('resize', closeRowMenu);
+        window.addEventListener('scroll', closeRowMenu, true);
+
         function renderFileList(items) {
+            closeRowMenu();
             const fileList = document.getElementById('cdeFileList');
             fileList.innerHTML = '';
             
@@ -410,7 +499,7 @@
                         </div>
                     </td>
                     <td class="py-2 px-3 text-right" onclick="event.stopPropagation()">
-                        <div class="flex items-center justify-end gap-1 flex-wrap">
+                        <div class="hidden sm:flex items-center justify-end gap-1 flex-wrap">
                             ${isDir ? `
                                 <button onclick="event.stopPropagation(); navigateTo('${safePath}')" title="Chuyển hẳn vào thư mục này" class="px-2 py-1 bg-blue-600/30 hover:bg-blue-600 text-blue-300 hover:text-white rounded border border-blue-500/30 text-[11px] transition-all flex items-center gap-1">
                                     <i class="fa-solid fa-folder-open text-[10px]"></i> <span class="hidden sm:inline">Vào</span>
@@ -439,6 +528,12 @@
                                 <i class="fa-solid fa-trash-can"></i>
                             </button>
                         </div>
+                        <button type="button" class="row-menu-btn sm:hidden w-9 h-9 inline-flex items-center justify-center rounded-lg bg-slate-800/80 border border-white/10 text-slate-300"
+                            aria-label="Thao tác" aria-haspopup="menu"
+                            data-path="${escAttr(cleanPath)}" data-name="${escAttr(item.name)}" data-url="${escAttr(fileUrl)}" data-dir="${isDir ? '1' : '0'}"
+                            onclick="openRowMenu(this, event)">
+                            <i class="fa-solid fa-ellipsis-vertical"></i>
+                        </button>
                     </td>
                 `;
                 container.appendChild(tr);
