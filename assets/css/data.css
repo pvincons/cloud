@@ -18,6 +18,51 @@
     --table-hover: rgba(226, 232, 240, 0.6);
 }
 
+[data-theme="light"] header button[onclick="createNewProject()"] {
+    color: #92400e;
+    background-color: #fef3c7;
+    border-color: #fcd34d;
+}
+
+[data-theme="light"] header button[onclick="createNewFolder()"] {
+    color: #1d4ed8;
+    background-color: #dbeafe;
+    border-color: #93c5fd;
+}
+
+[data-theme="light"] header #btnPaste:disabled {
+    color: #475569;
+    background-color: #e2e8f0;
+    border-color: #cbd5e1;
+    opacity: 1;
+}
+
+[data-theme="light"] header label[title="Upload tệp tin"] {
+    color: #047857;
+    background-color: #d1fae5;
+    border-color: #6ee7b7;
+}
+
+[data-theme="light"] header button[onclick="toggleServerSettings()"],
+[data-theme="light"] header button[onclick="loadCDEFiles(currentPath)"],
+[data-theme="light"] header button[onclick="toggleTheme()"] {
+    color: #334155;
+    background-color: #fff;
+    border-color: #cbd5e1;
+}
+
+[data-theme="light"] header button[onclick="toggleServerSettings()"]:hover,
+[data-theme="light"] header button[onclick="loadCDEFiles(currentPath)"]:hover {
+    color: #0f172a;
+    background-color: #f1f5f9;
+}
+
+[data-theme="light"] main > div:last-child {
+    color: #334155;
+    background-color: #eaf2ff;
+    border-color: #cbdcf5;
+}
+
 
 body {
     color: var(--text-main);
