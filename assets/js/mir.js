@@ -1223,11 +1223,16 @@ async function executeVnptSignHash() {
     const filePath = signTargetRow.getAttribute('data-path');
     const credSelect = document.getElementById('vnptCredentialSelect');
     const statusInfo = document.getElementById('vnptSignStatusInfo');
+    const cdeToken = localStorage.getItem('access_token') || '';
 
     if (credSelect && credSelect.value) {
         currentCredentialId = credSelect.value;
     }
 
+    if (!cdeToken) {
+        showToast("Phiên đăng nhập CDE đã hết hạn. Vui lòng đăng nhập lại.");
+        return;
+    }
     if (!vnptSessionReady || !currentCredentialId) {
         showToast("⚠️ Vui lòng xác thực phiên VNPT hoặc chọn Chứng thư số trước!");
         return;
