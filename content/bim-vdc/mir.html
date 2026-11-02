@@ -95,7 +95,8 @@
                     <path
                         d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" />
                 </svg>
-                <input type="text" id="searchInput" autocomplete="off" onkeyup="applyFilters()"
+                <input type="search" id="searchInput" name="cde-mir-search" autocomplete="off"
+                    autocapitalize="off" autocorrect="off" spellcheck="false" oninput="applyFilters()"
                     placeholder="Tìm kiếm file ISO 19650...">
             </div>
 
@@ -569,14 +570,14 @@
 
                 <div
                     style="background: var(--bg-input); padding: 10px; border-radius: 6px; border: 1px solid var(--border-color); margin-top: 8px;">
-                    <div style="margin-bottom: 8px;">
+                    <div id="vnptUsernameRow" style="margin-bottom: 8px;">
                         <label
                             style="font-weight: 600; font-size: 0.72rem; display: block; margin-bottom: 2px; color: var(--text-heading);">Tài
                             khoản / ID SmartCA:</label>
                         <input type="text" id="vnptUsernameInput" placeholder="Nhập ID SmartCA..." style="width: 100%; padding: 6px 8px; border-radius: 6px; border: 1px solid var(--border-color); 
                             background: var(--bg-card); color: var(--text-heading); font-size: 0.78rem;">
                     </div>
-                    <div style="margin-bottom: 8px;">
+                    <div id="vnptPasswordRow" style="margin-bottom: 8px;">
                         <label
                             style="font-weight: 600; font-size: 0.72rem; display: block; margin-bottom: 2px; color: var(--text-heading);">Mật
                             khẩu SmartCA:</label>
@@ -613,7 +614,7 @@
                         <path fill="currentColor"
                             d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z" />
                     </svg>
-                    <span>* Xác nhận ký số bằng sinh trắc học trên ứng dụng VNPT SmartCA.</span>
+                    <span>* Xác nhận ký số bằng sinh trắc học trên ứng dụng VNPT SmartCA. Phiên đăng nhập được giữ để ký nhiều lần và xóa khi đăng xuất CDE; mật khẩu không được lưu.</span>
                 </div>
 
                 <div id="vnptSignStatusInfo"
