@@ -130,11 +130,22 @@ function showToast(message) {
 
 /* 1. HÀM QUY ĐỔI DUNG LƯỢNG FILE */
 function formatFileSize(bytes) {
-    if (!bytes || isNaN(bytes) || bytes === 0) return '0 KB';
-    const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+    const size = Number(bytes);
+    if (!Number.isFinite(size) || size <= 0) return '0 MB';
+    const megabyte = 1024 ** 2;
+    const gigabyte = 1024 ** 3;
+    if (size >= gigabyte) return `${(size / gigabyte).toFixed(1)} GB`;
+    return `${(size / megabyte).toFixed(2)} MB`;
+}
+
+function formatMetadataDate(value) {
+    if (!value) return '—';
+    const date = new Date(value);
+    return Number.isNaN(date.getTime()) ? '—' : escapeAttr(date.toLocaleString('vi-VN', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+    }));
 }
 
 /* 2. NÚT ẨN / HIỆN CARD QUY CHUẨN ĐỊNH DANH ISO 19650-2 */
@@ -255,11 +266,16 @@ function buildTreeFromFlatList(flatList) {
                     path: accumPath,
                     type: isItemFile ? 'file' : 'folder',
                     size: item.size || item.fileSize || 0,
+                    metadata: isItemFile ? item.metadata : undefined,
                     expanded: true,
                     children: isItemFile ? undefined : []
                 };
                 current.children.push(newNode);
                 existing = newNode;
+            }
+            if (isItemFile) {
+                existing.metadata = item.metadata || {};
+                existing.size = item.size || item.fileSize || 0;
             }
             if (!isItemFile) {
                 current = existing;
@@ -779,8 +795,8 @@ function refreshRowActions(row) {
     if (!row) return;
     const path = row.getAttribute('data-path');
     const state = row.getAttribute('data-state');
-    const cell = row.querySelector('.action-btns');
-    if (cell) cell.innerHTML = getActionButtons(state, path);
+    const controls = row.querySelector('.action-controls');
+    if (controls) controls.innerHTML = getActionButtons(state, path);
     row.classList.toggle('is-recalled', !!getRecalledDB()[path]);
 }
 
@@ -1623,8 +1639,8 @@ function previewFile(btn) {
     let row = btn.closest('tr');
     document.getElementById('viewFileName').innerText = row.querySelector('.file-code').innerText;
     document.getElementById('viewFilePath').innerText = row.getAttribute('data-path');
-    document.getElementById('viewFileState').innerText = row.children[3].innerText;
-    document.getElementById('viewFileRev').innerText = row.children[5].innerText;
+    document.getElementById('viewFileState').innerText = row.querySelector('.container-state').innerText;
+    document.getElementById('viewFileRev').innerText = row.querySelector('.revision-value').innerText;
     const btn3d = document.getElementById('viewOpen3dBtn');
     if (btn3d) btn3d.style.display = /\.ifc$/i.test(row.getAttribute('data-path') || '') ? '' : 'none';
     const recallInfo = getRecalledDB()[row.getAttribute('data-path')];
@@ -1680,23 +1696,73 @@ function editMetadata(btn) {
     const row = btn.closest('tr');
     metadataEditingRow = row;
     document.getElementById('metaFileName').innerText = row.querySelector('.file-code').innerText;
+    document.getElementById('metaDescription').value = row.dataset.description || '';
+    document.getElementById('metaStatus').value = row.dataset.status || 'PENDING';
     document.getElementById('metaSuitability').value = row.getAttribute('data-suitability') || 'S0';
+    const discipline = row.getAttribute('data-discipline') || 'ARC';
+    const disciplineSelect = document.getElementById('metaDiscipline');
+    const customDisciplineInput = document.getElementById('metaCustomDiscipline');
+    const isCustomDiscipline = !Array.from(disciplineSelect.options).some(option => option.value === discipline);
+    disciplineSelect.value = isCustomDiscipline ? 'CUSTOM' : discipline;
+    customDisciplineInput.value = isCustomDiscipline ? discipline : '';
+    customDisciplineInput.classList.toggle('hidden', !isCustomDiscipline);
+    customDisciplineInput.required = isCustomDiscipline;
     openModal('metadataModal');
 }
 
-function saveMetadata() {
+function toggleCustomDiscipline(select) {
+    const input = document.getElementById('metaCustomDiscipline');
+    const isCustom = select.value === 'CUSTOM';
+    input.classList.toggle('hidden', !isCustom);
+    input.required = isCustom;
+    if (isCustom) input.focus();
+}
+
+async function saveMetadata() {
     if (!metadataEditingRow) return;
-    const select = document.getElementById('metaSuitability');
-    const code = select.value;
-    const label = select.options[select.selectedIndex].text;
+    const row = metadataEditingRow;
+    const description = document.getElementById('metaDescription').value.trim();
+    const status = document.getElementById('metaStatus').value;
+    const suitability = document.getElementById('metaSuitability').value;
+    const disciplineSelect = document.getElementById('metaDiscipline');
+    const discipline = disciplineSelect.value === 'CUSTOM'
+        ? document.getElementById('metaCustomDiscipline').value.trim()
+        : disciplineSelect.value;
+    if (!discipline) {
+        showToast('Vui lòng nhập tên bộ môn.');
+        return;
+    }
+    const saveButton = document.querySelector('#metadataModal .btn-primary');
+    if (saveButton) saveButton.disabled = true;
+    try {
+        const response = await fetch(`${DATA_SERVER_API}/api/file-metadata`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('access_token') || ''}`
+            },
+            body: JSON.stringify({
+                filePath: row.getAttribute('data-path'),
+                description,
+                status,
+                suitability,
+                discipline
+            })
+        });
+        const result = await response.json();
+        if (!response.ok || !result.success) {
+            throw new Error(result.error || 'Không thể lưu metadata.');
+        }
 
-    metadataEditingRow.setAttribute('data-suitability', code);
-    metadataEditingRow.children[4].innerHTML = `<span class="badge badge-${code.toLowerCase()}">${label}</span>`;
-
-    closeModal('metadataModal');
-    metadataEditingRow = null;
-    applyFilters();
-    showToast(`Cập nhật Suitability: ${label}`);
+        closeModal('metadataModal');
+        metadataEditingRow = null;
+        await reloadDatabaseData();
+        showToast('Đã cập nhật metadata file.');
+    } catch (error) {
+        showToast(error.message || 'Không thể lưu metadata.');
+    } finally {
+        if (saveButton) saveButton.disabled = false;
+    }
 }
 
 function shareFile(btn) {
@@ -1745,13 +1811,13 @@ function buildTableFromTree(node) {
 
     if (node.type === 'file') {
         if (isPathLocked(node.path)) return;
-        appendFileToTable(node.name, node.path, node.size || 0);
+        appendFileToTable(node.name, node.path, node.size || 0, node.metadata || {});
     } else if (node.children) {
         node.children.forEach(child => buildTableFromTree(child));
     }
 }
 
-function appendFileToTable(fileName, relativePath, fileSize = 0) {
+function appendFileToTable(fileName, relativePath, fileSize = 0, metadata = {}) {
     const tbody = document.getElementById('tableBody');
     if (!tbody) return;
     const upperPath = relativePath.toUpperCase();
@@ -1783,7 +1849,27 @@ function appendFileToTable(fileName, relativePath, fileSize = 0) {
     else if (fileName.includes('MEP') || fileName.includes('CODIEN')) disc = 'MEP';
     else if (fileName.includes('HVAC') || fileName.includes('THONGGIO')) disc = 'HVAC';
 
+    const validSuitabilities = ['S0', 'S1', 'S2', 'S3', 'S4', 'A1', 'A2'];
+    const validDisciplines = ['ARC', 'STR', 'MEP', 'HVAC'];
+    if (validSuitabilities.includes(metadata.suitability)) suit = metadata.suitability;
+    if (typeof metadata.discipline === 'string' && metadata.discipline.trim()) {
+        disc = metadata.discipline.trim().slice(0, 100);
+    } else if (validDisciplines.includes(metadata.discipline)) {
+        disc = metadata.discipline;
+    }
+    const suitLabels = {
+        S0: 'S0 - Draft', S1: 'S1 - Coordination', S2: 'S2 - Reference',
+        S3: 'S3 - Review', S4: 'S4 - Approval', A1: 'A1 - Construction',
+        A2: 'A2 - As-Built'
+    };
+    suitText = suitLabels[suit];
+
     const formattedSize = formatFileSize(fileSize);
+    const status = ['PENDING', 'APPROVED', 'REJECTED'].includes(metadata.status) ? metadata.status : 'PENDING';
+    const statusLabels = { PENDING: 'Pending', APPROVED: 'Approved', REJECTED: 'Rejected' };
+    const statusClasses = { PENDING: 'badge-pending', APPROVED: 'badge-approved', REJECTED: 'badge-rejected' };
+    const createdAt = formatMetadataDate(metadata.createdAt);
+    const updatedAt = formatMetadataDate(metadata.updatedAt);
 
     const tr = document.createElement('tr');
     tr.setAttribute('data-project', prjCode);
@@ -1792,6 +1878,9 @@ function appendFileToTable(fileName, relativePath, fileSize = 0) {
     tr.setAttribute('data-discipline', disc);
     tr.setAttribute('data-path', relativePath);
     tr.setAttribute('data-size', Number(fileSize) || 0);
+    tr.dataset.description = metadata.description || '';
+    tr.dataset.author = metadata.author || '';
+    tr.dataset.status = status;
     if (getRecalledDB()[relativePath]) tr.classList.add('is-recalled');
 
     tr.onclick = (e) => {
@@ -1810,13 +1899,19 @@ function appendFileToTable(fileName, relativePath, fileSize = 0) {
 
     tr.innerHTML = `
         <td><span class="badge badge-prj">${prjCode}</span></td>
-        <td class="file-code" title="${relativePath}">${fileName}</td>
-        <td style="font-family: monospace; color: var(--text-muted); font-size: 0.7rem;">${formattedSize}</td>
-        <td><span class="badge ${badgeClass}">${state}</span></td>
-        <td><span class="badge badge-${suit.toLowerCase()}">${suitText}</span></td>
-        <td><span class="rev-tag">${revText}</span></td>
-        <td><b>${disc}</b></td>
-        <td class="action-btns">${getActionButtons(state, relativePath)}</td>
+        <td class="file-details">
+            <span class="file-code" title="${escapeAttr(relativePath)}">${escapeAttr(fileName)}</span>
+            <span class="document-description" title="${escapeAttr(metadata.description || '')}">Mô tả: ${escapeAttr(metadata.description || '—')}</span>
+            <span class="file-author">Tác giả: ${escapeAttr(metadata.author || '—')}</span>
+        </td>
+        <td class="metadata-dates align-right"><span>Khởi tạo: ${createdAt}</span><span>Cập nhật: ${updatedAt}</span></td>
+        <td class="file-size align-right">${formattedSize}</td>
+        <td><span class="badge ${badgeClass} container-state">${state}</span></td>
+        <td class="align-right"><span class="badge ${statusClasses[status]} approval-status">${statusLabels[status]}</span></td>
+        <td><span class="badge badge-${suit.toLowerCase()} suitability-value">${suitText}</span></td>
+        <td><span class="rev-tag revision-value">${revText}</span></td>
+        <td class="discipline-value align-center"><b>${escapeAttr(disc)}</b></td>
+        <td class="action-btns"><div class="action-controls">${getActionButtons(state, relativePath)}</div></td>
     `;
     tbody.appendChild(tr);
 }
@@ -2211,6 +2306,7 @@ async function executeUploadFiles() {
     try {
         const res = await fetch(`${DATA_SERVER_API}/api/upload`, {
             method: 'POST',
+            headers: { 'Authorization': `Bearer ${localStorage.getItem('access_token') || ''}` },
             body: formData
         });
         const data = await res.json();
