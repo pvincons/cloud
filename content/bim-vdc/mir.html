@@ -314,12 +314,14 @@
                         <thead>
                             <tr>
                                 <th>Dự Án</th>
-                                <th>Tên File ISO 19650</th>
-                                <th>Dung Lượng</th>
+                                <th>Tên File ISO 19650 / Mô tả / Tác giả</th>
+                                <th class="align-right">Ngày khởi tạo / Cập nhật</th>
+                                <th class="align-right">Dung Lượng</th>
                                 <th>Container CDE</th>
+                                <th class="align-right">Trạng thái duyệt</th>
                                 <th>Suitability</th>
                                 <th>Revision</th>
-                                <th>Bộ Môn</th>
+                                <th class="align-center">Bộ Môn</th>
                                 <th>Thao Tác</th>
                             </tr>
                         </thead>
@@ -517,7 +519,7 @@
 
     <!-- MODAL SỬA METADATA -->
     <div class="modal" id="metadataModal">
-        <div class="modal-content" style="max-width: 420px; width: 92%;">
+        <div class="modal-content metadata-modal-content">
             <div class="modal-header">
                 <div class="modal-title">
                     <svg class="svg-icon" viewBox="0 0 24 24">
@@ -532,6 +534,19 @@
                 <div style="font-size: 0.68rem; color: var(--text-muted); font-family: monospace; word-break: break-all; margin-bottom: 12px;"
                     id="metaFileName"></div>
                 <div class="iso-group-custom">
+                    <label for="metaDescription">Mô tả file</label>
+                    <textarea id="metaDescription" maxlength="2000" rows="3"
+                        placeholder="Nhập mô tả tài liệu..."></textarea>
+                </div>
+                <div class="iso-group-custom">
+                    <label for="metaStatus">Trạng thái duyệt</label>
+                    <select id="metaStatus">
+                        <option value="PENDING">Pending</option>
+                        <option value="APPROVED">Approved</option>
+                        <option value="REJECTED">Rejected</option>
+                    </select>
+                </div>
+                <div class="iso-group-custom">
                     <label for="metaSuitability">Suitability (Mức độ phù hợp sử dụng)</label>
                     <select id="metaSuitability">
                         <option value="S0">S0 - Draft / WIP</option>
@@ -542,6 +557,18 @@
                         <option value="A1">A1 - Construction</option>
                         <option value="A2">A2 - As-Built</option>
                     </select>
+                </div>
+                <div class="iso-group-custom">
+                    <label for="metaDiscipline">Bộ môn</label>
+                    <select id="metaDiscipline" onchange="toggleCustomDiscipline(this)">
+                        <option value="ARC">ARC - Kiến trúc</option>
+                        <option value="STR">STR - Kết cấu</option>
+                        <option value="MEP">MEP - Cơ điện</option>
+                        <option value="HVAC">HVAC - Thông gió</option>
+                        <option value="CUSTOM">Tự nhập</option>
+                    </select>
+                    <input id="metaCustomDiscipline" class="hidden" type="text" maxlength="100"
+                        placeholder="Nhập tên bộ môn..." aria-label="Tên bộ môn tự nhập">
                 </div>
                 <div style="margin-top: 16px; display: flex; justify-content: flex-end; gap: 8px;">
                     <button class="btn btn-outline" onclick="closeModal('metadataModal')">Hủy</button>
