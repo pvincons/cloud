@@ -6,6 +6,8 @@ let DATA_SERVER_API = localStorage.getItem('cde_api_url') || 'https://api.pvinco
 let currentPath = 'database/bim-vdc';
 let fetchedItems = [];
 let clipboard = null;
+let xmlViewerRequestId = 0;
+let editingMetadataPath = '';
 
 // Quản lý trạng thái mở rộng của cây thư mục (Set các path đang được mở)
 const expandedFolders = new Set();
@@ -23,6 +25,7 @@ cdeSyncChannel.onmessage = (event) => {
 
 document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('apiServerUrlInput').value = DATA_SERVER_API;
+    document.getElementById('fileMetadataForm').addEventListener('submit', saveFileMetadata);
     initThemeUI();
     loadCDEFiles(currentPath);
 });
@@ -74,6 +77,114 @@ function getFileUrl(itemPath) {
     const parts = rel.split('/').filter(Boolean);
     const encodedParts = parts.map(p => encodeURIComponent(p));
     return `${DATA_SERVER_API}/files/${encodedParts.join('/')}`;
+}
+
+async function openXmlViewer(filePath, fileName) {
+    const modal = document.getElementById('xmlViewerModal');
+    const title = document.getElementById('xmlViewerTitle');
+    const status = document.getElementById('xmlViewerStatus');
+    const content = document.querySelector('#xmlViewerContent code');
+    const requestId = ++xmlViewerRequestId;
+
+    title.textContent = fileName || 'Trình xem XML';
+    status.textContent = 'Đang tải tệp XML...';
+    status.className = 'mt-1 text-xs text-slate-400';
+    content.textContent = '';
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+    document.body.classList.add('overflow-hidden');
+
+    try {
+        const response = await fetch(getFileUrl(filePath));
+        if (!response.ok) throw new Error(`Không thể tải tệp (HTTP ${response.status}).`);
+
+        const xmlText = await response.text();
+        if (requestId !== xmlViewerRequestId) return;
+
+        content.textContent = xmlText;
+        const parsedXml = new DOMParser().parseFromString(xmlText, 'application/xml');
+        const hasParseError = parsedXml.getElementsByTagName('parsererror').length > 0;
+        status.textContent = hasParseError ? 'XML không hợp lệ; đang hiển thị nội dung gốc.' : 'XML hợp lệ';
+        status.className = `mt-1 text-xs ${hasParseError ? 'text-amber-300' : 'text-emerald-400'}`;
+    } catch (error) {
+        if (requestId !== xmlViewerRequestId) return;
+        status.textContent = error.message || 'Không thể tải tệp XML.';
+        status.className = 'mt-1 text-xs text-rose-400';
+    }
+}
+
+function closeXmlViewer() {
+    xmlViewerRequestId++;
+    const modal = document.getElementById('xmlViewerModal');
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+    document.body.classList.remove('overflow-hidden');
+}
+
+function formatMetadataDate(value) {
+    if (!value) return '—';
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return '—';
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    return `${day}/${month}/${date.getFullYear()}`;
+}
+
+function openFileMetadataModal(filePath, fileName, metadata = {}) {
+    editingMetadataPath = filePath;
+    document.getElementById('fileMetadataName').textContent = fileName;
+    document.getElementById('fileMetadataDescription').value = metadata.description || '';
+    document.getElementById('fileMetadataStatus').value = metadata.status || 'PENDING';
+    const error = document.getElementById('fileMetadataError');
+    error.textContent = '';
+    error.classList.add('hidden');
+    const modal = document.getElementById('fileMetadataModal');
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+    document.body.classList.add('overflow-hidden');
+}
+
+function closeFileMetadataModal() {
+    editingMetadataPath = '';
+    const modal = document.getElementById('fileMetadataModal');
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+    document.body.classList.remove('overflow-hidden');
+}
+
+async function saveFileMetadata(event) {
+    event.preventDefault();
+    if (!editingMetadataPath) return;
+
+    const submit = document.getElementById('fileMetadataSubmit');
+    const error = document.getElementById('fileMetadataError');
+    submit.disabled = true;
+    error.classList.add('hidden');
+    try {
+        const response = await fetch(`${DATA_SERVER_API}/api/file-metadata`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('access_token') || ''}`
+            },
+            body: JSON.stringify({
+                filePath: editingMetadataPath,
+                description: document.getElementById('fileMetadataDescription').value,
+                status: document.getElementById('fileMetadataStatus').value
+            })
+        });
+        const result = await response.json();
+        if (!response.ok || !result.success) {
+            throw new Error(result.error || 'Không thể lưu thông tin tài liệu.');
+        }
+        closeFileMetadataModal();
+        await loadCDEFiles(currentPath);
+    } catch (saveError) {
+        error.textContent = saveError.message || 'Không thể lưu thông tin tài liệu.';
+        error.classList.remove('hidden');
+    } finally {
+        submit.disabled = false;
+    }
 }
 
 async function fetchFolderContent(path) {
@@ -186,9 +297,12 @@ function openRowMenu(btn, ev) {
     const owner = btn.dataset.path;
     if (!m.classList.contains('hidden') && m.dataset.owner === owner) { closeRowMenu(); return; }
     const { path, name, url } = btn.dataset, isDir = btn.dataset.dir === '1';
+    let metadata = {};
+    try { metadata = JSON.parse(btn.dataset.metadata || '{}'); } catch (error) { metadata = {}; }
     const entries = [
         isDir ? { i: 'fa-folder-open', t: 'Vào thư mục', f: () => navigateTo(path) }
-            : { i: 'fa-eye', t: 'Xem', f: () => window.open(url, '_blank') },
+            : { i: 'fa-eye', t: 'Xem', f: () => /\.xml$/i.test(name) ? openXmlViewer(path, name) : window.open(url, '_blank') },
+        ...(!isDir ? [{ i: 'fa-circle-info', t: 'Thông tin tài liệu', f: () => openFileMetadataModal(path, name, metadata) }] : []),
         ...(isDir ? [] : [{
             i: 'fa-download', t: 'Tải về', f: () => {
                 const a = document.createElement('a'); a.href = url; a.download = ''; a.target = '_blank';
@@ -219,7 +333,15 @@ function openRowMenu(btn, ev) {
     m.style.left = left + 'px'; m.style.top = top + 'px'; m.style.visibility = '';
 }
 document.addEventListener('click', e => { if (!e.target.closest('#rowMenu')) closeRowMenu(); });
-document.addEventListener('keydown', e => { if (e.key === 'Escape') closeRowMenu(); });
+document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+        closeRowMenu();
+        const xmlViewer = document.getElementById('xmlViewerModal');
+        if (xmlViewer && !xmlViewer.classList.contains('hidden')) closeXmlViewer();
+        const metadataModal = document.getElementById('fileMetadataModal');
+        if (metadataModal && !metadataModal.classList.contains('hidden')) closeFileMetadataModal();
+    }
+});
 window.addEventListener('resize', closeRowMenu);
 window.addEventListener('scroll', closeRowMenu, true);
 
@@ -238,19 +360,27 @@ function renderTreeItems(items, container, depth = 0) {
         tr.className = "hover:bg-slate-800/40 transition-colors group border-b border-white/5";
 
         const isDir = item.type === 'folder';
+        const isXml = !isDir && /\.xml$/i.test(String(item.name || ''));
         const cleanPath = String(item.path || '').replace(/\\/g, '/');
         const isExpanded = expandedFolders.has(cleanPath);
         const iconHtml = getItemIcon(item.name, isDir, isExpanded);
         const fileUrl = getFileUrl(cleanPath);
+        const metadata = item.metadata || {};
+        const status = ['PENDING', 'APPROVED', 'REJECTED'].includes(metadata.status) ? metadata.status : 'PENDING';
+        const statusLabel = { PENDING: 'Đang chờ', APPROVED: 'Phê duyệt', REJECTED: 'Từ chối' }[status];
+        const statusClass = { PENDING: 'bg-amber-500/15 text-amber-300 border-amber-500/30', APPROVED: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30', REJECTED: 'bg-rose-500/15 text-rose-300 border-rose-500/30' }[status];
 
         const safePath = cleanPath.replace(/'/g, "\\'");
-        const safeName = String(item.name || '').replace(/'/g, "\\'");
-        const safeUrl = String(fileUrl || '').replace(/'/g, "\\'");
+        const safePathArg = escAttr(JSON.stringify(cleanPath));
+        const safeNameArg = escAttr(JSON.stringify(String(item.name || '')));
+        const safeMetadata = escAttr(JSON.stringify(metadata));
 
         const paddingLeft = depth * 24 + 12; // Tính toán thụt lề cho từng cấp độ cây
 
         const clickHandler = isDir
             ? `toggleFolderExpand('${safePath}', event)`
+            : isXml
+                ? `openXmlViewer(${safePathArg}, ${safeNameArg})`
             : `window.open('${fileUrl}', '_blank')`;
 
         tr.innerHTML = `
@@ -262,42 +392,16 @@ function renderTreeItems(items, container, depth = 0) {
                                 </button>
                             ` : `<span class="w-5 shrink-0"></span>`}
                             <span class="text-base shrink-0">${iconHtml}</span>
-                            <span class="font-medium group-hover:text-blue-400 transition-colors break-all text-xs">${item.name}</span>
+                            <span class="font-medium group-hover:text-blue-400 transition-colors break-all text-xs">${escAttr(item.name)}</span>
                         </div>
                     </td>
+                    <td class="max-w-xs px-3 py-2.5 text-slate-300">${isDir ? '<span class="text-slate-500">—</span>' : `<div class="text-slate-200 uppercase italic font-normal">${escAttr(metadata.title || '—')}</div><div class="mt-1">Mô tả: ${escAttr(metadata.description || '—')}</div>`}</td>
+                    <td class="whitespace-nowrap px-3 py-2.5 text-right text-slate-400">${isDir ? '<span class="text-slate-500">—</span>' : `<div class="text-slate-300">Tác giả: ${escAttr(metadata.author || '—')}</div><div class="mt-1">Khởi tạo: ${escAttr(formatMetadataDate(metadata.createdAt))}<br>Cập nhật: ${escAttr(formatMetadataDate(metadata.updatedAt))}</div>`}</td>
+                    <td class="px-3 py-2.5 text-center">${isDir ? '<span class="text-slate-500">—</span>' : `<span class="inline-flex whitespace-nowrap rounded-full border px-2 py-1 text-[10px] font-semibold ${statusClass}">${statusLabel}</span>`}</td>
                     <td class="py-2 px-3 text-right" onclick="event.stopPropagation()">
-                        <div class="hidden sm:flex items-center justify-end gap-1 flex-wrap">
-                            ${isDir ? `
-                                <button onclick="event.stopPropagation(); navigateTo('${safePath}')" title="Chuyển hẳn vào thư mục này" class="px-2 py-1 bg-blue-600/30 hover:bg-blue-600 text-blue-300 hover:text-white rounded border border-blue-500/30 text-[11px] transition-all flex items-center gap-1">
-                                    <i class="fa-solid fa-folder-open text-[10px]"></i> <span class="hidden sm:inline">Vào</span>
-                                </button>
-                            ` : `
-                                <a href="${fileUrl}" target="_blank" title="Xem" class="px-2 py-1 bg-blue-600/30 hover:bg-blue-600 text-blue-300 hover:text-white rounded border border-blue-500/30 text-[11px] transition-all flex items-center gap-1">
-                                    <i class="fa-solid fa-eye text-[10px]"></i> <span class="hidden sm:inline">Xem</span>
-                                </a>
-                                <a href="${fileUrl}" download title="Tải về" class="px-2 py-1 bg-emerald-600/30 hover:bg-emerald-600 text-emerald-300 hover:text-white rounded border border-emerald-500/30 text-[11px] transition-all flex items-center gap-1">
-                                    <i class="fa-solid fa-download text-[10px]"></i> <span class="hidden sm:inline">Tải</span>
-                                </a>
-                            `}
-                            <button onclick="event.stopPropagation(); copyLink('${safeUrl}', '${safeName}')" title="Copy Link" class="p-1 sm:px-2 sm:py-1 bg-slate-800/80 hover:bg-teal-600/80 text-teal-300 hover:text-white rounded border border-teal-500/30 text-[11px] transition-all">
-                                <i class="fa-solid fa-link"></i>
-                            </button>
-                            <button onclick="event.stopPropagation(); renameItem('${safePath}', '${safeName}')" title="Đổi tên" class="p-1 sm:px-2 sm:py-1 bg-slate-800/80 hover:bg-amber-600/80 text-amber-300 hover:text-white rounded border border-amber-500/30 text-[11px] transition-all">
-                                <i class="fa-solid fa-pen-to-square"></i>
-                            </button>
-                            <button onclick="event.stopPropagation(); copyToClipboard('${safePath}', '${safeName}', 'copy')" title="Copy" class="p-1 sm:px-2 sm:py-1 bg-slate-800/80 hover:bg-cyan-600/80 text-cyan-300 hover:text-white rounded border border-cyan-500/30 text-[11px] transition-all">
-                                <i class="fa-solid fa-copy"></i>
-                            </button>
-                            <button onclick="event.stopPropagation(); copyToClipboard('${safePath}', '${safeName}', 'move')" title="Cut" class="p-1 sm:px-2 sm:py-1 bg-slate-800/80 hover:bg-indigo-600/80 text-indigo-300 hover:text-white rounded border border-indigo-500/30 text-[11px] transition-all">
-                                <i class="fa-solid fa-scissors"></i>
-                            </button>
-                            <button onclick="event.stopPropagation(); deleteItem('${safePath}', '${safeName}')" title="Xóa" class="p-1 sm:px-2 sm:py-1 bg-slate-800/80 hover:bg-rose-600 text-rose-400 hover:text-white rounded border border-rose-500/30 text-[11px] transition-all">
-                                <i class="fa-solid fa-trash-can"></i>
-                            </button>
-                        </div>
-                        <button type="button" class="row-menu-btn sm:hidden w-9 h-9 inline-flex items-center justify-center rounded-lg bg-slate-800/80 border border-white/10 text-slate-300"
+                        <button type="button" class="row-menu-btn w-9 h-9 inline-flex items-center justify-center rounded-lg bg-slate-800/80 border border-white/10 text-slate-300"
                             aria-label="Thao tác" aria-haspopup="menu"
-                            data-path="${escAttr(cleanPath)}" data-name="${escAttr(item.name)}" data-url="${escAttr(fileUrl)}" data-dir="${isDir ? '1' : '0'}"
+                            data-path="${escAttr(cleanPath)}" data-name="${escAttr(item.name)}" data-url="${escAttr(fileUrl)}" data-dir="${isDir ? '1' : '0'}" data-metadata="${safeMetadata}"
                             onclick="openRowMenu(this, event)">
                             <i class="fa-solid fa-ellipsis-vertical"></i>
                         </button>
@@ -314,7 +418,7 @@ function renderTreeItems(items, container, depth = 0) {
                 // Thư mục trống bên trong cây
                 const emptyTr = document.createElement('tr');
                 emptyTr.innerHTML = `
-                            <td colspan="2" class="py-1.5 text-xs text-slate-500 italic" style="padding-left: ${(depth + 1) * 24 + 40}px">
+                            <td colspan="6" class="py-1.5 text-xs text-slate-500 italic" style="padding-left: ${(depth + 1) * 24 + 40}px">
                                 (Thư mục trống)
                             </td>
                         `;
@@ -499,12 +603,13 @@ async function uploadSelectedFile(event) {
     const targetPath = String(currentPath).replace(/\\/g, '/');
 
     const formData = new FormData();
-    formData.append('file', file);
     formData.append('targetPath', targetPath);
+    formData.append('file', file);
 
     try {
         const res = await fetch(`${DATA_SERVER_API}/api/upload`, {
             method: 'POST',
+            headers: { 'Authorization': `Bearer ${localStorage.getItem('access_token') || ''}` },
             body: formData
         });
         const data = await res.json();

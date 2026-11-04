@@ -539,7 +539,7 @@ function getFileTypeIcon(fileName) {
     const extension = fileName.includes('.') ? fileName.split('.').pop().toLowerCase() : '';
     const iconByExtension = {
         pdf: { icon: 'fa-file-pdf', color: '#ef4444', label: 'PDF' },
-        ifc: { icon: 'fa-cubes', color: '#38bdf8', label: 'IFC' },
+        ifc: { icon: 'fa-cube', color: '#34d399', label: 'IFC' },
         xml: { icon: 'fa-file-code', color: '#f97316', label: 'XML' },
         xls: { icon: 'fa-file-excel', color: '#22c55e', label: 'Excel' },
         xlsx: { icon: 'fa-file-excel', color: '#22c55e', label: 'Excel' },
@@ -1696,6 +1696,7 @@ function editMetadata(btn) {
     const row = btn.closest('tr');
     metadataEditingRow = row;
     document.getElementById('metaFileName').innerText = row.querySelector('.file-code').innerText;
+    document.getElementById('metaTitle').value = row.dataset.title || '';
     document.getElementById('metaDescription').value = row.dataset.description || '';
     document.getElementById('metaStatus').value = row.dataset.status || 'PENDING';
     document.getElementById('metaSuitability').value = row.getAttribute('data-suitability') || 'S0';
@@ -1721,6 +1722,7 @@ function toggleCustomDiscipline(select) {
 async function saveMetadata() {
     if (!metadataEditingRow) return;
     const row = metadataEditingRow;
+    const title = document.getElementById('metaTitle').value.trim().toLocaleUpperCase('vi-VN');
     const description = document.getElementById('metaDescription').value.trim();
     const status = document.getElementById('metaStatus').value;
     const suitability = document.getElementById('metaSuitability').value;
@@ -1743,6 +1745,7 @@ async function saveMetadata() {
             },
             body: JSON.stringify({
                 filePath: row.getAttribute('data-path'),
+                title,
                 description,
                 status,
                 suitability,
@@ -1754,10 +1757,24 @@ async function saveMetadata() {
             throw new Error(result.error || 'Không thể lưu metadata.');
         }
 
+        const savedTitle = typeof result.metadata?.title === 'string' ? result.metadata.title : title;
+        const filePath = row.getAttribute('data-path');
         closeModal('metadataModal');
         metadataEditingRow = null;
         await reloadDatabaseData();
-        showToast('Đã cập nhật metadata file.');
+        const refreshedRow = Array.from(document.querySelectorAll('#cdeMasterTable tbody tr'))
+            .find(tableRow => tableRow.getAttribute('data-path') === filePath);
+        if (refreshedRow) {
+            refreshedRow.dataset.title = savedTitle;
+            const titleLine = refreshedRow.querySelector('.document-title');
+            if (titleLine) {
+                titleLine.textContent = savedTitle || '—';
+                titleLine.title = savedTitle;
+            }
+        }
+        showToast(typeof result.metadata?.title === 'string'
+            ? 'Đã cập nhật metadata file.'
+            : 'Metadata đã lưu nhưng server chưa xác nhận Tiêu đề. Vui lòng tải lại server CDE.');
     } catch (error) {
         showToast(error.message || 'Không thể lưu metadata.');
     } finally {
@@ -1866,7 +1883,7 @@ function appendFileToTable(fileName, relativePath, fileSize = 0, metadata = {}) 
 
     const formattedSize = formatFileSize(fileSize);
     const status = ['PENDING', 'APPROVED', 'REJECTED'].includes(metadata.status) ? metadata.status : 'PENDING';
-    const statusLabels = { PENDING: 'Pending', APPROVED: 'Approved', REJECTED: 'Rejected' };
+    const statusLabels = { PENDING: 'Đang chờ', APPROVED: 'Phê duyệt', REJECTED: 'Từ chối' };
     const statusClasses = { PENDING: 'badge-pending', APPROVED: 'badge-approved', REJECTED: 'badge-rejected' };
     const createdAt = formatMetadataDate(metadata.createdAt);
     const updatedAt = formatMetadataDate(metadata.updatedAt);
@@ -1878,6 +1895,7 @@ function appendFileToTable(fileName, relativePath, fileSize = 0, metadata = {}) 
     tr.setAttribute('data-discipline', disc);
     tr.setAttribute('data-path', relativePath);
     tr.setAttribute('data-size', Number(fileSize) || 0);
+    tr.dataset.title = metadata.title || '';
     tr.dataset.description = metadata.description || '';
     tr.dataset.author = metadata.author || '';
     tr.dataset.status = status;
@@ -1901,15 +1919,15 @@ function appendFileToTable(fileName, relativePath, fileSize = 0, metadata = {}) 
         <td><span class="badge badge-prj">${prjCode}</span></td>
         <td class="file-details">
             <span class="file-code" title="${escapeAttr(relativePath)}">${escapeAttr(fileName)}</span>
+            <span class="document-title" title="${escapeAttr(metadata.title || '')}">${escapeAttr(metadata.title || '—')}</span>
             <span class="document-description" title="${escapeAttr(metadata.description || '')}">Mô tả: ${escapeAttr(metadata.description || '—')}</span>
-            <span class="file-author">Tác giả: ${escapeAttr(metadata.author || '—')}</span>
         </td>
-        <td class="metadata-dates align-right"><span>Khởi tạo: ${createdAt}</span><span>Cập nhật: ${updatedAt}</span></td>
+        <td class="metadata-dates align-right"><span class="file-author">Tác giả: ${escapeAttr(metadata.author || '—')}</span><span>Khởi tạo: ${createdAt}</span><span>Cập nhật: ${updatedAt}</span></td>
         <td class="file-size align-right">${formattedSize}</td>
         <td><span class="badge ${badgeClass} container-state">${state}</span></td>
         <td class="align-right"><span class="badge ${statusClasses[status]} approval-status">${statusLabels[status]}</span></td>
         <td><span class="badge badge-${suit.toLowerCase()} suitability-value">${suitText}</span></td>
-        <td><span class="rev-tag revision-value">${revText}</span></td>
+        <td class="align-center"><span class="rev-tag revision-value">${revText}</span></td>
         <td class="discipline-value align-center"><b>${escapeAttr(disc)}</b></td>
         <td class="action-btns"><div class="action-controls">${getActionButtons(state, relativePath)}</div></td>
     `;
@@ -2015,7 +2033,7 @@ function updateStorageChart(storageByState, totalBytes) {
     const values = states.map(state => storageByState[state] || 0);
     const colors = ['#38bdf8', '#fbbf24', '#34d399', '#94a3b8'];
     const note = document.getElementById('storageChartNote');
-    if (note) note.textContent = `Tổng ${formatCompactStorage(totalBytes)} · theo container`;
+    if (note) note.textContent = `Tổng ${formatCompactStorage(totalBytes)} · theo CDE State`;
     storageChartInstance = updateDoughnutChart(
         storageChartInstance,
         'storageChart',
@@ -2105,11 +2123,14 @@ function applyFilters() {
         const prj = row.getAttribute('data-project') || '';
         const state = row.getAttribute('data-state') || '';
         const suit = row.getAttribute('data-suitability') || '';
+        const filePath = row.getAttribute('data-path') || '';
         const isRecalled = row.classList.contains('is-recalled');
         const text = row.innerText.toLowerCase();
         const fileName = (row.querySelector('.file-code') ? row.querySelector('.file-code').innerText : '').toLowerCase();
 
         let matchesProj = (projVal === 'ALL' || prj === projVal);
+        let matchesFolder = !selectedFolderPathFilter ||
+            filePath.startsWith(`${selectedFolderPathFilter.replace(/\/+$/, '')}/`);
         let matchesState = (stateVal === 'ALL' || state === stateVal);
         let matchesSuit = (suitVal === 'ALL' || suit === suitVal);
         let matchesSearch = (!query || text.includes(query));
@@ -2118,7 +2139,7 @@ function applyFilters() {
         const hasIssues = Array.isArray(fileIssues) && fileIssues.length > 0;
         let matchesAttention = (!attentionFilesOnly || hasIssues || isRecalled);
 
-        if (matchesProj && matchesState && matchesSuit && matchesSearch && matchesRecall && matchesAttention) {
+        if (matchesProj && matchesFolder && matchesState && matchesSuit && matchesSearch && matchesRecall && matchesAttention) {
             row.style.display = '';
             if (state === '01_WIP') wipCount++;
             else if (state === '02_SHARED') sharedCount++;
@@ -2298,6 +2319,11 @@ async function executeUploadFiles() {
     const targetFolder = targetFolderSelect.value;
     const formData = new FormData();
     formData.append('targetFolder', targetFolder);
+    formData.append('title', document.getElementById('uploadMetadataTitle').value.trim());
+    formData.append('description', document.getElementById('uploadMetadataDescription').value.trim());
+    formData.append('status', document.getElementById('uploadMetadataStatus').value);
+    formData.append('suitability', document.getElementById('uploadMetadataSuitability').value);
+    formData.append('discipline', document.getElementById('uploadMetadataDiscipline').value);
     for (let i = 0; i < fileInput.files.length; i++) {
         formData.append('files', fileInput.files[i]);
     }
@@ -2314,6 +2340,11 @@ async function executeUploadFiles() {
             showToast("Tải lên tệp thành công!");
             closeModal('uploadModal');
             fileInput.value = '';
+            document.getElementById('uploadMetadataTitle').value = '';
+            document.getElementById('uploadMetadataDescription').value = '';
+            document.getElementById('uploadMetadataStatus').value = 'PENDING';
+            document.getElementById('uploadMetadataSuitability').value = 'S0';
+            document.getElementById('uploadMetadataDiscipline').value = 'ARC';
             cdeSyncChannel.postMessage({ type: 'REFRESH_CDE_DATA' });
             reloadDatabaseData();
         } else {
@@ -2325,6 +2356,18 @@ async function executeUploadFiles() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.metadata-title-input').forEach(input => {
+        input.addEventListener('input', () => {
+            const start = input.selectionStart;
+            const end = input.selectionEnd;
+            const upperValue = input.value.toLocaleUpperCase('vi-VN');
+            if (input.value !== upperValue) {
+                input.value = upperValue;
+                input.setSelectionRange(start, end);
+            }
+        });
+    });
+
     const savedTheme = localStorage.getItem('cde_theme') || 'dark';
     document.documentElement.setAttribute('data-theme', savedTheme);
     updateThemeUI(savedTheme);

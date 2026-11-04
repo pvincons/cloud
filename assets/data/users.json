@@ -1,19 +1,21 @@
 [
   {
+    "id": 1,
     "username": "admin",
-    "passwordHash": "$2b$10$Mhg7uk2abtNcK8/yqU1ZFOzT7mPAdzbjK9zPJMX18cF/yalhrIpSa",
+    "passwordHash": "$2b$10$USEFTMMLS5K/PrImQhAySOJklXNvHeczdIaiuQpfLsfJ1tXV4UbNK",
     "role": "ADMIN",
     "permission": "ADMIN",
     "avatarLink": "",
-    "fullName": "TRẦN HOÀNG PHƯỚC",
+    "fullName": "Administrator",
     "phone": "0939751194",
-    "position": "Giám đốc",
-    "discipline": "Kỹ sư",
+    "position": "Quản trị hệ thống",
+    "discipline": "Kỹ sư IT",
     "projects": "Tất cả dự án",
     "company": "PV INCONS CO.LTD",
-    "status": "Đang triển khai"
+    "status": "Active"
   },
   {
+    "id": 2,
     "username": "master",
     "passwordHash": "$2b$10$Mhg7uk2abtNcK8/yqU1ZFOzT7mPAdzbjK9zPJMX18cF/yalhrIpSa",
     "role": "MASTER",
@@ -25,9 +27,10 @@
     "discipline": "Kỹ sư",
     "projects": "Project_01, Project_02",
     "company": "PV INCONS CO.LTD",
-    "status": "Đang triển khai"
+    "status": "Active"
   },
   {
+    "id": 3,
     "username": "designer",
     "passwordHash": "$2b$10$Mhg7uk2abtNcK8/yqU1ZFOzT7mPAdzbjK9zPJMX18cF/yalhrIpSa",
     "role": "DESIGNER",
@@ -39,9 +42,10 @@
     "discipline": "Kiến trúc sư",
     "projects": "Project_01",
     "company": "PV INCONS CO.LTD",
-    "status": "Đang triển khai"
+    "status": "Active"
   },
   {
+    "id": 4,
     "username": "management",
     "passwordHash": "$2b$10$Mhg7uk2abtNcK8/yqU1ZFOzT7mPAdzbjK9zPJMX18cF/yalhrIpSa",
     "role": "MANAGEMENT",
@@ -53,9 +57,10 @@
     "discipline": "",
     "projects": "Project_02",
     "company": "PV INCONS CO.LTD",
-    "status": "Đang triển khai"
+    "status": "Active"
   },
   {
+    "id": 5,
     "username": "contractor",
     "passwordHash": "$2b$10$Mhg7uk2abtNcK8/yqU1ZFOzT7mPAdzbjK9zPJMX18cF/yalhrIpSa",
     "role": "CONTRACTOR",
@@ -67,9 +72,10 @@
     "discipline": "Kỹ sư",
     "projects": "THAY LE NONG",
     "company": "PV INCONS CO.LTD",
-    "status": "Đang triển khai"
+    "status": "Active"
   },
   {
+    "id": 6,
     "username": "internal",
     "passwordHash": "$2b$10$Mhg7uk2abtNcK8/yqU1ZFOzT7mPAdzbjK9zPJMX18cF/yalhrIpSa",
     "role": "INTERNAL",
@@ -81,9 +87,10 @@
     "discipline": "Cử nhân kinh tế",
     "projects": "PROJECT 01",
     "company": "PV INCONS CO.LTD",
-    "status": "Đang triển khai"
+    "status": "Active"
   },
   {
+    "id": 7,
     "username": "-int",
     "passwordHash": "$2b$10$Mhg7uk2abtNcK8/yqU1ZFOzT7mPAdzbjK9zPJMX18cF/yalhrIpSa",
     "role": "INTERNAL",
@@ -95,9 +102,10 @@
     "discipline": "Cử nhân kinh tế",
     "projects": "PROJECT 02",
     "company": "PV INCONS CO.LTD",
-    "status": "Đang triển khai"
+    "status": "Active"
   },
   {
+    "id": 8,
     "username": "-vdc",
     "passwordHash": "$2b$10$Mhg7uk2abtNcK8/yqU1ZFOzT7mPAdzbjK9zPJMX18cF/yalhrIpSa",
     "role": "MASTER",
@@ -109,9 +117,10 @@
     "discipline": "Cử nhân kinh doanh quốc tế",
     "projects": "PROJECT 03",
     "company": "PV INCONS CO.LTD",
-    "status": "Đang triển khai"
+    "status": "Inactive"
   },
   {
+    "id": 9,
     "username": "lenong-vdc",
     "passwordHash": "$2b$10$Mhg7uk2abtNcK8/yqU1ZFOzT7mPAdzbjK9zPJMX18cF/yalhrIpSa",
     "role": "MASTER",
@@ -123,6 +132,6 @@
     "discipline": "Thạc sỹ",
     "projects": "Project 01, THAY LE NONG",
     "company": "TRIỀU PHÁT",
-    "status": "Đang triển khai"
+    "status": "Active"
   }
 ]

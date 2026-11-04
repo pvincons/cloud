@@ -15,7 +15,7 @@
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="/assets/css/data.css">
+    <link rel="stylesheet" href="/assets/css/data.css?v=20261104-1">
     <style>
         /* Styles website */        
     </style>
@@ -168,11 +168,14 @@
             </div>
 
             <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse">
+                <table class="w-full min-w-[1050px] text-left border-collapse">
                     <thead>
                         <tr
                             class="border-b border-[var(--border-color)] text-[11px] font-semibold uppercase text-[var(--text-muted)] tracking-wider">
-                            <th class="pb-3 px-3">Tên tập tin / Thư mục</th>
+                            <th class="pb-3 px-3">Tên tập tin</th>
+                            <th class="pb-3 px-3">Tiêu đề & Mô tả</th>
+                            <th class="pb-3 px-3 text-right">Tác giả &amp; Thời gian</th>
+                            <th class="pb-3 px-3 text-center">Trạng thái duyệt</th>
                             <th class="pb-3 px-3 text-right">Thao tác</th>
                         </tr>
                     </thead>
@@ -221,8 +224,66 @@
         <div>BIM/VDC Standard v2.6.0 Pro</div>
     </footer>
 
+    <div id="fileMetadataModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/80 p-3 sm:p-6"
+        role="dialog" aria-modal="true" aria-labelledby="fileMetadataTitle"
+        onclick="if (event.target === this) closeFileMetadataModal()">
+        <section class="w-full max-w-xl rounded-2xl border border-slate-700 bg-slate-900 p-5 shadow-2xl">
+            <div class="mb-5 flex items-start justify-between gap-4">
+                <div class="min-w-0">
+                    <h2 id="fileMetadataTitle" class="text-base font-bold text-white">Thông tin tài liệu</h2>
+                    <p id="fileMetadataName" class="mt-1 break-all text-xs text-slate-400"></p>
+                </div>
+                <button type="button" onclick="closeFileMetadataModal()" aria-label="Đóng"
+                    class="shrink-0 rounded-lg border border-slate-700 px-3 py-2 text-slate-300 hover:bg-slate-800">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <form id="fileMetadataForm" class="space-y-4">
+                <label class="block space-y-1.5">
+                    <span class="text-xs font-semibold text-slate-300">Tên tài liệu / Mô tả</span>
+                    <textarea id="fileMetadataDescription" rows="3" maxlength="2000"
+                        class="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-white placeholder-slate-500 focus:border-blue-500 focus:outline-none"
+                        placeholder="Mô tả nội dung hoặc mục đích của tài liệu"></textarea>
+                </label>
+                <label class="block space-y-1.5">
+                    <span class="text-xs font-semibold text-slate-300">Trạng thái duyệt</span>
+                    <select id="fileMetadataStatus"
+                        class="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-white focus:border-blue-500 focus:outline-none">
+                        <option value="PENDING">Đang chờ</option>
+                        <option value="APPROVED">Phê duyệt</option>
+                        <option value="REJECTED">Từ chối</option>
+                    </select>
+                </label>
+                <p id="fileMetadataError" class="hidden text-xs text-rose-400" role="alert"></p>
+                <div class="flex justify-end gap-2 pt-1">
+                    <button type="button" onclick="closeFileMetadataModal()"
+                        class="rounded-lg border border-slate-700 px-4 py-2 text-xs font-semibold text-slate-300 hover:bg-slate-800">Hủy</button>
+                    <button id="fileMetadataSubmit" type="submit"
+                        class="rounded-lg bg-blue-600 px-4 py-2 text-xs font-semibold text-white hover:bg-blue-500 disabled:cursor-wait disabled:opacity-60">Lưu thông tin</button>
+                </div>
+            </form>
+        </section>
+    </div>
+
+    <div id="xmlViewerModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/80 p-3 sm:p-6"
+        role="dialog" aria-modal="true" aria-labelledby="xmlViewerTitle" onclick="if (event.target === this) closeXmlViewer()">
+        <section class="w-full max-w-5xl max-h-[90vh] flex flex-col rounded-2xl border border-slate-700 bg-slate-900 shadow-2xl">
+            <header class="flex items-start justify-between gap-4 border-b border-slate-700 px-4 py-3 sm:px-5">
+                <div class="min-w-0">
+                    <h2 id="xmlViewerTitle" class="break-all text-sm font-bold text-white">Trình xem XML</h2>
+                    <p id="xmlViewerStatus" class="mt-1 text-xs text-slate-400" aria-live="polite">Đang tải...</p>
+                </div>
+                <button type="button" onclick="closeXmlViewer()" aria-label="Đóng trình xem XML"
+                    class="shrink-0 rounded-lg border border-slate-700 px-3 py-2 text-slate-300 hover:bg-slate-800 hover:text-white">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </header>
+            <pre id="xmlViewerContent" class="min-h-0 overflow-auto p-4 text-xs leading-6 text-slate-200 sm:p-5"><code></code></pre>
+        </section>
+    </div>
+
     <!-- JAVASCRIPT XỬ LÝ DATA -->
-    <script src="/assets/js/data.js"></script>
+    <script src="/assets/js/data.js?v=20261104-9"></script>
 </body>
 
 </html>

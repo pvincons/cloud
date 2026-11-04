@@ -95,7 +95,7 @@ body {
     background: rgba(59, 130, 246, 0.7);
 }
 
-/* Menu thao tác xổ xuống trên điện thoại (hiện bằng nút ⋮, ẩn từ màn hình >= 640px) */
+/* Menu thao tác xổ xuống dùng chung cho mọi kích thước màn hình */
 #rowMenu {
     position: fixed;
     z-index: 9999;

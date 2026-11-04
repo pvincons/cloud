@@ -77,25 +77,24 @@
             box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
         }
 
-        #loginForm input {
-            color-scheme: dark;
-            caret-color: #f8fafc;
-        }
-
-        #loginForm input:-webkit-autofill,
-        #loginForm input:-webkit-autofill:hover,
-        #loginForm input:-webkit-autofill:focus,
-        #loginForm input:-webkit-autofill:active {
+        #username:-webkit-autofill,
+        #username:-webkit-autofill:hover,
+        #username:-webkit-autofill:focus,
+        #password:-webkit-autofill,
+        #password:-webkit-autofill:hover,
+        #password:-webkit-autofill:focus {
             -webkit-text-fill-color: #f8fafc;
             caret-color: #f8fafc;
             -webkit-box-shadow: 0 0 0 1000px #0f172a inset;
             box-shadow: 0 0 0 1000px #0f172a inset;
-            transition: background-color 99999s ease-out;
+            transition: background-color 9999s ease-out 0s;
         }
 
-        #loginForm input:-moz-autofill {
-            color: #f8fafc !important;
+        #username:-moz-autofill,
+        #password:-moz-autofill {
             box-shadow: 0 0 0 1000px #0f172a inset;
+            color: #f8fafc;
+            caret-color: #f8fafc;
         }
     </style>
 </head>

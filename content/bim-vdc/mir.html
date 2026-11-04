@@ -31,7 +31,7 @@
     <script src="/assets/js/chat-client.js"></script>
 
     <!-- Custom Style Sheet -->
-    <link rel="stylesheet" href="/assets/css/mir.css">
+    <link rel="stylesheet" href="/assets/css/mir.css?v=20261104-7">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -183,7 +183,7 @@
                             <span class="chart-badge">CDE</span>
                         </div>
                         <div class="analytics-body">
-                            <div class="chart-wrapper"><canvas id="storageChart" aria-label="Dung lượng theo container CDE"></canvas></div>
+                            <div class="chart-wrapper"><canvas id="storageChart" aria-label="Dung lượng theo CDE State"></canvas></div>
                             <p class="chart-note" id="storageChartNote">Tổng dung lượng trong danh sách hiện tại</p>
                         </div>
                     </article>
@@ -287,7 +287,7 @@
                                 </button>
 
                                 <select class="select-filter" id="stateFilter" onchange="applyFilters()">
-                                    <option value="ALL">Tất cả Containers</option>
+                                    <option value="ALL">Tất cả CDE State</option>
                                     <option value="01_WIP">01_WIP</option>
                                     <option value="02_SHARED">02_SHARED</option>
                                     <option value="03_PUBLISHED">03_PUBLISHED</option>
@@ -314,13 +314,13 @@
                         <thead>
                             <tr>
                                 <th>Dự Án</th>
-                                <th>Tên File ISO 19650 / Mô tả / Tác giả</th>
-                                <th class="align-right">Ngày khởi tạo / Cập nhật</th>
+                                <th>Tên File ISO 19650/Tiêu đề</th>
+                                <th class="align-right">Tác giả & Thời gian</th>
                                 <th class="align-right">Dung Lượng</th>
-                                <th>Container CDE</th>
+                                <th>CDE State</th>
                                 <th class="align-right">Trạng thái duyệt</th>
                                 <th>Suitability</th>
-                                <th>Revision</th>
+                                <th class="align-center">Phiên bản</th>
                                 <th class="align-center">Bộ Môn</th>
                                 <th>Thao Tác</th>
                             </tr>
@@ -534,6 +534,11 @@
                 <div style="font-size: 0.68rem; color: var(--text-muted); font-family: monospace; word-break: break-all; margin-bottom: 12px;"
                     id="metaFileName"></div>
                 <div class="iso-group-custom">
+                    <label for="metaTitle">Tiêu đề</label>
+                    <input id="metaTitle" class="metadata-title-input" type="text" maxlength="2000"
+                        placeholder="Nhập tiêu đề tài liệu...">
+                </div>
+                <div class="iso-group-custom">
                     <label for="metaDescription">Mô tả file</label>
                     <textarea id="metaDescription" maxlength="2000" rows="3"
                         placeholder="Nhập mô tả tài liệu..."></textarea>
@@ -541,9 +546,9 @@
                 <div class="iso-group-custom">
                     <label for="metaStatus">Trạng thái duyệt</label>
                     <select id="metaStatus">
-                        <option value="PENDING">Pending</option>
-                        <option value="APPROVED">Approved</option>
-                        <option value="REJECTED">Rejected</option>
+                        <option value="PENDING">Đang chờ</option>
+                        <option value="APPROVED">Phê duyệt</option>
+                        <option value="REJECTED">Từ chối</option>
                     </select>
                 </div>
                 <div class="iso-group-custom">
@@ -832,6 +837,50 @@
                         đích:</label>
                     <select id="uploadTargetFolderSelect" class="project-select-box" style="margin-top: 3px;"></select>
                 </div>
+                <div class="upload-metadata-fields">
+                    <div class="iso-group-custom">
+                        <label for="uploadMetadataTitle">Tiêu đề</label>
+                        <input id="uploadMetadataTitle" class="metadata-title-input" type="text" maxlength="2000"
+                            placeholder="Nhập tiêu đề tài liệu...">
+                    </div>
+                    <div class="iso-group-custom">
+                        <label for="uploadMetadataDescription">Mô tả</label>
+                        <textarea id="uploadMetadataDescription" maxlength="2000" rows="2"
+                            placeholder="Nhập mô tả tài liệu..."></textarea>
+                    </div>
+                    <div class="iso-grid-custom">
+                        <div class="iso-group-custom">
+                            <label for="uploadMetadataStatus">Trạng thái duyệt</label>
+                            <select id="uploadMetadataStatus">
+                                <option value="PENDING">Đang chờ</option>
+                                <option value="APPROVED">Phê duyệt</option>
+                                <option value="REJECTED">Từ chối</option>
+                            </select>
+                        </div>
+                        <div class="iso-group-custom">
+                            <label for="uploadMetadataSuitability">Suitability</label>
+                            <select id="uploadMetadataSuitability">
+                                <option value="S0">S0 - Draft / WIP</option>
+                                <option value="S1">S1 - Coordination</option>
+                                <option value="S2">S2 - Reference</option>
+                                <option value="S3">S3 - Review</option>
+                                <option value="S4">S4 - Approval</option>
+                                <option value="A1">A1 - Construction</option>
+                                <option value="A2">A2 - As-Built</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="iso-group-custom">
+                        <label for="uploadMetadataDiscipline">Bộ môn</label>
+                        <select id="uploadMetadataDiscipline">
+                            <option value="ARC">ARC - Kiến trúc</option>
+                            <option value="STR">STR - Kết cấu</option>
+                            <option value="MEP">MEP - Cơ điện</option>
+                            <option value="HVAC">HVAC - Thông gió</option>
+                        </select>
+                    </div>
+                    <small class="upload-metadata-note">Thông tin này sẽ áp dụng cho tất cả tệp được chọn. Tác giả lấy theo tài khoản tải lên.</small>
+                </div>
                 <div style="text-align: right; display: flex; justify-content: flex-end; gap: 6px;">
                     <button class="btn btn-outline" onclick="closeModal('uploadModal')">Đóng</button>
                     <button class="btn btn-primary" onclick="executeUploadFiles()">Tải Lên CDE</button>
@@ -843,7 +892,7 @@
     <div class="toast-container" id="toastContainer"></div>
 
     <!-- JAVASCRIPT XỬ LÝ MIR -->
-    <script src="/assets/js/mir.js?v=20261102-1"></script>
+    <script src="/assets/js/mir.js?v=20261104-9"></script>
 </body>
 
 </html>
