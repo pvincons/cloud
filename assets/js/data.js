@@ -435,6 +435,7 @@ function getItemIcon(filename, isDirectory, isExpanded = false) {
             : '<i class="fa-solid fa-folder text-amber-400"></i>';
     }
     const ext = filename.split('.').pop().toLowerCase();
+    if (ext === 'ifc') return '<i class="fa-solid fa-cube text-emerald-400"></i>';
     if (['rvt', 'rfa', 'rte'].includes(ext)) return '<i class="fa-solid fa-cube text-blue-400"></i>';
     if (['dwg', 'dxf'].includes(ext)) return '<i class="fa-solid fa-drafting-compass text-amber-400"></i>';
     if (ext === 'pdf') return '<i class="fa-solid fa-file-pdf text-rose-400"></i>';
