@@ -826,7 +826,7 @@ body {
 .cde-table .document-title {
     color: var(--text-main);
     font-weight: 400;
-    font-style: italic;
+    font-style: normal;
     text-transform: uppercase;
 }
 
