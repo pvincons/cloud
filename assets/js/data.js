@@ -395,7 +395,7 @@ function renderTreeItems(items, container, depth = 0) {
                             <span class="font-medium group-hover:text-blue-400 transition-colors break-all text-xs">${escAttr(item.name)}</span>
                         </div>
                     </td>
-                    <td class="max-w-xs px-3 py-2.5 text-slate-300">${isDir ? '<span class="text-slate-500">—</span>' : `<div class="text-slate-200 uppercase italic font-normal">${escAttr(metadata.title || '—')}</div><div class="mt-1">Mô tả: ${escAttr(metadata.description || '—')}</div>`}</td>
+                    <td class="max-w-xs px-3 py-2.5 text-slate-300">${isDir ? '<span class="text-slate-500">—</span>' : `<div class="text-slate-200 uppercase not-italic font-normal">${escAttr(metadata.title || '—')}</div><div class="mt-1">Mô tả: ${escAttr(metadata.description || '—')}</div>`}</td>
                     <td class="whitespace-nowrap px-3 py-2.5 text-right text-slate-400">${isDir ? '<span class="text-slate-500">—</span>' : `<div class="text-slate-300">Tác giả: ${escAttr(metadata.author || '—')}</div><div class="mt-1">Khởi tạo: ${escAttr(formatMetadataDate(metadata.createdAt))}<br>Cập nhật: ${escAttr(formatMetadataDate(metadata.updatedAt))}</div>`}</td>
                     <td class="px-3 py-2.5 text-center">${isDir ? '<span class="text-slate-500">—</span>' : `<span class="inline-flex whitespace-nowrap rounded-full border px-2 py-1 text-[10px] font-semibold ${statusClass}">${statusLabel}</span>`}</td>
                     <td class="py-2 px-3 text-right" onclick="event.stopPropagation()">
