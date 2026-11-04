@@ -1504,15 +1504,17 @@ tr.highlight-row {
 .badge-signed {
     display: inline-flex;
     align-items: center;
-    gap: 4px;
+    justify-content: center;
+    gap: 3px;
     background: rgba(16, 185, 129, 0.15);
     color: #10b981;
     border: 1px solid rgba(16, 185, 129, 0.45);
-    padding: 2px 7px;
+    padding: 0 7px;
     border-radius: 4px;
-    font-size: 0.62rem;
-    font-weight: 700;
+    font-size: 0.7rem;
+    font-weight: 600;
     white-space: nowrap;
+    text-align: center;
 }
 
 tr.is-recalled .file-code {
@@ -1584,7 +1586,8 @@ td.action-btns .btn-icon,
 td.action-btns .sign-btn,
 td.action-btns .gate-btn,
 td.action-btns .badge-issue,
-td.action-btns .badge-recalled {
+td.action-btns .badge-recalled,
+td.action-btns .badge-signed {
     box-sizing: border-box;
     height: 26px;
     display: inline-flex;
