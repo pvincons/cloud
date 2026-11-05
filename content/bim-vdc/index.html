@@ -682,7 +682,10 @@
     </footer>
 
     <script>
-        let DATA_SERVER_API = localStorage.getItem('cde_api_url') || 'https://api.pvincons.cloud';
+        const isLocalHost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+        const DATA_SERVER_API = isLocalHost
+            ? 'http://localhost:3000'
+            : localStorage.getItem('cde_api_url') || 'https://api.pvincons.cloud';
 
         document.addEventListener('DOMContentLoaded', function () {
             const savedTheme = localStorage.getItem('cde_theme') || 'dark';
@@ -873,14 +876,27 @@
         async function checkCDEServerStatus() {
             const badge = document.getElementById('cdeServerBadge');
             try {
-                const res = await fetch(`${DATA_SERVER_API}/api/files?path=database/bim-vdc`);
+                const res = await fetch(`${DATA_SERVER_API}/api/health`);
+                let isHealthy = false;
                 if (res.ok) {
+                    try {
+                        const health = await res.json();
+                        isHealthy = health.status === 'ok';
+                    } catch (e) {
+                        // The server responded, but its health status could not be determined.
+                    }
+                }
+
+                if (isHealthy) {
                     badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-400"></span> database/bim-vdc (Online)`;
                     badge.className = "text-[10px] px-2.5 py-1 rounded-full bg-emerald-950/80 text-emerald-300 border border-emerald-500/30 flex items-center gap-1.5 font-medium";
-                } else throw new Error();
+                } else {
+                    badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-amber-400"></span> database/bim-vdc (Unknown)`;
+                    badge.className = "text-[10px] px-2.5 py-1 rounded-full bg-amber-950/80 text-amber-300 border border-amber-500/30 flex items-center gap-1.5 font-medium";
+                }
             } catch (e) {
                 badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-rose-400"></span> database/bim-vdc (Offline)`;
-                badge.className = "text-[10px] px-2.5 py-1 rounded-full bg-rose-950/80 text-rose-300 border border-emerald-500/30 flex items-center gap-1.5 font-medium";
+                badge.className = "text-[10px] px-2.5 py-1 rounded-full bg-rose-950/80 text-rose-300 border border-rose-500/30 flex items-center gap-1.5 font-medium";
             }
         }
     </script>

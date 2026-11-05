@@ -9,10 +9,17 @@ function protectRoute(allowedRoles = null) {
     return;
   }
 
-  const userSession = JSON.parse(localStorage.getItem('currentUser') || 'null');
+  let userSession = null;
+  try {
+    userSession = JSON.parse(localStorage.getItem('currentUser') || 'null');
+  } catch (error) {
+    userSession = null;
+  }
+  const userRole = String(userSession && userSession.role || '').toUpperCase();
+  const userPermission = String(userSession && userSession.permission || '').toUpperCase();
   
   // Tài khoản ADMIN tối cao được phép qua tất cả các trang
-  if (userSession && userSession.role === 'ADMIN') {
+  if (userRole === 'ADMIN' || userPermission === 'ADMIN') {
     const revealPage = () => { document.documentElement.style.display = ''; };
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', revealPage);
@@ -26,11 +33,12 @@ function protectRoute(allowedRoles = null) {
     const rolesArray = Array.isArray(allowedRoles) ? allowedRoles : [allowedRoles];
     
     // Nếu không có quyền truy cập
-    if (!userSession || !rolesArray.includes(userSession.role)) {
+    const allowed = rolesArray.map(role => String(role).toUpperCase());
+    if (!userSession || (!allowed.includes(userRole) && !allowed.includes(userPermission))) {
       // Hiển thị giao diện khóa trực tiếp trên trang thay vì chuyển hướng
       window.addEventListener('DOMContentLoaded', () => {
         document.documentElement.style.display = '';
-        renderLockedScreen(userSession ? userSession.role : 'Khách');
+        renderLockedScreen(userSession ? userRole || userPermission : 'Khách');
       });
       return;
     }

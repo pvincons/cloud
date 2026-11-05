@@ -60,7 +60,7 @@ function closeAllModals() {
     if (accountModal && !accountModal.classList.contains('hidden')) {
         toggleAccountModal(false);
     }
-    ['issuesModal', 'isoRenameModal', 'metadataModal', 'viewModal', 'otpSignModal', 'gateModal', 'namingModal', 'uploadModal'].forEach(id => {
+    ['issuesModal', 'isoRenameModal', 'metadataModal', 'viewModal', 'documentPreviewModal', 'otpSignModal', 'gateModal', 'namingModal', 'uploadModal'].forEach(id => {
         closeModal(id);
     });
 }
@@ -170,7 +170,7 @@ async function loadUserPermissions() {
     const userSession = JSON.parse(localStorage.getItem('currentUser') || '{}');
     currentUserRole = (userSession.role || '').toUpperCase();
     currentUserPermission = (userSession.permission || currentUserRole).toUpperCase();
-    isUserAdmin = (currentUserPermission === 'ADMIN' || currentUserRole === 'ADMIN');
+    isUserAdmin = currentUserRole === 'ADMIN' || currentUserPermission === 'ADMIN';
 
     if (userSession.fullName) {
         currentActiveUserFullName = userSession.fullName;
@@ -193,7 +193,19 @@ async function loadUserPermissions() {
         console.warn('Không thể tải users.json, sử dụng session hiện tại.', e);
     }
 
+    isUserAdmin = currentUserRole === 'ADMIN' || currentUserPermission === 'ADMIN';
     currentUserAssignedProjects = projectsStr.split(/[,]+/).map(p => p.trim());
+}
+
+function normalizeProjectName(name) {
+    return String(name || '').replace(/\s+/g, '_').toLowerCase();
+}
+
+function canUserAccessProject(projectName) {
+    if (isUserAdmin) return true;
+    const projectKey = normalizeProjectName(projectName);
+    if (!projectKey) return false;
+    return currentUserAssignedProjects.some(project => normalizeProjectName(project) === projectKey);
 }
 
 async function reloadDatabaseData() {
@@ -201,7 +213,9 @@ async function reloadDatabaseData() {
         await loadUserPermissions();
 
         const [filesRes, issuesRes, recallsRes, sigsRes] = await Promise.all([
-            fetch(`${DATA_SERVER_API}/api/cde-files`),
+            fetch(`${DATA_SERVER_API}/api/cde-files`, {
+                headers: { 'Authorization': `Bearer ${localStorage.getItem('access_token') || ''}` }
+            }),
             fetch(`${DATA_SERVER_API}/api/issues`),
             fetch(`${DATA_SERVER_API}/api/recalls`).catch(() => null),
             fetch(`${DATA_SERVER_API}/api/vnpt/signatures`, {
@@ -292,8 +306,6 @@ async function populateProjectOptions() {
     let currentVal = select.value;
     select.innerHTML = '';
 
-    const normalizedAssigned = currentUserAssignedProjects.map(p => p.replace(/\s+/g, '_').toLowerCase());
-
     if (isUserAdmin) {
         let allOpt = document.createElement('option');
         allOpt.value = 'ALL';
@@ -304,8 +316,7 @@ async function populateProjectOptions() {
     if (virtualTreeData.children) {
         virtualTreeData.children.forEach(child => {
             if (child.type === 'folder') {
-                let childNorm = child.name.replace(/\s+/g, '_').toLowerCase();
-                if (isUserAdmin || normalizedAssigned.includes(childNorm) || currentUserAssignedProjects.includes('Tất cả dự án') || currentUserAssignedProjects.includes('ALL')) {
+                if (canUserAccessProject(child.name)) {
                     let opt = document.createElement('option');
                     opt.value = child.name;
                     opt.innerText = child.name;
@@ -350,6 +361,175 @@ function buildFileUrl(itemPath) {
     };
 }
 
+function sanitizeDocumentPreview(html) {
+    const parsed = new DOMParser().parseFromString(html, 'text/html');
+    const allowedTags = new Set([
+        'A', 'B', 'BLOCKQUOTE', 'BR', 'CAPTION', 'CODE', 'DD', 'DIV', 'DL', 'DT',
+        'EM', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'HR', 'I', 'IMG', 'LI',
+        'OL', 'P', 'PRE', 'S', 'SPAN', 'STRONG', 'SUB', 'SUP', 'TABLE', 'TBODY',
+        'TD', 'TFOOT', 'TH', 'THEAD', 'TR', 'U', 'UL'
+    ]);
+    const blockedTags = new Set(['SCRIPT', 'STYLE', 'IFRAME', 'OBJECT', 'EMBED', 'SVG', 'MATH']);
+
+    function cleanNode(node) {
+        if (node.nodeType === Node.TEXT_NODE) return document.createTextNode(node.textContent || '');
+        if (node.nodeType !== Node.ELEMENT_NODE) return document.createDocumentFragment();
+        if (blockedTags.has(node.tagName)) return document.createDocumentFragment();
+
+        const fragment = document.createDocumentFragment();
+        if (!allowedTags.has(node.tagName)) {
+            node.childNodes.forEach(child => fragment.appendChild(cleanNode(child)));
+            return fragment;
+        }
+
+        const cleanElement = document.createElement(node.tagName.toLowerCase());
+        if (node.tagName === 'A') {
+            const href = node.getAttribute('href') || '';
+            try {
+                const safeUrl = new URL(href, window.location.origin);
+                if (['http:', 'https:', 'mailto:'].includes(safeUrl.protocol)) {
+                    cleanElement.href = safeUrl.href;
+                    cleanElement.rel = 'noopener noreferrer';
+                    cleanElement.target = '_blank';
+                }
+            } catch (error) {
+                // Ignore invalid links in the document.
+            }
+        } else if (node.tagName === 'IMG') {
+            const source = node.getAttribute('src') || '';
+            if (!/^data:image\/(?:png|jpeg|gif|webp);base64,/i.test(source) || source.length > 4_000_000) {
+                return fragment;
+            }
+            cleanElement.src = source;
+            cleanElement.alt = node.getAttribute('alt') || '';
+        }
+        node.childNodes.forEach(child => cleanElement.appendChild(cleanNode(child)));
+        fragment.appendChild(cleanElement);
+        return fragment;
+    }
+
+    const result = document.createDocumentFragment();
+    parsed.body.childNodes.forEach(node => result.appendChild(cleanNode(node)));
+    return result;
+}
+
+function renderSpreadsheetPreview(workbook, sheetName) {
+    const content = document.getElementById('documentPreviewContent');
+    const message = document.getElementById('documentPreviewMessage');
+    const worksheet = workbook.Sheets[sheetName];
+    if (!content || !message || !worksheet || !worksheet['!ref']) {
+        if (content) content.replaceChildren();
+        if (message) message.textContent = 'Trang tính này không có dữ liệu để hiển thị.';
+        return;
+    }
+
+    const fullRange = XLSX.utils.decode_range(worksheet['!ref']);
+    const rowLimit = 500;
+    const columnLimit = 50;
+    const range = {
+        s: { r: 0, c: 0 },
+        e: { r: Math.min(fullRange.e.r, rowLimit - 1), c: Math.min(fullRange.e.c, columnLimit - 1) }
+    };
+    const rows = XLSX.utils.sheet_to_json(worksheet, {
+        header: 1,
+        raw: false,
+        defval: '',
+        range
+    });
+    const table = document.createElement('table');
+    table.className = 'document-preview-table';
+    const body = document.createElement('tbody');
+
+    rows.forEach((row, rowIndex) => {
+        const tr = document.createElement('tr');
+        const rowNumber = document.createElement('th');
+        rowNumber.textContent = String(rowIndex + 1);
+        tr.appendChild(rowNumber);
+        row.forEach(value => {
+            const cell = document.createElement('td');
+            cell.textContent = String(value);
+            tr.appendChild(cell);
+        });
+        body.appendChild(tr);
+    });
+
+    table.appendChild(body);
+    content.replaceChildren(table);
+    const truncated = fullRange.e.r + 1 > rowLimit || fullRange.e.c + 1 > columnLimit;
+    message.textContent = truncated
+        ? `Đang hiển thị tối đa ${rowLimit} dòng và ${columnLimit} cột đầu tiên của trang tính.`
+        : 'Xem trước bảng tính (chỉ đọc).';
+}
+
+async function openDocumentPreview(itemPath) {
+    const modal = document.getElementById('documentPreviewModal');
+    const title = document.getElementById('documentPreviewTitle');
+    const message = document.getElementById('documentPreviewMessage');
+    const content = document.getElementById('documentPreviewContent');
+    const sheetSelect = document.getElementById('documentPreviewSheet');
+    const sheetLabel = document.getElementById('documentPreviewSheetLabel');
+    if (!modal || !title || !message || !content || !sheetSelect || !sheetLabel) return;
+
+    const { url, fileName } = buildFileUrl(itemPath);
+    const extension = fileName.split('.').pop().toLowerCase();
+    title.textContent = fileName;
+    message.textContent = 'Đang tải tài liệu...';
+    content.replaceChildren();
+    sheetSelect.replaceChildren();
+    sheetSelect.hidden = true;
+    sheetLabel.hidden = true;
+    openModal('documentPreviewModal');
+
+    if (extension === 'gdoc' || extension === 'gsheet') {
+        message.textContent = 'Tệp Google Docs/Sheets dạng liên kết không có nội dung tài liệu trong CDE. Hãy tải lên bản xuất .docx hoặc .xlsx để xem trước.';
+        return;
+    }
+    if (extension === 'doc') {
+        message.textContent = 'Chưa hỗ trợ định dạng Word .doc cũ. Hãy chuyển đổi và tải lên dưới dạng .docx.';
+        return;
+    }
+
+    try {
+        const response = await fetch(url);
+        if (!response.ok) throw new Error(`Máy chủ trả về lỗi ${response.status}.`);
+        const buffer = await response.arrayBuffer();
+
+        if (extension === 'xlsx' || extension === 'xls') {
+            if (!window.XLSX) throw new Error('Thư viện xem bảng tính chưa được tải.');
+            const workbook = XLSX.read(buffer, { type: 'array', cellDates: true });
+            if (!workbook.SheetNames.length) throw new Error('Không tìm thấy trang tính trong tệp.');
+            workbook.SheetNames.forEach(name => {
+                const option = document.createElement('option');
+                option.value = name;
+                option.textContent = name;
+                sheetSelect.appendChild(option);
+            });
+            sheetSelect.hidden = false;
+            sheetLabel.hidden = false;
+            sheetSelect.onchange = () => renderSpreadsheetPreview(workbook, sheetSelect.value);
+            renderSpreadsheetPreview(workbook, workbook.SheetNames[0]);
+            return;
+        }
+
+        if (extension === 'docx') {
+            if (!window.mammoth) throw new Error('Thư viện xem tài liệu chưa được tải.');
+            const result = await mammoth.convertToHtml({ arrayBuffer: buffer });
+            const wordContent = document.createElement('div');
+            wordContent.className = 'document-preview-word';
+            wordContent.appendChild(sanitizeDocumentPreview(result.value));
+            content.replaceChildren(wordContent);
+            message.textContent = result.messages.length
+                ? 'Đã mở bản xem trước. Một số định dạng nâng cao có thể không được thể hiện đầy đủ.'
+                : 'Xem trước tài liệu (chỉ đọc).';
+            return;
+        }
+
+        message.textContent = 'Định dạng này chưa được hỗ trợ xem trước.';
+    } catch (error) {
+        message.textContent = `Không thể xem trước tài liệu: ${error.message}`;
+    }
+}
+
 function openWithLocalApp(itemPath) {
     if (!itemPath) return;
     if (/\.ifc$/i.test(String(itemPath))) {
@@ -358,6 +538,10 @@ function openWithLocalApp(itemPath) {
     }
 
     const { url, fileName } = buildFileUrl(itemPath);
+    if (/\.(xlsx?|docx?|gdoc|gsheet)$/i.test(fileName)) {
+        openDocumentPreview(itemPath);
+        return;
+    }
     const win = window.open(url, '_blank');
     if (!win) {
         showToast("⚠️ Trình duyệt chặn popup. Hãy cho phép mở tab mới cho trang này!");
@@ -402,7 +586,10 @@ async function submitGateTransition() {
     try {
         const res = await fetch(`${DATA_SERVER_API}/api/move`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('access_token') || ''}`
+            },
             body: JSON.stringify({ sourcePath: oldPath, targetDir: targetDir })
         });
         const data = await res.json();
@@ -453,17 +640,10 @@ function renderTreeUI() {
     const normalizedAssigned = currentUserAssignedProjects.map(p => p.replace(/\s+/g, '_').toLowerCase());
 
     let prjVal = document.getElementById('projectSelect') ? document.getElementById('projectSelect').value : "ALL";
-    let nodesToRender = virtualTreeData.children;
+    let nodesToRender = virtualTreeData.children.filter(child => canUserAccessProject(child.name));
 
     if (prjVal && prjVal !== "ALL") {
-        nodesToRender = virtualTreeData.children.filter(child => child.name === prjVal);
-    } else {
-        if (!isUserAdmin) {
-            nodesToRender = virtualTreeData.children.filter(child => {
-                let childNorm = child.name.replace(/\s+/g, '_').toLowerCase();
-                return normalizedAssigned.includes(childNorm);
-            });
-        }
+        nodesToRender = nodesToRender.filter(child => child.name === prjVal);
     }
 
     if (nodesToRender.length === 0) {
@@ -529,6 +709,20 @@ function isPathLocked(path) {
         }
     }
     return false;
+}
+
+function getManageableContainer(path) {
+    const segments = String(path || '').replace(/\\/g, '/').split('/');
+    if (!canUserAccessProject(segments[2])) return null;
+    const containerIndex = segments.findIndex((segment, index) => index >= 3 &&
+        ISO_CONTAINERS.includes(segment.toUpperCase()));
+    if (containerIndex < 3) return null;
+    const container = segments[containerIndex].toUpperCase();
+    const permission = isUserAdmin
+        ? 'FULL CONTROL'
+        : (typeof getIso19650Permissions === 'function' ? getIso19650Permissions(container) : '').toUpperCase();
+    if (permission !== 'FULL CONTROL') return null;
+    return { container, isContainer: containerIndex === segments.length - 1 };
 }
 
 function nodeNameEqualsOrContains(pathUpper, container) {
@@ -636,6 +830,46 @@ function createTreeNodeElement(node) {
         </div>
     `;
 
+    const manageableContainer = isFolder ? getManageableContainer(node.path) : null;
+    if (manageableContainer) {
+        const actions = document.createElement('span');
+        actions.style.cssText = 'display:inline-flex; gap:4px; margin-left:auto;';
+        const addButton = document.createElement('button');
+        addButton.type = 'button';
+        addButton.title = 'Tạo thư mục con';
+        addButton.setAttribute('aria-label', `Tạo thư mục con trong ${node.name}`);
+        addButton.innerHTML = '<i class="fa-solid fa-folder-plus"></i>';
+        addButton.onclick = (event) => addNewFolder(node.id, event);
+        actions.appendChild(addButton);
+
+        if (!manageableContainer.isContainer) {
+            const renameButton = document.createElement('button');
+            renameButton.type = 'button';
+            renameButton.title = 'Đổi tên thư mục';
+            renameButton.setAttribute('aria-label', `Đổi tên ${node.name}`);
+            renameButton.innerHTML = '<i class="fa-solid fa-pen"></i>';
+            renameButton.onclick = (event) => renameFolder(node.id, event);
+            actions.appendChild(renameButton);
+
+            const deleteButton = document.createElement('button');
+            deleteButton.type = 'button';
+            deleteButton.title = 'Xóa thư mục';
+            deleteButton.setAttribute('aria-label', `Xóa ${node.name}`);
+            deleteButton.innerHTML = '<i class="fa-solid fa-trash"></i>';
+            deleteButton.onclick = (event) => deleteFolder(node.id, event);
+            actions.appendChild(deleteButton);
+        }
+
+        actions.querySelectorAll('button').forEach(button => {
+            button.className = 'w-6 h-6 inline-flex items-center justify-center rounded text-slate-400 hover:text-white hover:bg-slate-700';
+            button.onclick = ((handler) => (event) => {
+                event.stopPropagation();
+                handler(event);
+            })(button.onclick);
+        });
+        itemDiv.querySelector('.node-title').appendChild(actions);
+    }
+
     li.appendChild(itemDiv);
 
     if (isFolder && hasChildren && node.expanded && !locked) {
@@ -701,7 +935,10 @@ async function addNewFolder(parentId, e) {
     try {
         const res = await fetch(`${DATA_SERVER_API}/api/create-folder`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('access_token') || ''}`
+            },
             body: JSON.stringify({ parentPath: parentNode.path, folderName: folderName.trim() })
         });
         const data = await res.json();
@@ -727,7 +964,10 @@ async function renameFolder(nodeId, e) {
     try {
         const res = await fetch(`${DATA_SERVER_API}/api/rename`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('access_token') || ''}`
+            },
             body: JSON.stringify({ path: node.path, newName: newName.trim() })
         });
         const data = await res.json();
@@ -747,12 +987,15 @@ async function deleteFolder(nodeId, e) {
     if (e) e.stopPropagation();
     const node = findNodeById(virtualTreeData, nodeId);
     if (!node) return;
-    if (!confirm(`Bạn có chắc chắn muốn xóa thư mục "${node.name}" khỏi hệ thống CDE?`)) return;
+    if (!confirm(`Bạn có chắc chắn muốn xóa thư mục "${node.name}" và toàn bộ nội dung bên trong khỏi hệ thống CDE?`)) return;
 
     try {
         const res = await fetch(`${DATA_SERVER_API}/api/delete`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('access_token') || ''}`
+            },
             body: JSON.stringify({ path: node.path })
         });
         const data = await res.json();
@@ -1606,7 +1849,10 @@ async function saveIsoRename() {
     try {
         const res = await fetch(`${DATA_SERVER_API}/api/rename`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('access_token') || ''}`
+            },
             body: JSON.stringify({ path: oldPath, newName: newFileName })
         });
         const data = await res.json();
@@ -1802,7 +2048,10 @@ async function deleteRowFile(btn) {
         try {
             const res = await fetch(`${DATA_SERVER_API}/api/delete`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('access_token') || ''}`
+                },
                 body: JSON.stringify({ path: filePath })
             });
             const data = await res.json();
@@ -1922,7 +2171,7 @@ function appendFileToTable(fileName, relativePath, fileSize = 0, metadata = {}) 
             <span class="document-title" title="${escapeAttr(metadata.title || '')}">${escapeAttr(metadata.title || '—')}</span>
             <span class="document-description" title="${escapeAttr(metadata.description || '')}">Mô tả: ${escapeAttr(metadata.description || '—')}</span>
         </td>
-        <td class="metadata-dates align-right"><span class="file-author">Tác giả: ${escapeAttr(metadata.author || '—')}</span><span>Khởi tạo: ${createdAt}</span><span>Cập nhật: ${updatedAt}</span></td>
+        <td class="metadata-dates align-right"><span class="file-author">${escapeAttr(metadata.author || '—')}</span><span>Khởi tạo: ${createdAt}</span><span>Cập nhật: ${updatedAt}</span></td>
         <td class="file-size align-right">${formattedSize}</td>
         <td><span class="badge ${badgeClass} container-state">${state}</span></td>
         <td class="align-right"><span class="badge ${statusClasses[status]} approval-status">${statusLabels[status]}</span></td>
@@ -2128,7 +2377,7 @@ function applyFilters() {
         const text = row.innerText.toLowerCase();
         const fileName = (row.querySelector('.file-code') ? row.querySelector('.file-code').innerText : '').toLowerCase();
 
-        let matchesProj = (projVal === 'ALL' || prj === projVal);
+        let matchesProj = canUserAccessProject(prj) && (projVal === 'ALL' || prj === projVal);
         let matchesFolder = !selectedFolderPathFilter ||
             filePath.startsWith(`${selectedFolderPathFilter.replace(/\/+$/, '')}/`);
         let matchesState = (stateVal === 'ALL' || state === stateVal);
@@ -2276,23 +2525,29 @@ function populateUploadFolderOptions() {
     if (!select) return;
     select.innerHTML = '';
 
-    const normalizedAssigned = currentUserAssignedProjects.map(p => p.replace(/\s+/g, '_').toLowerCase());
+    const placeholder = document.createElement('option');
+    placeholder.value = '';
+    placeholder.textContent = '— Chọn thư mục đích —';
+    placeholder.disabled = true;
+    placeholder.selected = true;
+    select.appendChild(placeholder);
 
     function addFolders(parent, depth = 0) {
         if (parent.type === 'folder') {
             if (depth === 1) {
-                let prjNorm = parent.name.replace(/\s+/g, '_').toLowerCase();
-                let isAssigned = isUserAdmin || normalizedAssigned.includes(prjNorm) || currentUserAssignedProjects.includes('Tất cả dự án') || currentUserAssignedProjects.includes('ALL');
+                let isAssigned = canUserAccessProject(parent.name);
                 if (!isAssigned) {
                     return;
                 }
             }
 
-            let opt = document.createElement('option');
-            opt.value = parent.path;
-            let indent = '—'.repeat(Math.max(0, depth - 1));
-            opt.innerText = indent ? `${indent} ${parent.name}` : parent.name;
-            select.appendChild(opt);
+            if (depth > 0) {
+                let opt = document.createElement('option');
+                opt.value = parent.path;
+                let indent = '—'.repeat(Math.max(0, depth - 1));
+                opt.innerText = indent ? `${indent} ${parent.name}` : parent.name;
+                select.appendChild(opt);
+            }
 
             if (parent.children) {
                 parent.children.forEach(child => addFolders(child, depth + 1));
@@ -2307,12 +2562,12 @@ function populateUploadFolderOptions() {
 async function executeUploadFiles() {
     const fileInput = document.getElementById('fileUploadInput');
     const targetFolderSelect = document.getElementById('uploadTargetFolderSelect');
-    if (!fileInput || !fileInput.files || fileInput.files.length === 0) {
-        showToast("Vui lòng chọn ít nhất một tệp để tải lên!");
-        return;
-    }
     if (!targetFolderSelect || !targetFolderSelect.value) {
         showToast("Vui lòng chọn thư mục đích CDE!");
+        return;
+    }
+    if (!fileInput || !fileInput.files || fileInput.files.length === 0) {
+        showToast("Vui lòng chọn ít nhất một tệp để tải lên!");
         return;
     }
 

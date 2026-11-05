@@ -2,17 +2,103 @@
 // *** Script quản lý file dữ liệu CDE/data ***
 //----------------------------------------------
 
-let DATA_SERVER_API = localStorage.getItem('cde_api_url') || 'https://api.pvincons.cloud';
+const configuredCdeApi = typeof CONFIG !== 'undefined' && CONFIG.CDE_API
+    ? CONFIG.CDE_API.replace(/\/api\/?$/, '')
+    : 'https://api.pvincons.cloud';
+const savedCdeApi = localStorage.getItem('cde_api_url') || '';
+const isLocalAuthServer = typeof isLocal !== 'undefined' && isLocal;
+let DATA_SERVER_API = isLocalAuthServer &&
+    savedCdeApi.replace(/\/+$/, '') === 'https://api.pvincons.cloud'
+    ? configuredCdeApi
+    : savedCdeApi || configuredCdeApi;
+if (isLocalAuthServer && DATA_SERVER_API === configuredCdeApi) {
+    localStorage.setItem('cde_api_url', configuredCdeApi);
+}
 let currentPath = 'database/bim-vdc';
 let fetchedItems = [];
 let clipboard = null;
 let xmlViewerRequestId = 0;
 let editingMetadataPath = '';
+let dataUserProjects = [];
+let dataUserIsAdmin = false;
 
 // Quản lý trạng thái mở rộng của cây thư mục (Set các path đang được mở)
 const expandedFolders = new Set();
 // Bộ nhớ tạm chứa con của các thư mục đã tải
 const childItemsMap = new Map();
+
+function canManageData() {
+    try {
+        const user = JSON.parse(localStorage.getItem('currentUser') || 'null');
+        return !!(user && user.username && localStorage.getItem('access_token'));
+    } catch (error) {
+        return false;
+    }
+}
+
+function normalizeDataProjectName(name) {
+    return String(name || '').replace(/\s+/g, '_').toLowerCase();
+}
+
+function canAccessDataPath(path) {
+    if (dataUserIsAdmin) return true;
+    const parts = String(path || '').replace(/\\/g, '/').split('/').filter(Boolean);
+    if (parts[0] !== 'database' || parts[1] !== 'bim-vdc' || !parts[2]) return false;
+    const project = normalizeDataProjectName(parts[2]);
+    return dataUserProjects.some(name => {
+        const assigned = normalizeDataProjectName(name);
+        return assigned !== 'all' && assigned !== normalizeDataProjectName('Tất cả dự án') && assigned === project;
+    });
+}
+
+async function loadDataProjectAccess() {
+    let user;
+    try {
+        user = JSON.parse(localStorage.getItem('currentUser') || 'null');
+    } catch (error) {
+        user = null;
+    }
+    if (!user || !user.username) return;
+    dataUserIsAdmin = [user.role, user.permission]
+        .some(value => String(value || '').toUpperCase() === 'ADMIN');
+    let projects = typeof user.projects === 'string' ? user.projects : '';
+    try {
+        const response = await fetch('../../../assets/data/users.json');
+        if (response.ok) {
+            const users = await response.json();
+            const matchedUser = users.find(candidate => candidate.username === user.username);
+            if (matchedUser) {
+                if (typeof matchedUser.projects === 'string') projects = matchedUser.projects;
+                dataUserIsAdmin = [matchedUser.role, matchedUser.permission]
+                    .some(value => String(value || '').toUpperCase() === 'ADMIN');
+            }
+        }
+    } catch (error) {
+        console.warn('Không thể tải danh sách dự án được phân công:', error);
+    }
+    dataUserProjects = projects.split(',').map(project => project.trim()).filter(Boolean);
+}
+
+function getCdeAuthHeaders(headers = {}) {
+    if (!canManageData()) throw new Error('Vui lòng đăng nhập để thao tác trong trình duyệt dữ liệu CDE.');
+    const token = localStorage.getItem('access_token') || '';
+    if (!token) throw new Error('Phiên đăng nhập không hợp lệ. Vui lòng đăng nhập lại.');
+    return { ...headers, Authorization: `Bearer ${token}` };
+}
+
+async function fetchCdeMutation(url, options = {}) {
+    const response = await fetch(url, {
+        ...options,
+        headers: getCdeAuthHeaders(options.headers || {})
+    });
+    if (response.status === 401) {
+        localStorage.removeItem('access_token');
+        localStorage.removeItem('currentUser');
+        alert('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.');
+        window.location.href = '../../index.html';
+    }
+    return response;
+}
 
 // KÊNH ĐỒNG BỘ THỜI GIAN THỰC (BROADCAST CHANNEL)
 const cdeSyncChannel = new BroadcastChannel('pvincons_cde_sync_channel');
@@ -24,10 +110,13 @@ cdeSyncChannel.onmessage = (event) => {
 };
 
 document.addEventListener('DOMContentLoaded', function () {
-    document.getElementById('apiServerUrlInput').value = DATA_SERVER_API;
-    document.getElementById('fileMetadataForm').addEventListener('submit', saveFileMetadata);
-    initThemeUI();
-    loadCDEFiles(currentPath);
+    loadDataProjectAccess().then(() => {
+        if (!canManageData()) return;
+        document.getElementById('apiServerUrlInput').value = DATA_SERVER_API;
+        document.getElementById('fileMetadataForm').addEventListener('submit', saveFileMetadata);
+        initThemeUI();
+        loadCDEFiles(currentPath);
+    });
 });
 
 function toggleTheme() {
@@ -161,7 +250,10 @@ async function saveFileMetadata(event) {
     submit.disabled = true;
     error.classList.add('hidden');
     try {
-        const response = await fetch(`${DATA_SERVER_API}/api/file-metadata`, {
+        if (!canAccessDataPath(editingMetadataPath)) {
+            throw new Error('Bạn không được phân công tham gia dự án chứa tài liệu này.');
+        }
+        const response = await fetchCdeMutation(`${DATA_SERVER_API}/api/file-metadata`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -189,24 +281,29 @@ async function saveFileMetadata(event) {
 
 async function fetchFolderContent(path) {
     const cleanPath = String(path).replace(/\\/g, '/');
-    try {
-        const response = await fetch(`${DATA_SERVER_API}/api/files?path=${encodeURIComponent(cleanPath)}`);
-        if (!response.ok) throw new Error('Không thể đọc thư mục');
-        const rawItems = await response.json();
-        return (rawItems || []).map(item => ({
-            ...item,
-            path: String(item.path || '').replace(/\\/g, '/')
-        }));
-    } catch (error) {
-        console.warn(`Sử dụng dữ liệu mô phỏng cho thư mục (${cleanPath}):`, error);
-        return getMockCDEFiles(cleanPath);
-    }
+    const response = await fetch(`${DATA_SERVER_API}/api/files?path=${encodeURIComponent(cleanPath)}`, {
+        headers: getCdeAuthHeaders()
+    });
+    if (!response.ok) throw new Error(`Không thể đọc thư mục (HTTP ${response.status}).`);
+    const rawItems = await response.json();
+    const items = (rawItems || []).map(item => ({
+        ...item,
+        path: String(item.path || '').replace(/\\/g, '/')
+    }));
+    return cleanPath === 'database/bim-vdc'
+        ? items.filter(item => canAccessDataPath(item.path))
+        : items;
 }
 
 async function loadCDEFiles(path = 'database/bim-vdc') {
     if (!path || path === '' || path === '/') path = 'database/bim-vdc';
 
-    currentPath = String(path).replace(/\\/g, '/');
+    const requestedPath = String(path).replace(/\\/g, '/');
+    if (requestedPath !== 'database/bim-vdc' && !canAccessDataPath(requestedPath)) {
+        alert('Bạn không được phân công tham gia dự án này.');
+        return;
+    }
+    currentPath = requestedPath;
 
     document.getElementById('currentPathDisplay').textContent = currentPath;
     const loading = document.getElementById('cdeLoading');
@@ -222,7 +319,15 @@ async function loadCDEFiles(path = 'database/bim-vdc') {
 
     renderBreadcrumbs(currentPath);
 
-    fetchedItems = await fetchFolderContent(currentPath);
+    try {
+        fetchedItems = await fetchFolderContent(currentPath);
+    } catch (error) {
+        console.error('Không thể tải dữ liệu CDE:', error);
+        errorState.classList.remove('hidden');
+        loading.classList.add('hidden');
+        summaryText.innerText = error.message;
+        return;
+    }
     loading.classList.add('hidden');
 
     if (!fetchedItems || fetchedItems.length === 0) {
@@ -233,37 +338,6 @@ async function loadCDEFiles(path = 'database/bim-vdc') {
 
     summaryText.innerText = `Đã tải ${fetchedItems.length} mục trong ${currentPath}`;
     renderFileList(fetchedItems);
-}
-
-// Tạo dữ liệu mô phỏng theo đường dẫn thư mục hiện tại
-function getMockCDEFiles(path) {
-    const clean = String(path).replace(/\\/g, '/');
-    if (clean === 'database/bim-vdc') {
-        return [
-            { name: 'Project 01', type: 'folder', path: 'database/bim-vdc/Project 01' },
-            { name: 'Project 02', type: 'folder', path: 'database/bim-vdc/Project 02' },
-            { name: 'THAY LE NONG', type: 'folder', path: 'database/bim-vdc/THAY LE NONG' },
-            { name: 'PVINCONS_BIM_Execution_Plan.pdf', type: 'file', path: 'database/bim-vdc/PVINCONS_BIM_Execution_Plan.pdf' }
-        ];
-    } else if (clean.includes('Project 01')) {
-        return [
-            { name: '01_WORK_IN_PROGRESS', type: 'folder', path: `${clean}/01_WORK_IN_PROGRESS` },
-            { name: '02_SHARED', type: 'folder', path: `${clean}/02_SHARED` },
-            { name: '03_PUBLISHED', type: 'folder', path: `${clean}/03_PUBLISHED` },
-            { name: '04_ARCHIVED', type: 'folder', path: `${clean}/04_ARCHIVED` }
-        ];
-    } else if (clean.includes('01_WORK_IN_PROGRESS')) {
-        return [
-            { name: 'ARCH_Draft_v1.rvt', type: 'file', path: `${clean}/ARCH_Draft_v1.rvt` },
-            { name: 'MEP_Draft_v1.rvt', type: 'file', path: `${clean}/MEP_Draft_v1.rvt` },
-            { name: 'Subcontractor_Notes.xlsx', type: 'file', path: `${clean}/Subcontractor_Notes.xlsx` }
-        ];
-    } else {
-        return [
-            { name: 'BIM_Standard_Guidelines.pdf', type: 'file', path: `${clean}/BIM_Standard_Guidelines.pdf` },
-            { name: 'Model_Export_Specification.docx', type: 'file', path: `${clean}/Model_Export_Specification.docx` }
-        ];
-    }
 }
 
 // Toggle Xổ/Thu gọn cây thư mục
@@ -534,10 +608,14 @@ function updatePasteButtonState() {
 async function pasteItem() {
     if (!clipboard) return;
     const targetPath = String(currentPath).replace(/\\/g, '/');
+    if (!canAccessDataPath(clipboard.sourcePath) || !canAccessDataPath(targetPath)) {
+        alert('Bạn chỉ được thao tác trong các dự án được phân công.');
+        return;
+    }
     const endpoint = clipboard.action === 'copy' ? `${DATA_SERVER_API}/api/copy` : `${DATA_SERVER_API}/api/move`;
 
     try {
-        const res = await fetch(endpoint, {
+        const res = await fetchCdeMutation(endpoint, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ sourcePath: clipboard.sourcePath, targetDir: targetPath })
@@ -554,19 +632,7 @@ async function pasteItem() {
             alert("Lỗi: " + (data.error || "Thất bại"));
         }
     } catch (e) {
-        console.warn("Không kết nối được server, thực hiện Dán giả lập local:", e);
-        const newItemName = (clipboard.action === 'copy' ? 'Copy_of_' : '') + clipboard.name;
-        fetchedItems.push({
-            name: newItemName,
-            type: clipboard.name.includes('.') ? 'file' : 'folder',
-            path: `${targetPath}/${newItemName}`
-        });
-        if (clipboard.action === 'move') {
-            clipboard = null;
-            updatePasteButtonState();
-        }
-        renderFileList(fetchedItems);
-        document.getElementById('cdeSummaryText').innerText = `Đã dán "${newItemName}" (Local Mock)`;
+        alert(e.message || 'Không thể thực hiện thao tác trên CDE.');
     }
 }
 
@@ -574,11 +640,18 @@ async function createNewFolder() {
     const folderName = prompt("Nhập tên thư mục mới cần tạo:");
     if (!folderName || !folderName.trim()) return;
     const targetPath = String(currentPath).replace(/\\/g, '/');
+    if (!canAccessDataPath(targetPath)) {
+        alert('Bạn chỉ được tạo thư mục trong dự án được phân công.');
+        return;
+    }
 
     try {
-        const res = await fetch(`${DATA_SERVER_API}/api/create-folder`, {
+        const res = await fetchCdeMutation(`${DATA_SERVER_API}/api/create-folder`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('access_token') || ''}`
+            },
             body: JSON.stringify({ parentPath: targetPath, folderName: folderName.trim() })
         });
         const data = await res.json();
@@ -587,14 +660,7 @@ async function createNewFolder() {
             await loadCDEFiles(targetPath);
         } else alert("Lỗi: " + (data.error || "Không thể tạo thư mục"));
     } catch (e) {
-        console.warn("Tự động tạo thư mục giả lập:", e);
-        const newFolder = {
-            name: folderName.trim(),
-            type: 'folder',
-            path: `${targetPath}/${folderName.trim()}`
-        };
-        fetchedItems.push(newFolder);
-        renderFileList(fetchedItems);
+        alert(e.message || 'Không thể tạo thư mục trên CDE.');
     }
 }
 
@@ -602,13 +668,18 @@ async function uploadSelectedFile(event) {
     const file = event.target.files[0];
     if (!file) return;
     const targetPath = String(currentPath).replace(/\\/g, '/');
+    if (!canAccessDataPath(targetPath)) {
+        alert('Bạn chỉ được tải tệp lên dự án được phân công.');
+        event.target.value = '';
+        return;
+    }
 
     const formData = new FormData();
     formData.append('targetPath', targetPath);
     formData.append('file', file);
 
     try {
-        const res = await fetch(`${DATA_SERVER_API}/api/upload`, {
+        const res = await fetchCdeMutation(`${DATA_SERVER_API}/api/upload`, {
             method: 'POST',
             headers: { 'Authorization': `Bearer ${localStorage.getItem('access_token') || ''}` },
             body: formData
@@ -629,15 +700,27 @@ async function renameItem(itemPath, currentName) {
     if (!newName || newName.trim() === '' || newName === currentName) return;
     const targetPath = String(currentPath).replace(/\\/g, '/');
     const cleanItemPath = String(itemPath).replace(/\\/g, '/');
+    if (!canAccessDataPath(cleanItemPath)) {
+        alert('Bạn không được phân công tham gia dự án chứa mục này.');
+        return;
+    }
+    const projectSegments = cleanItemPath.replace(/^database\/bim-vdc\/?/, '').split('/').filter(Boolean);
 
     try {
-        const res = await fetch(`${DATA_SERVER_API}/api/rename`, {
+        const res = await fetchCdeMutation(`${DATA_SERVER_API}/api/rename`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ path: cleanItemPath, newName: newName.trim() })
         });
         const data = await res.json();
         if (data.success) {
+            if (projectSegments.length === 1) {
+                dataUserProjects = dataUserProjects.map(project =>
+                    normalizeDataProjectName(project) === normalizeDataProjectName(currentName)
+                        ? newName.trim()
+                        : project
+                );
+            }
             cdeSyncChannel.postMessage({ type: 'REFRESH_CDE_DATA' });
             await loadCDEFiles(targetPath);
         } else alert("Lỗi: " + (data.error || "Không thể đổi tên"));
@@ -647,12 +730,16 @@ async function renameItem(itemPath, currentName) {
 }
 
 async function deleteItem(itemPath, itemName) {
+    const cleanItemPath = String(itemPath).replace(/\\/g, '/');
+    if (!canAccessDataPath(cleanItemPath)) {
+        alert('Bạn không được phân công tham gia dự án chứa mục này.');
+        return;
+    }
     if (!confirm(`Bạn có chắc chắn muốn xóa "${itemName}" không?`)) return;
     const targetPath = String(currentPath).replace(/\\/g, '/');
-    const cleanItemPath = String(itemPath).replace(/\\/g, '/');
 
     try {
-        const res = await fetch(`${DATA_SERVER_API}/api/delete`, {
+        const res = await fetchCdeMutation(`${DATA_SERVER_API}/api/delete`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ path: cleanItemPath })
@@ -668,12 +755,16 @@ async function deleteItem(itemPath, itemName) {
 }
 
 async function createNewProject() {
-    const projectName = prompt("Nhập tên dự án mới cần khởi tạo (Ví dụ: Project 03, Khách sạn Tây Đô...):");
+    if (!dataUserIsAdmin) {
+        alert('Chỉ Admin mới được tạo dự án mới.');
+        return;
+    }
+    const projectName = prompt("Nhập tên dự án mới cần khởi tạo (Ví dụ: Example_Project...):");
     if (!projectName || !projectName.trim()) return;
     const targetPath = String(currentPath).replace(/\\/g, '/');
 
     try {
-        const res = await fetch(`${DATA_SERVER_API}/api/create-project`, {
+        const res = await fetchCdeMutation(`${DATA_SERVER_API}/api/create-project`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ parentPath: targetPath, projectName: projectName.trim() })

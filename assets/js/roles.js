@@ -11,20 +11,17 @@ function applyRolePermissionsUI(userRole) {
 
     // 2. DESIGNER: 
     if (role === 'DESIGNER') {
-        lockCardItem('cardDataDoc', 'footerDataDoc', 'iconDataDoc');
         lockCardItem('cardManagement', 'footerManagement', 'iconManagement');
         lockButtonItem('btnRevitServer', 'iconRevitServer');
     }
 
     // 3. MANAGEMENT: 
     if (role === 'MANAGEMENT') {
-        lockCardItem('cardDataDoc', 'footerDataDoc', 'iconDataDoc');
         lockButtonItem('btnRevitServer', 'iconRevitServer');
     }
 
     // 4. CONTRACTOR: 
     if (role === 'CONTRACTOR') {
-        lockCardItem('cardDataDoc', 'footerDataDoc', 'iconDataDoc');
         lockButtonItem('btnRevitServer', 'iconRevitServer');
         lockButtonItem('btnClashDetection', 'iconClashDetection');
     }

@@ -715,6 +715,22 @@
         </div>
     </div>
 
+    <div class="modal" id="documentPreviewModal">
+        <div class="modal-content document-preview-modal-content">
+            <div class="modal-header">
+                <div class="modal-title" id="documentPreviewTitle">Xem trước tài liệu</div>
+                <div class="close-btn" onclick="closeModal('documentPreviewModal')">✕</div>
+            </div>
+            <div id="documentPreviewMessage" class="document-preview-message">Đang tải tài liệu...</div>
+            <label id="documentPreviewSheetLabel" for="documentPreviewSheet" hidden>Trang tính:</label>
+            <select id="documentPreviewSheet" class="project-select-box document-preview-sheet" hidden></select>
+            <div id="documentPreviewContent" class="document-preview-content"></div>
+            <div class="document-preview-actions">
+                <button class="btn btn-outline" onclick="closeModal('documentPreviewModal')">Đóng</button>
+            </div>
+        </div>
+    </div>
+
     <!-- MODAL GATE APPROVAL -->
     <div class="modal" id="gateModal">
         <div class="modal-content">
@@ -821,17 +837,6 @@
                 <div class="close-btn" onclick="closeModal('uploadModal')">✕</div>
             </div>
             <div style="font-size: 0.78rem;">
-                <div id="dropZone"
-                    style="border: 2px dashed var(--border-color); padding: 18px; text-align: center; border-radius: 6px; background: var(--bg-input); margin-bottom: 8px; cursor: pointer;">
-                    <svg class="svg-icon-lg icon-folder" viewBox="0 0 24 24"
-                        style="width:32px; height:32px; margin-bottom:4px;">
-                        <path
-                            d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z" />
-                    </svg>
-                    <p style="font-weight: 600; margin-top: 4px; color: var(--text-heading);">Kéo thả tệp tin .RVT,
-                        .IFC, .PDF vào đây hoặc bấm để chọn</p>
-                    <input type="file" id="fileUploadInput" multiple style="display: none;">
-                </div>
                 <div style="margin-bottom: 8px;">
                     <label style="font-size: 0.72rem; font-weight: 600; color: var(--text-heading);">Chọn Thư mục
                         đích:</label>
@@ -881,6 +886,17 @@
                     </div>
                     <small class="upload-metadata-note">Thông tin này sẽ áp dụng cho tất cả tệp được chọn. Tác giả lấy theo tài khoản tải lên.</small>
                 </div>
+                <div id="dropZone"
+                    style="border: 2px dashed var(--border-color); padding: 18px; text-align: center; border-radius: 6px; background: var(--bg-input); margin-top: 8px; margin-bottom: 8px; cursor: pointer;">
+                    <svg class="svg-icon-lg icon-folder" viewBox="0 0 24 24"
+                        style="width:32px; height:32px; margin-bottom:4px;">
+                        <path
+                            d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z" />
+                    </svg>
+                    <p style="font-weight: 600; margin-top: 4px; color: var(--text-heading);">Kéo thả tệp tin .RVT,
+                        .IFC, .PDF vào đây hoặc bấm để chọn</p>
+                    <input type="file" id="fileUploadInput" multiple style="display: none;">
+                </div>
                 <div style="text-align: right; display: flex; justify-content: flex-end; gap: 6px;">
                     <button class="btn btn-outline" onclick="closeModal('uploadModal')">Đóng</button>
                     <button class="btn btn-primary" onclick="executeUploadFiles()">Tải Lên CDE</button>
@@ -892,7 +908,9 @@
     <div class="toast-container" id="toastContainer"></div>
 
     <!-- JAVASCRIPT XỬ LÝ MIR -->
-    <script src="/assets/js/mir.js?v=20261104-9"></script>
+    <script src="/assets/vendor/xlsx.full.min.js"></script>
+    <script src="/assets/vendor/mammoth.browser.min.js"></script>
+    <script src="/assets/js/mir.js?v=20261105-2"></script>
 </body>
 
 </html>
