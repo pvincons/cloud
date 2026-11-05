@@ -6,13 +6,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Trình duyệt dữ liệu CDE - PV INCONS</title>
     <!-- AUTH GUARD ANTI-FOUC -->
-    <script src="../../../assets/js/roles.js?v=20261105-1"></script>
-    <script src="../../../assets/js/auth-guard.js"></script>
-    <script src="../../../assets/js/config.js"></script>
+    <script src="/assets/js/roles.js?v=20261105-2"></script>
+    <script src="/assets/js/auth-guard.js"></script>
+    <script src="/assets/js/config.js"></script>
     <script>
-        if (typeof protectRoute === 'function') {
-            protectRoute();
-        }
+        window.dataRouteAllowed = typeof protectRoute === 'function'
+            && protectRoute(
+                ['ADMIN', 'MASTER', 'MANAGEMENT'],
+                ['DESIGNER', 'CONTRACTOR']
+            );
     </script>
 
     <script src="https://cdn.tailwindcss.com"></script>
@@ -285,7 +287,7 @@
     </div>
 
     <!-- JAVASCRIPT XỬ LÝ DATA -->
-    <script src="/assets/js/data.js?v=20261105-4"></script>
+    <script src="/assets/js/data.js?v=20261105-6"></script>
 </body>
 
 </html>
