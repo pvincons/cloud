@@ -811,9 +811,7 @@ function createTreeNodeElement(node) {
     }
 
     // Icon mũi tên Chevron đóng/mở phóng to hơn (16x16px)
-    let toggleIconSymbol = node.expanded 
-        ? `<svg viewBox="0 0 24 24" style="width:16px; height:16px;" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>`
-        : `<svg viewBox="0 0 24 24" style="width:16px; height:16px;" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>`;
+    const toggleIconSymbol = `<svg viewBox="0 0 24 24" style="width:16px; height:16px;" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>`;
 
     let toggleHtml = isFolder
         ? `<span class="toggle-icon ${node.expanded ? '' : 'collapsed'}" onclick="toggleFolderExpand(event, '${node.id}')" style="display:inline-flex; align-items:center; justify-content:center; width:18px;">${hasChildren ? toggleIconSymbol : '•'}</span>`

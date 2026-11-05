@@ -290,10 +290,6 @@ body {
     font-weight: 600;
 }
 
-.tree-node-item[data-path$=".ifc"] .toggle-icon {
-    width: 10px !important;
-}
-
 .node-title {
     display: flex;
     align-items: center;
