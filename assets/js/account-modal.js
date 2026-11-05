@@ -179,29 +179,17 @@
 
             if (currentUsername) {
                 try {
-                    const possiblePaths = [
-                        '/assets/data/users.json',
-                        './assets/data/users.json',
-                        '../assets/data/users.json',
-                        '../../assets/data/users.json',
-                        '../../../../assets/data/users.json'
-                    ];
-
-                    for (const path of possiblePaths) {
-                        try {
-                            const response = await fetch(path);
-                            if (response.ok) {
-                                const users = await response.json();
-                                const foundUser = users.find(u => u.username === currentUsername);
-                                if (foundUser) {
-                                    userData = { ...userSession, ...foundUser };
-                                    break;
-                                }
-                            }
-                        } catch (e) {}
+                    const apiUrl = `${CONFIG.CDE_API}/auth/me`;
+                    const response = await fetch(apiUrl, {
+                        headers: { Authorization: `Bearer ${localStorage.getItem('access_token') || ''}` }
+                    });
+                    if (!response.ok) throw new Error(`Lỗi tải hồ sơ (${response.status})`);
+                    const result = await response.json();
+                    if (result.user && result.user.username === currentUsername) {
+                        userData = { ...userSession, ...result.user };
                     }
                 } catch (error) {
-                    console.warn('Không thể đọc file users.json, đang dùng dữ liệu session hiện tại.', error);
+                    console.warn('Không thể tải hồ sơ từ backend, đang dùng dữ liệu session hiện tại.', error);
                 }
             }
 

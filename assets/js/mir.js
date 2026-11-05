@@ -183,19 +183,20 @@ async function loadUserPermissions() {
 
     let projectsStr = userSession.projects || '';
     try {
-        const response = await fetch('../../../assets/data/users.json');
-        if (response.ok) {
-            const users = await response.json();
-            const foundUser = users.find(u => u.username === userSession.username);
-            if (foundUser) {
-                if (foundUser.projects) projectsStr = foundUser.projects;
-                if (foundUser.permission) currentUserPermission = foundUser.permission.toUpperCase();
-                if (foundUser.role) currentUserRole = foundUser.role.toUpperCase();
-                if (foundUser.fullName) currentActiveUserFullName = foundUser.fullName;
-            }
+        const response = await fetch(`${CONFIG.CDE_API}/auth/me`, {
+            headers: { Authorization: `Bearer ${localStorage.getItem('access_token') || ''}` }
+        });
+        if (!response.ok) throw new Error(`Lỗi tải hồ sơ (${response.status})`);
+        const result = await response.json();
+        const profile = result.user;
+        if (profile && profile.username === userSession.username) {
+            if (profile.projects) projectsStr = profile.projects;
+            if (profile.permission) currentUserPermission = profile.permission.toUpperCase();
+            if (profile.role) currentUserRole = profile.role.toUpperCase();
+            if (profile.fullName) currentActiveUserFullName = profile.fullName;
         }
     } catch (e) {
-        console.warn('Không thể tải users.json, sử dụng session hiện tại.', e);
+        console.warn('Không thể tải quyền dự án từ backend, sử dụng session hiện tại.', e);
     }
 
     isUserAdmin = currentUserRole === 'ADMIN' || currentUserPermission === 'ADMIN';

@@ -63,18 +63,19 @@ async function loadDataProjectAccess() {
         .some(value => String(value || '').toUpperCase() === 'ADMIN');
     let projects = typeof user.projects === 'string' ? user.projects : '';
     try {
-        const response = await fetch('../../../assets/data/users.json');
-        if (response.ok) {
-            const users = await response.json();
-            const matchedUser = users.find(candidate => candidate.username === user.username);
-            if (matchedUser) {
-                if (typeof matchedUser.projects === 'string') projects = matchedUser.projects;
-                dataUserIsAdmin = [matchedUser.role, matchedUser.permission]
-                    .some(value => String(value || '').toUpperCase() === 'ADMIN');
-            }
+        const response = await fetch(`${CONFIG.CDE_API}/auth/me`, {
+            headers: { Authorization: `Bearer ${localStorage.getItem('access_token') || ''}` }
+        });
+        if (!response.ok) throw new Error(`Lỗi tải hồ sơ (${response.status})`);
+        const result = await response.json();
+        const profile = result.user;
+        if (profile && profile.username === user.username) {
+            if (typeof profile.projects === 'string') projects = profile.projects;
+            dataUserIsAdmin = [profile.role, profile.permission]
+                .some(value => String(value || '').toUpperCase() === 'ADMIN');
         }
     } catch (error) {
-        console.warn('Không thể tải danh sách dự án được phân công:', error);
+        console.warn('Không thể tải quyền dự án từ backend:', error);
     }
     dataUserProjects = projects.split(',').map(project => project.trim()).filter(Boolean);
 }
