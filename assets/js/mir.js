@@ -26,6 +26,11 @@ let fileTypeChartInstance = null;
 let storageChartInstance = null;
 let issueChartInstance = null;
 
+function getCdeAuthHeaders(headers = {}) {
+    const token = localStorage.getItem('access_token') || '';
+    return { ...headers, Authorization: `Bearer ${token}` };
+}
+
 let virtualTreeData = {
     id: "ROOT",
     name: "database/bim-vdc",
@@ -214,10 +219,10 @@ async function reloadDatabaseData() {
 
         const [filesRes, issuesRes, recallsRes, sigsRes] = await Promise.all([
             fetch(`${DATA_SERVER_API}/api/cde-files`, {
-                headers: { 'Authorization': `Bearer ${localStorage.getItem('access_token') || ''}` }
+                headers: getCdeAuthHeaders()
             }),
-            fetch(`${DATA_SERVER_API}/api/issues`),
-            fetch(`${DATA_SERVER_API}/api/recalls`).catch(() => null),
+            fetch(`${DATA_SERVER_API}/api/issues`, { headers: getCdeAuthHeaders() }),
+            fetch(`${DATA_SERVER_API}/api/recalls`, { headers: getCdeAuthHeaders() }).catch(() => null),
             fetch(`${DATA_SERVER_API}/api/vnpt/signatures`, {
                 headers: { 'Authorization': `Bearer ${localStorage.getItem('access_token') || ''}` }
             }).catch(() => null)
@@ -361,6 +366,45 @@ function buildFileUrl(itemPath) {
     };
 }
 
+async function openCdeFileInNewTab(itemPath) {
+    const popup = window.open('about:blank', '_blank');
+    if (!popup) {
+        showToast("⚠️ Trình duyệt chặn popup. Hãy cho phép mở tab mới cho trang này!");
+        return;
+    }
+    popup.opener = null;
+    try {
+        const { url, fileName } = buildFileUrl(itemPath);
+        const response = await fetch(url, { headers: getCdeAuthHeaders() });
+        if (!response.ok) throw new Error(`Máy chủ trả về lỗi ${response.status}.`);
+        const objectUrl = URL.createObjectURL(await response.blob());
+        popup.location.replace(objectUrl);
+        setTimeout(() => URL.revokeObjectURL(objectUrl), 60000);
+        showToast(`Đã mở tệp "${fileName}" ở tab mới.`);
+    } catch (error) {
+        popup.close();
+        showToast(`Không thể mở tệp: ${error.message}`);
+    }
+}
+
+async function downloadCdeFile(itemPath, fileName) {
+    try {
+        const { url } = buildFileUrl(itemPath);
+        const response = await fetch(url, { headers: getCdeAuthHeaders() });
+        if (!response.ok) throw new Error(`Máy chủ trả về lỗi ${response.status}.`);
+        const objectUrl = URL.createObjectURL(await response.blob());
+        const link = document.createElement('a');
+        link.href = objectUrl;
+        link.download = fileName;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        setTimeout(() => URL.revokeObjectURL(objectUrl), 60000);
+    } catch (error) {
+        showToast(`Không thể tải tệp: ${error.message}`);
+    }
+}
+
 function sanitizeDocumentPreview(html) {
     const parsed = new DOMParser().parseFromString(html, 'text/html');
     const allowedTags = new Set([
@@ -490,7 +534,7 @@ async function openDocumentPreview(itemPath) {
     }
 
     try {
-        const response = await fetch(url);
+        const response = await fetch(url, { headers: getCdeAuthHeaders() });
         if (!response.ok) throw new Error(`Máy chủ trả về lỗi ${response.status}.`);
         const buffer = await response.arrayBuffer();
 
@@ -542,13 +586,7 @@ function openWithLocalApp(itemPath) {
         openDocumentPreview(itemPath);
         return;
     }
-    const win = window.open(url, '_blank');
-    if (!win) {
-        showToast("⚠️ Trình duyệt chặn popup. Hãy cho phép mở tab mới cho trang này!");
-        return;
-    }
-    try { win.opener = null; } catch (e) { }
-    showToast(`Đã mở tệp "${fileName}" ở tab mới.`);
+    openCdeFileInNewTab(itemPath);
 }
 
 function countFilesInFolder(node) {
@@ -604,7 +642,7 @@ async function submitGateTransition() {
             try {
                 await fetch(`${DATA_SERVER_API}/api/issues/add`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: getCdeAuthHeaders({ 'Content-Type': 'application/json' }),
                     body: JSON.stringify({
                         filePath: newPathAfterMove,
                         text: issueContent,
@@ -1628,7 +1666,7 @@ function createIssuePrompt(filePath) {
 
     fetch(`${DATA_SERVER_API}/api/issues/add`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getCdeAuthHeaders({ 'Content-Type': 'application/json' }),
         body: JSON.stringify({ filePath: filePath, text: note.trim(), author: currentActiveUserFullName })
     })
         .then(res => res.json())
@@ -1694,7 +1732,7 @@ function addIssueToServer() {
 
     fetch(`${DATA_SERVER_API}/api/issues/add`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getCdeAuthHeaders({ 'Content-Type': 'application/json' }),
         body: JSON.stringify({ filePath: currentActiveFilePath, text: text, author: currentActiveUserFullName })
     })
         .then(res => res.json())
@@ -1714,7 +1752,7 @@ function addIssueToServer() {
 function deleteIssueFromServer(filePath, index) {
     fetch(`${DATA_SERVER_API}/api/issues/delete`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getCdeAuthHeaders({ 'Content-Type': 'application/json' }),
         body: JSON.stringify({ filePath: filePath, index: index })
     })
         .then(res => res.json())
@@ -1905,19 +1943,7 @@ function downloadFile(btn) {
     let filePath = row.getAttribute('data-path');
     let fileName = row.querySelector('.file-code').innerText;
 
-    let relFromBim = filePath.replace(/^database\/bim-vdc\/?/, '');
-    let parts = relFromBim.split('/');
-    let encodedParts = parts.map(p => encodeURIComponent(p));
-    let downloadUrl = `${DATA_SERVER_API}/files/${encodedParts.join('/')}`;
-
-    let link = document.createElement("a");
-    link.href = downloadUrl;
-    link.target = "_blank";
-    link.download = fileName;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    showToast(`Đã tải về tệp: ${fileName}`);
+    downloadCdeFile(filePath, fileName);
 }
 
 function uploadNewRevision(btn) {

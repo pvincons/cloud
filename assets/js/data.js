@@ -110,6 +110,7 @@ cdeSyncChannel.onmessage = (event) => {
 };
 
 document.addEventListener('DOMContentLoaded', function () {
+    if (window.dataRouteAllowed !== true) return;
     loadDataProjectAccess().then(() => {
         if (!canManageData()) return;
         document.getElementById('apiServerUrlInput').value = DATA_SERVER_API;
@@ -168,6 +169,34 @@ function getFileUrl(itemPath) {
     return `${DATA_SERVER_API}/files/${encodedParts.join('/')}`;
 }
 
+async function openProtectedCdeFile(filePath, fileName, download = false) {
+    const popup = download ? null : window.open('about:blank', '_blank');
+    if (!download && !popup) {
+        alert('Trình duyệt đã chặn cửa sổ bật lên. Hãy cho phép mở tab mới.');
+        return;
+    }
+    if (popup) popup.opener = null;
+    try {
+        const response = await fetch(getFileUrl(filePath), { headers: getCdeAuthHeaders() });
+        if (!response.ok) throw new Error(`Không thể tải tệp (HTTP ${response.status}).`);
+        const objectUrl = URL.createObjectURL(await response.blob());
+        if (download) {
+            const link = document.createElement('a');
+            link.href = objectUrl;
+            link.download = fileName;
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+        } else {
+            popup.location.replace(objectUrl);
+        }
+        setTimeout(() => URL.revokeObjectURL(objectUrl), 60000);
+    } catch (error) {
+        if (popup) popup.close();
+        alert(error.message || 'Không thể tải tệp.');
+    }
+}
+
 async function openXmlViewer(filePath, fileName) {
     const modal = document.getElementById('xmlViewerModal');
     const title = document.getElementById('xmlViewerTitle');
@@ -184,7 +213,7 @@ async function openXmlViewer(filePath, fileName) {
     document.body.classList.add('overflow-hidden');
 
     try {
-        const response = await fetch(getFileUrl(filePath));
+        const response = await fetch(getFileUrl(filePath), { headers: getCdeAuthHeaders() });
         if (!response.ok) throw new Error(`Không thể tải tệp (HTTP ${response.status}).`);
 
         const xmlText = await response.text();
@@ -375,13 +404,10 @@ function openRowMenu(btn, ev) {
     try { metadata = JSON.parse(btn.dataset.metadata || '{}'); } catch (error) { metadata = {}; }
     const entries = [
         isDir ? { i: 'fa-folder-open', t: 'Vào thư mục', f: () => navigateTo(path) }
-            : { i: 'fa-eye', t: 'Xem', f: () => /\.xml$/i.test(name) ? openXmlViewer(path, name) : window.open(url, '_blank') },
+            : { i: 'fa-eye', t: 'Xem', f: () => /\.xml$/i.test(name) ? openXmlViewer(path, name) : openProtectedCdeFile(path, name) },
         ...(!isDir ? [{ i: 'fa-circle-info', t: 'Thông tin tài liệu', f: () => openFileMetadataModal(path, name, metadata) }] : []),
         ...(isDir ? [] : [{
-            i: 'fa-download', t: 'Tải về', f: () => {
-                const a = document.createElement('a'); a.href = url; a.download = ''; a.target = '_blank';
-                document.body.appendChild(a); a.click(); a.remove();
-            }
+            i: 'fa-download', t: 'Tải về', f: () => openProtectedCdeFile(path, name, true)
         }]),
         { i: 'fa-link', t: 'Copy link', f: () => copyLink(url, name) },
         { i: 'fa-pen-to-square', t: 'Đổi tên', f: () => renameItem(path, name) },
@@ -455,7 +481,7 @@ function renderTreeItems(items, container, depth = 0) {
             ? `toggleFolderExpand('${safePath}', event)`
             : isXml
                 ? `openXmlViewer(${safePathArg}, ${safeNameArg})`
-            : `window.open('${fileUrl}', '_blank')`;
+            : `openProtectedCdeFile(${safePathArg}, ${safeNameArg})`;
 
         tr.innerHTML = `
                     <td class="py-2.5 px-3">

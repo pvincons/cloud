@@ -1,4 +1,4 @@
-function protectRoute(allowedRoles = null) {
+function protectRoute(allowedRoles = null, deniedRoles = []) {
   // Ẩn nội dung gốc trước khi kiểm tra để tránh chớp giật giao diện
   document.documentElement.style.display = 'none';
 
@@ -6,7 +6,7 @@ function protectRoute(allowedRoles = null) {
   if (!token) {
     alert('Bạn chưa đăng nhập!');
     window.location.href = '../../index.html';
-    return;
+    return false;
   }
 
   let userSession = null;
@@ -26,7 +26,16 @@ function protectRoute(allowedRoles = null) {
     } else {
       revealPage();
     }
-    return;
+    return true;
+  }
+
+  const denied = deniedRoles.map(role => String(role).toUpperCase());
+  if (denied.includes(userRole) || denied.includes(userPermission)) {
+    window.addEventListener('DOMContentLoaded', () => {
+      document.documentElement.style.display = '';
+      renderLockedScreen(userRole || userPermission);
+    });
+    return false;
   }
 
   if (allowedRoles) {
@@ -40,7 +49,7 @@ function protectRoute(allowedRoles = null) {
         document.documentElement.style.display = '';
         renderLockedScreen(userSession ? userRole || userPermission : 'Khách');
       });
-      return;
+      return false;
     }
   }
 
@@ -50,4 +59,26 @@ function protectRoute(allowedRoles = null) {
   } else {
     revealPage();
   }
+  return true;
+}
+
+function renderLockedScreen(userRole) {
+  const container = document.createElement('main');
+  container.style.cssText = 'min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:24px;background:#0f172a;color:#e2e8f0;font:14px sans-serif;text-align:center';
+
+  const heading = document.createElement('h1');
+  heading.textContent = 'Không có quyền truy cập';
+  heading.style.cssText = 'margin:0;font-size:24px;font-weight:700';
+
+  const message = document.createElement('p');
+  message.textContent = `Tài khoản ${userRole} không được phép mở trang này.`;
+  message.style.margin = '0';
+
+  const backLink = document.createElement('a');
+  backLink.href = './index.html';
+  backLink.textContent = 'Quay lại trang chính';
+  backLink.style.cssText = 'color:#60a5fa;text-decoration:underline';
+
+  container.append(heading, message, backLink);
+  document.body.replaceChildren(container);
 }
