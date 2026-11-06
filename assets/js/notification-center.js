@@ -7,6 +7,31 @@
         purple: 'bg-purple-500/10 text-purple-500',
         rose: 'bg-rose-500/10 text-rose-500'
     };
+    function getReadStateStorageKey() {
+        let username = 'anonymous';
+        try {
+            const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}') || {};
+            if (typeof currentUser.username === 'string' && currentUser.username.trim()) {
+                username = currentUser.username.trim().toLowerCase();
+            }
+        } catch (error) {
+            console.warn('[CDE] Không đọc được người dùng hiện tại để lưu trạng thái thông báo:', error);
+        }
+        return `cde-notification-read-v1:${encodeURIComponent(username)}`;
+    }
+
+    const readStateStorageKey = getReadStateStorageKey();
+    let readNotifications = {};
+    let notificationLoadPromise = null;
+    try {
+        const savedState = JSON.parse(localStorage.getItem(readStateStorageKey) || '{}');
+        if (savedState && typeof savedState === 'object' && !Array.isArray(savedState)) {
+            readNotifications = savedState;
+        }
+    } catch (error) {
+        console.warn('[CDE] Không đọc được trạng thái đã xem thông báo:', error);
+    }
+
     let activeNotifications = [];
     let loadError = '';
 
@@ -48,9 +73,56 @@
         });
     }
 
+    function notificationVersion(notification) {
+        return JSON.stringify([
+            notification.createdAt || '',
+            notification.updatedAt || '',
+            notification.title,
+            notification.message,
+            notification.icon || '',
+            notification.color || '',
+            notification.active !== false
+        ]);
+    }
+
+    function getUnreadNotifications() {
+        return activeNotifications.filter(notification =>
+            readNotifications[notification.id] !== notificationVersion(notification)
+        );
+    }
+
     function updateIndicator() {
+        const unreadCount = getUnreadNotifications().length;
         const indicator = document.getElementById('notificationIndicator');
-        if (indicator) indicator.classList.toggle('hidden', activeNotifications.length === 0);
+        const count = document.getElementById('notificationCount');
+        const bottomIndicator = document.getElementById('notificationBottomIndicator');
+        const button = document.getElementById('notificationButton');
+        const label = unreadCount ? `${unreadCount} thông báo mới` : 'Xem thông báo';
+
+        if (indicator) indicator.classList.toggle('hidden', unreadCount === 0);
+        if (count) count.textContent = String(unreadCount);
+        if (bottomIndicator) {
+            bottomIndicator.textContent = String(unreadCount);
+            bottomIndicator.classList.toggle('hidden', unreadCount === 0);
+            bottomIndicator.classList.toggle('flex', unreadCount > 0);
+        }
+        if (button) {
+            button.title = label;
+            button.setAttribute('aria-label', label);
+        }
+    }
+
+    function markNotificationsAsRead() {
+        readNotifications = {};
+        activeNotifications.forEach(notification => {
+            readNotifications[notification.id] = notificationVersion(notification);
+        });
+        try {
+            localStorage.setItem(readStateStorageKey, JSON.stringify(readNotifications));
+        } catch (error) {
+            console.error('[CDE] Không lưu được trạng thái đã xem thông báo:', error);
+        }
+        updateIndicator();
     }
 
     function renderNotifications() {
@@ -110,29 +182,40 @@
         });
     }
 
-    async function loadNotifications() {
-        try {
-            const response = await fetch(`${NOTIFICATIONS_URL}?_=${Date.now()}`, {
-                headers: { Accept: 'application/json' },
-                cache: 'no-store'
-            });
-            if (!response.ok) throw new Error(`HTTP ${response.status}`);
-            const data = await response.json();
-            if (!data || !Array.isArray(data.notifications)) {
-                throw new Error('Dữ liệu notifications.json không đúng định dạng.');
-            }
-            activeNotifications = data.notifications.filter(item =>
-                item && item.active !== false &&
-                typeof item.title === 'string' && typeof item.message === 'string'
-            );
-            loadError = '';
-        } catch (error) {
-            activeNotifications = [];
-            loadError = 'Không tải được thông báo hệ thống. Vui lòng thử lại sau.';
-            console.error('[CDE] Không tải được notifications.json:', error);
+    async function loadNotifications(markViewed = false) {
+        if (!notificationLoadPromise) {
+            notificationLoadPromise = (async () => {
+                try {
+                    const response = await fetch(`${NOTIFICATIONS_URL}?_=${Date.now()}`, {
+                        headers: { Accept: 'application/json' },
+                        cache: 'no-store'
+                    });
+                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                    const data = await response.json();
+                    if (!data || !Array.isArray(data.notifications)) {
+                        throw new Error('Dữ liệu notifications.json không đúng định dạng.');
+                    }
+                    activeNotifications = data.notifications.filter(item =>
+                        item && typeof item.id === 'string' && item.active !== false &&
+                        typeof item.title === 'string' && typeof item.message === 'string'
+                    );
+                    loadError = '';
+                } catch (error) {
+                    loadError = 'Không tải được thông báo hệ thống. Vui lòng thử lại sau.';
+                    console.error('[CDE] Không tải được notifications.json:', error);
+                }
+                updateIndicator();
+                renderNotifications();
+            })();
         }
-        updateIndicator();
-        renderNotifications();
+
+        const pendingLoad = notificationLoadPromise;
+        try {
+            await pendingLoad;
+        } finally {
+            if (notificationLoadPromise === pendingLoad) notificationLoadPromise = null;
+        }
+        if (markViewed && !loadError) markNotificationsAsRead();
     }
 
     window.toggleNotificationModal = function (show) {
@@ -146,7 +229,7 @@
                 content.classList.remove('translate-y-full');
                 content.classList.add('translate-y-0');
             });
-            loadNotifications();
+            loadNotifications(true);
         } else {
             content.classList.remove('translate-y-0');
             content.classList.add('translate-y-full');
@@ -160,6 +243,14 @@
     function initialize() {
         createModal();
         loadNotifications();
+        const refreshNotifications = () => {
+            if (document.visibilityState !== 'visible') return;
+            const modal = document.getElementById('notificationModal');
+            const isViewing = modal && !modal.classList.contains('hidden');
+            loadNotifications(Boolean(isViewing));
+        };
+        window.setInterval(refreshNotifications, 30_000);
+        window.addEventListener('focus', refreshNotifications);
     }
 
     if (document.readyState === 'loading') {
