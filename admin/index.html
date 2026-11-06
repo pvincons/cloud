@@ -84,18 +84,22 @@
                     <i class="fa-solid fa-user-shield"></i>
                 </div>
                 <h2 class="text-lg font-bold text-gray-100">Super Admin Portal</h2>
-                <p class="text-xs text-gray-400">Xác thực GitHub để quản lý users.json và notifications.json</p>
+                <p class="text-xs text-gray-400">Xác thực GitHub để quản lý phân quyền users.json</p>
             </div>
 
             <div class="space-y-3">
                 <div class="space-y-1">
-                    <label class="text-[11px] font-semibold text-gray-400 uppercase">Repository đích</label>
-                    <div class="w-full bg-[#0f1117] border border-[#2a2e3d] rounded-xl px-3 py-2.5 text-xs text-purple-300 font-mono">
-                        pvincons/cloud · main
-                    </div>
+                    <label class="text-[11px] font-semibold text-gray-400 uppercase">GitHub Owner / User</label>
+                    <input type="text" id="auth-owner" placeholder="VD: pvincons"
+                        class="w-full bg-[#0f1117] border border-[#2a2e3d] rounded-xl px-3 py-2.5 text-xs text-gray-200 outline-none focus:border-purple-500 font-mono">
                 </div>
                 <div class="space-y-1">
-                    <label class="text-[11px] font-semibold text-gray-400 uppercase">GitHub Token (cần quyền Contents: Read and write)</label>
+                    <label class="text-[11px] font-semibold text-gray-400 uppercase">Repository Name</label>
+                    <input type="text" id="auth-repo" placeholder="VD: backend"
+                        class="w-full bg-[#0f1117] border border-[#2a2e3d] rounded-xl px-3 py-2.5 text-xs text-gray-200 outline-none focus:border-purple-500 font-mono">
+                </div>
+                <div class="space-y-1">
+                    <label class="text-[11px] font-semibold text-gray-400 uppercase">Personal Access Token (PAT)</label>
                     <input type="password" id="auth-token" placeholder="ghp_......"
                         class="w-full bg-[#0f1117] border border-[#2a2e3d] rounded-xl px-3 py-2.5 text-xs text-gray-200 outline-none focus:border-purple-500 font-mono">
                 </div>
@@ -679,8 +683,6 @@
         });
 
         // ===== CẤU HÌNH ĐƯỜNG DẪN USERS.JSON (DÙNG CHUNG CHO LOCAL VÀ VPS) =====
-        const GITHUB_OWNER = 'pvincons';
-        const GITHUB_REPO = 'cloud';
         const USERS_FILE_PATH = 'assets/data/users.json';
         const NOTIFICATIONS_FILE_PATH = 'assets/data/notifications.json';
         const NOTIFICATION_ICONS = {
@@ -740,8 +742,15 @@
                 const val = localStorage.getItem('pv_github_auth');
                 if (!val) return null;
                 const parsed = val.trim().startsWith('{') ? JSON.parse(val) : JSON.parse(atob(val));
-                if (!parsed || typeof parsed.token !== 'string' || !parsed.token.trim()) return null;
-                const normalized = { owner: GITHUB_OWNER, repo: GITHUB_REPO, token: parsed.token.trim() };
+                if (!parsed || typeof parsed.owner !== 'string' || typeof parsed.repo !== 'string' ||
+                    typeof parsed.token !== 'string' || !parsed.owner.trim() || !parsed.repo.trim() || !parsed.token.trim()) {
+                    return null;
+                }
+                const normalized = {
+                    owner: parsed.owner.trim(),
+                    repo: parsed.repo.trim(),
+                    token: parsed.token.trim()
+                };
                 localStorage.setItem('pv_github_auth', btoa(JSON.stringify(normalized)));
                 return normalized;
             } catch (e) {
@@ -794,7 +803,7 @@
         }
 
         // Lắng nghe thay đổi input để ẩn lỗi cũ
-        ['auth-token'].forEach(id => {
+        ['auth-owner', 'auth-repo', 'auth-token'].forEach(id => {
             document.getElementById(id)?.addEventListener('input', hideLoginError);
         });
 
@@ -809,17 +818,19 @@
         if (authConfig) {
             document.getElementById('login-modal').classList.add('hidden');
             document.getElementById('admin-workspace').classList.remove('hidden');
-            document.getElementById('display-repo-info').innerText = `${GITHUB_OWNER}/${GITHUB_REPO}`;
+            document.getElementById('display-repo-info').innerText = `${authConfig.owner}/${authConfig.repo}`;
             loadUsersFromGitHub();
         }
 
         document.getElementById('btn-login').addEventListener('click', async () => {
             hideLoginError();
 
+            const owner = document.getElementById('auth-owner').value.trim();
+            const repo = document.getElementById('auth-repo').value.trim();
             const token = document.getElementById('auth-token').value.trim();
 
-            if (!token) {
-                showLoginError('Vui lòng nhập GitHub Token!');
+            if (!owner || !repo || !token) {
+                showLoginError('Vui lòng điền đầy đủ thông tin xác thực GitHub!');
                 return;
             }
 
@@ -828,7 +839,7 @@
             btnLogin.innerHTML = `<i class="fa-solid fa-arrows-rotate fa-spin text-xs"></i> <span>Đang xác thực với GitHub...</span>`;
 
             try {
-                const testUrl = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}`;
+                const testUrl = `https://api.github.com/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}`;
                 const response = await fetch(testUrl, {
                     headers: {
                         'Authorization': `Bearer ${token}`,
@@ -840,18 +851,18 @@
                     if (response.status === 401) {
                         throw new Error('Token PAT không hợp lệ hoặc đã hết hạn!');
                     } else if (response.status === 404) {
-                        throw new Error(`Token không truy cập được repository ${GITHUB_OWNER}/${GITHUB_REPO}.`);
+                        throw new Error('Không tìm thấy Repository hoặc Owner không đúng!');
                     } else {
                         throw new Error(`Xác thực thất bại (HTTP ${response.status})`);
                     }
                 }
 
-                authConfig = { owner: GITHUB_OWNER, repo: GITHUB_REPO, token };
+                authConfig = { owner, repo, token };
                 localStorage.setItem('pv_github_auth', btoa(JSON.stringify(authConfig)));
 
                 document.getElementById('login-modal').classList.add('hidden');
                 document.getElementById('admin-workspace').classList.remove('hidden');
-                document.getElementById('display-repo-info').innerText = `${GITHUB_OWNER}/${GITHUB_REPO}`;
+                document.getElementById('display-repo-info').innerText = `${owner}/${repo}`;
 
                 showToast('Xác thực GitHub thành công!');
                 loadUsersFromGitHub();
@@ -880,7 +891,7 @@
 
         function ghContentsUrl(filePath, withRef = true) {
             const enc = filePath.split('/').map(encodeURIComponent).join('/');
-            const base = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${enc}`;
+            const base = `https://api.github.com/repos/${encodeURIComponent(authConfig.owner)}/${encodeURIComponent(authConfig.repo)}/contents/${enc}`;
             return withRef ? `${base}?ref=${encodeURIComponent(GITHUB_BRANCH)}` : base;
         }
 
@@ -957,14 +968,14 @@
         }
 
         function updatePathLabels() {
-            const text = `${GITHUB_OWNER}/${GITHUB_REPO}/${GITHUB_BRANCH}/${USERS_FILE_PATH}`;
+            const text = `${authConfig.owner}/${authConfig.repo}/${GITHUB_BRANCH}/${USERS_FILE_PATH}`;
             const a = document.getElementById('users-path-label');
             const b = document.getElementById('users-path-footer');
             if (a) a.textContent = `( ${text} )`;
             if (b) b.textContent = text;
             const notificationsPath = document.getElementById('notifications-path-label');
             if (notificationsPath) {
-                notificationsPath.textContent = `https://raw.githubusercontent.com/${GITHUB_OWNER}/${GITHUB_REPO}/${GITHUB_BRANCH}/${NOTIFICATIONS_FILE_PATH}`;
+                notificationsPath.textContent = `https://raw.githubusercontent.com/${authConfig.owner}/${authConfig.repo}/${GITHUB_BRANCH}/${NOTIFICATIONS_FILE_PATH}`;
             }
         }
 
@@ -1205,16 +1216,16 @@
                 const message = document.createElement('p');
                 message.className = 'text-xs text-slate-400 mt-1 whitespace-pre-wrap break-words';
                 message.textContent = notification.message;
+                const metadata = document.createElement('div');
+                metadata.className = 'flex items-center gap-3 mt-2 flex-nowrap';
                 const status = document.createElement('span');
                 status.className = notification.active
-                    ? 'inline-block mt-2 text-[10px] text-emerald-300'
-                    : 'inline-block mt-2 text-[10px] text-slate-500';
+                    ? 'text-[10px] text-emerald-300 shrink-0'
+                    : 'text-[10px] text-slate-500 shrink-0';
                 status.textContent = notification.active ? 'Đang hiển thị' : 'Đã ẩn';
-                content.append(title, message, status);
-
                 const timestamp = Date.parse(notification.updatedAt || notification.createdAt || '');
-                const timestampLabel = document.createElement('p');
-                timestampLabel.className = 'text-[10px] text-slate-500 sm:text-right sm:self-center shrink-0';
+                const timestampLabel = document.createElement('span');
+                timestampLabel.className = 'text-[10px] text-slate-500 whitespace-nowrap';
                 if (Number.isNaN(timestamp)) {
                     timestampLabel.textContent = 'Chưa có thời gian';
                 } else {
@@ -1232,6 +1243,8 @@
                     timestampLabel.textContent =
                         `Thời gian: ${dateValues.hour}:${dateValues.minute}:${dateValues.second} Ngày ${dateValues.day}/${dateValues.month}/${dateValues.year}`;
                 }
+                metadata.append(status, timestampLabel);
+                content.append(title, message, metadata);
 
                 const actions = document.createElement('div');
                 actions.className = 'flex gap-2 shrink-0';
@@ -1246,7 +1259,7 @@
                 deleteButton.textContent = 'Xóa';
                 deleteButton.addEventListener('click', () => deleteNotification(notification.id));
                 actions.append(editButton, deleteButton);
-                card.append(content, timestampLabel, actions);
+                card.append(content, actions);
                 container.appendChild(card);
             });
         }
