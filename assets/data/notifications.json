@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "updatedAt": "2026-11-06T00:00:00.000Z",
+  "notifications": [
+    {
+      "id": "revit-server-2027",
+      "title": "Máy chủ Revit Server 2027",
+      "message": "Đã kết nối thành công tên miền revit.pvincons.cloud hỗ trợ đồng bộ dữ liệu Central từ xa.",
+      "icon": "fa-server",
+      "color": "blue",
+      "active": true,
+      "createdAt": "2026-11-06T00:00:00.000Z"
+    },
+    {
+      "id": "iso-19650-permissions",
+      "title": "Chuẩn hóa Phân quyền ISO 19650",
+      "message": "Cấu trúc thư mục dự án đã được phân chia theo 4 cấp độ tiêu chuẩn: WIP, Shared, Published và Archive.",
+      "icon": "fa-shield-halved",
+      "color": "emerald",
+      "active": true,
+      "createdAt": "2026-11-06T00:00:00.000Z"
+    }
+  ]
+}
