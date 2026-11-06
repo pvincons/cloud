@@ -84,24 +84,18 @@
                     <i class="fa-solid fa-user-shield"></i>
                 </div>
                 <h2 class="text-lg font-bold text-gray-100">Super Admin Portal</h2>
-                <p class="text-xs text-gray-400">Xác thực GitHub để quản lý phân quyền users.json</p>
+                <p class="text-xs text-gray-400">Xác thực GitHub để quản lý users.json và notifications.json</p>
             </div>
 
             <div class="space-y-3">
                 <div class="space-y-1">
-                    <label class="text-[11px] font-semibold text-gray-400 uppercase">GitHub Owner / User</label>
-                    <input type="text" id="auth-owner" placeholder="VD: pvincons"
-                        class="w-full bg-[#0f1117] border border-[#2a2e3d] rounded-xl px-3 py-2.5 text-xs text-gray-200 outline-none focus:border-purple-500 font-mono">
+                    <label class="text-[11px] font-semibold text-gray-400 uppercase">Repository đích</label>
+                    <div class="w-full bg-[#0f1117] border border-[#2a2e3d] rounded-xl px-3 py-2.5 text-xs text-purple-300 font-mono">
+                        pvincons/cloud · main
+                    </div>
                 </div>
-
                 <div class="space-y-1">
-                    <label class="text-[11px] font-semibold text-gray-400 uppercase">Repository Name</label>
-                    <input type="text" id="auth-repo" placeholder="VD: cloud"
-                        class="w-full bg-[#0f1117] border border-[#2a2e3d] rounded-xl px-3 py-2.5 text-xs text-gray-200 outline-none focus:border-purple-500 font-mono">
-                </div>
-
-                <div class="space-y-1">
-                    <label class="text-[11px] font-semibold text-gray-400 uppercase">Personal Access Token (PAT)</label>
+                    <label class="text-[11px] font-semibold text-gray-400 uppercase">GitHub Token (cần quyền Contents: Read and write)</label>
                     <input type="password" id="auth-token" placeholder="ghp_......"
                         class="w-full bg-[#0f1117] border border-[#2a2e3d] rounded-xl px-3 py-2.5 text-xs text-gray-200 outline-none focus:border-purple-500 font-mono">
                 </div>
@@ -137,8 +131,7 @@
                             SUPER ADMIN PORTAL <span
                                 class="text-[10px] bg-purple-500/20 text-purple-300 px-2 py-0.5 rounded border border-purple-500/30">ROOT</span>
                         </h1>
-                        <p class="text-[11px] sm:text-xs text-slate-400">Quản lý tài khoản, phân quyền & đồng bộ
-                            users.json</p>
+                        <p class="text-[11px] sm:text-xs text-slate-400">Quản lý tài khoản, thông báo & đồng bộ JSON lên GitHub</p>
                     </div>
                 </div>
 
@@ -277,7 +270,7 @@
                 </a>
             </div>
 
-            <!-- THANH ĐIỀU HƯỚNG TAB & NÚT XUẤT JSON -->
+            <!-- THANH ĐIỀU HƯỚNG TAB -->
             <div class="flex flex-wrap items-center justify-between gap-3 mb-4 border-b border-white/10" role="tablist">
                 <div class="flex items-center gap-2">
                     <button type="button" id="tab-btn-users" role="tab" data-tab="users" aria-selected="true"
@@ -288,16 +281,14 @@
                             class="text-[10px] bg-purple-500/20 text-purple-300 px-1.5 py-0.5 rounded border border-purple-500/30">0</span>
                     </button>
 
-                    <a href="../content/cms/index.html"
-                        class="tab-btn px-4 py-2.5 text-xs font-bold uppercase tracking-widest flex items-center gap-2 -mb-px text-slate-400 hover:text-purple-300 transition-colors">
-                        <i class="fa-solid fa-bullhorn text-purple-400"></i> Quản Trị Thông Báo
-                    </a>
+                    <button type="button" id="tab-btn-notifications" role="tab" data-tab="notifications"
+                        aria-selected="false" aria-controls="tab-panel-notifications"
+                        onclick="switchTab('notifications')"
+                        class="tab-btn px-4 py-2.5 text-xs font-bold uppercase tracking-widest flex items-center gap-2 -mb-px">
+                        <i class="fa-solid fa-bullhorn text-purple-400"></i> Thông Báo
+                    </button>
                 </div>
 
-                <button type="button" id="btn-export-users-json" onclick="exportUsersJson()"
-                    class="mb-2 px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-amber-400 border border-slate-700 font-bold text-xs rounded-xl transition-all flex items-center gap-1.5 shadow">
-                    <i class="fa-solid fa-file-arrow-down"></i> Xuất users.json
-                </button>
             </div>
 
             <div id="tab-panel-users" role="tabpanel" aria-labelledby="tab-btn-users">
@@ -315,11 +306,14 @@
                                     Vai trò, Công ty, Trạng thái & Sắp xếp</p>
                             </div>
 
-                            <!-- 3 NÚT ĐƯỢC CHỈNH KÍCH THƯỚC BẰNG NHAU TRÊN MOBILE -->
-                            <div class="grid grid-cols-3 gap-1.5 sm:flex sm:items-center sm:gap-2 w-full sm:w-auto justify-end">
+                            <div class="grid grid-cols-2 gap-1.5 sm:flex sm:items-center sm:gap-2 w-full sm:w-auto justify-end">
                                 <button id="btn-sync-github"
                                     class="w-full sm:w-auto justify-center px-2 sm:px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-blue-400 border border-slate-700 font-bold text-[11px] sm:text-xs rounded-xl transition-all flex items-center gap-1 shadow truncate">
                                     <i class="fa-solid fa-arrows-rotate shrink-0"></i> <span class="truncate">Tải dữ liệu</span>
+                                </button>
+                                <button type="button" id="btn-export-users-json" onclick="exportUsersJson()"
+                                    class="w-full sm:w-auto justify-center px-2 sm:px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-amber-400 border border-slate-700 font-bold text-[11px] sm:text-xs rounded-xl transition-all flex items-center gap-1 shadow truncate">
+                                    <i class="fa-solid fa-file-arrow-down shrink-0"></i> <span class="truncate">Xuất users.json</span>
                                 </button>
                                 <button id="btn-publish-github"
                                     class="w-full sm:w-auto justify-center px-2 sm:px-3.5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-[11px] sm:text-xs rounded-xl shadow-lg transition-all flex items-center gap-1 shadow truncate">
@@ -363,11 +357,15 @@
                             </select>
                             <div class="relative">
                                 <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-slate-500 text-xs"></i>
-                                <input type="text" id="searchInput" placeholder="Tìm kiếm tên, user..."
+                                <input type="text" id="searchInput" name="admin-user-search" readonly
+                                    placeholder="Tìm kiếm tên, user..." autocomplete="off" autocorrect="off"
+                                    autocapitalize="off" spellcheck="false" aria-autocomplete="none"
+                                    onfocus="this.removeAttribute('readonly'); this.value='';"
                                     onkeyup="applyFiltersAndSort()"
                                     class="w-full bg-slate-900 border border-slate-700 text-xs pl-8 pr-3 py-2.5 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-purple-400">
                             </div>
                         </div>
+
                     </div>
 
                     <!-- BẢNG TÀI KHOẢN - DESKTOP VIEW -->
@@ -394,6 +392,154 @@
                     <div id="userCardList" class="md:hidden grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
                 </div>
             </div>
+
+            <section id="tab-panel-notifications" role="tabpanel" aria-labelledby="tab-btn-notifications" class="hidden">
+                <div class="glass-card p-4 sm:p-6 rounded-3xl">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
+                        <div>
+                            <h2 class="text-sm font-bold text-white flex items-center gap-2">
+                                <i class="fa-solid fa-bullhorn text-amber-400"></i> Quản lý thông báo
+                            </h2>
+                            <p class="text-xs text-slate-400 mt-1">GitHub: <span id="notifications-path-label" class="font-mono text-purple-300">https://raw.githubusercontent.com/pvincons/cloud/main/assets/data/notifications.json</span></p>
+                        </div>
+                        <div class="grid grid-cols-3 gap-2 sm:flex">
+                            <button type="button" id="btn-sync-notifications"
+                                class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-blue-400 border border-slate-700 font-bold text-xs rounded-xl">
+                                <i class="fa-solid fa-arrows-rotate"></i> Tải JSON
+                            </button>
+                            <button type="button" id="btn-export-notifications" onclick="exportNotificationsJson()"
+                                class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-amber-400 border border-slate-700 font-bold text-xs rounded-xl">
+                                <i class="fa-solid fa-file-arrow-down"></i> Tải xuống
+                            </button>
+                            <button type="button" id="btn-publish-notifications"
+                                class="px-3 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl">
+                                <i class="fa-solid fa-cloud-arrow-up"></i> Xuất Notification.json
+                            </button>
+                        </div>
+                    </div>
+
+                    <form id="notification-form" class="grid grid-cols-1 md:grid-cols-2 gap-3 p-4 rounded-2xl bg-slate-900/70 border border-white/10 mb-5">
+                        <input id="notification-title" type="text" maxlength="160" required
+                            placeholder="Tiêu đề thông báo"
+                            class="bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-xs text-white outline-none focus:border-purple-500">
+                        <div class="grid grid-cols-2 gap-2">
+                            <div id="notification-icon-picker" class="relative">
+                                <input id="notification-icon" type="hidden" value="fa-circle-info">
+                                <button type="button" id="notification-icon-button" aria-haspopup="listbox"
+                                    aria-expanded="false"
+                                    class="w-full h-full min-h-[42px] flex items-center justify-between gap-2 bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-xs text-white outline-none focus:border-purple-500">
+                                    <span class="flex items-center gap-2 min-w-0">
+                                        <i id="notification-icon-preview" class="fa-solid fa-circle-info text-purple-300"></i>
+                                        <span id="notification-icon-label" class="truncate">Thông tin</span>
+                                    </span>
+                                    <i class="fa-solid fa-chevron-down text-[10px] text-slate-400"></i>
+                                </button>
+                                <div id="notification-icon-options" role="listbox"
+                                    class="hidden absolute top-full left-0 mt-1 w-full max-h-56 overflow-y-auto z-50 p-1.5 bg-slate-950 border border-slate-700 rounded-xl shadow-2xl">
+                                    <button type="button" role="option" aria-selected="true" data-notification-icon="fa-circle-info"
+                                        class="w-full flex items-center gap-2 px-2.5 py-2 text-left text-xs text-slate-200 hover:bg-slate-800 rounded-lg">
+                                        <i class="fa-solid fa-circle-info w-5 text-center text-blue-400"></i> Thông tin
+                                    </button>
+                                    <button type="button" role="option" aria-selected="false" data-notification-icon="fa-bell"
+                                        class="w-full flex items-center gap-2 px-2.5 py-2 text-left text-xs text-slate-200 hover:bg-slate-800 rounded-lg">
+                                        <i class="fa-solid fa-bell w-5 text-center text-amber-400"></i> Chuông
+                                    </button>
+                                    <button type="button" role="option" aria-selected="false" data-notification-icon="fa-bullhorn"
+                                        class="w-full flex items-center gap-2 px-2.5 py-2 text-left text-xs text-slate-200 hover:bg-slate-800 rounded-lg">
+                                        <i class="fa-solid fa-bullhorn w-5 text-center text-purple-400"></i> Thông báo
+                                    </button>
+                                    <button type="button" role="option" aria-selected="false" data-notification-icon="fa-server"
+                                        class="w-full flex items-center gap-2 px-2.5 py-2 text-left text-xs text-slate-200 hover:bg-slate-800 rounded-lg">
+                                        <i class="fa-solid fa-server w-5 text-center text-cyan-400"></i> Máy chủ
+                                    </button>
+                                    <button type="button" role="option" aria-selected="false" data-notification-icon="fa-shield-halved"
+                                        class="w-full flex items-center gap-2 px-2.5 py-2 text-left text-xs text-slate-200 hover:bg-slate-800 rounded-lg">
+                                        <i class="fa-solid fa-shield-halved w-5 text-center text-emerald-400"></i> Bảo mật
+                                    </button>
+                                    <button type="button" role="option" aria-selected="false" data-notification-icon="fa-circle-check"
+                                        class="w-full flex items-center gap-2 px-2.5 py-2 text-left text-xs text-slate-200 hover:bg-slate-800 rounded-lg">
+                                        <i class="fa-solid fa-circle-check w-5 text-center text-emerald-400"></i> Thành công
+                                    </button>
+                                    <button type="button" role="option" aria-selected="false" data-notification-icon="fa-triangle-exclamation"
+                                        class="w-full flex items-center gap-2 px-2.5 py-2 text-left text-xs text-slate-200 hover:bg-slate-800 rounded-lg">
+                                        <i class="fa-solid fa-triangle-exclamation w-5 text-center text-rose-400"></i> Cảnh báo
+                                    </button>
+                                    <button type="button" role="option" aria-selected="false" data-notification-icon="fa-screwdriver-wrench"
+                                        class="w-full flex items-center gap-2 px-2.5 py-2 text-left text-xs text-slate-200 hover:bg-slate-800 rounded-lg">
+                                        <i class="fa-solid fa-screwdriver-wrench w-5 text-center text-orange-400"></i> Bảo trì
+                                    </button>
+                                    <button type="button" role="option" aria-selected="false" data-notification-icon="fa-cloud-arrow-up"
+                                        class="w-full flex items-center gap-2 px-2.5 py-2 text-left text-xs text-slate-200 hover:bg-slate-800 rounded-lg">
+                                        <i class="fa-solid fa-cloud-arrow-up w-5 text-center text-sky-400"></i> Cập nhật
+                                    </button>
+                                    <button type="button" role="option" aria-selected="false" data-notification-icon="fa-lock"
+                                        class="w-full flex items-center gap-2 px-2.5 py-2 text-left text-xs text-slate-200 hover:bg-slate-800 rounded-lg">
+                                        <i class="fa-solid fa-lock w-5 text-center text-slate-300"></i> Quyền truy cập
+                                    </button>
+                                </div>
+                            </div>
+                            <div id="notification-color-picker" class="relative">
+                                <input id="notification-color" type="hidden" value="blue">
+                                <button type="button" id="notification-color-button" aria-haspopup="listbox"
+                                    aria-expanded="false"
+                                    class="w-full h-full min-h-[42px] flex items-center justify-between gap-2 bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-xs text-white outline-none focus:border-purple-500">
+                                    <span class="flex items-center gap-2 min-w-0">
+                                        <span id="notification-color-swatch" class="w-3.5 h-3.5 rounded-full bg-blue-400 border border-white/30"></span>
+                                        <span id="notification-color-label" class="truncate">Xanh dương</span>
+                                    </span>
+                                    <i class="fa-solid fa-chevron-down text-[10px] text-slate-400"></i>
+                                </button>
+                                <div id="notification-color-options" role="listbox"
+                                    class="hidden absolute top-full left-0 mt-1 w-full z-50 p-1.5 bg-slate-950 border border-slate-700 rounded-xl shadow-2xl">
+                                    <button type="button" role="option" aria-selected="true" data-notification-color="blue"
+                                        class="w-full flex items-center gap-2 px-2.5 py-2 text-left text-xs text-slate-200 hover:bg-slate-800 rounded-lg">
+                                        <span class="w-3.5 h-3.5 rounded-full bg-blue-400 border border-white/30"></span> Xanh dương
+                                    </button>
+                                    <button type="button" role="option" aria-selected="false" data-notification-color="emerald"
+                                        class="w-full flex items-center gap-2 px-2.5 py-2 text-left text-xs text-slate-200 hover:bg-slate-800 rounded-lg">
+                                        <span class="w-3.5 h-3.5 rounded-full bg-emerald-400 border border-white/30"></span> Xanh lá
+                                    </button>
+                                    <button type="button" role="option" aria-selected="false" data-notification-color="amber"
+                                        class="w-full flex items-center gap-2 px-2.5 py-2 text-left text-xs text-slate-200 hover:bg-slate-800 rounded-lg">
+                                        <span class="w-3.5 h-3.5 rounded-full bg-amber-400 border border-white/30"></span> Vàng
+                                    </button>
+                                    <button type="button" role="option" aria-selected="false" data-notification-color="purple"
+                                        class="w-full flex items-center gap-2 px-2.5 py-2 text-left text-xs text-slate-200 hover:bg-slate-800 rounded-lg">
+                                        <span class="w-3.5 h-3.5 rounded-full bg-purple-400 border border-white/30"></span> Tím
+                                    </button>
+                                    <button type="button" role="option" aria-selected="false" data-notification-color="rose"
+                                        class="w-full flex items-center gap-2 px-2.5 py-2 text-left text-xs text-slate-200 hover:bg-slate-800 rounded-lg">
+                                        <span class="w-3.5 h-3.5 rounded-full bg-rose-400 border border-white/30"></span> Đỏ
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <textarea id="notification-message" maxlength="2000" rows="3" required
+                            placeholder="Nội dung thông báo"
+                            class="md:col-span-2 bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-xs text-white outline-none focus:border-purple-500"></textarea>
+                        <div class="md:col-span-2 flex flex-wrap items-center justify-between gap-3">
+                            <label class="flex items-center gap-2 text-xs text-slate-300">
+                                <input id="notification-active" type="checkbox" checked class="accent-purple-500">
+                                Đang hiển thị
+                            </label>
+                            <div class="flex gap-2">
+                                <button type="button" id="btn-cancel-notification-edit"
+                                    class="hidden px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold rounded-xl">
+                                    Hủy sửa
+                                </button>
+                                <button type="submit" id="btn-save-notification"
+                                    class="px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold rounded-xl">
+                                    <i class="fa-solid fa-plus"></i> Thêm thông báo
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+
+                    <div id="notification-admin-list" class="space-y-3" aria-live="polite">
+                        <p class="text-xs text-slate-500">Đăng nhập GitHub và tải JSON để quản lý thông báo.</p>
+                    </div>
+                </div>
+            </section>
         </div>
 
         <footer class="mt-8 text-center text-xs text-slate-500">
@@ -517,9 +663,45 @@
 
     <script>
         let usersData = [];
+        const adminSearchInput = document.getElementById('searchInput');
+        if (adminSearchInput) adminSearchInput.name = `admin-user-search-${Date.now().toString(36)}`;
+        function clearAdminSearchInput() {
+            if (!adminSearchInput) return;
+            adminSearchInput.value = '';
+            adminSearchInput.removeAttribute('value');
+        }
+        clearAdminSearchInput();
+        window.addEventListener('pageshow', () => {
+            setTimeout(() => {
+                clearAdminSearchInput();
+                if (typeof applyFiltersAndSort === 'function') applyFiltersAndSort();
+            }, 0);
+        });
 
         // ===== CẤU HÌNH ĐƯỜNG DẪN USERS.JSON (DÙNG CHUNG CHO LOCAL VÀ VPS) =====
+        const GITHUB_OWNER = 'pvincons';
+        const GITHUB_REPO = 'cloud';
         const USERS_FILE_PATH = 'assets/data/users.json';
+        const NOTIFICATIONS_FILE_PATH = 'assets/data/notifications.json';
+        const NOTIFICATION_ICONS = {
+            'fa-circle-info': 'Thông tin',
+            'fa-bell': 'Chuông',
+            'fa-bullhorn': 'Thông báo',
+            'fa-server': 'Máy chủ',
+            'fa-shield-halved': 'Bảo mật',
+            'fa-circle-check': 'Thành công',
+            'fa-triangle-exclamation': 'Cảnh báo',
+            'fa-screwdriver-wrench': 'Bảo trì',
+            'fa-cloud-arrow-up': 'Cập nhật',
+            'fa-lock': 'Quyền truy cập'
+        };
+        const NOTIFICATION_COLORS = {
+            blue: { label: 'Xanh dương', swatch: 'bg-blue-400' },
+            emerald: { label: 'Xanh lá', swatch: 'bg-emerald-400' },
+            amber: { label: 'Vàng', swatch: 'bg-amber-400' },
+            purple: { label: 'Tím', swatch: 'bg-purple-400' },
+            rose: { label: 'Đỏ', swatch: 'bg-rose-400' }
+        };
         const GITHUB_BRANCH = 'main';
         const USERS_PATH_KEY = 'pv_users_json_path';
         localStorage.removeItem(USERS_PATH_KEY);
@@ -530,6 +712,10 @@
         let usersFileExists = null;
         let usersLoadedFromGitHub = false;
         let isLoadingUsers = false;
+        let notificationsData = [];
+        let notificationsLoadedFromGitHub = false;
+        let isLoadingNotifications = false;
+        let editingNotificationId = null;
 
         const SAMPLE_USERS = [
             {
@@ -553,12 +739,11 @@
             try {
                 const val = localStorage.getItem('pv_github_auth');
                 if (!val) return null;
-                if (val.trim().startsWith('{')) {
-                    const parsed = JSON.parse(val);
-                    localStorage.setItem('pv_github_auth', btoa(JSON.stringify(parsed)));
-                    return parsed;
-                }
-                return JSON.parse(atob(val));
+                const parsed = val.trim().startsWith('{') ? JSON.parse(val) : JSON.parse(atob(val));
+                if (!parsed || typeof parsed.token !== 'string' || !parsed.token.trim()) return null;
+                const normalized = { owner: GITHUB_OWNER, repo: GITHUB_REPO, token: parsed.token.trim() };
+                localStorage.setItem('pv_github_auth', btoa(JSON.stringify(normalized)));
+                return normalized;
             } catch (e) {
                 return null;
             }
@@ -609,7 +794,7 @@
         }
 
         // Lắng nghe thay đổi input để ẩn lỗi cũ
-        ['auth-owner', 'auth-repo', 'auth-token'].forEach(id => {
+        ['auth-token'].forEach(id => {
             document.getElementById(id)?.addEventListener('input', hideLoginError);
         });
 
@@ -624,19 +809,17 @@
         if (authConfig) {
             document.getElementById('login-modal').classList.add('hidden');
             document.getElementById('admin-workspace').classList.remove('hidden');
-            document.getElementById('display-repo-info').innerText = `${authConfig.owner}/${authConfig.repo}`;
+            document.getElementById('display-repo-info').innerText = `${GITHUB_OWNER}/${GITHUB_REPO}`;
             loadUsersFromGitHub();
         }
 
         document.getElementById('btn-login').addEventListener('click', async () => {
             hideLoginError();
 
-            const owner = document.getElementById('auth-owner').value.trim();
-            const repo = document.getElementById('auth-repo').value.trim();
             const token = document.getElementById('auth-token').value.trim();
 
-            if (!owner || !repo || !token) {
-                showLoginError('Vui lòng điền đầy đủ thông tin xác thực GitHub!');
+            if (!token) {
+                showLoginError('Vui lòng nhập GitHub Token!');
                 return;
             }
 
@@ -645,7 +828,7 @@
             btnLogin.innerHTML = `<i class="fa-solid fa-arrows-rotate fa-spin text-xs"></i> <span>Đang xác thực với GitHub...</span>`;
 
             try {
-                const testUrl = `https://api.github.com/repos/${owner}/${repo}`;
+                const testUrl = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}`;
                 const response = await fetch(testUrl, {
                     headers: {
                         'Authorization': `Bearer ${token}`,
@@ -657,18 +840,18 @@
                     if (response.status === 401) {
                         throw new Error('Token PAT không hợp lệ hoặc đã hết hạn!');
                     } else if (response.status === 404) {
-                        throw new Error('Không tìm thấy Repository hoặc Owner không đúng!');
+                        throw new Error(`Token không truy cập được repository ${GITHUB_OWNER}/${GITHUB_REPO}.`);
                     } else {
                         throw new Error(`Xác thực thất bại (HTTP ${response.status})`);
                     }
                 }
 
-                authConfig = { owner, repo, token };
+                authConfig = { owner: GITHUB_OWNER, repo: GITHUB_REPO, token };
                 localStorage.setItem('pv_github_auth', btoa(JSON.stringify(authConfig)));
 
                 document.getElementById('login-modal').classList.add('hidden');
                 document.getElementById('admin-workspace').classList.remove('hidden');
-                document.getElementById('display-repo-info').innerText = `${owner}/${repo}`;
+                document.getElementById('display-repo-info').innerText = `${GITHUB_OWNER}/${GITHUB_REPO}`;
 
                 showToast('Xác thực GitHub thành công!');
                 loadUsersFromGitHub();
@@ -697,7 +880,7 @@
 
         function ghContentsUrl(filePath, withRef = true) {
             const enc = filePath.split('/').map(encodeURIComponent).join('/');
-            const base = `https://api.github.com/repos/${authConfig.owner}/${authConfig.repo}/contents/${enc}`;
+            const base = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${enc}`;
             return withRef ? `${base}?ref=${encodeURIComponent(GITHUB_BRANCH)}` : base;
         }
 
@@ -768,15 +951,21 @@
         function switchTab(name) {
             document.querySelectorAll('[data-tab]').forEach(b => b.setAttribute('aria-selected', b.dataset.tab === name ? 'true' : 'false'));
             document.querySelectorAll('[role="tabpanel"]').forEach(p => p.classList.toggle('hidden', p.id !== `tab-panel-${name}`));
+            if (name === 'notifications' && !notificationsLoadedFromGitHub) {
+                loadNotificationsFromGitHub();
+            }
         }
 
         function updatePathLabels() {
-            const repoName = authConfig ? authConfig.repo : '';
-            const text = USERS_FILE_PATH ? `${repoName}/${USERS_FILE_PATH}` : 'chưa có file';
+            const text = `${GITHUB_OWNER}/${GITHUB_REPO}/${GITHUB_BRANCH}/${USERS_FILE_PATH}`;
             const a = document.getElementById('users-path-label');
             const b = document.getElementById('users-path-footer');
             if (a) a.textContent = `( ${text} )`;
             if (b) b.textContent = text;
+            const notificationsPath = document.getElementById('notifications-path-label');
+            if (notificationsPath) {
+                notificationsPath.textContent = `https://raw.githubusercontent.com/${GITHUB_OWNER}/${GITHUB_REPO}/${GITHUB_BRANCH}/${NOTIFICATIONS_FILE_PATH}`;
+            }
         }
 
         async function findUsersFile() {
@@ -791,6 +980,28 @@
             const res = await fetch(ghContentsUrl(found.path), { headers: ghHeaders('application/vnd.github.raw+json'), cache: 'no-store' });
             if (!res.ok) throw new Error(await describeGitHubError(res));
             return await res.text();
+        }
+
+        async function publishJsonFile(filePath, data, message) {
+            const checkRes = await fetch(ghContentsUrl(filePath), { headers: ghHeaders(), cache: 'no-store' });
+            let sha = null;
+            if (checkRes.ok) {
+                sha = (await checkRes.json()).sha;
+            } else if (checkRes.status !== 404) {
+                throw new Error(await describeGitHubError(checkRes));
+            }
+
+            const putRes = await fetch(ghContentsUrl(filePath, false), {
+                method: 'PUT',
+                headers: { ...ghHeaders(), 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    message,
+                    content: utf8_to_b64(JSON.stringify(data, null, 2)),
+                    branch: GITHUB_BRANCH,
+                    sha: sha || undefined
+                })
+            });
+            if (!putRes.ok) throw new Error(await describeGitHubError(putRes));
         }
 
         async function loadUsersFromGitHub() {
@@ -887,6 +1098,339 @@
             } finally {
                 btnPub.disabled = false;
                 btnPub.innerHTML = `<i class="fa-solid fa-cloud-arrow-up"></i> Xuất bản GitHub`;
+            }
+        });
+
+        function serializeNotifications() {
+            return {
+                version: 1,
+                updatedAt: new Date().toISOString(),
+                notifications: notificationsData.map(notification => ({
+                    id: notification.id,
+                    title: notification.title,
+                    message: notification.message,
+                    icon: notification.icon,
+                    color: notification.color,
+                    active: notification.active,
+                    createdAt: notification.createdAt,
+                    updatedAt: notification.updatedAt
+                }))
+            };
+        }
+
+        async function loadNotificationsFromGitHub(force = false) {
+            if (!authConfig || isLoadingNotifications || (!force && notificationsLoadedFromGitHub)) return;
+            isLoadingNotifications = true;
+            const button = document.getElementById('btn-sync-notifications');
+            const oldHtml = button.innerHTML;
+            button.disabled = true;
+            button.innerHTML = '<i class="fa-solid fa-arrows-rotate fa-spin"></i> Đang tải...';
+
+            try {
+                const response = await fetch(ghContentsUrl(NOTIFICATIONS_FILE_PATH), {
+                    headers: ghHeaders(),
+                    cache: 'no-store'
+                });
+                if (response.status === 404) {
+                    notificationsData = [];
+                    notificationsLoadedFromGitHub = true;
+                    showToast(`Repo chưa có ${NOTIFICATIONS_FILE_PATH}. Có thể tạo và xuất bản file mới.`, 'info');
+                } else {
+                    if (!response.ok) throw new Error(await describeGitHubError(response));
+                    const metadata = await response.json();
+                    const raw = await readFileContent({ path: NOTIFICATIONS_FILE_PATH, data: metadata });
+                    const parsed = JSON.parse(raw);
+                    if (!parsed || !Array.isArray(parsed.notifications)) {
+                        throw new Error('notifications.json phải có thuộc tính notifications dạng mảng.');
+                    }
+
+                    notificationsData = parsed.notifications.map((item, index) => ({
+                        id: String(item.id || `notification-${index + 1}`),
+                        title: String(item.title || ''),
+                        message: String(item.message || ''),
+                        icon: String(item.icon || 'fa-circle-info'),
+                        color: ['blue', 'emerald', 'amber', 'purple', 'rose'].includes(item.color) ? item.color : 'blue',
+                        active: item.active !== false,
+                        createdAt: item.createdAt || new Date().toISOString(),
+                        updatedAt: item.updatedAt || ''
+                    }));
+                    notificationsLoadedFromGitHub = true;
+                    showToast(`Đã tải ${notificationsData.length} thông báo từ GitHub.`);
+                }
+                renderNotificationsAdmin();
+            } catch (error) {
+                notificationsLoadedFromGitHub = false;
+                showToast(`Không tải được notifications.json: ${error.message}`, 'error');
+                renderNotificationsAdmin(error.message);
+            } finally {
+                isLoadingNotifications = false;
+                button.disabled = false;
+                button.innerHTML = oldHtml;
+            }
+        }
+
+        function renderNotificationsAdmin(errorMessage = '') {
+            const container = document.getElementById('notification-admin-list');
+            container.replaceChildren();
+            if (errorMessage) {
+                const error = document.createElement('p');
+                error.className = 'text-xs text-rose-300';
+                error.textContent = `Không thể hiển thị danh sách: ${errorMessage}`;
+                container.appendChild(error);
+                return;
+            }
+            if (!notificationsLoadedFromGitHub) {
+                const hint = document.createElement('p');
+                hint.className = 'text-xs text-slate-500';
+                hint.textContent = 'Đăng nhập GitHub và tải JSON để quản lý thông báo.';
+                container.appendChild(hint);
+                return;
+            }
+            if (!notificationsData.length) {
+                const empty = document.createElement('p');
+                empty.className = 'text-xs text-slate-400';
+                empty.textContent = 'Chưa có thông báo. Thêm thông báo rồi xuất bản lên GitHub.';
+                container.appendChild(empty);
+                return;
+            }
+
+            notificationsData.forEach(notification => {
+                const card = document.createElement('article');
+                card.className = 'flex flex-col sm:flex-row sm:items-start justify-between gap-3 p-4 rounded-2xl bg-slate-900/70 border border-white/10';
+                const content = document.createElement('div');
+                content.className = 'min-w-0';
+                const title = document.createElement('h3');
+                title.className = 'text-sm font-bold text-white';
+                title.textContent = notification.title;
+                const message = document.createElement('p');
+                message.className = 'text-xs text-slate-400 mt-1 whitespace-pre-wrap break-words';
+                message.textContent = notification.message;
+                const status = document.createElement('span');
+                status.className = notification.active
+                    ? 'inline-block mt-2 text-[10px] text-emerald-300'
+                    : 'inline-block mt-2 text-[10px] text-slate-500';
+                status.textContent = notification.active ? 'Đang hiển thị' : 'Đã ẩn';
+                content.append(title, message, status);
+
+                const actions = document.createElement('div');
+                actions.className = 'flex gap-2 shrink-0';
+                const editButton = document.createElement('button');
+                editButton.type = 'button';
+                editButton.className = 'px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-blue-300 text-xs rounded-lg';
+                editButton.textContent = 'Sửa';
+                editButton.addEventListener('click', () => editNotification(notification.id));
+                const deleteButton = document.createElement('button');
+                deleteButton.type = 'button';
+                deleteButton.className = 'px-3 py-1.5 bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 text-xs rounded-lg';
+                deleteButton.textContent = 'Xóa';
+                deleteButton.addEventListener('click', () => deleteNotification(notification.id));
+                actions.append(editButton, deleteButton);
+                card.append(content, actions);
+                container.appendChild(card);
+            });
+        }
+
+        function setNotificationIcon(value) {
+            const icon = Object.prototype.hasOwnProperty.call(NOTIFICATION_ICONS, value)
+                ? value
+                : 'fa-circle-info';
+            document.getElementById('notification-icon').value = icon;
+            document.getElementById('notification-icon-preview').className = `fa-solid ${icon} text-purple-300`;
+            document.getElementById('notification-icon-label').textContent = NOTIFICATION_ICONS[icon];
+            document.querySelectorAll('[data-notification-icon]').forEach(option => {
+                const selected = option.dataset.notificationIcon === icon;
+                option.setAttribute('aria-selected', String(selected));
+                option.classList.toggle('bg-purple-500/20', selected);
+            });
+        }
+
+        function setNotificationColor(value) {
+            const color = Object.prototype.hasOwnProperty.call(NOTIFICATION_COLORS, value) ? value : 'blue';
+            const colorInfo = NOTIFICATION_COLORS[color];
+            document.getElementById('notification-color').value = color;
+            document.getElementById('notification-color-swatch').className =
+                `w-3.5 h-3.5 rounded-full border border-white/30 ${colorInfo.swatch}`;
+            document.getElementById('notification-color-label').textContent = colorInfo.label;
+            document.querySelectorAll('[data-notification-color]').forEach(option => {
+                const selected = option.dataset.notificationColor === color;
+                option.setAttribute('aria-selected', String(selected));
+                option.classList.toggle('bg-purple-500/20', selected);
+            });
+        }
+
+        function resetNotificationForm() {
+            editingNotificationId = null;
+            document.getElementById('notification-form').reset();
+            setNotificationIcon('fa-circle-info');
+            setNotificationColor('blue');
+            document.getElementById('notification-active').checked = true;
+            document.getElementById('btn-save-notification').innerHTML = '<i class="fa-solid fa-plus"></i> Thêm thông báo';
+            document.getElementById('btn-cancel-notification-edit').classList.add('hidden');
+        }
+
+        function editNotification(id) {
+            const notification = notificationsData.find(item => item.id === id);
+            if (!notification) return;
+            editingNotificationId = id;
+            document.getElementById('notification-title').value = notification.title;
+            document.getElementById('notification-message').value = notification.message;
+            setNotificationIcon(notification.icon);
+            setNotificationColor(notification.color);
+            document.getElementById('notification-active').checked = notification.active;
+            document.getElementById('btn-save-notification').innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Lưu thay đổi';
+            document.getElementById('btn-cancel-notification-edit').classList.remove('hidden');
+            document.getElementById('notification-title').focus();
+        }
+
+        function deleteNotification(id) {
+            const notification = notificationsData.find(item => item.id === id);
+            if (!notification || !window.confirm(`Xóa thông báo "${notification.title}"?`)) return;
+            notificationsData = notificationsData.filter(item => item.id !== id);
+            if (editingNotificationId === id) resetNotificationForm();
+            renderNotificationsAdmin();
+            showToast('Đã xóa thông báo khỏi bản nháp. Hãy xuất bản để cập nhật GitHub.');
+        }
+
+        document.getElementById('notification-form').addEventListener('submit', event => {
+            event.preventDefault();
+            if (!notificationsLoadedFromGitHub) {
+                showToast('Hãy tải notifications.json từ GitHub trước khi chỉnh sửa.', 'error');
+                return;
+            }
+
+            const title = document.getElementById('notification-title').value.trim();
+            const message = document.getElementById('notification-message').value.trim();
+            const icon = document.getElementById('notification-icon').value.trim() || 'fa-circle-info';
+            if (!Object.prototype.hasOwnProperty.call(NOTIFICATION_ICONS, icon)) {
+                showToast('Vui lòng chọn một icon trong danh sách.', 'error');
+                return;
+            }
+            const color = document.getElementById('notification-color').value;
+            if (!Object.prototype.hasOwnProperty.call(NOTIFICATION_COLORS, color)) {
+                showToast('Vui lòng chọn một màu trong danh sách.', 'error');
+                return;
+            }
+
+            const now = new Date().toISOString();
+            const existing = notificationsData.find(item => item.id === editingNotificationId);
+            const notification = {
+                id: editingNotificationId || (window.crypto && window.crypto.randomUUID
+                    ? window.crypto.randomUUID()
+                    : `notification-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`),
+                title,
+                message,
+                icon,
+                color,
+                active: document.getElementById('notification-active').checked,
+                createdAt: existing ? existing.createdAt : now,
+                updatedAt: now
+            };
+
+            if (existing) {
+                notificationsData = notificationsData.map(item => item.id === editingNotificationId ? notification : item);
+            } else {
+                notificationsData.unshift(notification);
+            }
+            resetNotificationForm();
+            renderNotificationsAdmin();
+            showToast('Đã lưu thông báo vào bản nháp. Nhấn “Xuất Notification.json” để cập nhật GitHub.');
+        });
+
+        document.getElementById('btn-cancel-notification-edit').addEventListener('click', resetNotificationForm);
+        document.getElementById('btn-sync-notifications').addEventListener('click', () => loadNotificationsFromGitHub(true));
+
+        const notificationIconPicker = document.getElementById('notification-icon-picker');
+        const notificationIconButton = document.getElementById('notification-icon-button');
+        const notificationIconOptions = document.getElementById('notification-icon-options');
+        function closeNotificationIconOptions() {
+            notificationIconOptions.classList.add('hidden');
+            notificationIconButton.setAttribute('aria-expanded', 'false');
+        }
+        notificationIconButton.addEventListener('click', () => {
+            const isOpen = !notificationIconOptions.classList.contains('hidden');
+            notificationIconOptions.classList.toggle('hidden', isOpen);
+            notificationIconButton.setAttribute('aria-expanded', String(!isOpen));
+        });
+        notificationIconOptions.addEventListener('click', event => {
+            const option = event.target.closest('[data-notification-icon]');
+            if (!option) return;
+            setNotificationIcon(option.dataset.notificationIcon);
+            closeNotificationIconOptions();
+            notificationIconButton.focus();
+        });
+        document.addEventListener('click', event => {
+            if (!notificationIconPicker.contains(event.target)) closeNotificationIconOptions();
+        });
+        document.addEventListener('keydown', event => {
+            if (event.key === 'Escape') closeNotificationIconOptions();
+        });
+        setNotificationIcon(document.getElementById('notification-icon').value);
+
+        const notificationColorPicker = document.getElementById('notification-color-picker');
+        const notificationColorButton = document.getElementById('notification-color-button');
+        const notificationColorOptions = document.getElementById('notification-color-options');
+        function closeNotificationColorOptions() {
+            notificationColorOptions.classList.add('hidden');
+            notificationColorButton.setAttribute('aria-expanded', 'false');
+        }
+        notificationColorButton.addEventListener('click', () => {
+            const isOpen = !notificationColorOptions.classList.contains('hidden');
+            notificationColorOptions.classList.toggle('hidden', isOpen);
+            notificationColorButton.setAttribute('aria-expanded', String(!isOpen));
+        });
+        notificationColorOptions.addEventListener('click', event => {
+            const option = event.target.closest('[data-notification-color]');
+            if (!option) return;
+            setNotificationColor(option.dataset.notificationColor);
+            closeNotificationColorOptions();
+            notificationColorButton.focus();
+        });
+        document.addEventListener('click', event => {
+            if (!notificationColorPicker.contains(event.target)) closeNotificationColorOptions();
+        });
+        document.addEventListener('keydown', event => {
+            if (event.key === 'Escape') closeNotificationColorOptions();
+        });
+        setNotificationColor(document.getElementById('notification-color').value);
+
+        function exportNotificationsJson() {
+            if (!notificationsLoadedFromGitHub) {
+                showToast('Hãy tải notifications.json từ GitHub trước khi xuất.', 'error');
+                return;
+            }
+            const blob = new Blob([JSON.stringify(serializeNotifications(), null, 2)], {
+                type: 'application/json;charset=utf-8'
+            });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'notifications.json';
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            setTimeout(() => URL.revokeObjectURL(link.href), 1000);
+            showToast('Đã tải xuống notifications.json.');
+        }
+
+        document.getElementById('btn-publish-notifications').addEventListener('click', async () => {
+            if (!authConfig || !notificationsLoadedFromGitHub) {
+                showToast('Hãy tải notifications.json từ GitHub trước khi xuất bản.', 'error');
+                return;
+            }
+            const button = document.getElementById('btn-publish-notifications');
+            button.disabled = true;
+            button.innerHTML = '<i class="fa-solid fa-arrows-rotate fa-spin"></i> Đang đẩy...';
+            try {
+                await publishJsonFile(
+                    NOTIFICATIONS_FILE_PATH,
+                    serializeNotifications(),
+                    `Update ${NOTIFICATIONS_FILE_PATH} via Super Admin Portal`
+                );
+                showToast(`Đã xuất bản ${notificationsData.length} thông báo lên GitHub (${NOTIFICATIONS_FILE_PATH}).`);
+            } catch (error) {
+                showToast(`Lỗi xuất bản thông báo: ${error.message}`, 'error');
+            } finally {
+                button.disabled = false;
+                button.innerHTML = '<i class="fa-solid fa-cloud-arrow-up"></i> Xuất Notification.json';
             }
         });
 
