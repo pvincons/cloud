@@ -92,7 +92,7 @@ async function handleLogout() {
         }
         localStorage.removeItem('currentUser');
         localStorage.removeItem('access_token');
-        showToast(vnptSessionCleared ? "Đã xóa phiên VNPT. Đang đăng xuất..." : "Đang đăng xuất; phiên VNPT trên server chưa được xác nhận xóa.");
+        showToast(vnptSessionCleared ? "Đang đăng xuất..." : "Đang đăng xuất; phiên Ký số trên server chưa được xác nhận xóa.");
         setTimeout(() => {
             window.location.href = '../../../index.html';
         }, 1200);
