@@ -26,7 +26,7 @@
     "position": "Giám đốc",
     "discipline": "Kỹ sư",
     "projects": "@Sample Project, @SampleZ101",
-    "company": "PV INCONS CO.LTD",
+    "company": "abc",
     "status": "Active"
   },
   {
@@ -85,7 +85,7 @@
     "phone": "0932836907",
     "position": "Giám đốc tài chính",
     "discipline": "Cử nhân kinh tế",
-    "projects": "ProjectZ101",
+    "projects": "@Sample Project, Project 101",
     "company": "PV INCONS CO.LTD",
     "status": "Active"
   },
