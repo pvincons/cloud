@@ -8,11 +8,18 @@ on:
       - assets/data/users.json
   workflow_dispatch:
 
+concurrency:
+  group: users-cache-sync
+  cancel-in-progress: true
+
 jobs:
   notify-backend:
     runs-on: ubuntu-latest
     steps:
-      - name: Notify backend
+      - name: Check out users.json from this commit
+        uses: actions/checkout@v4
+
+      - name: Notify backend with the committed users.json
         env:
           BACKEND_API_URL: ${{ vars.BACKEND_API_URL }}
           USERS_SYNC_TOKEN: ${{ secrets.USERS_SYNC_TOKEN }}
@@ -24,4 +31,4 @@ jobs:
             -X POST "${BACKEND_API_URL%/}/api/users/refresh" \
             -H "Authorization: Bearer ${USERS_SYNC_TOKEN}" \
             -H "Content-Type: application/json" \
-            -d '{}'
+            --data-binary @assets/data/users.json
