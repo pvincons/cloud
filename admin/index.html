@@ -8,7 +8,6 @@
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bcryptjs/2.4.3/bcrypt.min.js"></script>
-    <script src="../assets/js/config.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body {
@@ -75,7 +74,7 @@
         class="fixed top-4 right-4 left-4 lg:left-auto z-50 flex flex-col gap-2 pointer-events-none lg:max-w-sm w-auto">
     </div>
 
-    <!-- 1. MÀN HÌNH ĐĂNG NHẬP TÀI KHOẢN ADMIN (BACKEND) -->
+    <!-- 1. MÀN HÌNH ĐĂNG NHẬP GITHUB PAT -->
     <div id="login-modal"
         class="fixed inset-0 bg-[#090a0f]/95 backdrop-blur-md z-50 flex items-center justify-center p-4">
         <div class="bg-[#14171f] border border-[#262a36] rounded-2xl p-6 w-full max-w-md shadow-2xl space-y-5">
@@ -85,24 +84,30 @@
                     <i class="fa-solid fa-user-shield"></i>
                 </div>
                 <h2 class="text-lg font-bold text-gray-100">Super Admin Portal</h2>
-                <p class="text-xs text-gray-400">Đăng nhập tài khoản ADMIN để quản lý phân quyền & thông báo</p>
+                <p class="text-xs text-gray-400">Xác thực GitHub để quản lý phân quyền users.json</p>
             </div>
 
             <div class="space-y-3">
                 <div class="space-y-1">
-                    <label class="text-[11px] font-semibold text-gray-400 uppercase">Tài khoản ADMIN</label>
-                    <input type="text" id="auth-username" placeholder="VD: admin" autocomplete="username"
+                    <label class="text-[11px] font-semibold text-gray-400 uppercase">GitHub Owner / User</label>
+                    <input type="text" id="auth-owner" placeholder="VD: pvincons"
                         class="w-full bg-[#0f1117] border border-[#2a2e3d] rounded-xl px-3 py-2.5 text-xs text-gray-200 outline-none focus:border-purple-500 font-mono">
                 </div>
                 <div class="space-y-1">
-                    <label class="text-[11px] font-semibold text-gray-400 uppercase">Mật khẩu</label>
-                    <input type="password" id="auth-password" placeholder="••••••••" autocomplete="current-password"
+                    <label class="text-[11px] font-semibold text-gray-400 uppercase">Repository Name</label>
+                    <input type="text" id="auth-repo" placeholder="VD: backend"
+                        class="w-full bg-[#0f1117] border border-[#2a2e3d] rounded-xl px-3 py-2.5 text-xs text-gray-200 outline-none focus:border-purple-500 font-mono">
+                </div>
+                <div class="space-y-1">
+                    <label class="text-[11px] font-semibold text-gray-400 uppercase">Personal Access Token (PAT)</label>
+                    <input type="password" id="auth-token" placeholder="ghp_......"
                         class="w-full bg-[#0f1117] border border-[#2a2e3d] rounded-xl px-3 py-2.5 text-xs text-gray-200 outline-none focus:border-purple-500 font-mono">
                 </div>
             </div>
 
             <!-- KHUNG HIỂN THỊ THÔNG BÁO LỖI TRỰC TIẾP TRÊN TAB ĐĂNG NHẬP -->
-            <div id="login-error-box" class="hidden bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs p-3 rounded-xl flex items-center gap-2">
+            <div id="login-error-box"
+                class="hidden bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs p-3 rounded-xl flex items-center gap-2">
                 <i class="fa-solid fa-circle-exclamation shrink-0 text-sm"></i>
                 <span id="login-error-text">Nội dung lỗi...</span>
             </div>
@@ -131,15 +136,16 @@
                             SUPER ADMIN PORTAL <span
                                 class="text-[10px] bg-purple-500/20 text-purple-300 px-2 py-0.5 rounded border border-purple-500/30">ROOT</span>
                         </h1>
-                        <p class="text-[11px] sm:text-xs text-slate-400">Quản lý tài khoản, thông báo & lưu dữ liệu trên Backend</p>
+                        <p class="text-[11px] sm:text-xs text-slate-400">Quản lý tài khoản, thông báo & đồng bộ JSON lên
+                            GitHub</p>
                     </div>
                 </div>
 
                 <div class="flex items-center gap-2 sm:gap-3 w-full sm:w-auto justify-between sm:justify-end">
                     <span
                         class="text-[10px] sm:text-xs text-slate-400 font-mono flex items-center gap-1 shrink-0 bg-slate-900 px-2.5 py-1.5 rounded-xl border border-slate-800">
-                        <i class="fa-solid fa-server text-xs text-slate-300"></i>
-                        <span id="display-repo-info" class="text-purple-300 font-semibold">backend</span>
+                        <i class="fa-brands fa-github text-xs text-slate-300"></i>
+                        <span id="display-repo-info" class="text-purple-300 font-semibold">pvincons/cloud</span>
                     </span>
                     <button id="btn-logout"
                         class="px-3 py-2 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 text-xs font-bold transition-all flex items-center gap-1.5">
@@ -163,7 +169,8 @@
                         <p class="text-[10px] sm:text-xs font-semibold text-slate-400 uppercase">TỔNG TÀI KHOẢN</p>
                         <p id="stat-total" class="text-xl sm:text-2xl font-black text-white mt-1">0</p>
                     </div>
-                    <div class="hidden lg:block text-blue-400 text-xl sm:text-2xl"><i class="fa-solid fa-users"></i></div>
+                    <div class="hidden lg:block text-blue-400 text-xl sm:text-2xl"><i class="fa-solid fa-users"></i>
+                    </div>
                 </div>
 
                 <!-- 2. Hoạt động -->
@@ -179,7 +186,8 @@
                         <p class="text-[10px] sm:text-xs font-semibold text-slate-400 uppercase">HOẠT ĐỘNG (ACTIVE)</p>
                         <p id="stat-active" class="text-xl sm:text-2xl font-black text-emerald-400 mt-1">0</p>
                     </div>
-                    <div class="hidden lg:block text-emerald-400 text-xl sm:text-2xl"><i class="fa-solid fa-user-check"></i></div>
+                    <div class="hidden lg:block text-emerald-400 text-xl sm:text-2xl"><i
+                            class="fa-solid fa-user-check"></i></div>
                 </div>
 
                 <!-- 3. Khóa -->
@@ -195,13 +203,14 @@
                         <p class="text-[10px] sm:text-xs font-semibold text-slate-400 uppercase">KHÓA (INACTIVE)</p>
                         <p id="stat-inactive" class="text-xl sm:text-2xl font-black text-amber-400 mt-1">0</p>
                     </div>
-                    <div class="hidden lg:block text-amber-400 text-xl sm:text-2xl"><i class="fa-solid fa-user-slash"></i></div>
+                    <div class="hidden lg:block text-amber-400 text-xl sm:text-2xl"><i
+                            class="fa-solid fa-user-slash"></i></div>
                 </div>
 
-                <!-- 4. Hệ thống Backend -->
+                <!-- 4. Hệ thống GitHub -->
                 <div class="glass-card p-3 sm:p-5 rounded-2xl flex items-center justify-between">
                     <div class="flex lg:hidden items-center justify-between w-full">
-                        <span class="text-xs font-semibold text-slate-400 uppercase">HỆ THỐNG BACKEND</span>
+                        <span class="text-xs font-semibold text-slate-400 uppercase">HỆ THỐNG GITHUB</span>
                         <div class="flex items-center gap-2">
                             <span class="text-[11px] font-bold text-emerald-400 flex items-center gap-1">
                                 <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> API CONNECTED
@@ -210,12 +219,13 @@
                         </div>
                     </div>
                     <div class="hidden lg:block">
-                        <p class="text-[10px] sm:text-xs font-semibold text-slate-400 uppercase">HỆ THỐNG BACKEND</p>
+                        <p class="text-[10px] sm:text-xs font-semibold text-slate-400 uppercase">HỆ THỐNG GITHUB</p>
                         <p class="text-[11px] sm:text-xs font-bold text-emerald-400 mt-2 flex items-center gap-1.5">
                             <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> API CONNECTED
                         </p>
                     </div>
-                    <div class="hidden lg:block text-emerald-400 text-xl sm:text-2xl"><i class="fa-solid fa-cloud"></i></div>
+                    <div class="hidden lg:block text-emerald-400 text-xl sm:text-2xl"><i class="fa-solid fa-cloud"></i>
+                    </div>
                 </div>
 
                 <!-- 5. CRM Khách Hàng -->
@@ -227,32 +237,17 @@
                             <i class="fa-solid fa-handshake"></i>
                         </div>
                         <div>
-                            <h3 class="font-bold text-xs sm:text-sm text-white group-hover:text-orange-300 transition-colors">
+                            <h3
+                                class="font-bold text-xs sm:text-sm text-white group-hover:text-orange-300 transition-colors">
                                 CRM Khách Hàng</h3>
                             <p class="text-[10px] text-slate-400 font-mono mt-0.5">partner/index.html</p>
                         </div>
                     </div>
-                    <i class="fa-solid fa-arrow-right text-xs text-slate-500 group-hover:text-orange-400 group-hover:translate-x-1 transition-all"></i>
+                    <i
+                        class="fa-solid fa-arrow-right text-xs text-slate-500 group-hover:text-orange-400 group-hover:translate-x-1 transition-all"></i>
                 </a>
 
-                <!-- 6. Quản Lý Nội Bộ -->
-                <a href="../content/internal/index.html"
-                    class="workspace-card p-3 sm:p-5 rounded-2xl flex items-center justify-between group">
-                    <div class="flex items-center gap-3">
-                        <div
-                            class="w-9 h-9 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 flex items-center justify-center text-base shrink-0">
-                            <i class="fa-solid fa-folder-closed"></i>
-                        </div>
-                        <div>
-                            <h3 class="font-bold text-xs sm:text-sm text-white group-hover:text-emerald-300 transition-colors">
-                                Quản Lý Nội Bộ</h3>
-                            <p class="text-[10px] text-slate-400 font-mono mt-0.5">internal/index.html</p>
-                        </div>
-                    </div>
-                    <i class="fa-solid fa-arrow-right text-xs text-slate-500 group-hover:text-emerald-400 group-hover:translate-x-1 transition-all"></i>
-                </a>
-
-                <!-- 7. BIM - VDC CDE -->
+                <!-- 6. BIM - VDC CDE -->
                 <a href="../content/bim-vdc/index.html"
                     class="workspace-card p-3 sm:p-5 rounded-2xl flex items-center justify-between group">
                     <div class="flex items-center gap-3">
@@ -261,13 +256,35 @@
                             <i class="fa-solid fa-cubes"></i>
                         </div>
                         <div>
-                            <h3 class="font-bold text-xs sm:text-sm text-white group-hover:text-blue-300 transition-colors">
+                            <h3
+                                class="font-bold text-xs sm:text-sm text-white group-hover:text-blue-300 transition-colors">
                                 BIM - VDC CDE</h3>
                             <p class="text-[10px] text-slate-400 font-mono mt-0.5">bim-vdc/index.html</p>
                         </div>
                     </div>
-                    <i class="fa-solid fa-arrow-right text-xs text-slate-500 group-hover:text-blue-400 group-hover:translate-x-1 transition-all"></i>
+                    <i
+                        class="fa-solid fa-arrow-right text-xs text-slate-500 group-hover:text-blue-400 group-hover:translate-x-1 transition-all"></i>
                 </a>
+
+                <!-- 7. Quản Lý Nội Bộ -->
+                <a href="../content/internal/index.html"
+                    class="workspace-card p-3 sm:p-5 rounded-2xl flex items-center justify-between group">
+                    <div class="flex items-center gap-3">
+                        <div
+                            class="w-9 h-9 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 flex items-center justify-center text-base shrink-0">
+                            <i class="fa-solid fa-folder-closed"></i>
+                        </div>
+                        <div>
+                            <h3
+                                class="font-bold text-xs sm:text-sm text-white group-hover:text-emerald-300 transition-colors">
+                                Quản Lý Nội Bộ</h3>
+                            <p class="text-[10px] text-slate-400 font-mono mt-0.5">internal/index.html</p>
+                        </div>
+                    </div>
+                    <i
+                        class="fa-solid fa-arrow-right text-xs text-slate-500 group-hover:text-emerald-400 group-hover:translate-x-1 transition-all"></i>
+                </a>
+
             </div>
 
             <!-- THANH ĐIỀU HƯỚNG TAB -->
@@ -292,7 +309,7 @@
             </div>
 
             <div id="tab-panel-users" role="tabpanel" aria-labelledby="tab-btn-users">
-                <!-- THƯ MỤC 2: QUẢN LÝ TÀI KHOẢN (database/users.json) & BỘ LỌC -->
+                <!-- THƯ MỤC 2: QUẢN LÝ TÀI KHOẢN USERS.JSON & BỘ LỌC -->
                 <div class="glass-card p-4 sm:p-6 rounded-3xl">
                     <div class="flex flex-col gap-4 mb-6">
                         <div class="flex flex-wrap items-center justify-between gap-4">
@@ -300,24 +317,30 @@
                                 <h2 class="text-sm font-bold text-white flex items-center gap-2">
                                     <i class="fa-solid fa-database text-yellow-400"></i> Danh Sách Tài Khoản <span
                                         id="users-path-label"
-                                        class="font-mono text-xs text-purple-300 hidden sm:inline">( chưa đồng bộ )</span>
+                                        class="font-mono text-xs text-purple-300 hidden sm:inline">( chưa đồng bộ
+                                        )</span>
                                 </h2>
-                                <p class="text-xs text-slate-400 mt-1 hidden sm:block">Hệ thống lọc nâng cao theo Chức vụ,
+                                <p class="text-xs text-slate-400 mt-1 hidden sm:block">Hệ thống lọc nâng cao theo Chức
+                                    vụ,
                                     Vai trò, Công ty, Trạng thái & Sắp xếp</p>
                             </div>
 
-                            <div class="grid grid-cols-2 gap-1.5 sm:flex sm:items-center sm:gap-2 w-full sm:w-auto justify-end">
-                                <button id="btn-sync-users"
+                            <div
+                                class="grid grid-cols-2 gap-1.5 sm:flex sm:items-center sm:gap-2 w-full sm:w-auto justify-end">
+                                <button id="btn-sync-github"
                                     class="w-full sm:w-auto justify-center px-2 sm:px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-blue-400 border border-slate-700 font-bold text-[11px] sm:text-xs rounded-xl transition-all flex items-center gap-1 shadow truncate">
-                                    <i class="fa-solid fa-arrows-rotate shrink-0"></i> <span class="truncate">Tải dữ liệu</span>
+                                    <i class="fa-solid fa-arrows-rotate shrink-0"></i> <span class="truncate">Tải dữ
+                                        liệu</span>
                                 </button>
                                 <button type="button" id="btn-export-users-json" onclick="exportUsersJson()"
                                     class="w-full sm:w-auto justify-center px-2 sm:px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-amber-400 border border-slate-700 font-bold text-[11px] sm:text-xs rounded-xl transition-all flex items-center gap-1 shadow truncate">
-                                    <i class="fa-solid fa-file-arrow-down shrink-0"></i> <span class="truncate">Xuất users.json</span>
+                                    <i class="fa-solid fa-file-arrow-down shrink-0"></i> <span class="truncate">Xuất
+                                        users.json</span>
                                 </button>
-                                <button id="btn-publish-users"
+                                <button id="btn-publish-github"
                                     class="w-full sm:w-auto justify-center px-2 sm:px-3.5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-[11px] sm:text-xs rounded-xl shadow-lg transition-all flex items-center gap-1 shadow truncate">
-                                    <i class="fa-solid fa-cloud-arrow-up shrink-0"></i> <span class="truncate">Xuất bản</span>
+                                    <i class="fa-solid fa-cloud-arrow-up shrink-0"></i> <span class="truncate">Xuất
+                                        bản</span>
                                 </button>
                                 <button onclick="openAddModal()"
                                     class="w-full sm:w-auto justify-center px-2 sm:px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold text-[11px] sm:text-xs rounded-xl shadow-lg transition-all flex items-center gap-1 shadow truncate">
@@ -356,7 +379,8 @@
                                 <option value="Inactive">Inactive</option>
                             </select>
                             <div class="relative">
-                                <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-slate-500 text-xs"></i>
+                                <i
+                                    class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-slate-500 text-xs"></i>
                                 <input type="text" id="searchInput" name="admin-user-search" readonly
                                     placeholder="Tìm kiếm tên, user..." autocomplete="off" autocorrect="off"
                                     autocapitalize="off" spellcheck="false" aria-autocomplete="none"
@@ -393,14 +417,17 @@
                 </div>
             </div>
 
-            <section id="tab-panel-notifications" role="tabpanel" aria-labelledby="tab-btn-notifications" class="hidden">
+            <section id="tab-panel-notifications" role="tabpanel" aria-labelledby="tab-btn-notifications"
+                class="hidden">
                 <div class="glass-card p-4 sm:p-6 rounded-3xl">
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
                         <div>
                             <h2 class="text-sm font-bold text-white flex items-center gap-2">
                                 <i class="fa-solid fa-bullhorn text-amber-400"></i> Quản lý thông báo
                             </h2>
-                            <p class="text-xs text-slate-400 mt-1">Backend: <span id="notifications-path-label" class="font-mono text-purple-300">database/notifications.json</span></p>
+                            <p class="text-xs text-slate-400 mt-1">GitHub: <span id="notifications-path-label"
+                                    class="font-mono text-purple-300">https://raw.githubusercontent.com/pvincons/cloud/main/assets/data/notifications.json</span>
+                            </p>
                         </div>
                         <div class="grid grid-cols-3 gap-2 sm:flex">
                             <button type="button" id="btn-sync-notifications"
@@ -418,7 +445,8 @@
                         </div>
                     </div>
 
-                    <form id="notification-form" class="grid grid-cols-1 md:grid-cols-2 gap-3 p-4 rounded-2xl bg-slate-900/70 border border-white/10 mb-5">
+                    <form id="notification-form"
+                        class="grid grid-cols-1 md:grid-cols-2 gap-3 p-4 rounded-2xl bg-slate-900/70 border border-white/10 mb-5">
                         <input id="notification-title" type="text" maxlength="160" required
                             placeholder="Tiêu đề thông báo"
                             class="bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-xs text-white outline-none focus:border-purple-500">
@@ -429,50 +457,65 @@
                                     aria-expanded="false"
                                     class="w-full h-full min-h-[42px] flex items-center justify-between gap-2 bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-xs text-white outline-none focus:border-purple-500">
                                     <span class="flex items-center gap-2 min-w-0">
-                                        <i id="notification-icon-preview" class="fa-solid fa-circle-info text-purple-300"></i>
+                                        <i id="notification-icon-preview"
+                                            class="fa-solid fa-circle-info text-purple-300"></i>
                                         <span id="notification-icon-label" class="truncate">Thông tin</span>
                                     </span>
                                     <i class="fa-solid fa-chevron-down text-[10px] text-slate-400"></i>
                                 </button>
                                 <div id="notification-icon-options" role="listbox"
                                     class="hidden absolute top-full left-0 mt-1 w-full max-h-56 overflow-y-auto z-50 p-1.5 bg-slate-950 border border-slate-700 rounded-xl shadow-2xl">
-                                    <button type="button" role="option" aria-selected="true" data-notification-icon="fa-circle-info"
+                                    <button type="button" role="option" aria-selected="true"
+                                        data-notification-icon="fa-circle-info"
                                         class="w-full flex items-center gap-2 px-2.5 py-2 text-left text-xs text-slate-200 hover:bg-slate-800 rounded-lg">
                                         <i class="fa-solid fa-circle-info w-5 text-center text-blue-400"></i> Thông tin
                                     </button>
-                                    <button type="button" role="option" aria-selected="false" data-notification-icon="fa-bell"
+                                    <button type="button" role="option" aria-selected="false"
+                                        data-notification-icon="fa-bell"
                                         class="w-full flex items-center gap-2 px-2.5 py-2 text-left text-xs text-slate-200 hover:bg-slate-800 rounded-lg">
                                         <i class="fa-solid fa-bell w-5 text-center text-amber-400"></i> Chuông
                                     </button>
-                                    <button type="button" role="option" aria-selected="false" data-notification-icon="fa-bullhorn"
+                                    <button type="button" role="option" aria-selected="false"
+                                        data-notification-icon="fa-bullhorn"
                                         class="w-full flex items-center gap-2 px-2.5 py-2 text-left text-xs text-slate-200 hover:bg-slate-800 rounded-lg">
                                         <i class="fa-solid fa-bullhorn w-5 text-center text-purple-400"></i> Thông báo
                                     </button>
-                                    <button type="button" role="option" aria-selected="false" data-notification-icon="fa-server"
+                                    <button type="button" role="option" aria-selected="false"
+                                        data-notification-icon="fa-server"
                                         class="w-full flex items-center gap-2 px-2.5 py-2 text-left text-xs text-slate-200 hover:bg-slate-800 rounded-lg">
                                         <i class="fa-solid fa-server w-5 text-center text-cyan-400"></i> Máy chủ
                                     </button>
-                                    <button type="button" role="option" aria-selected="false" data-notification-icon="fa-shield-halved"
+                                    <button type="button" role="option" aria-selected="false"
+                                        data-notification-icon="fa-shield-halved"
                                         class="w-full flex items-center gap-2 px-2.5 py-2 text-left text-xs text-slate-200 hover:bg-slate-800 rounded-lg">
-                                        <i class="fa-solid fa-shield-halved w-5 text-center text-emerald-400"></i> Bảo mật
+                                        <i class="fa-solid fa-shield-halved w-5 text-center text-emerald-400"></i> Bảo
+                                        mật
                                     </button>
-                                    <button type="button" role="option" aria-selected="false" data-notification-icon="fa-circle-check"
+                                    <button type="button" role="option" aria-selected="false"
+                                        data-notification-icon="fa-circle-check"
                                         class="w-full flex items-center gap-2 px-2.5 py-2 text-left text-xs text-slate-200 hover:bg-slate-800 rounded-lg">
-                                        <i class="fa-solid fa-circle-check w-5 text-center text-emerald-400"></i> Thành công
+                                        <i class="fa-solid fa-circle-check w-5 text-center text-emerald-400"></i> Thành
+                                        công
                                     </button>
-                                    <button type="button" role="option" aria-selected="false" data-notification-icon="fa-triangle-exclamation"
+                                    <button type="button" role="option" aria-selected="false"
+                                        data-notification-icon="fa-triangle-exclamation"
                                         class="w-full flex items-center gap-2 px-2.5 py-2 text-left text-xs text-slate-200 hover:bg-slate-800 rounded-lg">
-                                        <i class="fa-solid fa-triangle-exclamation w-5 text-center text-rose-400"></i> Cảnh báo
+                                        <i class="fa-solid fa-triangle-exclamation w-5 text-center text-rose-400"></i>
+                                        Cảnh báo
                                     </button>
-                                    <button type="button" role="option" aria-selected="false" data-notification-icon="fa-screwdriver-wrench"
+                                    <button type="button" role="option" aria-selected="false"
+                                        data-notification-icon="fa-screwdriver-wrench"
                                         class="w-full flex items-center gap-2 px-2.5 py-2 text-left text-xs text-slate-200 hover:bg-slate-800 rounded-lg">
-                                        <i class="fa-solid fa-screwdriver-wrench w-5 text-center text-orange-400"></i> Bảo trì
+                                        <i class="fa-solid fa-screwdriver-wrench w-5 text-center text-orange-400"></i>
+                                        Bảo trì
                                     </button>
-                                    <button type="button" role="option" aria-selected="false" data-notification-icon="fa-cloud-arrow-up"
+                                    <button type="button" role="option" aria-selected="false"
+                                        data-notification-icon="fa-cloud-arrow-up"
                                         class="w-full flex items-center gap-2 px-2.5 py-2 text-left text-xs text-slate-200 hover:bg-slate-800 rounded-lg">
                                         <i class="fa-solid fa-cloud-arrow-up w-5 text-center text-sky-400"></i> Cập nhật
                                     </button>
-                                    <button type="button" role="option" aria-selected="false" data-notification-icon="fa-lock"
+                                    <button type="button" role="option" aria-selected="false"
+                                        data-notification-icon="fa-lock"
                                         class="w-full flex items-center gap-2 px-2.5 py-2 text-left text-xs text-slate-200 hover:bg-slate-800 rounded-lg">
                                         <i class="fa-solid fa-lock w-5 text-center text-slate-300"></i> Quyền truy cập
                                     </button>
@@ -484,32 +527,48 @@
                                     aria-expanded="false"
                                     class="w-full h-full min-h-[42px] flex items-center justify-between gap-2 bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-xs text-white outline-none focus:border-purple-500">
                                     <span class="flex items-center gap-2 min-w-0">
-                                        <span id="notification-color-swatch" class="w-3.5 h-3.5 rounded-full bg-blue-400 border border-white/30"></span>
+                                        <span id="notification-color-swatch"
+                                            class="w-3.5 h-3.5 rounded-full bg-blue-400 border border-white/30"></span>
                                         <span id="notification-color-label" class="truncate">Xanh dương</span>
                                     </span>
                                     <i class="fa-solid fa-chevron-down text-[10px] text-slate-400"></i>
                                 </button>
                                 <div id="notification-color-options" role="listbox"
                                     class="hidden absolute top-full left-0 mt-1 w-full z-50 p-1.5 bg-slate-950 border border-slate-700 rounded-xl shadow-2xl">
-                                    <button type="button" role="option" aria-selected="true" data-notification-color="blue"
+                                    <button type="button" role="option" aria-selected="true"
+                                        data-notification-color="blue"
                                         class="w-full flex items-center gap-2 px-2.5 py-2 text-left text-xs text-slate-200 hover:bg-slate-800 rounded-lg">
-                                        <span class="w-3.5 h-3.5 rounded-full bg-blue-400 border border-white/30"></span> Xanh dương
+                                        <span
+                                            class="w-3.5 h-3.5 rounded-full bg-blue-400 border border-white/30"></span>
+                                        Xanh dương
                                     </button>
-                                    <button type="button" role="option" aria-selected="false" data-notification-color="emerald"
+                                    <button type="button" role="option" aria-selected="false"
+                                        data-notification-color="emerald"
                                         class="w-full flex items-center gap-2 px-2.5 py-2 text-left text-xs text-slate-200 hover:bg-slate-800 rounded-lg">
-                                        <span class="w-3.5 h-3.5 rounded-full bg-emerald-400 border border-white/30"></span> Xanh lá
+                                        <span
+                                            class="w-3.5 h-3.5 rounded-full bg-emerald-400 border border-white/30"></span>
+                                        Xanh lá
                                     </button>
-                                    <button type="button" role="option" aria-selected="false" data-notification-color="amber"
+                                    <button type="button" role="option" aria-selected="false"
+                                        data-notification-color="amber"
                                         class="w-full flex items-center gap-2 px-2.5 py-2 text-left text-xs text-slate-200 hover:bg-slate-800 rounded-lg">
-                                        <span class="w-3.5 h-3.5 rounded-full bg-amber-400 border border-white/30"></span> Vàng
+                                        <span
+                                            class="w-3.5 h-3.5 rounded-full bg-amber-400 border border-white/30"></span>
+                                        Vàng
                                     </button>
-                                    <button type="button" role="option" aria-selected="false" data-notification-color="purple"
+                                    <button type="button" role="option" aria-selected="false"
+                                        data-notification-color="purple"
                                         class="w-full flex items-center gap-2 px-2.5 py-2 text-left text-xs text-slate-200 hover:bg-slate-800 rounded-lg">
-                                        <span class="w-3.5 h-3.5 rounded-full bg-purple-400 border border-white/30"></span> Tím
+                                        <span
+                                            class="w-3.5 h-3.5 rounded-full bg-purple-400 border border-white/30"></span>
+                                        Tím
                                     </button>
-                                    <button type="button" role="option" aria-selected="false" data-notification-color="rose"
+                                    <button type="button" role="option" aria-selected="false"
+                                        data-notification-color="rose"
                                         class="w-full flex items-center gap-2 px-2.5 py-2 text-left text-xs text-slate-200 hover:bg-slate-800 rounded-lg">
-                                        <span class="w-3.5 h-3.5 rounded-full bg-rose-400 border border-white/30"></span> Đỏ
+                                        <span
+                                            class="w-3.5 h-3.5 rounded-full bg-rose-400 border border-white/30"></span>
+                                        Đỏ
                                     </button>
                                 </div>
                             </div>
@@ -536,15 +595,15 @@
                     </form>
 
                     <div id="notification-admin-list" class="space-y-3" aria-live="polite">
-                        <p class="text-xs text-slate-500">Đăng nhập và tải dữ liệu từ máy chủ để quản lý thông báo.</p>
+                        <p class="text-xs text-slate-500">Đăng nhập GitHub và tải JSON để quản lý thông báo.</p>
                     </div>
                 </div>
             </section>
         </div>
 
         <footer class="mt-8 text-center text-xs text-slate-500">
-            &copy; 2026 PV INCONS Enterprise Workspace. Database Path: <span
-                id="users-path-footer" class="font-mono text-purple-400">chưa đồng bộ</span>
+            &copy; 2026 PV INCONS Enterprise Workspace. GitHub Path: <span id="users-path-footer"
+                class="font-mono text-purple-400">chưa đồng bộ</span>
         </footer>
     </div>
 
@@ -678,14 +737,9 @@
             }, 0);
         });
 
-        // ===== KẾT NỐI BACKEND (server.js): users.json & notifications.json nằm trong thư mục database của backend =====
-        const API_BASE = (typeof CONFIG !== 'undefined' && CONFIG.CDE_API) ? CONFIG.CDE_API : 'http://localhost:3000/api';
-        const AUTH_BASE = (typeof CONFIG !== 'undefined' && CONFIG.AUTH_API) ? CONFIG.AUTH_API : 'http://localhost:3000/api/auth';
-        const USERS_API_PATH = '/admin/users';
-        const NOTIFICATIONS_API_PATH = '/admin/notifications';
-        const USERS_FILE_LABEL = 'database/users.json';
-        const NOTIFICATIONS_FILE_LABEL = 'database/notifications.json';
-        const ADMIN_SESSION_KEY = 'pv_admin_session';
+        // ===== CẤU HÌNH ĐƯỜNG DẪN USERS.JSON (DÙNG CHUNG CHO LOCAL VÀ VPS) =====
+        const USERS_FILE_PATH = 'assets/data/users.json';
+        const NOTIFICATIONS_FILE_PATH = 'assets/data/notifications.json';
         const NOTIFICATION_ICONS = {
             'fa-circle-info': 'Thông tin',
             'fa-bell': 'Chuông',
@@ -705,16 +759,18 @@
             purple: { label: 'Tím', swatch: 'bg-purple-400' },
             rose: { label: 'Đỏ', swatch: 'bg-rose-400' }
         };
-        // Dọn thông tin đăng nhập GitHub (PAT) cũ còn lưu trong trình duyệt
-        localStorage.removeItem('pv_github_auth');
-        localStorage.removeItem('pv_users_json_path');
+        const GITHUB_BRANCH = 'main';
+        const USERS_PATH_KEY = 'pv_users_json_path';
+        localStorage.removeItem(USERS_PATH_KEY);
 
         const USER_FIELDS = ['id', 'username', 'passwordHash', 'role', 'permission', 'avatarLink', 'fullName', 'phone', 'position', 'discipline', 'projects', 'company', 'status'];
 
-        let usersLoadedFromServer = false;
+        let usersFilePath = USERS_FILE_PATH;
+        let usersFileExists = null;
+        let usersLoadedFromGitHub = false;
         let isLoadingUsers = false;
         let notificationsData = [];
-        let notificationsLoadedFromServer = false;
+        let notificationsLoadedFromGitHub = false;
         let isLoadingNotifications = false;
         let editingNotificationId = null;
 
@@ -738,12 +794,20 @@
 
         function loadAuth() {
             try {
-                const parsed = JSON.parse(localStorage.getItem(ADMIN_SESSION_KEY) || 'null');
-                if (!parsed || typeof parsed.token !== 'string' || !parsed.token.trim() ||
-                    typeof parsed.username !== 'string' || !parsed.username.trim()) {
+                const val = localStorage.getItem('pv_github_auth');
+                if (!val) return null;
+                const parsed = val.trim().startsWith('{') ? JSON.parse(val) : JSON.parse(atob(val));
+                if (!parsed || typeof parsed.owner !== 'string' || typeof parsed.repo !== 'string' ||
+                    typeof parsed.token !== 'string' || !parsed.owner.trim() || !parsed.repo.trim() || !parsed.token.trim()) {
                     return null;
                 }
-                return { username: parsed.username.trim(), token: parsed.token.trim() };
+                const normalized = {
+                    owner: parsed.owner.trim(),
+                    repo: parsed.repo.trim(),
+                    token: parsed.token.trim()
+                };
+                localStorage.setItem('pv_github_auth', btoa(JSON.stringify(normalized)));
+                return normalized;
             } catch (e) {
                 return null;
             }
@@ -794,129 +858,109 @@
         }
 
         // Lắng nghe thay đổi input để ẩn lỗi cũ
-        ['auth-username', 'auth-password'].forEach(id => {
+        ['auth-owner', 'auth-repo', 'auth-token'].forEach(id => {
             document.getElementById(id)?.addEventListener('input', hideLoginError);
         });
 
-        function enterWorkspace() {
-            document.getElementById('login-modal').classList.add('hidden');
-            document.getElementById('admin-workspace').classList.remove('hidden');
-            document.getElementById('display-repo-info').innerText = `${authConfig.username} @ ${new URL(API_BASE, window.location.href).host}`;
+        function utf8_to_b64(str) {
+            return btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, (match, p1) => String.fromCharCode('0x' + p1)));
         }
 
-        function forceRelogin(message) {
-            localStorage.removeItem(ADMIN_SESSION_KEY);
-            authConfig = null;
-            usersData = [];
-            usersLoadedFromServer = false;
-            notificationsData = [];
-            notificationsLoadedFromServer = false;
-            document.getElementById('admin-workspace').classList.add('hidden');
-            document.getElementById('login-modal').classList.remove('hidden');
-            if (message) showLoginError(message);
-        }
-
-        async function apiRequest(path, options = {}) {
-            const response = await fetch(`${API_BASE}${path}`, {
-                ...options,
-                headers: {
-                    'Accept': 'application/json',
-                    ...(options.body ? { 'Content-Type': 'application/json' } : {}),
-                    'Authorization': `Bearer ${authConfig ? authConfig.token : ''}`
-                },
-                cache: 'no-store'
-            });
-            let body = null;
-            try { body = await response.json(); } catch (e) { /* phản hồi không phải JSON */ }
-            if (!response.ok || !body || body.success === false) {
-                const error = new Error((body && body.error) || `Máy chủ trả về lỗi HTTP ${response.status}`);
-                error.status = response.status;
-                throw error;
-            }
-            return body;
-        }
-
-        // Trả về true nếu lỗi do phiên đăng nhập/quyền hạn (đã đưa người dùng về màn hình đăng nhập)
-        function handleAuthFailure(err) {
-            if (!err || (err.status !== 401 && err.status !== 403)) return false;
-            forceRelogin(err.status === 403
-                ? 'Tài khoản này không có quyền truy cập Super Admin Portal (cần vai trò ADMIN)!'
-                : 'Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại!');
-            return true;
+        function b64_to_utf8(str) {
+            return decodeURIComponent(Array.prototype.map.call(atob(str.replace(/\s/g, '')), c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
         }
 
         if (authConfig) {
-            enterWorkspace();
-            loadUsersFromServer();
+            document.getElementById('login-modal').classList.add('hidden');
+            document.getElementById('admin-workspace').classList.remove('hidden');
+            document.getElementById('display-repo-info').innerText = `${authConfig.owner}/${authConfig.repo}`;
+            loadUsersFromGitHub();
         }
 
-        async function submitLogin() {
+        document.getElementById('btn-login').addEventListener('click', async () => {
             hideLoginError();
 
-            const username = document.getElementById('auth-username').value.trim();
-            const password = document.getElementById('auth-password').value;
+            const owner = document.getElementById('auth-owner').value.trim();
+            const repo = document.getElementById('auth-repo').value.trim();
+            const token = document.getElementById('auth-token').value.trim();
 
-            if (!username || !password) {
-                showLoginError('Vui lòng nhập đầy đủ tài khoản và mật khẩu!');
+            if (!owner || !repo || !token) {
+                showLoginError('Vui lòng điền đầy đủ thông tin xác thực GitHub!');
                 return;
             }
 
             const btnLogin = document.getElementById('btn-login');
             btnLogin.disabled = true;
-            btnLogin.innerHTML = `<i class="fa-solid fa-arrows-rotate fa-spin text-xs"></i> <span>Đang xác thực với máy chủ...</span>`;
+            btnLogin.innerHTML = `<i class="fa-solid fa-arrows-rotate fa-spin text-xs"></i> <span>Đang xác thực với GitHub...</span>`;
 
             try {
-                const response = await fetch(`${AUTH_BASE}/login`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username, password }),
-                    signal: AbortSignal.timeout(10000)
-                });
-                const data = await response.json().catch(() => ({}));
-                if (!response.ok || !data.success || !data.token) {
-                    throw new Error(data.error || `Xác thực thất bại (HTTP ${response.status})`);
-                }
-
-                // Kiểm tra quyền ADMIN trực tiếp trên backend trước khi vào màn hình quản trị
-                authConfig = { username: (data.user && data.user.username) || username, token: data.token };
-                try {
-                    await apiRequest(USERS_API_PATH);
-                } catch (accessError) {
-                    authConfig = null;
-                    if (accessError.status === 403) {
-                        throw new Error('Tài khoản này không có quyền truy cập Super Admin Portal (cần vai trò ADMIN)!');
+                const testUrl = `https://api.github.com/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}`;
+                const response = await fetch(testUrl, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Accept': 'application/vnd.github.v3+json'
                     }
-                    throw accessError;
+                });
+
+                if (!response.ok) {
+                    if (response.status === 401) {
+                        throw new Error('Token PAT không hợp lệ hoặc đã hết hạn!');
+                    } else if (response.status === 404) {
+                        throw new Error('Không tìm thấy Repository hoặc Owner không đúng!');
+                    } else {
+                        throw new Error(`Xác thực thất bại (HTTP ${response.status})`);
+                    }
                 }
 
-                localStorage.setItem(ADMIN_SESSION_KEY, JSON.stringify(authConfig));
-                document.getElementById('auth-password').value = '';
+                authConfig = { owner, repo, token };
+                localStorage.setItem('pv_github_auth', btoa(JSON.stringify(authConfig)));
 
-                enterWorkspace();
-                showToast('Đăng nhập Super Admin thành công!');
-                loadUsersFromServer();
+                document.getElementById('login-modal').classList.add('hidden');
+                document.getElementById('admin-workspace').classList.remove('hidden');
+                document.getElementById('display-repo-info').innerText = `${owner}/${repo}`;
+
+                showToast('Xác thực GitHub thành công!');
+                loadUsersFromGitHub();
             } catch (err) {
                 console.error('Lỗi đăng nhập:', err);
                 let errorMsg = err.message;
-                if (errorMsg === 'Failed to fetch' || err.name === 'TimeoutError') {
-                    errorMsg = 'Không kết nối được máy chủ backend. Hãy kiểm tra lại kết nối hoặc cấu hình CORS!';
+                if (errorMsg === 'Failed to fetch') {
+                    errorMsg = 'Lỗi kết nối mạng hoặc bị chặn CORS. Hãy kiểm tra lại kết nối!';
                 }
                 showLoginError(errorMsg || 'Xác thực thất bại!');
             } finally {
                 btnLogin.disabled = false;
                 btnLogin.innerHTML = `<i class="fa-solid fa-key text-xs"></i><span>Xác nhận & Vào Super Admin</span>`;
             }
-        }
-
-        document.getElementById('btn-login').addEventListener('click', submitLogin);
-        document.getElementById('auth-password').addEventListener('keydown', event => {
-            if (event.key === 'Enter') submitLogin();
         });
 
         document.getElementById('btn-logout').addEventListener('click', () => {
-            localStorage.removeItem(ADMIN_SESSION_KEY);
+            localStorage.removeItem('pv_github_auth');
+            localStorage.removeItem('pv_users_json_path');
             location.reload();
         });
+
+        function ghHeaders(accept) {
+            return { 'Authorization': `Bearer ${authConfig.token}`, 'Accept': accept || 'application/vnd.github.v3+json' };
+        }
+
+        function ghContentsUrl(filePath, withRef = true) {
+            const enc = filePath.split('/').map(encodeURIComponent).join('/');
+            const base = `https://api.github.com/repos/${encodeURIComponent(authConfig.owner)}/${encodeURIComponent(authConfig.repo)}/contents/${enc}`;
+            return withRef ? `${base}?ref=${encodeURIComponent(GITHUB_BRANCH)}` : base;
+        }
+
+        async function describeGitHubError(res) {
+            let detail = '';
+            try { detail = (await res.json()).message || ''; } catch (e) { }
+            if (res.status === 401) return 'Token PAT không hợp lệ hoặc đã hết hạn (401).';
+            if (res.status === 403) {
+                if (res.headers.get('x-ratelimit-remaining') === '0') return 'Vượt giới hạn số lần gọi GitHub API (403).';
+                return 'Token không đủ quyền với repo này (403).' + (detail ? ` [${detail}]` : '');
+            }
+            if (res.status === 404) return 'Không tìm thấy repo hoặc token không truy cập được (404).';
+            return `GitHub trả về lỗi HTTP ${res.status}` + (detail ? `: ${detail}` : '');
+        }
 
         function normalizeStatus(st) {
             return (st === 'Active' || st === 'Đang triển khai') ? 'Active' : 'Inactive';
@@ -955,8 +999,8 @@
         }
 
         function exportUsersJson() {
-            if (!usersData.length || !usersLoadedFromServer) {
-                showToast('Chưa có dữ liệu users.json từ máy chủ để xuất.', 'error');
+            if (!usersData.length || (!usersLoadedFromGitHub && usersFileExists !== false)) {
+                showToast('Chưa có dữ liệu users.json từ GitHub để xuất.', 'error');
                 return;
             }
             const blob = new Blob([JSON.stringify(serializeUsers(), null, 2)], { type: 'application/json;charset=utf-8' });
@@ -973,42 +1017,92 @@
         function switchTab(name) {
             document.querySelectorAll('[data-tab]').forEach(b => b.setAttribute('aria-selected', b.dataset.tab === name ? 'true' : 'false'));
             document.querySelectorAll('[role="tabpanel"]').forEach(p => p.classList.toggle('hidden', p.id !== `tab-panel-${name}`));
-            if (name === 'notifications' && !notificationsLoadedFromServer) {
-                loadNotificationsFromServer();
+            if (name === 'notifications' && !notificationsLoadedFromGitHub) {
+                loadNotificationsFromGitHub();
             }
         }
 
         function updatePathLabels() {
+            const text = `${authConfig.owner}/${authConfig.repo}/${GITHUB_BRANCH}/${USERS_FILE_PATH}`;
             const a = document.getElementById('users-path-label');
             const b = document.getElementById('users-path-footer');
-            if (a) a.textContent = `( ${USERS_FILE_LABEL} )`;
-            if (b) b.textContent = USERS_FILE_LABEL;
+            if (a) a.textContent = `( ${text} )`;
+            if (b) b.textContent = text;
             const notificationsPath = document.getElementById('notifications-path-label');
-            if (notificationsPath) notificationsPath.textContent = NOTIFICATIONS_FILE_LABEL;
+            if (notificationsPath) {
+                notificationsPath.textContent = `https://raw.githubusercontent.com/${authConfig.owner}/${authConfig.repo}/${GITHUB_BRANCH}/${NOTIFICATIONS_FILE_PATH}`;
+            }
         }
 
-        async function loadUsersFromServer() {
+        async function findUsersFile() {
+            const res = await fetch(ghContentsUrl(USERS_FILE_PATH), { headers: ghHeaders(), cache: 'no-store' });
+            if (res.ok) return { path: USERS_FILE_PATH, data: await res.json() };
+            if (res.status !== 404) throw new Error(await describeGitHubError(res));
+            return null;
+        }
+
+        async function readFileContent(found) {
+            if (found.data.content && found.data.encoding === 'base64') return b64_to_utf8(found.data.content);
+            const res = await fetch(ghContentsUrl(found.path), { headers: ghHeaders('application/vnd.github.raw+json'), cache: 'no-store' });
+            if (!res.ok) throw new Error(await describeGitHubError(res));
+            return await res.text();
+        }
+
+        async function publishJsonFile(filePath, data, message) {
+            const checkRes = await fetch(ghContentsUrl(filePath), { headers: ghHeaders(), cache: 'no-store' });
+            let sha = null;
+            if (checkRes.ok) {
+                sha = (await checkRes.json()).sha;
+            } else if (checkRes.status !== 404) {
+                throw new Error(await describeGitHubError(checkRes));
+            }
+
+            const putRes = await fetch(ghContentsUrl(filePath, false), {
+                method: 'PUT',
+                headers: { ...ghHeaders(), 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    message,
+                    content: utf8_to_b64(JSON.stringify(data, null, 2)),
+                    branch: GITHUB_BRANCH,
+                    sha: sha || undefined
+                })
+            });
+            if (!putRes.ok) throw new Error(await describeGitHubError(putRes));
+        }
+
+        async function loadUsersFromGitHub() {
             if (!authConfig || isLoadingUsers) return;
             isLoadingUsers = true;
-            const btn = document.getElementById('btn-sync-users');
+            const btn = document.getElementById('btn-sync-github');
             const oldHtml = btn ? btn.innerHTML : '';
             if (btn) { btn.disabled = true; btn.innerHTML = `<i class="fa-solid fa-arrows-rotate fa-spin text-xs"></i> Đang tải...`; }
 
             try {
-                const result = await apiRequest(USERS_API_PATH);
-                if (!Array.isArray(result.users)) throw new Error('Dữ liệu users.json từ máy chủ sai định dạng mảng.');
+                const found = await findUsersFile();
+                if (!found) {
+                    usersFileExists = false;
+                    usersLoadedFromGitHub = false;
+                    if (!usersData.length) usersData = JSON.parse(JSON.stringify(SAMPLE_USERS));
+                    updatePathLabels();
+                    showToast(`Repo chưa có file ${USERS_FILE_PATH}. Đang hiển thị dữ liệu mẫu.`, 'info');
+                } else {
+                    let content;
+                    try { content = JSON.parse(await readFileContent(found)); }
+                    catch (e) { throw new Error(`File ${found.path} không đọc được (${e.message}).`); }
+                    if (!Array.isArray(content)) throw new Error(`File ${found.path} sai định dạng mảng.`);
 
-                usersLoadedFromServer = true;
-                usersData = result.users.map(u => ({
-                    ...u,
-                    status: normalizeStatus(u.status)
-                }));
-                updatePathLabels();
-                showToast(`Đã tải ${usersData.length} tài khoản từ máy chủ (${USERS_FILE_LABEL}).`);
+                    usersFileExists = true;
+                    usersLoadedFromGitHub = true;
+                    usersData = content.map(u => ({
+                        ...u,
+                        status: normalizeStatus(u.status)
+                    }));
+                    updatePathLabels();
+                    showToast(`Đã tải ${usersData.length} tài khoản từ GitHub (${USERS_FILE_PATH}).`);
+                }
             } catch (err) {
-                if (handleAuthFailure(err)) return;
                 console.error(err);
-                usersLoadedFromServer = false;
+                usersLoadedFromGitHub = false;
                 showToast(`Không tải được users.json: ${err.message}`, 'error');
                 if (!usersData.length) usersData = JSON.parse(JSON.stringify(SAMPLE_USERS));
             } finally {
@@ -1019,39 +1113,57 @@
             }
         }
 
-        document.getElementById('btn-sync-users').addEventListener('click', loadUsersFromServer);
+        document.getElementById('btn-sync-github').addEventListener('click', loadUsersFromGitHub);
 
-        document.getElementById('btn-publish-users').addEventListener('click', async () => {
+        document.getElementById('btn-publish-github').addEventListener('click', async () => {
             if (!authConfig) return;
 
-            if (!usersLoadedFromServer) {
-                showToast('Chưa tải được users.json từ máy chủ nên không thể xuất bản.', 'error');
+            if (!usersLoadedFromGitHub && usersFileExists !== false) {
+                showToast('Chưa đồng bộ được users.json từ GitHub nên không thể xuất bản.', 'error');
                 return;
             }
 
-            const btnPub = document.getElementById('btn-publish-users');
-            const oldHtml = btnPub.innerHTML;
+            const url = ghContentsUrl(USERS_FILE_PATH);
+            const putUrl = ghContentsUrl(USERS_FILE_PATH, false);
+
+            const btnPub = document.getElementById('btn-publish-github');
             btnPub.disabled = true;
             btnPub.innerHTML = `<i class="fa-solid fa-arrows-rotate fa-spin text-xs"></i> Đang đẩy...`;
 
             try {
-                const result = await apiRequest(USERS_API_PATH, {
-                    method: 'PUT',
-                    body: JSON.stringify({ users: serializeUsers() })
-                });
-                if (Array.isArray(result.users)) {
-                    usersData = result.users.map(u => ({ ...u, status: normalizeStatus(u.status) }));
-                    populateFilterDropdowns();
-                    applyFiltersAndSort();
+                let sha = null;
+                const checkRes = await fetch(url, { headers: ghHeaders(), cache: 'no-store' });
+                if (checkRes.ok) {
+                    sha = (await checkRes.json()).sha;
+                } else if (checkRes.status !== 404) {
+                    throw new Error(await describeGitHubError(checkRes));
                 }
+
+                const jsonString = JSON.stringify(serializeUsers(), null, 2);
+                const contentBase64 = utf8_to_b64(jsonString);
+
+                const putRes = await fetch(putUrl, {
+                    method: 'PUT',
+                    headers: { ...ghHeaders(), 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        message: `Update ${USERS_FILE_PATH} via Super Admin Portal`,
+                        content: contentBase64,
+                        branch: GITHUB_BRANCH,
+                        sha: sha || undefined
+                    })
+                });
+
+                if (!putRes.ok) throw new Error(await describeGitHubError(putRes));
+
+                usersFileExists = true;
+                usersLoadedFromGitHub = true;
                 updatePathLabels();
-                showToast(`Đã xuất bản ${usersData.length} tài khoản lên máy chủ (${USERS_FILE_LABEL}).`);
+                showToast(`Đã xuất bản ${usersData.length} tài khoản lên GitHub (${USERS_FILE_PATH}).`);
             } catch (err) {
-                if (handleAuthFailure(err)) return;
                 showToast(`Lỗi xuất bản: ${err.message}`, 'error');
             } finally {
                 btnPub.disabled = false;
-                btnPub.innerHTML = oldHtml;
+                btnPub.innerHTML = `<i class="fa-solid fa-cloud-arrow-up"></i> Xuất bản GitHub`;
             }
         });
 
@@ -1072,8 +1184,8 @@
             };
         }
 
-        async function loadNotificationsFromServer(force = false) {
-            if (!authConfig || isLoadingNotifications || (!force && notificationsLoadedFromServer)) return;
+        async function loadNotificationsFromGitHub(force = false) {
+            if (!authConfig || isLoadingNotifications || (!force && notificationsLoadedFromGitHub)) return;
             isLoadingNotifications = true;
             const button = document.getElementById('btn-sync-notifications');
             const oldHtml = button.innerHTML;
@@ -1081,27 +1193,39 @@
             button.innerHTML = '<i class="fa-solid fa-arrows-rotate fa-spin"></i> Đang tải...';
 
             try {
-                const parsed = await apiRequest(NOTIFICATIONS_API_PATH);
-                if (!parsed || !Array.isArray(parsed.notifications)) {
-                    throw new Error('notifications.json phải có thuộc tính notifications dạng mảng.');
-                }
+                const response = await fetch(ghContentsUrl(NOTIFICATIONS_FILE_PATH), {
+                    headers: ghHeaders(),
+                    cache: 'no-store'
+                });
+                if (response.status === 404) {
+                    notificationsData = [];
+                    notificationsLoadedFromGitHub = true;
+                    showToast(`Repo chưa có ${NOTIFICATIONS_FILE_PATH}. Có thể tạo và xuất bản file mới.`, 'info');
+                } else {
+                    if (!response.ok) throw new Error(await describeGitHubError(response));
+                    const metadata = await response.json();
+                    const raw = await readFileContent({ path: NOTIFICATIONS_FILE_PATH, data: metadata });
+                    const parsed = JSON.parse(raw);
+                    if (!parsed || !Array.isArray(parsed.notifications)) {
+                        throw new Error('notifications.json phải có thuộc tính notifications dạng mảng.');
+                    }
 
-                notificationsData = parsed.notifications.map((item, index) => ({
-                    id: String(item.id || `notification-${index + 1}`),
-                    title: String(item.title || ''),
-                    message: String(item.message || ''),
-                    icon: String(item.icon || 'fa-circle-info'),
-                    color: ['blue', 'emerald', 'amber', 'purple', 'rose'].includes(item.color) ? item.color : 'blue',
-                    active: item.active !== false,
-                    createdAt: item.createdAt || new Date().toISOString(),
-                    updatedAt: item.updatedAt || ''
-                }));
-                notificationsLoadedFromServer = true;
-                showToast(`Đã tải ${notificationsData.length} thông báo từ máy chủ.`);
+                    notificationsData = parsed.notifications.map((item, index) => ({
+                        id: String(item.id || `notification-${index + 1}`),
+                        title: String(item.title || ''),
+                        message: String(item.message || ''),
+                        icon: String(item.icon || 'fa-circle-info'),
+                        color: ['blue', 'emerald', 'amber', 'purple', 'rose'].includes(item.color) ? item.color : 'blue',
+                        active: item.active !== false,
+                        createdAt: item.createdAt || new Date().toISOString(),
+                        updatedAt: item.updatedAt || ''
+                    }));
+                    notificationsLoadedFromGitHub = true;
+                    showToast(`Đã tải ${notificationsData.length} thông báo từ GitHub.`);
+                }
                 renderNotificationsAdmin();
             } catch (error) {
-                if (handleAuthFailure(error)) return;
-                notificationsLoadedFromServer = false;
+                notificationsLoadedFromGitHub = false;
                 showToast(`Không tải được notifications.json: ${error.message}`, 'error');
                 renderNotificationsAdmin(error.message);
             } finally {
@@ -1121,17 +1245,17 @@
                 container.appendChild(error);
                 return;
             }
-            if (!notificationsLoadedFromServer) {
+            if (!notificationsLoadedFromGitHub) {
                 const hint = document.createElement('p');
                 hint.className = 'text-xs text-slate-500';
-                hint.textContent = 'Đăng nhập và tải dữ liệu từ máy chủ để quản lý thông báo.';
+                hint.textContent = 'Đăng nhập GitHub và tải JSON để quản lý thông báo.';
                 container.appendChild(hint);
                 return;
             }
             if (!notificationsData.length) {
                 const empty = document.createElement('p');
                 empty.className = 'text-xs text-slate-400';
-                empty.textContent = 'Chưa có thông báo. Thêm thông báo rồi xuất bản lên máy chủ.';
+                empty.textContent = 'Chưa có thông báo. Thêm thông báo rồi xuất bản lên GitHub.';
                 container.appendChild(empty);
                 return;
             }
@@ -1253,13 +1377,13 @@
             notificationsData = notificationsData.filter(item => item.id !== id);
             if (editingNotificationId === id) resetNotificationForm();
             renderNotificationsAdmin();
-            showToast('Đã xóa thông báo khỏi bản nháp. Hãy xuất bản để cập nhật lên máy chủ.');
+            showToast('Đã xóa thông báo khỏi bản nháp. Hãy xuất bản để cập nhật GitHub.');
         }
 
         document.getElementById('notification-form').addEventListener('submit', event => {
             event.preventDefault();
-            if (!notificationsLoadedFromServer) {
-                showToast('Hãy tải notifications.json từ máy chủ trước khi chỉnh sửa.', 'error');
+            if (!notificationsLoadedFromGitHub) {
+                showToast('Hãy tải notifications.json từ GitHub trước khi chỉnh sửa.', 'error');
                 return;
             }
 
@@ -1298,11 +1422,11 @@
             }
             resetNotificationForm();
             renderNotificationsAdmin();
-            showToast('Đã lưu thông báo vào bản nháp. Nhấn “Xuất Notification.json” để cập nhật lên máy chủ.');
+            showToast('Đã lưu thông báo vào bản nháp. Nhấn “Xuất Notification.json” để cập nhật GitHub.');
         });
 
         document.getElementById('btn-cancel-notification-edit').addEventListener('click', resetNotificationForm);
-        document.getElementById('btn-sync-notifications').addEventListener('click', () => loadNotificationsFromServer(true));
+        document.getElementById('btn-sync-notifications').addEventListener('click', () => loadNotificationsFromGitHub(true));
 
         const notificationIconPicker = document.getElementById('notification-icon-picker');
         const notificationIconButton = document.getElementById('notification-icon-button');
@@ -1359,8 +1483,8 @@
         setNotificationColor(document.getElementById('notification-color').value);
 
         function exportNotificationsJson() {
-            if (!notificationsLoadedFromServer) {
-                showToast('Hãy tải notifications.json từ máy chủ trước khi xuất.', 'error');
+            if (!notificationsLoadedFromGitHub) {
+                showToast('Hãy tải notifications.json từ GitHub trước khi xuất.', 'error');
                 return;
             }
             const blob = new Blob([JSON.stringify(serializeNotifications(), null, 2)], {
@@ -1377,21 +1501,21 @@
         }
 
         document.getElementById('btn-publish-notifications').addEventListener('click', async () => {
-            if (!authConfig || !notificationsLoadedFromServer) {
-                showToast('Hãy tải notifications.json từ máy chủ trước khi xuất bản.', 'error');
+            if (!authConfig || !notificationsLoadedFromGitHub) {
+                showToast('Hãy tải notifications.json từ GitHub trước khi xuất bản.', 'error');
                 return;
             }
             const button = document.getElementById('btn-publish-notifications');
             button.disabled = true;
             button.innerHTML = '<i class="fa-solid fa-arrows-rotate fa-spin"></i> Đang đẩy...';
             try {
-                await apiRequest(NOTIFICATIONS_API_PATH, {
-                    method: 'PUT',
-                    body: JSON.stringify({ notifications: serializeNotifications().notifications })
-                });
-                showToast(`Đã xuất bản ${notificationsData.length} thông báo lên máy chủ (${NOTIFICATIONS_FILE_LABEL}).`);
+                await publishJsonFile(
+                    NOTIFICATIONS_FILE_PATH,
+                    serializeNotifications(),
+                    `Update ${NOTIFICATIONS_FILE_PATH} via Super Admin Portal`
+                );
+                showToast(`Đã xuất bản ${notificationsData.length} thông báo lên GitHub (${NOTIFICATIONS_FILE_PATH}).`);
             } catch (error) {
-                if (handleAuthFailure(error)) return;
                 showToast(`Lỗi xuất bản thông báo: ${error.message}`, 'error');
             } finally {
                 button.disabled = false;
@@ -1681,7 +1805,7 @@
                 populateFilterDropdowns();
                 applyFiltersAndSort();
                 closeModal();
-                showToast('Đã lưu thay đổi vào bộ nhớ tạm. Hãy nhấn "Xuất bản" để lưu lên máy chủ!');
+                showToast('Đã lưu thay đổi vào bộ nhớ tạm. Hãy nhấn "Xuất bản GitHub" để đồng bộ lên repo!');
             } catch (err) {
                 console.error(err);
                 showToast(`Lưu thất bại: ${err && err.message ? err.message : err}`, 'error');
