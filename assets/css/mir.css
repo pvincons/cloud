@@ -506,7 +506,7 @@ body {
 
 .analytics-grid {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 8px;
     min-width: 0;
 }
@@ -570,9 +570,152 @@ body {
     margin-right: 3px;
 }
 
+.chart-title-total {
+    margin-left: 3px;
+    color: var(--text-muted);
+    font-size: 0.58rem;
+    letter-spacing: 0;
+    text-transform: none;
+}
+
 .chart-icon-storage { color: #38bdf8; }
 .chart-icon-types { color: #a78bfa; }
 .chart-icon-issues { color: #fb7185; }
+.chart-icon-deadline { color: #fbbf24; }
+
+.deadline-card-controls {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-shrink: 0;
+}
+
+.deadline-edit-btn {
+    width: 22px;
+    height: 22px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    background: var(--bg-input);
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 0.62rem;
+}
+
+.deadline-edit-btn:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+.deadline-body {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 5px;
+}
+
+.deadline-date-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    color: var(--text-muted);
+    font-size: 0.52rem;
+    line-height: 1.25;
+}
+
+.deadline-date-row div {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.deadline-date-row div:last-child {
+    text-align: right;
+}
+
+.deadline-date-row strong {
+    color: var(--text-heading);
+    font-size: 0.57rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.deadline-progress-row {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.deadline-progress-track {
+    flex: 1;
+    height: 7px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: var(--border-color);
+}
+
+.deadline-progress-fill {
+    width: 0;
+    height: 100%;
+    border-radius: inherit;
+    background: #38bdf8;
+    transition: width 0.6s ease, background-color 0.3s ease;
+}
+
+.deadline-progress-row > strong {
+    min-width: 27px;
+    color: var(--text-heading);
+    font-size: 0.58rem;
+    text-align: right;
+}
+
+.deadline-status,
+.deadline-modal-project {
+    margin: 0;
+    color: var(--text-muted);
+    font-size: 0.55rem;
+    line-height: 1.2;
+}
+
+.deadline-date-fields {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.deadline-form-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.deadline-form-action-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+.deadline-complete-toggle {
+    min-height: 36px;
+    padding: 6px 10px;
+    border: 1px solid rgba(34, 197, 94, 0.45);
+    border-radius: 6px;
+    background: rgba(34, 197, 94, 0.1);
+    color: #22c55e;
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.deadline-complete-toggle:hover,
+.deadline-complete-toggle.is-completed {
+    border-color: #22c55e;
+    background: rgba(34, 197, 94, 0.18);
+}
 
 .chart-badge {
     flex-shrink: 0;
@@ -592,6 +735,10 @@ body {
     min-width: 0;
 }
 
+.analytics-body.deadline-body {
+    align-items: stretch;
+}
+
 .chart-wrapper {
     position: relative;
     flex: 1 1 58%;
@@ -606,6 +753,7 @@ body {
     color: var(--text-muted);
     font-size: 0.57rem;
     line-height: 1.4;
+    white-space: pre-line;
 }
 
 /* CARD QUY CHUẨN ĐỊNH DANH ISO & NÚT TOGGLE ẨN/HIỆN */
@@ -1341,6 +1489,12 @@ body {
     }
 }
 
+@media (max-width: 1200px) {
+    .analytics-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
 @media (max-width: 1024px) {
     .search-bar {
         width: 200px;
@@ -1477,7 +1631,100 @@ body {
 
 @media (max-width: 768px) {
     .analytics-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .analytics-grid > .analytics-card:not(#projectDeadlineCard) {
         display: none;
+    }
+
+    #projectDeadlineCard {
+        min-height: 0;
+        padding: 6px 9px;
+    }
+
+    #projectDeadlineCard .chart-title,
+    #projectDeadlineCard .chart-badge {
+        display: none;
+    }
+
+    #projectDeadlineCard .chart-header {
+        display: none;
+    }
+
+    #projectDeadlineCard .deadline-edit-btn {
+        display: none !important;
+    }
+
+    #projectDeadlineCard .deadline-body {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+        align-items: center;
+        column-gap: 6px;
+        row-gap: 4px;
+    }
+
+    #projectDeadlineCard .deadline-date-row {
+        display: contents;
+        font-size: 0.48rem;
+    }
+
+    #projectDeadlineCard .deadline-date-row div {
+        flex-direction: row;
+        align-items: baseline;
+        gap: 4px;
+    }
+
+    #projectDeadlineCard .deadline-date-row div:first-child {
+        grid-column: 1;
+        grid-row: 1;
+        justify-content: flex-start;
+    }
+
+    #projectDeadlineCard .deadline-date-row div:last-child {
+        grid-column: 3;
+        grid-row: 1;
+        justify-content: flex-end;
+    }
+
+    #projectDeadlineCard .deadline-date-row strong {
+        font-size: 0.53rem;
+    }
+
+    #projectDeadlineCard .deadline-status {
+        grid-column: 2;
+        grid-row: 1;
+        text-align: center;
+        white-space: nowrap;
+    }
+
+    #projectDeadlineCard .deadline-progress-row {
+        grid-column: 1 / -1;
+        grid-row: 2;
+    }
+
+    #projectDeadlineCard .deadline-status {
+        font-size: 0.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    #projectDeadlineModal .deadline-form-actions {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    #projectDeadlineModal .deadline-complete-toggle {
+        align-self: flex-start;
+    }
+
+    #projectDeadlineModal .deadline-form-action-buttons {
+        width: 100%;
+    }
+
+    #projectDeadlineModal .deadline-form-action-buttons .btn {
+        flex: 1;
     }
 }
 
