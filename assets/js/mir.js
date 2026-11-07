@@ -2556,8 +2556,8 @@ function updateIssueChart(filesWithIssues, recalledFiles, recalledWithIssues, si
     const attentionCount = filesWithIssues + recalledWithoutIssues + signedOnlyFiles;
     if (note) {
         note.textContent = attentionFilesOnly
-            ? `Đang lọc · ${filesWithIssues} ghi chú\n${recalledFiles} tệp thu hồi\n${signedFiles} tệp ký số`
-            : `${filesWithIssues} tệp có ghi chú\n${recalledFiles} tệp thu hồi\n${signedFiles} tệp ký số`;
+            ? `Đang lọc\n${filesWithIssues} tệp có ghi chú\n${recalledFiles} tệp bị thu hồi\n${signedFiles} tệp được ký số`
+            : `${filesWithIssues} tệp có ghi chú\n${recalledFiles} tệp bị thu hồi\n${signedFiles} tệp được ký số`;
     }
     if (card) {
         card.classList.toggle('is-active', attentionFilesOnly);
