@@ -250,6 +250,42 @@ async function reloadDatabaseData() {
     }
 }
 
+function resetToCurrentProjectRoot() {
+    const projectSelect = document.getElementById('projectSelect');
+    const selectedProject = projectSelect ? projectSelect.value : 'ALL';
+    const stateFilter = document.getElementById('stateFilter');
+
+    if (!selectedProject || selectedProject === 'ALL') {
+        selectedFolderPathFilter = '';
+        if (stateFilter) stateFilter.value = 'ALL';
+        renderTreeUI();
+        applyFilters();
+        return;
+    }
+
+    const projectNode = virtualTreeData.children.find(
+        child => child.type === 'folder' && child.name === selectedProject
+    );
+    if (!projectNode) {
+        showToast(`Không tìm thấy thư mục gốc của dự án "${selectedProject}".`);
+        return;
+    }
+
+    let projectElement = Array.from(document.querySelectorAll('.tree-node-item'))
+        .find(element => element.getAttribute('data-path') === projectNode.path);
+    if (!projectElement) {
+        renderTreeUI();
+        projectElement = Array.from(document.querySelectorAll('.tree-node-item'))
+            .find(element => element.getAttribute('data-path') === projectNode.path);
+    }
+    if (!projectElement) {
+        showToast(`Không thể hiển thị thư mục gốc của dự án "${selectedProject}".`);
+        return;
+    }
+
+    selectTreeNode(projectNode, projectElement);
+}
+
 function buildTreeFromFlatList(flatList) {
     let root = {
         id: "ROOT",
@@ -1211,8 +1247,7 @@ function getActionButtons(state, relativePath) {
     const isRecalled = !!recallInfo;
     const isSignable = /\.(pdf|rvt|ifc|xml)$/i.test(relativePath);
 
-    const normKey = relativePath.replace(/^database\/bim-vdc\/?/, '');
-    const signatureRecord = serverSignaturesDB[relativePath] || serverSignaturesDB['database/bim-vdc/' + normKey];
+    const signatureRecord = getSignatureRecord(relativePath);
     const isSigned = !!signatureRecord;
 
     const lockSvg = `<svg class="svg-icon-sm" viewBox="0 0 24 24" fill="currentColor" style="width:12px; height:12px; margin-left:3px;"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>`;
@@ -1347,6 +1382,11 @@ function getActionButtons(state, relativePath) {
         ${recallBadge}
         ${dropdownHtml}
     `;
+}
+
+function getSignatureRecord(relativePath) {
+    const normKey = relativePath.replace(/^database\/bim-vdc\/?/, '');
+    return serverSignaturesDB[relativePath] || serverSignaturesDB['database/bim-vdc/' + normKey];
 }
 
 let signTargetRow = null;
@@ -2209,7 +2249,7 @@ function appendFileToTable(fileName, relativePath, fileSize = 0, metadata = {}) 
 }
 
 const doughnutCenterText = {
-    id: 'doughnutCenterText',
+    id: 'centerText',
     afterDraw(chart, args, options) {
         if (!options || !options.main) return;
         const { ctx, chartArea } = chart;
@@ -2221,15 +2261,12 @@ const doughnutCenterText = {
         ctx.textBaseline = 'middle';
         ctx.fillStyle = options.color || '#f1f5f9';
         ctx.font = '700 11px "Plus Jakarta Sans", sans-serif';
-        ctx.fillText(options.main, x, y - 4, chartArea.width * 0.9);
-        ctx.fillStyle = options.subColor || '#94a3b8';
-        ctx.font = '600 6px "Plus Jakarta Sans", sans-serif';
-        ctx.fillText(options.sub || '', x, y + 8, chartArea.width * 0.9);
+        ctx.fillText(options.main, x, y, chartArea.width * 0.9);
         ctx.restore();
     }
 };
 
-function updateDoughnutChart(instance, canvasId, labels, values, colors, centerMain, centerSub, tooltipLabel, showLegend = false) {
+function updateDoughnutChart(instance, canvasId, labels, values, colors, centerMain, tooltipLabel, showLegend = false) {
     const canvas = document.getElementById(canvasId);
     if (!canvas || typeof Chart === 'undefined') return instance;
 
@@ -2238,7 +2275,6 @@ function updateDoughnutChart(instance, canvasId, labels, values, colors, centerM
     const displayLabels = hasData ? labels : ['Chưa có dữ liệu'];
     const displayColors = hasData ? colors : ['#334155'];
     const textColor = getComputedStyle(document.documentElement).getPropertyValue('--text-heading').trim() || '#f1f5f9';
-    const mutedColor = getComputedStyle(document.documentElement).getPropertyValue('--text-muted').trim() || '#94a3b8';
     const data = {
         labels: displayLabels,
         datasets: [{
@@ -2251,7 +2287,7 @@ function updateDoughnutChart(instance, canvasId, labels, values, colors, centerM
 
     if (instance) {
         instance.data = data;
-        instance.options.plugins.centerText = { main: centerMain, sub: centerSub, color: textColor, subColor: mutedColor };
+        instance.options.plugins.centerText = { main: centerMain, color: textColor };
         instance.options.plugins.legend.display = showLegend && hasData;
         instance.options.plugins.legend.labels.color = textColor;
         instance.options.plugins.tooltip.enabled = hasData;
@@ -2270,7 +2306,7 @@ function updateDoughnutChart(instance, canvasId, labels, values, colors, centerM
             animation: { duration: 450 },
             layout: { padding: 1 },
             plugins: {
-                centerText: { main: centerMain, sub: centerSub, color: textColor, subColor: mutedColor },
+                centerText: { main: centerMain, color: textColor },
                 legend: {
                     display: showLegend && hasData,
                     position: 'right',
@@ -2306,22 +2342,21 @@ function updateStorageChart(storageByState, totalBytes) {
     const states = ['01_WIP', '02_SHARED', '03_PUBLISHED', '04_ARCHIVE'];
     const values = states.map(state => storageByState[state] || 0);
     const colors = ['#38bdf8', '#fbbf24', '#34d399', '#94a3b8'];
-    const note = document.getElementById('storageChartNote');
-    if (note) note.textContent = `Tổng ${formatCompactStorage(totalBytes)} · theo CDE State`;
+    const total = document.getElementById('storageChartTotal');
+    if (total) total.textContent = formatCompactStorage(totalBytes);
     storageChartInstance = updateDoughnutChart(
         storageChartInstance,
         'storageChart',
         states,
         values,
         colors,
-        formatCompactStorage(totalBytes),
-        totalBytes ? 'TỔNG DUNG LƯỢNG' : 'CHƯA CÓ DỮ LIỆU',
+        '',
         context => ` ${context.label}: ${formatFileSize(context.raw)}`,
         true
     );
 }
 
-function updateIssueChart(filesWithIssues, recalledFiles, recalledWithIssues, totalFiles, issueCount) {
+function updateIssueChart(filesWithIssues, recalledFiles, recalledWithIssues, signedFiles, totalFiles, issueCount) {
     const recalledWithoutIssues = Math.max(recalledFiles - recalledWithIssues, 0);
     const otherFiles = Math.max(totalFiles - filesWithIssues - recalledWithoutIssues, 0);
     const note = document.getElementById('issueChartNote');
@@ -2329,8 +2364,8 @@ function updateIssueChart(filesWithIssues, recalledFiles, recalledWithIssues, to
     const attentionCount = filesWithIssues + recalledWithoutIssues;
     if (note) {
         note.textContent = attentionFilesOnly
-            ? `Đang lọc · ${filesWithIssues} ghi chú · ${recalledFiles} thu hồi`
-            : `${filesWithIssues} tệp có ghi chú · ${recalledFiles} tệp thu hồi`;
+            ? `Đang lọc · ${filesWithIssues} ghi chú\n${recalledFiles} tệp thu hồi\n${signedFiles} tệp ký số`
+            : `${filesWithIssues} tệp có ghi chú\n${recalledFiles} tệp thu hồi\n${signedFiles} tệp ký số`;
     }
     if (card) {
         card.classList.toggle('is-active', attentionFilesOnly);
@@ -2343,7 +2378,6 @@ function updateIssueChart(filesWithIssues, recalledFiles, recalledWithIssues, to
         [filesWithIssues, recalledWithoutIssues, otherFiles],
         ['#fb7185', '#f59e0b', '#334155'],
         String(attentionCount),
-        totalFiles ? 'CẦN THEO DÕI' : 'CHƯA CÓ DỮ LIỆU',
         context => ` ${context.label}: ${context.raw} tệp`
     );
 }
@@ -2362,7 +2396,6 @@ function initOrUpdateFileTypeChart(typeCounts, totalFiles) {
         values,
         colors,
         String(totalFiles),
-        'TỔNG SỐ TỆP',
         context => ` ${context.label}: ${context.raw} tệp`,
         true
     );
@@ -2391,6 +2424,7 @@ function applyFilters() {
     let filesWithIssues = 0;
     let recalledFiles = 0;
     let recalledWithIssues = 0;
+    let signedFiles = 0;
     let totalIssueCount = 0;
 
     rows.forEach(row => {
@@ -2411,6 +2445,7 @@ function applyFilters() {
         let matchesRecall = (!hideRecalledFilesFlag || !isRecalled || attentionFilesOnly);
         const fileIssues = serverIssuesDB[row.getAttribute('data-path')] || [];
         const hasIssues = Array.isArray(fileIssues) && fileIssues.length > 0;
+        if (getSignatureRecord(filePath)) signedFiles++;
         let matchesAttention = (!attentionFilesOnly || hasIssues || isRecalled);
 
         if (matchesProj && matchesFolder && matchesState && matchesSuit && matchesSearch && matchesRecall && matchesAttention) {
@@ -2458,7 +2493,7 @@ function applyFilters() {
     // Cập nhật biểu đồ trực quan Chart.js
     initOrUpdateFileTypeChart(typeCounts, totalVisibleFiles);
     updateStorageChart(storageByState, totalStorageBytes);
-    updateIssueChart(filesWithIssues, recalledFiles, recalledWithIssues, totalVisibleFiles, totalIssueCount);
+    updateIssueChart(filesWithIssues, recalledFiles, recalledWithIssues, signedFiles, totalVisibleFiles, totalIssueCount);
 }
 
 function toggleAttentionFiles() {
