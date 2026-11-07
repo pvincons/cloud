@@ -1,0 +1,1706 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Super Admin - Quản lý Phân quyền Portal</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bcryptjs/2.4.3/bcrypt.min.js"></script>
+    <script src="../assets/js/config.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            background-color: #0b0f19;
+            color: #f8fafc;
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+
+        .glass-card {
+            background: rgba(15, 23, 42, 0.75);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(12px);
+        }
+
+        .workspace-card {
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: all 0.2s ease;
+        }
+
+        .workspace-card:hover {
+            background: rgba(30, 41, 59, 0.9);
+            border-color: rgba(59, 130, 246, 0.4);
+            transform: translateY(-2px);
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .toast-animate {
+            animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .tab-btn {
+            border-bottom: 2px solid transparent;
+            color: #94a3b8;
+            transition: all 0.2s ease;
+        }
+
+        .tab-btn:hover {
+            color: #e2e8f0;
+        }
+
+        .tab-btn[aria-selected="true"] {
+            border-bottom-color: #a855f7;
+            color: #d8b4fe;
+        }
+    </style>
+</head>
+
+<body class="min-h-screen flex flex-col justify-between p-3 sm:p-6 md:p-8">
+
+    <!-- TOAST NOTIFICATION CONTAINER -->
+    <div id="toast-container"
+        class="fixed top-4 right-4 left-4 lg:left-auto z-50 flex flex-col gap-2 pointer-events-none lg:max-w-sm w-auto">
+    </div>
+
+    <!-- 1. MÀN HÌNH ĐĂNG NHẬP TÀI KHOẢN ADMIN (BACKEND) -->
+    <div id="login-modal"
+        class="fixed inset-0 bg-[#090a0f]/95 backdrop-blur-md z-50 flex items-center justify-center p-4">
+        <div class="bg-[#14171f] border border-[#262a36] rounded-2xl p-6 w-full max-w-md shadow-2xl space-y-5">
+            <div class="text-center space-y-2">
+                <div
+                    class="w-14 h-14 mx-auto rounded-2xl bg-purple-600/20 border border-purple-500/30 text-purple-400 flex items-center justify-center text-2xl shadow-lg">
+                    <i class="fa-solid fa-user-shield"></i>
+                </div>
+                <h2 class="text-lg font-bold text-gray-100">Super Admin Portal</h2>
+                <p class="text-xs text-gray-400">Đăng nhập tài khoản ADMIN để quản lý phân quyền & thông báo</p>
+            </div>
+
+            <div class="space-y-3">
+                <div class="space-y-1">
+                    <label class="text-[11px] font-semibold text-gray-400 uppercase">Tài khoản ADMIN</label>
+                    <input type="text" id="auth-username" placeholder="VD: admin" autocomplete="username"
+                        class="w-full bg-[#0f1117] border border-[#2a2e3d] rounded-xl px-3 py-2.5 text-xs text-gray-200 outline-none focus:border-purple-500 font-mono">
+                </div>
+                <div class="space-y-1">
+                    <label class="text-[11px] font-semibold text-gray-400 uppercase">Mật khẩu</label>
+                    <input type="password" id="auth-password" placeholder="••••••••" autocomplete="current-password"
+                        class="w-full bg-[#0f1117] border border-[#2a2e3d] rounded-xl px-3 py-2.5 text-xs text-gray-200 outline-none focus:border-purple-500 font-mono">
+                </div>
+            </div>
+
+            <!-- KHUNG HIỂN THỊ THÔNG BÁO LỖI TRỰC TIẾP TRÊN TAB ĐĂNG NHẬP -->
+            <div id="login-error-box" class="hidden bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs p-3 rounded-xl flex items-center gap-2">
+                <i class="fa-solid fa-circle-exclamation shrink-0 text-sm"></i>
+                <span id="login-error-text">Nội dung lỗi...</span>
+            </div>
+
+            <button id="btn-login"
+                class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold py-2.5 rounded-xl text-xs transition shadow-lg shadow-purple-900/30 flex items-center justify-center gap-2">
+                <i class="fa-solid fa-key text-xs"></i>
+                <span>Xác nhận & Vào Super Admin</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- 2. MAIN WORKSPACE -->
+    <div id="admin-workspace" class="hidden flex-1 flex flex-col justify-between">
+        <div>
+            <!-- HEADER ADMIN -->
+            <header class="flex flex-wrap items-center justify-between gap-4 mb-4 md:mb-8">
+                <div class="flex items-center gap-3">
+                    <div
+                        class="w-10 h-10 rounded-xl bg-purple-600/20 border border-purple-500/30 text-purple-400 flex items-center justify-center text-xl shrink-0">
+                        <i class="fa-solid fa-user-shield"></i>
+                    </div>
+                    <div>
+                        <h1
+                            class="font-extrabold text-white text-base sm:text-lg tracking-wider flex items-center gap-2">
+                            SUPER ADMIN PORTAL <span
+                                class="text-[10px] bg-purple-500/20 text-purple-300 px-2 py-0.5 rounded border border-purple-500/30">ROOT</span>
+                        </h1>
+                        <p class="text-[11px] sm:text-xs text-slate-400">Quản lý tài khoản, thông báo & lưu dữ liệu trên Backend</p>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-2 sm:gap-3 w-full sm:w-auto justify-between sm:justify-end">
+                    <span
+                        class="text-[10px] sm:text-xs text-slate-400 font-mono flex items-center gap-1 shrink-0 bg-slate-900 px-2.5 py-1.5 rounded-xl border border-slate-800">
+                        <i class="fa-solid fa-server text-xs text-slate-300"></i>
+                        <span id="display-repo-info" class="text-purple-300 font-semibold">backend</span>
+                    </span>
+                    <button id="btn-logout"
+                        class="px-3 py-2 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 text-xs font-bold transition-all flex items-center gap-1.5">
+                        <i class="fa-solid fa-right-from-bracket"></i> Đăng xuất
+                    </button>
+                </div>
+            </header>
+
+            <!-- 7 Ô GOM CHUNG TRÊN 1 HÀNG MÁY TÍNH (4 Thống kê + 3 Điều hướng trực tiếp) -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-7 gap-3 sm:gap-4 mb-4 md:mb-8">
+                <!-- 1. Tổng tài khoản -->
+                <div class="glass-card p-3 sm:p-5 rounded-2xl flex items-center justify-between">
+                    <div class="flex lg:hidden items-center justify-between w-full">
+                        <span class="text-xs font-semibold text-slate-400 uppercase">TỔNG TÀI KHOẢN</span>
+                        <div class="flex items-center gap-3">
+                            <span id="stat-total-mob" class="text-lg font-black text-white">0</span>
+                            <div class="text-blue-400 text-xl"><i class="fa-solid fa-users"></i></div>
+                        </div>
+                    </div>
+                    <div class="hidden lg:block">
+                        <p class="text-[10px] sm:text-xs font-semibold text-slate-400 uppercase">TỔNG TÀI KHOẢN</p>
+                        <p id="stat-total" class="text-xl sm:text-2xl font-black text-white mt-1">0</p>
+                    </div>
+                    <div class="hidden lg:block text-blue-400 text-xl sm:text-2xl"><i class="fa-solid fa-users"></i></div>
+                </div>
+
+                <!-- 2. Hoạt động -->
+                <div class="glass-card p-3 sm:p-5 rounded-2xl flex items-center justify-between">
+                    <div class="flex lg:hidden items-center justify-between w-full">
+                        <span class="text-xs font-semibold text-slate-400 uppercase">HOẠT ĐỘNG (ACTIVE)</span>
+                        <div class="flex items-center gap-3">
+                            <span id="stat-active-mob" class="text-lg font-black text-emerald-400">0</span>
+                            <div class="text-emerald-400 text-xl"><i class="fa-solid fa-user-check"></i></div>
+                        </div>
+                    </div>
+                    <div class="hidden lg:block">
+                        <p class="text-[10px] sm:text-xs font-semibold text-slate-400 uppercase">HOẠT ĐỘNG (ACTIVE)</p>
+                        <p id="stat-active" class="text-xl sm:text-2xl font-black text-emerald-400 mt-1">0</p>
+                    </div>
+                    <div class="hidden lg:block text-emerald-400 text-xl sm:text-2xl"><i class="fa-solid fa-user-check"></i></div>
+                </div>
+
+                <!-- 3. Khóa -->
+                <div class="glass-card p-3 sm:p-5 rounded-2xl flex items-center justify-between">
+                    <div class="flex lg:hidden items-center justify-between w-full">
+                        <span class="text-xs font-semibold text-slate-400 uppercase">KHÓA (INACTIVE)</span>
+                        <div class="flex items-center gap-3">
+                            <span id="stat-inactive-mob" class="text-lg font-black text-amber-400">0</span>
+                            <div class="text-amber-400 text-xl"><i class="fa-solid fa-user-slash"></i></div>
+                        </div>
+                    </div>
+                    <div class="hidden lg:block">
+                        <p class="text-[10px] sm:text-xs font-semibold text-slate-400 uppercase">KHÓA (INACTIVE)</p>
+                        <p id="stat-inactive" class="text-xl sm:text-2xl font-black text-amber-400 mt-1">0</p>
+                    </div>
+                    <div class="hidden lg:block text-amber-400 text-xl sm:text-2xl"><i class="fa-solid fa-user-slash"></i></div>
+                </div>
+
+                <!-- 4. Hệ thống Backend -->
+                <div class="glass-card p-3 sm:p-5 rounded-2xl flex items-center justify-between">
+                    <div class="flex lg:hidden items-center justify-between w-full">
+                        <span class="text-xs font-semibold text-slate-400 uppercase">HỆ THỐNG BACKEND</span>
+                        <div class="flex items-center gap-2">
+                            <span class="text-[11px] font-bold text-emerald-400 flex items-center gap-1">
+                                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> API CONNECTED
+                            </span>
+                            <div class="text-emerald-400 text-xl"><i class="fa-solid fa-cloud"></i></div>
+                        </div>
+                    </div>
+                    <div class="hidden lg:block">
+                        <p class="text-[10px] sm:text-xs font-semibold text-slate-400 uppercase">HỆ THỐNG BACKEND</p>
+                        <p class="text-[11px] sm:text-xs font-bold text-emerald-400 mt-2 flex items-center gap-1.5">
+                            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> API CONNECTED
+                        </p>
+                    </div>
+                    <div class="hidden lg:block text-emerald-400 text-xl sm:text-2xl"><i class="fa-solid fa-cloud"></i></div>
+                </div>
+
+                <!-- 5. CRM Khách Hàng -->
+                <a href="../content/partner/index.html"
+                    class="workspace-card p-3 sm:p-5 rounded-2xl flex items-center justify-between group">
+                    <div class="flex items-center gap-3">
+                        <div
+                            class="w-9 h-9 rounded-xl bg-orange-500/10 border border-orange-500/30 text-orange-400 flex items-center justify-center text-base shrink-0">
+                            <i class="fa-solid fa-handshake"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-xs sm:text-sm text-white group-hover:text-orange-300 transition-colors">
+                                CRM Khách Hàng</h3>
+                            <p class="text-[10px] text-slate-400 font-mono mt-0.5">partner/index.html</p>
+                        </div>
+                    </div>
+                    <i class="fa-solid fa-arrow-right text-xs text-slate-500 group-hover:text-orange-400 group-hover:translate-x-1 transition-all"></i>
+                </a>
+
+                <!-- 6. Quản Lý Nội Bộ -->
+                <a href="../content/internal/index.html"
+                    class="workspace-card p-3 sm:p-5 rounded-2xl flex items-center justify-between group">
+                    <div class="flex items-center gap-3">
+                        <div
+                            class="w-9 h-9 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 flex items-center justify-center text-base shrink-0">
+                            <i class="fa-solid fa-folder-closed"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-xs sm:text-sm text-white group-hover:text-emerald-300 transition-colors">
+                                Quản Lý Nội Bộ</h3>
+                            <p class="text-[10px] text-slate-400 font-mono mt-0.5">internal/index.html</p>
+                        </div>
+                    </div>
+                    <i class="fa-solid fa-arrow-right text-xs text-slate-500 group-hover:text-emerald-400 group-hover:translate-x-1 transition-all"></i>
+                </a>
+
+                <!-- 7. BIM - VDC CDE -->
+                <a href="../content/bim-vdc/index.html"
+                    class="workspace-card p-3 sm:p-5 rounded-2xl flex items-center justify-between group">
+                    <div class="flex items-center gap-3">
+                        <div
+                            class="w-9 h-9 rounded-xl bg-blue-500/10 border border-blue-500/30 text-blue-400 flex items-center justify-center text-base shrink-0">
+                            <i class="fa-solid fa-cubes"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-xs sm:text-sm text-white group-hover:text-blue-300 transition-colors">
+                                BIM - VDC CDE</h3>
+                            <p class="text-[10px] text-slate-400 font-mono mt-0.5">bim-vdc/index.html</p>
+                        </div>
+                    </div>
+                    <i class="fa-solid fa-arrow-right text-xs text-slate-500 group-hover:text-blue-400 group-hover:translate-x-1 transition-all"></i>
+                </a>
+            </div>
+
+            <!-- THANH ĐIỀU HƯỚNG TAB -->
+            <div class="flex flex-wrap items-center justify-between gap-3 mb-4 border-b border-white/10" role="tablist">
+                <div class="flex items-center gap-2">
+                    <button type="button" id="tab-btn-users" role="tab" data-tab="users" aria-selected="true"
+                        aria-controls="tab-panel-users" onclick="switchTab('users')"
+                        class="tab-btn px-4 py-2.5 text-xs font-bold uppercase tracking-widest flex items-center gap-2 -mb-px">
+                        <i class="fa-solid fa-users"></i> Users
+                        <span id="tab-users-count"
+                            class="text-[10px] bg-purple-500/20 text-purple-300 px-1.5 py-0.5 rounded border border-purple-500/30">0</span>
+                    </button>
+
+                    <button type="button" id="tab-btn-notifications" role="tab" data-tab="notifications"
+                        aria-selected="false" aria-controls="tab-panel-notifications"
+                        onclick="switchTab('notifications')"
+                        class="tab-btn px-4 py-2.5 text-xs font-bold uppercase tracking-widest flex items-center gap-2 -mb-px">
+                        <i class="fa-solid fa-bullhorn text-purple-400"></i> Thông Báo
+                    </button>
+                </div>
+
+            </div>
+
+            <div id="tab-panel-users" role="tabpanel" aria-labelledby="tab-btn-users">
+                <!-- THƯ MỤC 2: QUẢN LÝ TÀI KHOẢN (database/users.json) & BỘ LỌC -->
+                <div class="glass-card p-4 sm:p-6 rounded-3xl">
+                    <div class="flex flex-col gap-4 mb-6">
+                        <div class="flex flex-wrap items-center justify-between gap-4">
+                            <div>
+                                <h2 class="text-sm font-bold text-white flex items-center gap-2">
+                                    <i class="fa-solid fa-database text-yellow-400"></i> Danh Sách Tài Khoản <span
+                                        id="users-path-label"
+                                        class="font-mono text-xs text-purple-300 hidden sm:inline">( chưa đồng bộ )</span>
+                                </h2>
+                                <p class="text-xs text-slate-400 mt-1 hidden sm:block">Hệ thống lọc nâng cao theo Chức vụ,
+                                    Vai trò, Công ty, Trạng thái & Sắp xếp</p>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-1.5 sm:flex sm:items-center sm:gap-2 w-full sm:w-auto justify-end">
+                                <button id="btn-sync-users"
+                                    class="w-full sm:w-auto justify-center px-2 sm:px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-blue-400 border border-slate-700 font-bold text-[11px] sm:text-xs rounded-xl transition-all flex items-center gap-1 shadow truncate">
+                                    <i class="fa-solid fa-arrows-rotate shrink-0"></i> <span class="truncate">Tải dữ liệu</span>
+                                </button>
+                                <button type="button" id="btn-export-users-json" onclick="exportUsersJson()"
+                                    class="w-full sm:w-auto justify-center px-2 sm:px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-amber-400 border border-slate-700 font-bold text-[11px] sm:text-xs rounded-xl transition-all flex items-center gap-1 shadow truncate">
+                                    <i class="fa-solid fa-file-arrow-down shrink-0"></i> <span class="truncate">Xuất users.json</span>
+                                </button>
+                                <button id="btn-publish-users"
+                                    class="w-full sm:w-auto justify-center px-2 sm:px-3.5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-[11px] sm:text-xs rounded-xl shadow-lg transition-all flex items-center gap-1 shadow truncate">
+                                    <i class="fa-solid fa-cloud-arrow-up shrink-0"></i> <span class="truncate">Xuất bản</span>
+                                </button>
+                                <button onclick="openAddModal()"
+                                    class="w-full sm:w-auto justify-center px-2 sm:px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold text-[11px] sm:text-xs rounded-xl shadow-lg transition-all flex items-center gap-1 shadow truncate">
+                                    <i class="fa-solid fa-plus shrink-0"></i> <span class="truncate">Thêm</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- THANH BỘ LỌC VÀ SẮP XẾP -->
+                        <div
+                            class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2.5 pt-2 border-t border-white/10">
+                            <select id="sortSelect" onchange="applyFiltersAndSort()"
+                                class="bg-slate-900 border border-purple-500/50 text-purple-300 font-bold text-xs px-3 py-2.5 rounded-xl focus:outline-none focus:border-purple-400">
+                                <option value="id-asc">ID: Tăng dần</option>
+                                <option value="id-desc">ID: Giảm dần</option>
+                                <option value="name-asc">Tên: A ➔ Z</option>
+                                <option value="name-desc">Tên: Z ➔ A</option>
+                            </select>
+
+                            <select id="filterPosition" onchange="applyFiltersAndSort()"
+                                class="bg-slate-900 border border-slate-700 text-xs px-3 py-2.5 rounded-xl text-white focus:outline-none focus:border-purple-400">
+                                <option value="">-- Tất cả Chức vụ --</option>
+                            </select>
+                            <select id="filterRole" onchange="applyFiltersAndSort()"
+                                class="bg-slate-900 border border-slate-700 text-xs px-3 py-2.5 rounded-xl text-white focus:outline-none focus:border-purple-400">
+                                <option value="">-- Tất cả Vai trò --</option>
+                            </select>
+                            <select id="filterCompany" onchange="applyFiltersAndSort()"
+                                class="bg-slate-900 border border-slate-700 text-xs px-3 py-2.5 rounded-xl text-white focus:outline-none focus:border-purple-400">
+                                <option value="">-- Tất cả Công ty --</option>
+                            </select>
+                            <select id="filterStatus" onchange="applyFiltersAndSort()"
+                                class="bg-slate-900 border border-slate-700 text-xs px-3 py-2.5 rounded-xl text-white focus:outline-none focus:border-purple-400">
+                                <option value="">-- Trạng thái --</option>
+                                <option value="Active">Active</option>
+                                <option value="Inactive">Inactive</option>
+                            </select>
+                            <div class="relative">
+                                <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-slate-500 text-xs"></i>
+                                <input type="text" id="searchInput" name="admin-user-search" readonly
+                                    placeholder="Tìm kiếm tên, user..." autocomplete="off" autocorrect="off"
+                                    autocapitalize="off" spellcheck="false" aria-autocomplete="none"
+                                    onfocus="this.removeAttribute('readonly'); this.value='';"
+                                    onkeyup="applyFiltersAndSort()"
+                                    class="w-full bg-slate-900 border border-slate-700 text-xs pl-8 pr-3 py-2.5 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-purple-400">
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- BẢNG TÀI KHOẢN - DESKTOP VIEW -->
+                    <div class="hidden md:block overflow-x-auto">
+                        <table class="w-full text-left text-xs">
+                            <thead>
+                                <tr class="border-b border-white/10 text-slate-400 uppercase font-semibold">
+                                    <th class="pb-3 px-3">Tài Khoản</th>
+                                    <th class="pb-3 px-3">Họ Tên & Liên Hệ</th>
+                                    <th class="pb-3 px-3">Chức Vụ</th>
+                                    <th class="pb-3 px-3">Vai Trò (Role)</th>
+                                    <th class="pb-3 px-3">Quyền Hạn (Permission)</th>
+                                    <th class="pb-3 px-3">Công Ty</th>
+                                    <th class="pb-3 px-3">Dự Án Tham Gia</th>
+                                    <th class="pb-3 px-3">Trạng Thái</th>
+                                    <th class="pb-3 px-3 text-right">Thao Tác</th>
+                                </tr>
+                            </thead>
+                            <tbody id="userTableBody" class="divide-y divide-white/5 font-medium"></tbody>
+                        </table>
+                    </div>
+
+                    <!-- DANH SÁCH DẠNG CARD - MOBILE & TABLET VIEW -->
+                    <div id="userCardList" class="md:hidden grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
+                </div>
+            </div>
+
+            <section id="tab-panel-notifications" role="tabpanel" aria-labelledby="tab-btn-notifications" class="hidden">
+                <div class="glass-card p-4 sm:p-6 rounded-3xl">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
+                        <div>
+                            <h2 class="text-sm font-bold text-white flex items-center gap-2">
+                                <i class="fa-solid fa-bullhorn text-amber-400"></i> Quản lý thông báo
+                            </h2>
+                            <p class="text-xs text-slate-400 mt-1">Backend: <span id="notifications-path-label" class="font-mono text-purple-300">database/notifications.json</span></p>
+                        </div>
+                        <div class="grid grid-cols-3 gap-2 sm:flex">
+                            <button type="button" id="btn-sync-notifications"
+                                class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-blue-400 border border-slate-700 font-bold text-xs rounded-xl">
+                                <i class="fa-solid fa-arrows-rotate"></i> Tải JSON
+                            </button>
+                            <button type="button" id="btn-export-notifications" onclick="exportNotificationsJson()"
+                                class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-amber-400 border border-slate-700 font-bold text-xs rounded-xl">
+                                <i class="fa-solid fa-file-arrow-down"></i> Tải xuống
+                            </button>
+                            <button type="button" id="btn-publish-notifications"
+                                class="px-3 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl">
+                                <i class="fa-solid fa-cloud-arrow-up"></i> Xuất Notification.json
+                            </button>
+                        </div>
+                    </div>
+
+                    <form id="notification-form" class="grid grid-cols-1 md:grid-cols-2 gap-3 p-4 rounded-2xl bg-slate-900/70 border border-white/10 mb-5">
+                        <input id="notification-title" type="text" maxlength="160" required
+                            placeholder="Tiêu đề thông báo"
+                            class="bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-xs text-white outline-none focus:border-purple-500">
+                        <div class="grid grid-cols-2 gap-2">
+                            <div id="notification-icon-picker" class="relative">
+                                <input id="notification-icon" type="hidden" value="fa-circle-info">
+                                <button type="button" id="notification-icon-button" aria-haspopup="listbox"
+                                    aria-expanded="false"
+                                    class="w-full h-full min-h-[42px] flex items-center justify-between gap-2 bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-xs text-white outline-none focus:border-purple-500">
+                                    <span class="flex items-center gap-2 min-w-0">
+                                        <i id="notification-icon-preview" class="fa-solid fa-circle-info text-purple-300"></i>
+                                        <span id="notification-icon-label" class="truncate">Thông tin</span>
+                                    </span>
+                                    <i class="fa-solid fa-chevron-down text-[10px] text-slate-400"></i>
+                                </button>
+                                <div id="notification-icon-options" role="listbox"
+                                    class="hidden absolute top-full left-0 mt-1 w-full max-h-56 overflow-y-auto z-50 p-1.5 bg-slate-950 border border-slate-700 rounded-xl shadow-2xl">
+                                    <button type="button" role="option" aria-selected="true" data-notification-icon="fa-circle-info"
+                                        class="w-full flex items-center gap-2 px-2.5 py-2 text-left text-xs text-slate-200 hover:bg-slate-800 rounded-lg">
+                                        <i class="fa-solid fa-circle-info w-5 text-center text-blue-400"></i> Thông tin
+                                    </button>
+                                    <button type="button" role="option" aria-selected="false" data-notification-icon="fa-bell"
+                                        class="w-full flex items-center gap-2 px-2.5 py-2 text-left text-xs text-slate-200 hover:bg-slate-800 rounded-lg">
+                                        <i class="fa-solid fa-bell w-5 text-center text-amber-400"></i> Chuông
+                                    </button>
+                                    <button type="button" role="option" aria-selected="false" data-notification-icon="fa-bullhorn"
+                                        class="w-full flex items-center gap-2 px-2.5 py-2 text-left text-xs text-slate-200 hover:bg-slate-800 rounded-lg">
+                                        <i class="fa-solid fa-bullhorn w-5 text-center text-purple-400"></i> Thông báo
+                                    </button>
+                                    <button type="button" role="option" aria-selected="false" data-notification-icon="fa-server"
+                                        class="w-full flex items-center gap-2 px-2.5 py-2 text-left text-xs text-slate-200 hover:bg-slate-800 rounded-lg">
+                                        <i class="fa-solid fa-server w-5 text-center text-cyan-400"></i> Máy chủ
+                                    </button>
+                                    <button type="button" role="option" aria-selected="false" data-notification-icon="fa-shield-halved"
+                                        class="w-full flex items-center gap-2 px-2.5 py-2 text-left text-xs text-slate-200 hover:bg-slate-800 rounded-lg">
+                                        <i class="fa-solid fa-shield-halved w-5 text-center text-emerald-400"></i> Bảo mật
+                                    </button>
+                                    <button type="button" role="option" aria-selected="false" data-notification-icon="fa-circle-check"
+                                        class="w-full flex items-center gap-2 px-2.5 py-2 text-left text-xs text-slate-200 hover:bg-slate-800 rounded-lg">
+                                        <i class="fa-solid fa-circle-check w-5 text-center text-emerald-400"></i> Thành công
+                                    </button>
+                                    <button type="button" role="option" aria-selected="false" data-notification-icon="fa-triangle-exclamation"
+                                        class="w-full flex items-center gap-2 px-2.5 py-2 text-left text-xs text-slate-200 hover:bg-slate-800 rounded-lg">
+                                        <i class="fa-solid fa-triangle-exclamation w-5 text-center text-rose-400"></i> Cảnh báo
+                                    </button>
+                                    <button type="button" role="option" aria-selected="false" data-notification-icon="fa-screwdriver-wrench"
+                                        class="w-full flex items-center gap-2 px-2.5 py-2 text-left text-xs text-slate-200 hover:bg-slate-800 rounded-lg">
+                                        <i class="fa-solid fa-screwdriver-wrench w-5 text-center text-orange-400"></i> Bảo trì
+                                    </button>
+                                    <button type="button" role="option" aria-selected="false" data-notification-icon="fa-cloud-arrow-up"
+                                        class="w-full flex items-center gap-2 px-2.5 py-2 text-left text-xs text-slate-200 hover:bg-slate-800 rounded-lg">
+                                        <i class="fa-solid fa-cloud-arrow-up w-5 text-center text-sky-400"></i> Cập nhật
+                                    </button>
+                                    <button type="button" role="option" aria-selected="false" data-notification-icon="fa-lock"
+                                        class="w-full flex items-center gap-2 px-2.5 py-2 text-left text-xs text-slate-200 hover:bg-slate-800 rounded-lg">
+                                        <i class="fa-solid fa-lock w-5 text-center text-slate-300"></i> Quyền truy cập
+                                    </button>
+                                </div>
+                            </div>
+                            <div id="notification-color-picker" class="relative">
+                                <input id="notification-color" type="hidden" value="blue">
+                                <button type="button" id="notification-color-button" aria-haspopup="listbox"
+                                    aria-expanded="false"
+                                    class="w-full h-full min-h-[42px] flex items-center justify-between gap-2 bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-xs text-white outline-none focus:border-purple-500">
+                                    <span class="flex items-center gap-2 min-w-0">
+                                        <span id="notification-color-swatch" class="w-3.5 h-3.5 rounded-full bg-blue-400 border border-white/30"></span>
+                                        <span id="notification-color-label" class="truncate">Xanh dương</span>
+                                    </span>
+                                    <i class="fa-solid fa-chevron-down text-[10px] text-slate-400"></i>
+                                </button>
+                                <div id="notification-color-options" role="listbox"
+                                    class="hidden absolute top-full left-0 mt-1 w-full z-50 p-1.5 bg-slate-950 border border-slate-700 rounded-xl shadow-2xl">
+                                    <button type="button" role="option" aria-selected="true" data-notification-color="blue"
+                                        class="w-full flex items-center gap-2 px-2.5 py-2 text-left text-xs text-slate-200 hover:bg-slate-800 rounded-lg">
+                                        <span class="w-3.5 h-3.5 rounded-full bg-blue-400 border border-white/30"></span> Xanh dương
+                                    </button>
+                                    <button type="button" role="option" aria-selected="false" data-notification-color="emerald"
+                                        class="w-full flex items-center gap-2 px-2.5 py-2 text-left text-xs text-slate-200 hover:bg-slate-800 rounded-lg">
+                                        <span class="w-3.5 h-3.5 rounded-full bg-emerald-400 border border-white/30"></span> Xanh lá
+                                    </button>
+                                    <button type="button" role="option" aria-selected="false" data-notification-color="amber"
+                                        class="w-full flex items-center gap-2 px-2.5 py-2 text-left text-xs text-slate-200 hover:bg-slate-800 rounded-lg">
+                                        <span class="w-3.5 h-3.5 rounded-full bg-amber-400 border border-white/30"></span> Vàng
+                                    </button>
+                                    <button type="button" role="option" aria-selected="false" data-notification-color="purple"
+                                        class="w-full flex items-center gap-2 px-2.5 py-2 text-left text-xs text-slate-200 hover:bg-slate-800 rounded-lg">
+                                        <span class="w-3.5 h-3.5 rounded-full bg-purple-400 border border-white/30"></span> Tím
+                                    </button>
+                                    <button type="button" role="option" aria-selected="false" data-notification-color="rose"
+                                        class="w-full flex items-center gap-2 px-2.5 py-2 text-left text-xs text-slate-200 hover:bg-slate-800 rounded-lg">
+                                        <span class="w-3.5 h-3.5 rounded-full bg-rose-400 border border-white/30"></span> Đỏ
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <textarea id="notification-message" maxlength="2000" rows="3" required
+                            placeholder="Nội dung thông báo"
+                            class="md:col-span-2 bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-xs text-white outline-none focus:border-purple-500"></textarea>
+                        <div class="md:col-span-2 flex flex-wrap items-center justify-between gap-3">
+                            <label class="flex items-center gap-2 text-xs text-slate-300">
+                                <input id="notification-active" type="checkbox" checked class="accent-purple-500">
+                                Đang hiển thị
+                            </label>
+                            <div class="flex gap-2">
+                                <button type="button" id="btn-cancel-notification-edit"
+                                    class="hidden px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold rounded-xl">
+                                    Hủy sửa
+                                </button>
+                                <button type="submit" id="btn-save-notification"
+                                    class="px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold rounded-xl">
+                                    <i class="fa-solid fa-plus"></i> Thêm thông báo
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+
+                    <div id="notification-admin-list" class="space-y-3" aria-live="polite">
+                        <p class="text-xs text-slate-500">Đăng nhập và tải dữ liệu từ máy chủ để quản lý thông báo.</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <footer class="mt-8 text-center text-xs text-slate-500">
+            &copy; 2026 PV INCONS Enterprise Workspace. Database Path: <span
+                id="users-path-footer" class="font-mono text-purple-400">chưa đồng bộ</span>
+        </footer>
+    </div>
+
+    <!-- MODAL EDIT / ADD USER -->
+    <div id="userModal"
+        class="fixed inset-0 bg-black/80 backdrop-blur-md hidden items-center justify-center p-3 sm:p-4 z-50">
+        <div
+            class="glass-card max-w-2xl w-full p-5 sm:p-6 rounded-3xl border border-white/20 max-h-[92vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-4">
+                <h3 id="modalTitle" class="text-sm font-bold text-white uppercase flex items-center gap-2">
+                    <i class="fa-solid fa-user-pen text-purple-400"></i> Chỉnh Sửa Người Dùng
+                </h3>
+                <button onclick="closeModal()" class="text-slate-400 hover:text-white text-lg p-1"><i
+                        class="fa-solid fa-xmark"></i></button>
+            </div>
+            <form id="userForm" onsubmit="saveUser(event)" class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 text-xs">
+                <input type="hidden" id="userId">
+
+                <div>
+                    <label class="block text-slate-400 mb-1 font-semibold">Username <span
+                            class="text-red-400">*</span></label>
+                    <input type="text" id="formUsername" required
+                        class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-purple-400">
+                </div>
+
+                <div>
+                    <label class="block text-slate-400 mb-1 font-semibold">Mật Khẩu Ban Đầu (Gốc)</label>
+                    <input type="text" id="formRawPassword" placeholder="Nhập mật khẩu mới (nếu muốn đổi)"
+                        class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-purple-400 placeholder:text-slate-600">
+                    <p class="text-[10px] text-slate-500 mt-1">* Hệ thống tự mã hóa Hash khi lưu vào JSON</p>
+                </div>
+
+                <div>
+                    <label class="block text-slate-400 mb-1 font-semibold">Họ và Tên (fullName) <span
+                            class="text-red-400">*</span></label>
+                    <input type="text" id="formFullName" required
+                        class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-purple-400">
+                </div>
+
+                <div>
+                    <label class="block text-slate-400 mb-1 font-semibold">Số điện thoại (phone)</label>
+                    <input type="text" id="formPhone"
+                        class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-purple-400">
+                </div>
+
+                <div>
+                    <label class="block text-slate-400 mb-1 font-semibold">Chức vụ (position)</label>
+                    <input type="text" id="formPosition"
+                        class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-purple-400">
+                </div>
+
+                <div>
+                    <label class="block text-slate-400 mb-1 font-semibold">Chuyên môn (discipline)</label>
+                    <input type="text" id="formDiscipline"
+                        class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-purple-400">
+                </div>
+
+                <div>
+                    <label class="block text-slate-400 mb-1 font-semibold">Vai trò (Role)</label>
+                    <select id="formRole"
+                        class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-purple-400">
+                        <option value="ADMIN">ADMIN</option>
+                        <option value="MASTER">MASTER</option>
+                        <option value="DESIGNER">DESIGNER</option>
+                        <option value="MANAGEMENT">MANAGEMENT</option>
+                        <option value="CONTRACTOR">CONTRACTOR</option>
+                        <option value="INTERNAL">INTERNAL</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-slate-400 mb-1 font-semibold">Quyền hạn (Permission)</label>
+                    <select id="formPermission"
+                        class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-purple-400">
+                        <option value="ADMIN">ADMIN</option>
+                        <option value="MASTER">MASTER</option>
+                        <option value="DESIGNER">DESIGNER</option>
+                        <option value="MANAGEMENT">MANAGEMENT</option>
+                        <option value="CONTRACTOR">CONTRACTOR</option>
+                        <option value="INTERNAL">INTERNAL</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-slate-400 mb-1 font-semibold">Công ty (company)</label>
+                    <input type="text" id="formCompany"
+                        class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-purple-400">
+                </div>
+
+                <div>
+                    <label class="block text-slate-400 mb-1 font-semibold">Trạng thái (status)</label>
+                    <select id="formStatus"
+                        class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-purple-400">
+                        <option value="Active">Active (Hoạt động)</option>
+                        <option value="Inactive">Inactive (Khóa/Tạm dừng)</option>
+                    </select>
+                </div>
+
+                <div class="sm:col-span-2">
+                    <label class="block text-slate-400 mb-1 font-semibold">Dự án tham gia (projects - phân tách bằng dấu
+                        phẩy)</label>
+                    <input type="text" id="formProjects" placeholder="VD: Project_01, Project_02"
+                        class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-purple-400">
+                </div>
+
+                <div class="sm:col-span-2 flex justify-end gap-3 mt-4 pt-3 border-t border-white/10">
+                    <button type="button" onclick="closeModal()"
+                        class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl font-bold">Hủy</button>
+                    <button type="submit"
+                        class="px-5 py-2 bg-purple-600 hover:bg-purple-500 text-white rounded-xl font-bold shadow-lg">Lưu
+                        Thay Đổi</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let usersData = [];
+        const adminSearchInput = document.getElementById('searchInput');
+        if (adminSearchInput) adminSearchInput.name = `admin-user-search-${Date.now().toString(36)}`;
+        function clearAdminSearchInput() {
+            if (!adminSearchInput) return;
+            adminSearchInput.value = '';
+            adminSearchInput.removeAttribute('value');
+        }
+        clearAdminSearchInput();
+        window.addEventListener('pageshow', () => {
+            setTimeout(() => {
+                clearAdminSearchInput();
+                if (typeof applyFiltersAndSort === 'function') applyFiltersAndSort();
+            }, 0);
+        });
+
+        // ===== KẾT NỐI BACKEND (server.js): users.json & notifications.json nằm trong thư mục database của backend =====
+        const API_BASE = (typeof CONFIG !== 'undefined' && CONFIG.CDE_API) ? CONFIG.CDE_API : 'http://localhost:3000/api';
+        const AUTH_BASE = (typeof CONFIG !== 'undefined' && CONFIG.AUTH_API) ? CONFIG.AUTH_API : 'http://localhost:3000/api/auth';
+        const USERS_API_PATH = '/admin/users';
+        const NOTIFICATIONS_API_PATH = '/admin/notifications';
+        const USERS_FILE_LABEL = 'database/users.json';
+        const NOTIFICATIONS_FILE_LABEL = 'database/notifications.json';
+        const ADMIN_SESSION_KEY = 'pv_admin_session';
+        const NOTIFICATION_ICONS = {
+            'fa-circle-info': 'Thông tin',
+            'fa-bell': 'Chuông',
+            'fa-bullhorn': 'Thông báo',
+            'fa-server': 'Máy chủ',
+            'fa-shield-halved': 'Bảo mật',
+            'fa-circle-check': 'Thành công',
+            'fa-triangle-exclamation': 'Cảnh báo',
+            'fa-screwdriver-wrench': 'Bảo trì',
+            'fa-cloud-arrow-up': 'Cập nhật',
+            'fa-lock': 'Quyền truy cập'
+        };
+        const NOTIFICATION_COLORS = {
+            blue: { label: 'Xanh dương', swatch: 'bg-blue-400' },
+            emerald: { label: 'Xanh lá', swatch: 'bg-emerald-400' },
+            amber: { label: 'Vàng', swatch: 'bg-amber-400' },
+            purple: { label: 'Tím', swatch: 'bg-purple-400' },
+            rose: { label: 'Đỏ', swatch: 'bg-rose-400' }
+        };
+        // Dọn thông tin đăng nhập GitHub (PAT) cũ còn lưu trong trình duyệt
+        localStorage.removeItem('pv_github_auth');
+        localStorage.removeItem('pv_users_json_path');
+
+        const USER_FIELDS = ['id', 'username', 'passwordHash', 'role', 'permission', 'avatarLink', 'fullName', 'phone', 'position', 'discipline', 'projects', 'company', 'status'];
+
+        let usersLoadedFromServer = false;
+        let isLoadingUsers = false;
+        let notificationsData = [];
+        let notificationsLoadedFromServer = false;
+        let isLoadingNotifications = false;
+        let editingNotificationId = null;
+
+        const SAMPLE_USERS = [
+            {
+                "id": 1,
+                "username": "admin",
+                "passwordHash": "$2b$10$Mhg7uk2abtNcK8/yqU1ZFOzT7mPAdzbjK9zPJMX18cF/yalhrIpSa",
+                "role": "ADMIN",
+                "permission": "ADMIN",
+                "avatarLink": "",
+                "fullName": "TRẦN HOÀNG PHƯỚC",
+                "phone": "0939751194",
+                "position": "Giám đốc",
+                "discipline": "Kỹ sư",
+                "projects": "Tất cả dự án",
+                "company": "PV INCONS CO.LTD",
+                "status": "Active"
+            }
+        ];
+
+        function loadAuth() {
+            try {
+                const parsed = JSON.parse(localStorage.getItem(ADMIN_SESSION_KEY) || 'null');
+                if (!parsed || typeof parsed.token !== 'string' || !parsed.token.trim() ||
+                    typeof parsed.username !== 'string' || !parsed.username.trim()) {
+                    return null;
+                }
+                return { username: parsed.username.trim(), token: parsed.token.trim() };
+            } catch (e) {
+                return null;
+            }
+        }
+        let authConfig = loadAuth();
+
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            if (!container) return;
+
+            const key = `${type}|${message}`;
+            Array.from(container.children).forEach(t => { if (t.dataset.key === key) t.remove(); });
+            while (container.children.length >= 4) container.firstElementChild.remove();
+
+            const toast = document.createElement('div');
+            const isSuccess = type === 'success';
+            const isError = type === 'error';
+            const bgColor = isSuccess ? 'bg-[#14231e]' : isError ? 'bg-[#2a171a]' : 'bg-[#1e2330]';
+            const borderColor = isSuccess ? 'border-emerald-500/50' : isError ? 'border-rose-500/50' : 'border-blue-500/50';
+            const textColor = isSuccess ? 'text-emerald-300' : isError ? 'text-rose-300' : 'text-blue-300';
+            const iconClass = isSuccess ? 'fa-circle-check' : isError ? 'fa-circle-exclamation' : 'fa-circle-info';
+
+            toast.dataset.key = key;
+            toast.className = `toast-animate border ${borderColor} ${bgColor} ${textColor} p-3 rounded-xl shadow-xl flex items-center gap-2.5 text-xs font-medium pointer-events-auto`;
+            const icon = document.createElement('i');
+            icon.className = `fa-solid ${iconClass} shrink-0 text-sm`;
+            const span = document.createElement('span');
+            span.textContent = message;
+            toast.append(icon, span);
+            container.appendChild(toast);
+            setTimeout(() => { toast.remove(); }, isError ? 7000 : 4500);
+        }
+
+        function showLoginError(message) {
+            const errorBox = document.getElementById('login-error-box');
+            const errorText = document.getElementById('login-error-text');
+            if (errorBox && errorText) {
+                errorText.textContent = message;
+                errorBox.classList.remove('hidden');
+            }
+        }
+
+        function hideLoginError() {
+            const errorBox = document.getElementById('login-error-box');
+            if (errorBox) {
+                errorBox.classList.add('hidden');
+            }
+        }
+
+        // Lắng nghe thay đổi input để ẩn lỗi cũ
+        ['auth-username', 'auth-password'].forEach(id => {
+            document.getElementById(id)?.addEventListener('input', hideLoginError);
+        });
+
+        function enterWorkspace() {
+            document.getElementById('login-modal').classList.add('hidden');
+            document.getElementById('admin-workspace').classList.remove('hidden');
+            document.getElementById('display-repo-info').innerText = `${authConfig.username} @ ${new URL(API_BASE, window.location.href).host}`;
+        }
+
+        function forceRelogin(message) {
+            localStorage.removeItem(ADMIN_SESSION_KEY);
+            authConfig = null;
+            usersData = [];
+            usersLoadedFromServer = false;
+            notificationsData = [];
+            notificationsLoadedFromServer = false;
+            document.getElementById('admin-workspace').classList.add('hidden');
+            document.getElementById('login-modal').classList.remove('hidden');
+            if (message) showLoginError(message);
+        }
+
+        async function apiRequest(path, options = {}) {
+            const response = await fetch(`${API_BASE}${path}`, {
+                ...options,
+                headers: {
+                    'Accept': 'application/json',
+                    ...(options.body ? { 'Content-Type': 'application/json' } : {}),
+                    'Authorization': `Bearer ${authConfig ? authConfig.token : ''}`
+                },
+                cache: 'no-store'
+            });
+            let body = null;
+            try { body = await response.json(); } catch (e) { /* phản hồi không phải JSON */ }
+            if (!response.ok || !body || body.success === false) {
+                const error = new Error((body && body.error) || `Máy chủ trả về lỗi HTTP ${response.status}`);
+                error.status = response.status;
+                throw error;
+            }
+            return body;
+        }
+
+        // Trả về true nếu lỗi do phiên đăng nhập/quyền hạn (đã đưa người dùng về màn hình đăng nhập)
+        function handleAuthFailure(err) {
+            if (!err || (err.status !== 401 && err.status !== 403)) return false;
+            forceRelogin(err.status === 403
+                ? 'Tài khoản này không có quyền truy cập Super Admin Portal (cần vai trò ADMIN)!'
+                : 'Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại!');
+            return true;
+        }
+
+        if (authConfig) {
+            enterWorkspace();
+            loadUsersFromServer();
+        }
+
+        async function submitLogin() {
+            hideLoginError();
+
+            const username = document.getElementById('auth-username').value.trim();
+            const password = document.getElementById('auth-password').value;
+
+            if (!username || !password) {
+                showLoginError('Vui lòng nhập đầy đủ tài khoản và mật khẩu!');
+                return;
+            }
+
+            const btnLogin = document.getElementById('btn-login');
+            btnLogin.disabled = true;
+            btnLogin.innerHTML = `<i class="fa-solid fa-arrows-rotate fa-spin text-xs"></i> <span>Đang xác thực với máy chủ...</span>`;
+
+            try {
+                const response = await fetch(`${AUTH_BASE}/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password }),
+                    signal: AbortSignal.timeout(10000)
+                });
+                const data = await response.json().catch(() => ({}));
+                if (!response.ok || !data.success || !data.token) {
+                    throw new Error(data.error || `Xác thực thất bại (HTTP ${response.status})`);
+                }
+
+                // Kiểm tra quyền ADMIN trực tiếp trên backend trước khi vào màn hình quản trị
+                authConfig = { username: (data.user && data.user.username) || username, token: data.token };
+                try {
+                    await apiRequest(USERS_API_PATH);
+                } catch (accessError) {
+                    authConfig = null;
+                    if (accessError.status === 403) {
+                        throw new Error('Tài khoản này không có quyền truy cập Super Admin Portal (cần vai trò ADMIN)!');
+                    }
+                    throw accessError;
+                }
+
+                localStorage.setItem(ADMIN_SESSION_KEY, JSON.stringify(authConfig));
+                document.getElementById('auth-password').value = '';
+
+                enterWorkspace();
+                showToast('Đăng nhập Super Admin thành công!');
+                loadUsersFromServer();
+            } catch (err) {
+                console.error('Lỗi đăng nhập:', err);
+                let errorMsg = err.message;
+                if (errorMsg === 'Failed to fetch' || err.name === 'TimeoutError') {
+                    errorMsg = 'Không kết nối được máy chủ backend. Hãy kiểm tra lại kết nối hoặc cấu hình CORS!';
+                }
+                showLoginError(errorMsg || 'Xác thực thất bại!');
+            } finally {
+                btnLogin.disabled = false;
+                btnLogin.innerHTML = `<i class="fa-solid fa-key text-xs"></i><span>Xác nhận & Vào Super Admin</span>`;
+            }
+        }
+
+        document.getElementById('btn-login').addEventListener('click', submitLogin);
+        document.getElementById('auth-password').addEventListener('keydown', event => {
+            if (event.key === 'Enter') submitLogin();
+        });
+
+        document.getElementById('btn-logout').addEventListener('click', () => {
+            localStorage.removeItem(ADMIN_SESSION_KEY);
+            location.reload();
+        });
+
+        function normalizeStatus(st) {
+            return (st === 'Active' || st === 'Đang triển khai') ? 'Active' : 'Inactive';
+        }
+
+        const BCRYPT_RE = /^\$2[aby]\$\d{2}\$[./A-Za-z0-9]{53}$/;
+
+        function getBcrypt() {
+            return (window.dcodeIO && window.dcodeIO.bcrypt) || window.bcrypt || null;
+        }
+
+        function hashPassword(raw) {
+            const bc = getBcrypt();
+            return new Promise((resolve, reject) => {
+                bc.genSalt(10, (e1, salt) => {
+                    if (e1) return reject(e1);
+                    bc.hash(raw, salt, (e2, hash) => {
+                        if (e2) return reject(e2);
+                        resolve(hash.replace(/^\$2a\$/, () => '$2b$'));
+                    });
+                });
+            });
+        }
+
+        function serializeUsers() {
+            return usersData.map(u => {
+                const o = {};
+                USER_FIELDS.forEach(k => {
+                    if (k === 'id') o.id = Number(u.id);
+                    else if (k === 'status') o.status = normalizeStatus(u.status);
+                    else o[k] = (u[k] === undefined || u[k] === null) ? '' : u[k];
+                });
+                Object.keys(u).forEach(k => { if (!(k in o) && !k.startsWith('_')) o[k] = u[k]; });
+                return o;
+            });
+        }
+
+        function exportUsersJson() {
+            if (!usersData.length || !usersLoadedFromServer) {
+                showToast('Chưa có dữ liệu users.json từ máy chủ để xuất.', 'error');
+                return;
+            }
+            const blob = new Blob([JSON.stringify(serializeUsers(), null, 2)], { type: 'application/json;charset=utf-8' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'users.json';
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+            showToast(`Đã xuất users.json (${usersData.length} tài khoản).`);
+        }
+
+        function switchTab(name) {
+            document.querySelectorAll('[data-tab]').forEach(b => b.setAttribute('aria-selected', b.dataset.tab === name ? 'true' : 'false'));
+            document.querySelectorAll('[role="tabpanel"]').forEach(p => p.classList.toggle('hidden', p.id !== `tab-panel-${name}`));
+            if (name === 'notifications' && !notificationsLoadedFromServer) {
+                loadNotificationsFromServer();
+            }
+        }
+
+        function updatePathLabels() {
+            const a = document.getElementById('users-path-label');
+            const b = document.getElementById('users-path-footer');
+            if (a) a.textContent = `( ${USERS_FILE_LABEL} )`;
+            if (b) b.textContent = USERS_FILE_LABEL;
+            const notificationsPath = document.getElementById('notifications-path-label');
+            if (notificationsPath) notificationsPath.textContent = NOTIFICATIONS_FILE_LABEL;
+        }
+
+        async function loadUsersFromServer() {
+            if (!authConfig || isLoadingUsers) return;
+            isLoadingUsers = true;
+            const btn = document.getElementById('btn-sync-users');
+            const oldHtml = btn ? btn.innerHTML : '';
+            if (btn) { btn.disabled = true; btn.innerHTML = `<i class="fa-solid fa-arrows-rotate fa-spin text-xs"></i> Đang tải...`; }
+
+            try {
+                const result = await apiRequest(USERS_API_PATH);
+                if (!Array.isArray(result.users)) throw new Error('Dữ liệu users.json từ máy chủ sai định dạng mảng.');
+
+                usersLoadedFromServer = true;
+                usersData = result.users.map(u => ({
+                    ...u,
+                    status: normalizeStatus(u.status)
+                }));
+                updatePathLabels();
+                showToast(`Đã tải ${usersData.length} tài khoản từ máy chủ (${USERS_FILE_LABEL}).`);
+            } catch (err) {
+                if (handleAuthFailure(err)) return;
+                console.error(err);
+                usersLoadedFromServer = false;
+                showToast(`Không tải được users.json: ${err.message}`, 'error');
+                if (!usersData.length) usersData = JSON.parse(JSON.stringify(SAMPLE_USERS));
+            } finally {
+                isLoadingUsers = false;
+                if (btn) { btn.disabled = false; btn.innerHTML = oldHtml; }
+                populateFilterDropdowns();
+                applyFiltersAndSort();
+            }
+        }
+
+        document.getElementById('btn-sync-users').addEventListener('click', loadUsersFromServer);
+
+        document.getElementById('btn-publish-users').addEventListener('click', async () => {
+            if (!authConfig) return;
+
+            if (!usersLoadedFromServer) {
+                showToast('Chưa tải được users.json từ máy chủ nên không thể xuất bản.', 'error');
+                return;
+            }
+
+            const btnPub = document.getElementById('btn-publish-users');
+            const oldHtml = btnPub.innerHTML;
+            btnPub.disabled = true;
+            btnPub.innerHTML = `<i class="fa-solid fa-arrows-rotate fa-spin text-xs"></i> Đang đẩy...`;
+
+            try {
+                const result = await apiRequest(USERS_API_PATH, {
+                    method: 'PUT',
+                    body: JSON.stringify({ users: serializeUsers() })
+                });
+                if (Array.isArray(result.users)) {
+                    usersData = result.users.map(u => ({ ...u, status: normalizeStatus(u.status) }));
+                    populateFilterDropdowns();
+                    applyFiltersAndSort();
+                }
+                updatePathLabels();
+                showToast(`Đã xuất bản ${usersData.length} tài khoản lên máy chủ (${USERS_FILE_LABEL}).`);
+            } catch (err) {
+                if (handleAuthFailure(err)) return;
+                showToast(`Lỗi xuất bản: ${err.message}`, 'error');
+            } finally {
+                btnPub.disabled = false;
+                btnPub.innerHTML = oldHtml;
+            }
+        });
+
+        function serializeNotifications() {
+            return {
+                version: 1,
+                updatedAt: new Date().toISOString(),
+                notifications: notificationsData.map(notification => ({
+                    id: notification.id,
+                    title: notification.title,
+                    message: notification.message,
+                    icon: notification.icon,
+                    color: notification.color,
+                    active: notification.active,
+                    createdAt: notification.createdAt,
+                    updatedAt: notification.updatedAt
+                }))
+            };
+        }
+
+        async function loadNotificationsFromServer(force = false) {
+            if (!authConfig || isLoadingNotifications || (!force && notificationsLoadedFromServer)) return;
+            isLoadingNotifications = true;
+            const button = document.getElementById('btn-sync-notifications');
+            const oldHtml = button.innerHTML;
+            button.disabled = true;
+            button.innerHTML = '<i class="fa-solid fa-arrows-rotate fa-spin"></i> Đang tải...';
+
+            try {
+                const parsed = await apiRequest(NOTIFICATIONS_API_PATH);
+                if (!parsed || !Array.isArray(parsed.notifications)) {
+                    throw new Error('notifications.json phải có thuộc tính notifications dạng mảng.');
+                }
+
+                notificationsData = parsed.notifications.map((item, index) => ({
+                    id: String(item.id || `notification-${index + 1}`),
+                    title: String(item.title || ''),
+                    message: String(item.message || ''),
+                    icon: String(item.icon || 'fa-circle-info'),
+                    color: ['blue', 'emerald', 'amber', 'purple', 'rose'].includes(item.color) ? item.color : 'blue',
+                    active: item.active !== false,
+                    createdAt: item.createdAt || new Date().toISOString(),
+                    updatedAt: item.updatedAt || ''
+                }));
+                notificationsLoadedFromServer = true;
+                showToast(`Đã tải ${notificationsData.length} thông báo từ máy chủ.`);
+                renderNotificationsAdmin();
+            } catch (error) {
+                if (handleAuthFailure(error)) return;
+                notificationsLoadedFromServer = false;
+                showToast(`Không tải được notifications.json: ${error.message}`, 'error');
+                renderNotificationsAdmin(error.message);
+            } finally {
+                isLoadingNotifications = false;
+                button.disabled = false;
+                button.innerHTML = oldHtml;
+            }
+        }
+
+        function renderNotificationsAdmin(errorMessage = '') {
+            const container = document.getElementById('notification-admin-list');
+            container.replaceChildren();
+            if (errorMessage) {
+                const error = document.createElement('p');
+                error.className = 'text-xs text-rose-300';
+                error.textContent = `Không thể hiển thị danh sách: ${errorMessage}`;
+                container.appendChild(error);
+                return;
+            }
+            if (!notificationsLoadedFromServer) {
+                const hint = document.createElement('p');
+                hint.className = 'text-xs text-slate-500';
+                hint.textContent = 'Đăng nhập và tải dữ liệu từ máy chủ để quản lý thông báo.';
+                container.appendChild(hint);
+                return;
+            }
+            if (!notificationsData.length) {
+                const empty = document.createElement('p');
+                empty.className = 'text-xs text-slate-400';
+                empty.textContent = 'Chưa có thông báo. Thêm thông báo rồi xuất bản lên máy chủ.';
+                container.appendChild(empty);
+                return;
+            }
+
+            notificationsData.forEach(notification => {
+                const card = document.createElement('article');
+                card.className = 'flex flex-col sm:flex-row sm:items-start justify-between gap-3 p-4 rounded-2xl bg-slate-900/70 border border-white/10';
+                const content = document.createElement('div');
+                content.className = 'min-w-0 flex-1';
+                const title = document.createElement('h3');
+                title.className = 'text-sm font-bold text-white';
+                title.textContent = notification.title;
+                const message = document.createElement('p');
+                message.className = 'text-xs text-slate-400 mt-1 whitespace-pre-wrap break-words';
+                message.textContent = notification.message;
+                const metadata = document.createElement('div');
+                metadata.className = 'flex items-center gap-3 mt-2 flex-nowrap';
+                const status = document.createElement('span');
+                status.className = notification.active
+                    ? 'text-[10px] text-emerald-300 shrink-0'
+                    : 'text-[10px] text-slate-500 shrink-0';
+                status.textContent = notification.active ? 'Đang hiển thị' : 'Đã ẩn';
+                const timestamp = Date.parse(notification.updatedAt || notification.createdAt || '');
+                const timestampLabel = document.createElement('span');
+                timestampLabel.className = 'text-[10px] text-slate-500 whitespace-nowrap';
+                if (Number.isNaN(timestamp)) {
+                    timestampLabel.textContent = 'Chưa có thời gian';
+                } else {
+                    const dateParts = new Intl.DateTimeFormat('en-GB', {
+                        timeZone: 'Asia/Ho_Chi_Minh',
+                        day: '2-digit',
+                        month: '2-digit',
+                        year: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        second: '2-digit',
+                        hourCycle: 'h23'
+                    }).formatToParts(new Date(timestamp));
+                    const dateValues = Object.fromEntries(dateParts.map(part => [part.type, part.value]));
+                    timestampLabel.textContent =
+                        `Thời gian: ${dateValues.hour}:${dateValues.minute}:${dateValues.second} Ngày ${dateValues.day}/${dateValues.month}/${dateValues.year}`;
+                }
+                metadata.append(status, timestampLabel);
+                content.append(title, message, metadata);
+
+                const actions = document.createElement('div');
+                actions.className = 'flex gap-2 shrink-0';
+                const editButton = document.createElement('button');
+                editButton.type = 'button';
+                editButton.className = 'px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-blue-300 text-xs rounded-lg';
+                editButton.textContent = 'Sửa';
+                editButton.addEventListener('click', () => editNotification(notification.id));
+                const deleteButton = document.createElement('button');
+                deleteButton.type = 'button';
+                deleteButton.className = 'px-3 py-1.5 bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 text-xs rounded-lg';
+                deleteButton.textContent = 'Xóa';
+                deleteButton.addEventListener('click', () => deleteNotification(notification.id));
+                actions.append(editButton, deleteButton);
+                card.append(content, actions);
+                container.appendChild(card);
+            });
+        }
+
+        function setNotificationIcon(value) {
+            const icon = Object.prototype.hasOwnProperty.call(NOTIFICATION_ICONS, value)
+                ? value
+                : 'fa-circle-info';
+            document.getElementById('notification-icon').value = icon;
+            document.getElementById('notification-icon-preview').className = `fa-solid ${icon} text-purple-300`;
+            document.getElementById('notification-icon-label').textContent = NOTIFICATION_ICONS[icon];
+            document.querySelectorAll('[data-notification-icon]').forEach(option => {
+                const selected = option.dataset.notificationIcon === icon;
+                option.setAttribute('aria-selected', String(selected));
+                option.classList.toggle('bg-purple-500/20', selected);
+            });
+        }
+
+        function setNotificationColor(value) {
+            const color = Object.prototype.hasOwnProperty.call(NOTIFICATION_COLORS, value) ? value : 'blue';
+            const colorInfo = NOTIFICATION_COLORS[color];
+            document.getElementById('notification-color').value = color;
+            document.getElementById('notification-color-swatch').className =
+                `w-3.5 h-3.5 rounded-full border border-white/30 ${colorInfo.swatch}`;
+            document.getElementById('notification-color-label').textContent = colorInfo.label;
+            document.querySelectorAll('[data-notification-color]').forEach(option => {
+                const selected = option.dataset.notificationColor === color;
+                option.setAttribute('aria-selected', String(selected));
+                option.classList.toggle('bg-purple-500/20', selected);
+            });
+        }
+
+        function resetNotificationForm() {
+            editingNotificationId = null;
+            document.getElementById('notification-form').reset();
+            setNotificationIcon('fa-circle-info');
+            setNotificationColor('blue');
+            document.getElementById('notification-active').checked = true;
+            document.getElementById('btn-save-notification').innerHTML = '<i class="fa-solid fa-plus"></i> Thêm thông báo';
+            document.getElementById('btn-cancel-notification-edit').classList.add('hidden');
+        }
+
+        function editNotification(id) {
+            const notification = notificationsData.find(item => item.id === id);
+            if (!notification) return;
+            editingNotificationId = id;
+            document.getElementById('notification-title').value = notification.title;
+            document.getElementById('notification-message').value = notification.message;
+            setNotificationIcon(notification.icon);
+            setNotificationColor(notification.color);
+            document.getElementById('notification-active').checked = notification.active;
+            document.getElementById('btn-save-notification').innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Lưu thay đổi';
+            document.getElementById('btn-cancel-notification-edit').classList.remove('hidden');
+            document.getElementById('notification-title').focus();
+        }
+
+        function deleteNotification(id) {
+            const notification = notificationsData.find(item => item.id === id);
+            if (!notification || !window.confirm(`Xóa thông báo "${notification.title}"?`)) return;
+            notificationsData = notificationsData.filter(item => item.id !== id);
+            if (editingNotificationId === id) resetNotificationForm();
+            renderNotificationsAdmin();
+            showToast('Đã xóa thông báo khỏi bản nháp. Hãy xuất bản để cập nhật lên máy chủ.');
+        }
+
+        document.getElementById('notification-form').addEventListener('submit', event => {
+            event.preventDefault();
+            if (!notificationsLoadedFromServer) {
+                showToast('Hãy tải notifications.json từ máy chủ trước khi chỉnh sửa.', 'error');
+                return;
+            }
+
+            const title = document.getElementById('notification-title').value.trim();
+            const message = document.getElementById('notification-message').value.trim();
+            const icon = document.getElementById('notification-icon').value.trim() || 'fa-circle-info';
+            if (!Object.prototype.hasOwnProperty.call(NOTIFICATION_ICONS, icon)) {
+                showToast('Vui lòng chọn một icon trong danh sách.', 'error');
+                return;
+            }
+            const color = document.getElementById('notification-color').value;
+            if (!Object.prototype.hasOwnProperty.call(NOTIFICATION_COLORS, color)) {
+                showToast('Vui lòng chọn một màu trong danh sách.', 'error');
+                return;
+            }
+
+            const now = new Date().toISOString();
+            const existing = notificationsData.find(item => item.id === editingNotificationId);
+            const notification = {
+                id: editingNotificationId || (window.crypto && window.crypto.randomUUID
+                    ? window.crypto.randomUUID()
+                    : `notification-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`),
+                title,
+                message,
+                icon,
+                color,
+                active: document.getElementById('notification-active').checked,
+                createdAt: existing ? existing.createdAt : now,
+                updatedAt: now
+            };
+
+            if (existing) {
+                notificationsData = notificationsData.map(item => item.id === editingNotificationId ? notification : item);
+            } else {
+                notificationsData.unshift(notification);
+            }
+            resetNotificationForm();
+            renderNotificationsAdmin();
+            showToast('Đã lưu thông báo vào bản nháp. Nhấn “Xuất Notification.json” để cập nhật lên máy chủ.');
+        });
+
+        document.getElementById('btn-cancel-notification-edit').addEventListener('click', resetNotificationForm);
+        document.getElementById('btn-sync-notifications').addEventListener('click', () => loadNotificationsFromServer(true));
+
+        const notificationIconPicker = document.getElementById('notification-icon-picker');
+        const notificationIconButton = document.getElementById('notification-icon-button');
+        const notificationIconOptions = document.getElementById('notification-icon-options');
+        function closeNotificationIconOptions() {
+            notificationIconOptions.classList.add('hidden');
+            notificationIconButton.setAttribute('aria-expanded', 'false');
+        }
+        notificationIconButton.addEventListener('click', () => {
+            const isOpen = !notificationIconOptions.classList.contains('hidden');
+            notificationIconOptions.classList.toggle('hidden', isOpen);
+            notificationIconButton.setAttribute('aria-expanded', String(!isOpen));
+        });
+        notificationIconOptions.addEventListener('click', event => {
+            const option = event.target.closest('[data-notification-icon]');
+            if (!option) return;
+            setNotificationIcon(option.dataset.notificationIcon);
+            closeNotificationIconOptions();
+            notificationIconButton.focus();
+        });
+        document.addEventListener('click', event => {
+            if (!notificationIconPicker.contains(event.target)) closeNotificationIconOptions();
+        });
+        document.addEventListener('keydown', event => {
+            if (event.key === 'Escape') closeNotificationIconOptions();
+        });
+        setNotificationIcon(document.getElementById('notification-icon').value);
+
+        const notificationColorPicker = document.getElementById('notification-color-picker');
+        const notificationColorButton = document.getElementById('notification-color-button');
+        const notificationColorOptions = document.getElementById('notification-color-options');
+        function closeNotificationColorOptions() {
+            notificationColorOptions.classList.add('hidden');
+            notificationColorButton.setAttribute('aria-expanded', 'false');
+        }
+        notificationColorButton.addEventListener('click', () => {
+            const isOpen = !notificationColorOptions.classList.contains('hidden');
+            notificationColorOptions.classList.toggle('hidden', isOpen);
+            notificationColorButton.setAttribute('aria-expanded', String(!isOpen));
+        });
+        notificationColorOptions.addEventListener('click', event => {
+            const option = event.target.closest('[data-notification-color]');
+            if (!option) return;
+            setNotificationColor(option.dataset.notificationColor);
+            closeNotificationColorOptions();
+            notificationColorButton.focus();
+        });
+        document.addEventListener('click', event => {
+            if (!notificationColorPicker.contains(event.target)) closeNotificationColorOptions();
+        });
+        document.addEventListener('keydown', event => {
+            if (event.key === 'Escape') closeNotificationColorOptions();
+        });
+        setNotificationColor(document.getElementById('notification-color').value);
+
+        function exportNotificationsJson() {
+            if (!notificationsLoadedFromServer) {
+                showToast('Hãy tải notifications.json từ máy chủ trước khi xuất.', 'error');
+                return;
+            }
+            const blob = new Blob([JSON.stringify(serializeNotifications(), null, 2)], {
+                type: 'application/json;charset=utf-8'
+            });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'notifications.json';
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            setTimeout(() => URL.revokeObjectURL(link.href), 1000);
+            showToast('Đã tải xuống notifications.json.');
+        }
+
+        document.getElementById('btn-publish-notifications').addEventListener('click', async () => {
+            if (!authConfig || !notificationsLoadedFromServer) {
+                showToast('Hãy tải notifications.json từ máy chủ trước khi xuất bản.', 'error');
+                return;
+            }
+            const button = document.getElementById('btn-publish-notifications');
+            button.disabled = true;
+            button.innerHTML = '<i class="fa-solid fa-arrows-rotate fa-spin"></i> Đang đẩy...';
+            try {
+                await apiRequest(NOTIFICATIONS_API_PATH, {
+                    method: 'PUT',
+                    body: JSON.stringify({ notifications: serializeNotifications().notifications })
+                });
+                showToast(`Đã xuất bản ${notificationsData.length} thông báo lên máy chủ (${NOTIFICATIONS_FILE_LABEL}).`);
+            } catch (error) {
+                if (handleAuthFailure(error)) return;
+                showToast(`Lỗi xuất bản thông báo: ${error.message}`, 'error');
+            } finally {
+                button.disabled = false;
+                button.innerHTML = '<i class="fa-solid fa-cloud-arrow-up"></i> Xuất Notification.json';
+            }
+        });
+
+        function populateFilterDropdowns() {
+            const positions = [...new Set(usersData.map(u => u.position).filter(Boolean))];
+            const roles = [...new Set(usersData.map(u => u.role).filter(Boolean))];
+            const companies = [...new Set(usersData.map(u => u.company).filter(Boolean))];
+
+            document.getElementById('filterPosition').innerHTML = '<option value="">-- Tất cả Chức vụ --</option>' + positions.map(p => `<option value="${p}">${p}</option>`).join('');
+            document.getElementById('filterRole').innerHTML = '<option value="">-- Tất cả Vai trò --</option>' + roles.map(r => `<option value="${r}">${r}</option>`).join('');
+            document.getElementById('filterCompany').innerHTML = '<option value="">-- Tất cả Công ty --</option>' + companies.map(c => `<option value="${c}">${c}</option>`).join('');
+        }
+
+        function applyFiltersAndSort() {
+            const keyword = document.getElementById('searchInput').value.toLowerCase();
+            const filterPos = document.getElementById('filterPosition').value;
+            const filterRole = document.getElementById('filterRole').value;
+            const filterComp = document.getElementById('filterCompany').value;
+            const filterStatus = document.getElementById('filterStatus').value;
+            const sortVal = document.getElementById('sortSelect').value;
+
+            let result = usersData.filter(u => {
+                const matchKeyword = !keyword || u.username.toLowerCase().includes(keyword) || (u.fullName && u.fullName.toLowerCase().includes(keyword));
+                const matchPos = !filterPos || u.position === filterPos;
+                const matchRole = !filterRole || u.role === filterRole;
+                const matchComp = !filterComp || u.company === filterComp;
+                const matchStatus = !filterStatus || u.status === filterStatus;
+                return matchKeyword && matchPos && matchRole && matchComp && matchStatus;
+            });
+
+            result.sort((a, b) => {
+                if (sortVal === 'id-asc') return a.id - b.id;
+                if (sortVal === 'id-desc') return b.id - a.id;
+                if (sortVal === 'name-asc') return (a.fullName || '').localeCompare(b.fullName || '');
+                if (sortVal === 'name-desc') return (b.fullName || '').localeCompare(a.fullName || '');
+                return 0;
+            });
+
+            renderUI(result);
+            updateStats(usersData);
+        }
+
+        function updateStats(data) {
+            const total = data.length;
+            const active = data.filter(u => u.status === 'Active').length;
+            const inactive = data.filter(u => u.status === 'Inactive').length;
+
+            document.getElementById('stat-total').innerText = total;
+            document.getElementById('stat-total-mob').innerText = total;
+            document.getElementById('tab-users-count').innerText = total;
+
+            document.getElementById('stat-active').innerText = active;
+            document.getElementById('stat-active-mob').innerText = active;
+
+            document.getElementById('stat-inactive').innerText = inactive;
+            document.getElementById('stat-inactive-mob').innerText = inactive;
+        }
+
+        function renderUI(data) {
+            renderTable(data);
+            renderCards(data);
+        }
+
+        function renderTable(data) {
+            const tbody = document.getElementById('userTableBody');
+            tbody.innerHTML = '';
+
+            if (data.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="9" class="text-center py-6 text-slate-500">Không tìm thấy tài khoản phù hợp.</td></tr>`;
+                return;
+            }
+
+            data.forEach(user => {
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-white/5 transition-colors';
+                tr.innerHTML = `
+                    <td class="py-3.5 px-3">
+                        <div class="font-bold text-white flex items-center gap-1.5">
+                            <i class="fa-solid fa-user-circle text-purple-400"></i> ${user.username}
+                        </div>
+                        <span class="text-[10px] text-slate-500 font-mono">ID: #${user.id}</span>
+                    </td>
+                    <td class="py-3.5 px-3">
+                        <div class="font-bold text-slate-200">${user.fullName || 'Chưa cập nhật'}</div>
+                        <div class="text-[11px] text-slate-400">${user.phone || 'N/A'}</div>
+                    </td>
+                    <td class="py-3.5 px-3">
+                        <div class="text-slate-300">${user.position || 'Nhân viên'}</div>
+                        <div class="text-[10px] text-slate-500">${user.discipline || ''}</div>
+                    </td>
+                    <td class="py-3.5 px-3">
+                        <span class="px-2.5 py-1 rounded-md text-[10px] font-extrabold bg-purple-500/10 text-purple-300 border border-purple-500/30">
+                            ${user.role}
+                        </span>
+                    </td>
+                    <td class="py-3.5 px-3">
+                        <span class="px-2.5 py-1 rounded-md text-[10px] font-extrabold bg-blue-500/10 text-blue-300 border border-blue-500/30">
+                            ${user.permission}
+                        </span>
+                    </td>
+                    <td class="py-3.5 px-3 font-bold text-slate-200">${user.company || 'PV INCONS'}</td>
+                    <td class="py-3.5 px-3 max-w-[180px]">
+                        <div class="flex flex-wrap gap-1">
+                            ${(user.projects || '').split(',').map(p => `<span class="px-1.5 py-0.5 bg-slate-800 text-slate-300 text-[10px] rounded border border-slate-700">${p.trim()}</span>`).join('')}
+                        </div>
+                    </td>
+                    <td class="py-3.5 px-3">
+                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${user.status === 'Active' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30' : 'bg-slate-700 text-slate-400'}">
+                            ● ${user.status}
+                        </span>
+                    </td>
+                    <td class="py-3.5 px-3 text-right space-x-1">
+                        <button onclick="editUser(${user.id})" class="px-2 py-1 bg-slate-800 text-slate-300 rounded-lg hover:bg-slate-700" title="Chỉnh sửa"><i class="fa-solid fa-pen"></i></button>
+                        <button onclick="deleteUser(${user.id})" class="px-2 py-1 bg-red-500/10 text-red-400 rounded-lg hover:bg-red-500/20" title="Xóa"><i class="fa-solid fa-trash"></i></button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function renderCards(data) {
+            const container = document.getElementById('userCardList');
+            container.innerHTML = '';
+
+            if (data.length === 0) {
+                container.innerHTML = `<div class="col-span-full text-center py-6 text-slate-500 text-xs">Không tìm thấy tài khoản phù hợp.</div>`;
+                return;
+            }
+
+            data.forEach(user => {
+                const card = document.createElement('div');
+                card.className = 'workspace-card p-4 rounded-2xl border border-white/10 flex flex-col justify-between gap-3';
+                card.innerHTML = `
+                    <div class="flex items-start justify-between border-b border-white/10 pb-2.5">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-full bg-purple-600/20 text-purple-400 flex items-center justify-center font-bold text-xs">
+                                <i class="fa-solid fa-user"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-xs text-white">${user.fullName || user.username}</h3>
+                                <p class="text-[10px] text-slate-400 font-mono">@${user.username} • ID: #${user.id}</p>
+                            </div>
+                        </div>
+                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${user.status === 'Active' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30' : 'bg-slate-700 text-slate-400'}">
+                            ● ${user.status}
+                        </span>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2 text-[11px]">
+                        <div>
+                            <span class="text-slate-500 block text-[10px]">VAI TRÒ (ROLE)</span>
+                            <span class="font-bold text-purple-300">${user.role}</span>
+                        </div>
+                        <div>
+                            <span class="text-slate-500 block text-[10px]">QUYỀN (PERMISSION)</span>
+                            <span class="font-bold text-blue-300">${user.permission}</span>
+                        </div>
+                        <div>
+                            <span class="text-slate-500 block text-[10px]">CHỨC VỤ</span>
+                            <span class="text-slate-200">${user.position || 'N/A'}</span>
+                        </div>
+                        <div>
+                            <span class="text-slate-500 block text-[10px]">SỐ ĐIỆN THOẠI</span>
+                            <span class="text-slate-200">${user.phone || 'N/A'}</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-900/60 p-2.5 rounded-xl text-[11px]">
+                        <div class="text-slate-400 font-bold mb-1"><i class="fa-solid fa-building text-xs mr-1"></i> ${user.company || 'PV INCONS'}</div>
+                        <div class="flex flex-wrap gap-1 mt-1">
+                            ${(user.projects || '').split(',').map(p => `<span class="px-1.5 py-0.5 bg-slate-800 text-slate-300 text-[9px] rounded border border-slate-700">${p.trim()}</span>`).join('')}
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-end gap-2 pt-1">
+                        <button onclick="editUser(${user.id})" class="px-3 py-1.5 bg-slate-800 text-slate-200 rounded-lg text-xs font-semibold hover:bg-slate-700 flex items-center gap-1"><i class="fa-solid fa-pen text-[10px]"></i> Sửa</button>
+                        <button onclick="deleteUser(${user.id})" class="px-3 py-1.5 bg-red-500/10 text-red-400 rounded-lg text-xs font-semibold hover:bg-red-500/20 flex items-center gap-1"><i class="fa-solid fa-trash text-[10px]"></i> Xóa</button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function openAddModal() {
+            document.getElementById('modalTitle').innerHTML = '<i class="fa-solid fa-user-plus text-purple-400"></i> Thêm Người Dùng Mới';
+            document.getElementById('userForm').reset();
+            document.getElementById('userId').value = '';
+            document.getElementById('formRawPassword').value = '123456';
+            document.getElementById('userModal').classList.remove('hidden');
+            document.getElementById('userModal').classList.add('flex');
+        }
+
+        function editUser(id) {
+            const user = usersData.find(u => u.id === id);
+            if (!user) return;
+            document.getElementById('modalTitle').innerHTML = `<i class="fa-solid fa-user-pen text-purple-400"></i> Chỉnh Sửa: @${user.username}`;
+            document.getElementById('userId').value = user.id;
+            document.getElementById('formUsername').value = user.username;
+            document.getElementById('formRawPassword').value = '';
+            document.getElementById('formFullName').value = user.fullName || '';
+            document.getElementById('formPhone').value = user.phone || '';
+            document.getElementById('formPosition').value = user.position || '';
+            document.getElementById('formDiscipline').value = user.discipline || '';
+            document.getElementById('formRole').value = user.role || 'INTERNAL';
+            document.getElementById('formPermission').value = user.permission || 'INTERNAL';
+            document.getElementById('formCompany').value = user.company || '';
+            document.getElementById('formStatus').value = user.status === 'Active' ? 'Active' : 'Inactive';
+            document.getElementById('formProjects').value = user.projects || '';
+
+            document.getElementById('userModal').classList.remove('hidden');
+            document.getElementById('userModal').classList.add('flex');
+        }
+
+        function closeModal() {
+            document.getElementById('userModal').classList.remove('flex');
+            document.getElementById('userModal').classList.add('hidden');
+        }
+
+        let isSavingUser = false;
+
+        async function saveUser(event) {
+            event.preventDefault();
+            if (isSavingUser) return;
+            isSavingUser = true;
+
+            const btnSave = document.querySelector('#userForm button[type="submit"]');
+            const oldBtnHtml = btnSave.innerHTML;
+            btnSave.disabled = true;
+
+            try {
+                const idVal = document.getElementById('userId').value;
+                const rawPassword = document.getElementById('formRawPassword').value;
+                const username = document.getElementById('formUsername').value.trim();
+                const existingUser = idVal ? usersData.find(u => u.id === parseInt(idVal)) : null;
+
+                if (idVal && !existingUser) {
+                    showToast('Không tìm thấy tài khoản cần cập nhật.', 'error');
+                    return;
+                }
+
+                const duplicate = usersData.find(u => (u.username || '').toLowerCase() === username.toLowerCase() && String(u.id) !== String(idVal));
+                if (duplicate) {
+                    showToast(`Username "${username}" đã tồn tại.`, 'error');
+                    return;
+                }
+
+                let finalPasswordHash = "$2b$10$Mhg7uk2abtNcK8/yqU1ZFOzT7mPAdzbjK9zPJMX18cF/yalhrIpSa";
+                if (existingUser) finalPasswordHash = existingUser.passwordHash;
+                if (rawPassword.trim() !== '') {
+                    if (!getBcrypt()) {
+                        showToast('Chưa tải được thư viện mã hóa bcrypt.', 'error');
+                        return;
+                    }
+                    btnSave.innerHTML = `<i class="fa-solid fa-arrows-rotate fa-spin text-xs"></i> Đang mã hóa...`;
+                    finalPasswordHash = await hashPassword(rawPassword);
+                }
+
+                const userData = {
+                    ...(existingUser || {}),
+                    id: existingUser ? existingUser.id : (usersData.length ? Math.max(...usersData.map(u => u.id)) + 1 : 1),
+                    username: username,
+                    passwordHash: finalPasswordHash,
+                    role: document.getElementById('formRole').value,
+                    permission: document.getElementById('formPermission').value,
+                    avatarLink: existingUser ? (existingUser.avatarLink || "") : "",
+                    fullName: document.getElementById('formFullName').value.trim(),
+                    phone: document.getElementById('formPhone').value.trim(),
+                    position: document.getElementById('formPosition').value.trim(),
+                    discipline: document.getElementById('formDiscipline').value.trim(),
+                    projects: document.getElementById('formProjects').value.trim(),
+                    company: document.getElementById('formCompany').value.trim(),
+                    status: document.getElementById('formStatus').value
+                };
+
+                if (existingUser) {
+                    const index = usersData.findIndex(u => u.id === existingUser.id);
+                    if (index !== -1) usersData[index] = userData;
+                    else usersData.push(userData);
+                } else {
+                    usersData.push(userData);
+                }
+
+                populateFilterDropdowns();
+                applyFiltersAndSort();
+                closeModal();
+                showToast('Đã lưu thay đổi vào bộ nhớ tạm. Hãy nhấn "Xuất bản" để lưu lên máy chủ!');
+            } catch (err) {
+                console.error(err);
+                showToast(`Lưu thất bại: ${err && err.message ? err.message : err}`, 'error');
+            } finally {
+                isSavingUser = false;
+                btnSave.disabled = false;
+                btnSave.innerHTML = oldBtnHtml;
+            }
+        }
+
+        function deleteUser(id) {
+            if (confirm('Xác nhận xóa tài khoản này khỏi danh sách quản trị?')) {
+                usersData = usersData.filter(u => u.id !== id);
+                populateFilterDropdowns();
+                applyFiltersAndSort();
+                showToast('Đã xóa tài khoản.');
+            }
+        }
+    </script>
+</body>
+
+</html>
