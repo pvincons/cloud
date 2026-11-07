@@ -178,10 +178,38 @@
                 </div>
 
                 <div class="analytics-grid">
+                    <article class="analytics-card" id="projectDeadlineCard">
+                        <div class="chart-header">
+                            <span class="chart-title"><i class="fa-solid fa-calendar-days chart-icon-deadline"></i> Deadline dự án</span>
+                            <div class="deadline-card-controls">
+                                <span class="chart-badge">PROJECT</span>
+                                <button class="deadline-edit-btn" id="deadlineEditButton" type="button"
+                                    onclick="openProjectDeadlineModal()" title="Nhập ngày dự án"
+                                    aria-label="Nhập ngày bắt đầu và ngày kết thúc dự án" style="display:none;">
+                                    <i class="fa-solid fa-pen" aria-hidden="true"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="analytics-body deadline-body">
+                            <div class="deadline-date-row">
+                                <div><span>Bắt đầu</span><strong id="deadlineStartLabel">—</strong></div>
+                                <div><span>Kết thúc</span><strong id="deadlineEndLabel">—</strong></div>
+                            </div>
+                            <div class="deadline-progress-row">
+                                <div class="deadline-progress-track" id="deadlineProgressTrack" role="progressbar"
+                                    aria-label="Tiến độ thời gian dự án" aria-valuemin="0" aria-valuemax="100"
+                                    aria-valuenow="0">
+                                    <div class="deadline-progress-fill" id="deadlineProgressFill"></div>
+                                </div>
+                                <strong id="deadlineProgressPercent">—</strong>
+                            </div>
+                            <p class="deadline-status" id="deadlineStatus">Chọn một dự án</p>
+                        </div>
+                    </article>
                     <article class="analytics-card">
                         <div class="chart-header">
                             <span class="chart-title">
-                                <i class="fa-solid fa-hard-drive chart-icon-storage"></i> Dung lượng lưu trữ
+                                <i class="fa-solid fa-hard-drive chart-icon-storage"></i>lưu trữ
                                 <span class="chart-title-total" id="storageChartTotal">0 KB</span>
                             </span>
                             <span class="chart-badge">CDE</span>
@@ -198,7 +226,7 @@
                         <div class="analytics-body">
                             <div class="chart-wrapper"><canvas id="fileTypeChart" aria-label="Thống kê định dạng tệp"></canvas></div>
                         </div>
-                    </article>
+                    </article>                    
                     <article class="analytics-card analytics-card-interactive" id="issueAnalyticsCard"
                         role="button" tabindex="0" aria-pressed="false"
                         title="Bấm để lọc tệp có ghi chú hoặc đã thu hồi">
@@ -915,6 +943,42 @@
     </div>
 
     <div class="toast-container" id="toastContainer"></div>
+
+    <div class="modal" id="projectDeadlineModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">
+                    <i class="fa-solid fa-calendar-days chart-icon-deadline" aria-hidden="true"></i>
+                    Cập nhật deadline dự án
+                </div>
+                <div class="close-btn" onclick="closeModal('projectDeadlineModal')">✕</div>
+            </div>
+            <p class="deadline-modal-project" id="deadlineModalProjectName"></p>
+            <form id="projectDeadlineForm" onsubmit="saveProjectDeadline(event)">
+                <div class="deadline-date-fields">
+                    <div class="iso-group-custom">
+                        <label for="projectDeadlineStartInput">Ngày bắt đầu</label>
+                        <input id="projectDeadlineStartInput" type="date" required>
+                    </div>
+                    <div class="iso-group-custom">
+                        <label for="projectDeadlineEndInput">Ngày kết thúc</label>
+                        <input id="projectDeadlineEndInput" type="date" required>
+                    </div>
+                </div>
+                <div class="deadline-form-actions">
+                    <button class="deadline-complete-toggle" id="projectDeadlineCompleteToggle" type="button"
+                        aria-pressed="false" onclick="toggleProjectDeadlineCompletion()">
+                        <i class="fa-solid fa-check" aria-hidden="true"></i> Đánh dấu hoàn thành
+                    </button>
+                    <div class="deadline-form-action-buttons">
+                        <button class="btn btn-outline" type="button"
+                            onclick="closeModal('projectDeadlineModal')">Hủy</button>
+                        <button class="btn btn-primary" id="saveProjectDeadlineButton" type="submit">Lưu ngày</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
 
     <!-- JAVASCRIPT XỬ LÝ MIR -->
     <script src="/assets/vendor/xlsx.full.min.js"></script>
