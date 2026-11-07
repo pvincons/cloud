@@ -1,0 +1,169 @@
+:root[data-theme="dark"] {
+    --bg-main: #0f172a;
+    --bg-card: rgba(15, 23, 42, 0.85);
+    --border-color: rgba(255, 255, 255, 0.1);
+    --text-main: #f8fafc;
+    --text-muted: #94a3b8;
+    --header-bg: #0b1329;
+    --table-hover: rgba(51, 65, 85, 0.4);
+}
+
+:root[data-theme="light"] {
+    --bg-main: #f8fafc;
+    --bg-card: rgba(255, 255, 255, 0.95);
+    --border-color: rgba(0, 0, 0, 0.1);
+    --text-main: #0f172a;
+    --text-muted: #64748b;
+    --header-bg: #ffffff;
+    --table-hover: rgba(226, 232, 240, 0.6);
+}
+
+[data-theme="light"] header button[onclick="createNewProject()"] {
+    color: #92400e;
+    background-color: #fef3c7;
+    border-color: #fcd34d;
+}
+
+[data-theme="light"] header button[onclick="createNewFolder()"] {
+    color: #1d4ed8;
+    background-color: #dbeafe;
+    border-color: #93c5fd;
+}
+
+[data-theme="light"] header #btnPaste:disabled {
+    color: #475569;
+    background-color: #e2e8f0;
+    border-color: #cbd5e1;
+    opacity: 1;
+}
+
+[data-theme="light"] header label[title="Upload tệp tin"] {
+    color: #047857;
+    background-color: #d1fae5;
+    border-color: #6ee7b7;
+}
+
+[data-theme="light"] header button[onclick="toggleServerSettings()"],
+[data-theme="light"] header button[onclick="loadCDEFiles(currentPath)"],
+[data-theme="light"] header button[onclick="toggleTheme()"] {
+    color: #334155;
+    background-color: #fff;
+    border-color: #cbd5e1;
+}
+
+[data-theme="light"] header button[onclick="toggleServerSettings()"]:hover,
+[data-theme="light"] header button[onclick="loadCDEFiles(currentPath)"]:hover {
+    color: #0f172a;
+    background-color: #f1f5f9;
+}
+
+[data-theme="light"] main > div:last-child {
+    color: #334155;
+    background-color: #eaf2ff;
+    border-color: #cbdcf5;
+}
+
+
+body {
+    color: var(--text-main);
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background-color: var(--bg-main);
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.glass-panel {
+    background: var(--bg-card);
+    backdrop-filter: blur(16px);
+    border: 1px solid var(--border-color);
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: var(--border-color);
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(59, 130, 246, 0.4);
+    border-radius: 3px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(59, 130, 246, 0.7);
+}
+
+/* Menu thao tác xổ xuống dùng chung cho mọi kích thước màn hình */
+#rowMenu {
+    position: fixed;
+    z-index: 9999;
+    min-width: 190px;
+    max-width: calc(100vw - 16px);
+    padding: 4px;
+    background: #0f172a;
+    border: 1px solid rgba(255, 255, 255, .12);
+    border-radius: 10px;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, .5);
+}
+
+#rowMenu .row-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 10px 12px;
+    border: 0;
+    border-radius: 7px;
+    background: transparent;
+    color: #e2e8f0;
+    font-size: 13px;
+    text-align: left;
+    cursor: pointer;
+}
+
+#rowMenu .row-menu-item i {
+    width: 16px;
+    text-align: center;
+}
+
+#rowMenu .row-menu-item:hover,
+#rowMenu .row-menu-item:active {
+    background: rgba(148, 163, 184, .18);
+}
+
+#rowMenu .row-menu-item.danger {
+    color: #fb7185;
+}
+
+#rowMenu .row-menu-sep {
+    height: 1px;
+    margin: 3px 6px;
+    background: rgba(255, 255, 255, .1);
+}
+
+[data-theme="light"] #rowMenu {
+    background: #fff;
+    border-color: #e2e8f0;
+    box-shadow: 0 12px 30px rgba(15, 23, 42, .18);
+}
+
+[data-theme="light"] #rowMenu .row-menu-item {
+    color: #0f172a;
+}
+
+[data-theme="light"] #rowMenu .row-menu-item:hover,
+[data-theme="light"] #rowMenu .row-menu-item:active {
+    background: #f1f5f9;
+}
+
+[data-theme="light"] #rowMenu .row-menu-item.danger {
+    color: #e11d48;
+}
+
+[data-theme="light"] .row-menu-btn {
+    background: #f1f5f9;
+    color: #334155;
+    border-color: #cbd5e1;
+}

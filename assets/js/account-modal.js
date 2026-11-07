@@ -1,0 +1,311 @@
+// account-modal.js - Xử lý Popup Thông Tin Tài Khoản và nạp dữ liệu tài khoản/avatar từ backend (server.js)
+(function() {
+    let selectedAvatarFile = null;
+    let pendingAvatarBase64 = null;
+
+    const AVATAR_TYPES = ['image/png', 'image/jpeg', 'image/webp', 'image/gif'];
+
+    // avatarLink do backend trả về dạng "avatar/<file>?v=...": ghép với địa chỉ API. Link http(s)/data: cũ giữ nguyên.
+    function resolveAvatarUrl(link) {
+        const value = String(link || '').trim();
+        if (!value) return '';
+        if (/^(https?:|data:)/i.test(value)) return value;
+        return `${CONFIG.CDE_API}/${value.replace(/^\/+/, '').replace(/^assets\/data\/avatar\//, 'avatar/')}`;
+    }
+
+    function renderAvatarImage(container, url) {
+        const img = document.createElement('img');
+        img.src = url;
+        img.alt = 'Avatar';
+        img.className = 'w-full h-full object-cover rounded-2xl';
+        container.replaceChildren(img);
+    }
+
+    // 1. Tự động chèn HTML của Popup vào cuối trang khi DOM sẵn sàng
+    const accountModalHTML = `
+    <div id="accountModal"
+        class="fixed inset-0 bg-slate-950/80 backdrop-blur-md hidden flex-col justify-end sm:justify-center items-center z-[100] transition-all">
+        <div
+            class="bg-white dark:bg-slate-900 border-0 sm:border border-slate-200/80 dark:border-slate-800/80 w-full h-full sm:h-auto sm:max-w-lg p-6 sm:p-7 pb-24 sm:pb-7 rounded-none sm:rounded-3xl shadow-2xl relative flex flex-col justify-between transform translate-y-full ease-out overflow-y-auto no-scrollbar max-h-screen" id="accountModalContent">
+            
+            <div>
+                <div class="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800 mb-6">
+                    <h3 class="text-base font-extrabold text-slate-900 dark:text-white flex items-center gap-2.5">
+                        <div class="w-8 h-8 rounded-xl bg-blue-500/10 text-blue-500 flex items-center justify-center text-sm">
+                            <i class="fa-solid fa-user-shield"></i>
+                        </div>
+                        Thông Tin Tài Khoản
+                    </h3>
+                </div>
+
+                <div class="space-y-4 text-xs">
+                    <!-- AVATAR & HỌ TÊN -->
+                    <div class="flex items-center gap-4 p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/80">
+                        <div class="relative group cursor-pointer shrink-0" id="accAvatarWrapper" title="Nhấn để chọn ảnh đại diện (Tối đa 5MB)">
+                            <div class="w-16 h-16 rounded-2xl bg-transparent border border-blue-500/30 text-blue-400 flex items-center justify-center text-2xl font-bold shadow-lg shadow-blue-500/10 overflow-hidden" id="accAvatar">
+                                N/A
+                            </div>
+                            <div class="absolute inset-0 bg-black/50 rounded-2xl flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-white text-xs">
+                                <i class="fa-solid fa-camera"></i>
+                            </div>
+                            <input type="file" id="avatarFileInput" accept="image/png,image/jpeg,image/webp,image/gif" class="hidden">
+                        </div>
+                        <div class="overflow-hidden">
+                            <p class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Họ và tên / Full Name</p>
+                            <p class="text-sm uppercase font-extrabold text-slate-900 dark:text-white mt-0.5 truncate" id="accFullName">N/A</p>
+                        </div>
+                    </div>
+
+                    <!-- THÔNG TIN CHI TIẾT -->
+                    <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700/60 space-y-3">
+                        <div class="flex justify-between items-center text-slate-600 dark:text-slate-300">
+                            <span class="font-medium">Tên đăng nhập (User):</span>
+                            <span class="text-xs font-semibold text-slate-800 dark:text-slate-100 font-mono" id="accUsername">N/A</span>
+                        </div>
+                        <div class="flex justify-between items-center text-slate-600 dark:text-slate-300">
+                            <span class="font-medium">Số điện thoại:</span>
+                            <span class="text-xs font-semibold text-slate-800 dark:text-slate-100 font-mono" id="accPhone">N/A</span>
+                        </div>
+                        <div class="flex justify-between items-center text-slate-600 dark:text-slate-300">
+                            <span class="font-medium">Chức vụ:</span>
+                            <span class="text-xs font-semibold text-slate-800 dark:text-slate-100" id="accPosition">N/A</span>
+                        </div>
+                        <div class="flex justify-between items-center text-slate-600 dark:text-slate-300">
+                            <span class="font-medium">Chuyên môn:</span>
+                            <span class="text-xs font-semibold text-slate-800 dark:text-slate-100" id="accDiscipline">N/A</span>
+                        </div>
+                        <div class="flex justify-between items-center text-slate-600 dark:text-slate-300">
+                            <span class="font-medium">Công ty:</span>
+                            <span class="text-xs font-semibold text-slate-800 dark:text-slate-100" id="accCompany">N/A</span>
+                        </div>
+                        <div class="flex justify-between items-center text-slate-600 dark:text-slate-300">
+                            <span class="font-medium">Dự án tham gia:</span>
+                            <span class="text-xs font-semibold text-slate-800 dark:text-slate-100 truncate max-w-[200px]" id="accProjects">N/A</span>
+                        </div>
+                        <div class="flex justify-between items-center text-slate-600 dark:text-slate-300">
+                            <span class="font-medium">Trạng thái dự án:</span>
+                            <span class="text-xs font-semibold text-slate-800 dark:text-slate-100" id="accStatus">N/A</span>
+                        </div>
+                        <div class="flex justify-between items-center text-slate-600 dark:text-slate-300">
+                            <span class="font-medium">Phân quyền truy cập:</span>
+                            <span class="font-bold font-mono text-blue-400 bg-blue-500/10 px-2.5 py-0.5 rounded border border-blue-500/20 text-xs uppercase" id="accRole">N/A</span>
+                        </div>
+                    </div>
+
+                    <!-- HỆ THỐNG PHÂN QUYỀN ISO 19650 -->
+                    <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700/60 space-y-2">
+                        <p class="font-bold text-slate-800 dark:text-slate-200 mb-2 flex items-center gap-2">
+                            <i class="fa-solid fa-shield-halved text-blue-500"></i> Hệ thống phân quyền chuẩn ISO 19650:
+                        </p>
+                        <div class="grid grid-cols-2 gap-2 text-[11px]">
+                            <div class="p-2 rounded bg-slate-200/60 dark:bg-slate-800 border border-slate-300/50 dark:border-slate-700">
+                                <span class="block text-slate-400 font-mono text-[9px]">01_WIP</span>
+                                <span class="font-bold" id="permWIP">N/A</span>
+                            </div>
+                            <div class="p-2 rounded bg-slate-200/60 dark:bg-slate-800 border border-slate-300/50 dark:border-slate-700">
+                                <span class="block text-slate-400 font-mono text-[9px]">02_SHARED</span>
+                                <span class="font-bold" id="permShared">N/A</span>
+                            </div>
+                            <div class="p-2 rounded bg-slate-200/60 dark:bg-slate-800 border border-slate-300/50 dark:border-slate-700">
+                                <span class="block text-slate-400 font-mono text-[9px]">03_PUBLISHED</span>
+                                <span class="font-bold" id="permPublished">N/A</span>
+                            </div>
+                            <div class="p-2 rounded bg-slate-200/80 dark:bg-slate-800 border border-slate-300/50 dark:border-slate-700">
+                                <span class="block text-slate-400 font-mono text-[9px]">04_ARCHIVE</span>
+                                <span class="font-bold" id="permArchive">N/A</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-6 pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-end">
+                <button onclick="toggleAccountModal(false)"
+                    class="w-full py-3.5 bg-blue-600 hover:bg-blue-500 text-xs font-bold text-white rounded-xl shadow-lg shadow-blue-500/25 transition-all">Đóng thông tin</button>
+            </div>
+        </div>
+    </div>`;
+
+    document.addEventListener("DOMContentLoaded", () => {
+        const container = document.createElement('div');
+        container.innerHTML = accountModalHTML;
+        document.body.appendChild(container.firstElementChild);
+
+        const avatarWrapper = document.getElementById('accAvatarWrapper');
+        const fileInput = document.getElementById('avatarFileInput');
+
+        if (avatarWrapper && fileInput) {
+            avatarWrapper.addEventListener('click', () => fileInput.click());
+
+            fileInput.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (!file) return;
+
+                if (!AVATAR_TYPES.includes(file.type)) {
+                    alert('⚠️ Chỉ hỗ trợ ảnh PNG, JPG, WEBP hoặc GIF!');
+                    fileInput.value = '';
+                    return;
+                }
+
+                const maxSize = 5 * 1024 * 1024;
+                if (file.size > maxSize) {
+                    alert('⚠️ Kích thước ảnh vượt quá giới hạn 5MB. Vui lòng chọn file ảnh nhỏ hơn!');
+                    fileInput.value = '';
+                    return;
+                }
+
+                selectedAvatarFile = file;
+
+                const reader = new FileReader();
+                reader.onload = function(uploadEvent) {
+                    pendingAvatarBase64 = uploadEvent.target.result;
+                    
+                    const avatarContainer = document.getElementById('accAvatar');
+                    renderAvatarImage(avatarContainer, pendingAvatarBase64);
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+    });
+
+    function setPermissionBadge(elementId, permissionText) {
+        const el = document.getElementById(elementId);
+        if (!el) return;
+        el.innerText = permissionText;
+        el.className = "font-bold text-xs ";
+
+        if (permissionText === 'Full Control') {
+            el.className += "text-blue-500";
+        } else if (permissionText === 'Read & Write') {
+            el.className += "text-emerald-500";
+        } else if (permissionText === 'Read-Only') {
+            el.className += "text-amber-500";
+        } else if (permissionText === 'No Access') {
+            el.className += "text-rose-500";
+        } else {
+            el.className += "text-slate-400";
+        }
+    }
+
+    window.toggleAccountModal = async function(show) {
+        const modal = document.getElementById('accountModal');
+        const content = document.getElementById('accountModalContent');
+        if (!modal || !content) return;
+        
+        if (show) {
+            selectedAvatarFile = null;
+            pendingAvatarBase64 = null;
+
+            const userSession = JSON.parse(localStorage.getItem('currentUser') || '{}');
+            const currentUsername = userSession.username || '';
+
+            let userData = userSession;
+
+            if (currentUsername) {
+                try {
+                    const apiUrl = `${CONFIG.CDE_API}/auth/me`;
+                    const response = await fetch(apiUrl, {
+                        headers: { Authorization: `Bearer ${localStorage.getItem('access_token') || ''}` }
+                    });
+                    if (!response.ok) throw new Error(`Lỗi tải hồ sơ (${response.status})`);
+                    const result = await response.json();
+                    if (result.user && result.user.username === currentUsername) {
+                        userData = { ...userSession, ...result.user };
+                    }
+                } catch (error) {
+                    console.warn('Không thể tải hồ sơ từ backend, đang dùng dữ liệu session hiện tại.', error);
+                }
+            }
+
+            document.getElementById('accUsername').innerText = userData.username || 'N/A';
+            const fullName = userData.fullName || 'N/A';
+            document.getElementById('accFullName').innerText = fullName;
+
+            document.getElementById('accPhone').innerText = userData.phone || 'N/A';
+            document.getElementById('accProjects').innerText = userData.projects || 'N/A';
+            document.getElementById('accStatus').innerText = userData.status || 'N/A';
+
+            document.getElementById('accPosition').innerText = userData.position || 'N/A';
+            document.getElementById('accDiscipline').innerText = userData.discipline || 'N/A';
+            document.getElementById('accCompany').innerText = userData.company || 'N/A';
+            
+            const role = userData.role ? userData.role.toUpperCase() : 'N/A';
+            document.getElementById('accRole').innerText = role;
+            
+            const avatarContainer = document.getElementById('accAvatar');
+            if (userData.avatarLink) {
+                renderAvatarImage(avatarContainer, resolveAvatarUrl(userData.avatarLink));
+            } else if (fullName && fullName !== 'N/A') {
+                const initials = fullName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+                avatarContainer.innerText = initials;
+            } else {
+                avatarContainer.innerText = 'N/A';
+            }
+
+            const matrixMapping = {
+                'MASTER':    { wip: 'Full Control', shared: 'Full Control', published: 'Full Control', archive: 'Full Control' },
+                'ADMIN':     { wip: 'Full Control', shared: 'Full Control', published: 'Full Control', archive: 'Full Control' },
+                'MANAGEMENT':{ wip: 'No Access',    shared: 'Full Control', published: 'Full Control', archive: 'Read & Write' },
+                'DESIGNER':  { wip: 'Full Control', shared: 'Read & Write', published: 'Read-Only',  archive: 'No Access' },
+                'CONTRACTOR':{ wip: 'No Access',    shared: 'Read-Only',  published: 'Read & Write',archive: 'No Access' },
+            };
+
+            const permissions = matrixMapping[role] || { wip: 'N/A', shared: 'N/A', published: 'N/A', archive: 'N/A' };
+            setPermissionBadge('permWIP', permissions.wip);
+            setPermissionBadge('permShared', permissions.shared);
+            setPermissionBadge('permPublished', permissions.published);
+            setPermissionBadge('permArchive', permissions.archive);
+
+            content.style.transitionDuration = '400ms';
+            content.classList.add('translate-y-full');
+            content.classList.remove('translate-y-0');
+
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    content.classList.remove('translate-y-full');
+                    content.classList.add('translate-y-0');
+                });
+            });
+        } else {
+            if (selectedAvatarFile && pendingAvatarBase64) {
+                const userSession = JSON.parse(localStorage.getItem('currentUser') || '{}');
+                try {
+                    const response = await fetch(`${CONFIG.CDE_API}/upload-avatar`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${localStorage.getItem('access_token') || ''}`
+                        },
+                        body: JSON.stringify({ image: pendingAvatarBase64 })
+                    });
+                    const result = await response.json().catch(() => ({}));
+
+                    if (response.ok && result.success) {
+                        console.log(`✅ Đã lưu ảnh thành công vào server: ${result.path}`);
+
+                        userSession.avatarLink = result.avatarLink;
+                        localStorage.setItem('currentUser', JSON.stringify(userSession));
+                    } else {
+                        console.error('Lỗi phản hồi từ server khi lưu ảnh:', result.error);
+                        alert(result.error || 'Không thể lưu ảnh đại diện. Vui lòng thử lại!');
+                    }
+                } catch (error) {
+                    console.error('Không thể kết nối đến server để lưu ảnh:', error);
+                    alert('Không thể kết nối đến máy chủ để lưu ảnh đại diện!');
+                }
+            }
+
+            content.style.transitionDuration = '300ms';
+            content.classList.remove('translate-y-0');
+            content.classList.add('translate-y-full');
+            
+            setTimeout(() => {
+                modal.classList.remove('flex');
+                modal.classList.add('hidden');
+            }, 300);
+        }
+    };
+})();
