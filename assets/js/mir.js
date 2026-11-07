@@ -2549,12 +2549,12 @@ function updateStorageChart(storageByState, totalBytes) {
     );
 }
 
-function updateIssueChart(filesWithIssues, recalledFiles, recalledWithIssues, signedFiles, totalFiles, issueCount) {
+function updateIssueChart(filesWithIssues, recalledFiles, recalledWithIssues, signedFiles, signedOnlyFiles, totalFiles) {
     const recalledWithoutIssues = Math.max(recalledFiles - recalledWithIssues, 0);
-    const otherFiles = Math.max(totalFiles - filesWithIssues - recalledWithoutIssues, 0);
+    const otherFiles = Math.max(totalFiles - filesWithIssues - recalledWithoutIssues - signedOnlyFiles, 0);
     const note = document.getElementById('issueChartNote');
     const card = document.getElementById('issueAnalyticsCard');
-    const attentionCount = filesWithIssues + recalledWithoutIssues;
+    const attentionCount = filesWithIssues + recalledWithoutIssues + signedOnlyFiles;
     if (note) {
         note.textContent = attentionFilesOnly
             ? `Đang lọc · ${filesWithIssues} ghi chú\n${recalledFiles} tệp thu hồi\n${signedFiles} tệp ký số`
@@ -2567,9 +2567,9 @@ function updateIssueChart(filesWithIssues, recalledFiles, recalledWithIssues, si
     issueChartInstance = updateDoughnutChart(
         issueChartInstance,
         'issueChart',
-        ['Có ghi chú', 'Thu hồi · không ghi chú', 'Khác'],
-        [filesWithIssues, recalledWithoutIssues, otherFiles],
-        ['#fb7185', '#f59e0b', '#334155'],
+        ['Có ghi chú', 'Thu hồi · không ghi chú', 'Ký số · riêng', 'Khác'],
+        [filesWithIssues, recalledWithoutIssues, signedOnlyFiles, otherFiles],
+        ['#fb7185', '#f59e0b', '#38bdf8', '#334155'],
         String(attentionCount),
         context => ` ${context.label}: ${context.raw} tệp`
     );
@@ -2618,7 +2618,7 @@ function applyFilters() {
     let recalledFiles = 0;
     let recalledWithIssues = 0;
     let signedFiles = 0;
-    let totalIssueCount = 0;
+    let signedOnlyFiles = 0;
 
     rows.forEach(row => {
         const prj = row.getAttribute('data-project') || '';
@@ -2638,8 +2638,8 @@ function applyFilters() {
         let matchesRecall = (!hideRecalledFilesFlag || !isRecalled || attentionFilesOnly);
         const fileIssues = serverIssuesDB[row.getAttribute('data-path')] || [];
         const hasIssues = Array.isArray(fileIssues) && fileIssues.length > 0;
-        if (getSignatureRecord(filePath)) signedFiles++;
-        let matchesAttention = (!attentionFilesOnly || hasIssues || isRecalled);
+        const isSigned = !!getSignatureRecord(filePath);
+        let matchesAttention = (!attentionFilesOnly || hasIssues || isRecalled || isSigned);
 
         if (matchesProj && matchesFolder && matchesState && matchesSuit && matchesSearch && matchesRecall && matchesAttention) {
             row.style.display = '';
@@ -2652,10 +2652,13 @@ function applyFilters() {
             totalStorageBytes += fileSize;
             if (Object.prototype.hasOwnProperty.call(storageByState, state)) storageByState[state] += fileSize;
 
+            if (isSigned) {
+                signedFiles++;
+                if (!hasIssues && !isRecalled) signedOnlyFiles++;
+            }
             if (isRecalled) recalledFiles++;
             if (hasIssues) {
                 filesWithIssues++;
-                totalIssueCount += fileIssues.length;
                 if (isRecalled) recalledWithIssues++;
             }
 
@@ -2686,15 +2689,15 @@ function applyFilters() {
     // Cập nhật biểu đồ trực quan Chart.js
     initOrUpdateFileTypeChart(typeCounts, totalVisibleFiles);
     updateStorageChart(storageByState, totalStorageBytes);
-    updateIssueChart(filesWithIssues, recalledFiles, recalledWithIssues, signedFiles, totalVisibleFiles, totalIssueCount);
+    updateIssueChart(filesWithIssues, recalledFiles, recalledWithIssues, signedFiles, signedOnlyFiles, totalVisibleFiles);
 }
 
 function toggleAttentionFiles() {
     attentionFilesOnly = !attentionFilesOnly;
     applyFilters();
     showToast(attentionFilesOnly
-        ? "Đang lọc các tệp có ghi chú QA/QC hoặc đã thu hồi."
-        : "Đã bỏ lọc ghi chú và tệp thu hồi.");
+        ? "Đang lọc các tệp có ghi chú QA/QC, đã thu hồi hoặc ký số."
+        : "Đã bỏ lọc ghi chú, tệp thu hồi và tệp ký số.");
 }
 
 function toggleTheme() {
