@@ -2549,9 +2549,8 @@ function updateStorageChart(storageByState, totalBytes) {
     );
 }
 
-function updateIssueChart(filesWithIssues, recalledFiles, recalledWithIssues, signedFiles, signedOnlyFiles, totalFiles) {
+function updateIssueChart(filesWithIssues, recalledFiles, recalledWithIssues, signedFiles, signedOnlyFiles) {
     const recalledWithoutIssues = Math.max(recalledFiles - recalledWithIssues, 0);
-    const otherFiles = Math.max(totalFiles - filesWithIssues - recalledWithoutIssues - signedOnlyFiles, 0);
     const note = document.getElementById('issueChartNote');
     const card = document.getElementById('issueAnalyticsCard');
     const attentionCount = filesWithIssues + recalledWithoutIssues + signedOnlyFiles;
@@ -2567,9 +2566,9 @@ function updateIssueChart(filesWithIssues, recalledFiles, recalledWithIssues, si
     issueChartInstance = updateDoughnutChart(
         issueChartInstance,
         'issueChart',
-        ['Có ghi chú', 'Thu hồi · không ghi chú', 'Ký số · riêng', 'Khác'],
-        [filesWithIssues, recalledWithoutIssues, signedOnlyFiles, otherFiles],
-        ['#fb7185', '#f59e0b', '#38bdf8', '#334155'],
+        ['Issues', 'Thu hồi', 'Ký số'],
+        [filesWithIssues, recalledWithoutIssues, signedOnlyFiles],
+        ['#fb7185', '#f59e0b', '#22c55e'],
         String(attentionCount),
         context => ` ${context.label}: ${context.raw} tệp`
     );
@@ -2689,7 +2688,7 @@ function applyFilters() {
     // Cập nhật biểu đồ trực quan Chart.js
     initOrUpdateFileTypeChart(typeCounts, totalVisibleFiles);
     updateStorageChart(storageByState, totalStorageBytes);
-    updateIssueChart(filesWithIssues, recalledFiles, recalledWithIssues, signedFiles, signedOnlyFiles, totalVisibleFiles);
+    updateIssueChart(filesWithIssues, recalledFiles, recalledWithIssues, signedFiles, signedOnlyFiles);
 }
 
 function toggleAttentionFiles() {
