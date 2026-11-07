@@ -432,7 +432,7 @@
                         <div class="grid grid-cols-3 gap-2 sm:flex">
                             <button type="button" id="btn-sync-notifications"
                                 class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-blue-400 border border-slate-700 font-bold text-xs rounded-xl">
-                                <i class="fa-solid fa-arrows-rotate"></i> Tải JSON
+                                <i class="fa-solid fa-arrows-rotate"></i> Tải dữ liệu
                             </button>
                             <button type="button" id="btn-export-notifications" onclick="exportNotificationsJson()"
                                 class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-amber-400 border border-slate-700 font-bold text-xs rounded-xl">
@@ -440,7 +440,7 @@
                             </button>
                             <button type="button" id="btn-publish-notifications"
                                 class="px-3 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl">
-                                <i class="fa-solid fa-cloud-arrow-up"></i> Xuất Notification.json
+                                <i class="fa-solid fa-cloud-arrow-up"></i> Tải xuống
                             </button>
                         </div>
                     </div>
@@ -1163,7 +1163,7 @@
                 showToast(`Lỗi xuất bản: ${err.message}`, 'error');
             } finally {
                 btnPub.disabled = false;
-                btnPub.innerHTML = `<i class="fa-solid fa-cloud-arrow-up"></i> Xuất bản GitHub`;
+                btnPub.innerHTML = `<i class="fa-solid fa-cloud-arrow-up"></i> Xuất bản`;
             }
         });
 
@@ -1422,7 +1422,7 @@
             }
             resetNotificationForm();
             renderNotificationsAdmin();
-            showToast('Đã lưu thông báo vào bản nháp. Nhấn “Xuất Notification.json” để cập nhật GitHub.');
+            showToast('Đã lưu thông báo vào bản nháp. Nhấn “Xuất bản” để cập nhật.');
         });
 
         document.getElementById('btn-cancel-notification-edit').addEventListener('click', resetNotificationForm);
@@ -1519,7 +1519,7 @@
                 showToast(`Lỗi xuất bản thông báo: ${error.message}`, 'error');
             } finally {
                 button.disabled = false;
-                button.innerHTML = '<i class="fa-solid fa-cloud-arrow-up"></i> Xuất Notification.json';
+                button.innerHTML = '<i class="fa-solid fa-cloud-arrow-up"></i> Xuất bản';
             }
         });
 
