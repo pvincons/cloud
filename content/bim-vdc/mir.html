@@ -54,7 +54,7 @@
                         </svg>
                         <span>Dashboard</span>
                     </a>
-                    <span style="color:var(--text-heading); font-weight:600;">CDE Master</span>
+                    <span style="color:var(--text-heading); font-weight:600;"> CHỌN DỰ ÁN</span>
                 </div>
                 <button class="close-sidebar-btn" onclick="closeMobileSidebar()">✕</button>
             </div>
@@ -180,12 +180,14 @@
                 <div class="analytics-grid">
                     <article class="analytics-card">
                         <div class="chart-header">
-                            <span class="chart-title"><i class="fa-solid fa-hard-drive chart-icon-storage"></i> Dung lượng lưu trữ</span>
+                            <span class="chart-title">
+                                <i class="fa-solid fa-hard-drive chart-icon-storage"></i> Dung lượng lưu trữ
+                                <span class="chart-title-total" id="storageChartTotal">0 KB</span>
+                            </span>
                             <span class="chart-badge">CDE</span>
                         </div>
                         <div class="analytics-body">
                             <div class="chart-wrapper"><canvas id="storageChart" aria-label="Dung lượng theo CDE State"></canvas></div>
-                            <p class="chart-note" id="storageChartNote">Tổng dung lượng trong danh sách hiện tại</p>
                         </div>
                     </article>
                     <article class="analytics-card">
@@ -195,7 +197,6 @@
                         </div>
                         <div class="analytics-body">
                             <div class="chart-wrapper"><canvas id="fileTypeChart" aria-label="Thống kê định dạng tệp"></canvas></div>
-                            <p class="chart-note">Cơ cấu tệp trong danh sách hiện tại</p>
                         </div>
                     </article>
                     <article class="analytics-card analytics-card-interactive" id="issueAnalyticsCard"
@@ -305,6 +306,13 @@
                                     <option value="A1">A1 - Construction</option>
                                     <option value="A2">A2 - As-Built</option>
                                 </select>
+
+                                <button class="btn-filter-toggle" id="resetProjectViewBtn" type="button"
+                                    onclick="resetToCurrentProjectRoot()" title="Reset dự án hiện tại"
+                                    aria-label="Reset dự án hiện tại">
+                                    <i class="fa-solid fa-arrow-rotate-right" style="color: var(--text-muted);"
+                                        aria-hidden="true"></i>
+                                </button>
                             </div>
                         </div>
                     </div>
