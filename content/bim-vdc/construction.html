@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="dark"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Dữ liệu giai đoạn thi công | VDC Workspace</title>
+<link rel="stylesheet" href="/assets/css/mir.css"><!-- dùng chung giao diện với mir.html; đổi đường dẫn nếu mir.css nằm thư mục khác -->
+<style>
+/* Phần riêng của trang thi công (các class còn lại dùng từ mir.css) */
+.inp{background:var(--bg-input);border:1px solid var(--border-color);color:var(--text-heading);border-radius:6px;padding:5px 8px;font-size:.75rem;outline:none;min-width:0}
+.inp:focus{border-color:var(--primary)}
+.mini{width:44px;height:34px;object-fit:cover;border-radius:4px;background:var(--bg-input);display:block}
+.mini.ph{display:grid;place-items:center;font-size:.6rem;color:var(--text-muted);border:1px solid var(--border-color)}
+.cons-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px;padding:12px}
+.cons-card{background:var(--bg-input);border:1px solid var(--border-color);border-radius:8px;overflow:hidden;cursor:pointer}
+.cons-card:hover{border-color:var(--primary)}.cons-card.is-recalled{opacity:.6}
+.cons-card .im{aspect-ratio:4/3;background:var(--bg-main) center/cover;display:grid;place-items:center;color:var(--text-muted);font-size:.75rem}
+.cons-card .bd{padding:7px 9px;font-size:.72rem;display:grid;gap:3px}
+.empty{padding:28px;text-align:center;font-size:.8rem;color:var(--text-muted)}
+.f{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin:10px 0}
+.f label{display:grid;gap:3px;font-size:.65rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em}
+.f .inp{text-transform:none;letter-spacing:0}
+.it{display:grid;grid-template-columns:60px 1fr;gap:10px;padding:8px 0;border-top:1px solid var(--border-color);font-size:.75rem}
+.it img,.it .ph{width:60px;height:60px;object-fit:cover;border-radius:6px;background:var(--bg-input);display:grid;place-items:center}
+.pg{height:3px;background:var(--border-color);border-radius:2px;margin-top:5px}.pg i{display:block;height:100%;width:0;background:var(--primary);border-radius:2px}
+.kv{display:grid;grid-template-columns:120px 1fr;gap:5px 10px;font-size:.76rem}.kv dt{color:var(--text-muted)}.kv dd{color:var(--text-heading);word-break:break-word}
+.dt{display:grid;grid-template-columns:1fr 1fr;gap:14px}.dt img,.dt video{width:100%;border-radius:8px;background:var(--bg-input)}
+.log{font-size:.7rem;color:var(--text-muted);padding:2px 0}
+.btn-warn{color:#f59e0b}.sub{font-size:.68rem;color:var(--text-muted)}
+@media(max-width:768px){.dt{grid-template-columns:1fr}.kv{grid-template-columns:100px 1fr}.table-container{min-height:0}}
+</style></head><body>
+
+<div class="sidebar-overlay" id="ov"></div>
+<aside class="sidebar" id="sb">
+  <div class="sidebar-header">
+    <div class="brand-logo"><span>Dữ liệu thi công</span>
+      <a class="dashboard-link-btn" href="javascript:history.back()">← Dashboard</a>
+      <button class="close-sidebar-btn" id="bCloseSb" aria-label="Đóng menu">✕</button></div>
+    <select class="project-select-box" id="fPrj" aria-label="Dự án"></select>
+  </div>
+  <div class="nav-section">
+    <div class="nav-section-title">Tầng thi công</div>
+    <ul id="lvTree" style="list-style:none"></ul>
+  </div>
+</aside>
+
+<div class="main-wrapper">
+  <div class="top-navbar">
+    <button class="mobile-toggle-btn" id="bMenu" aria-label="Mở menu">☰</button>
+    <div class="search-bar"><span class="sub">⌕</span><input id="fQ" placeholder="Tìm mã, tên file, khu vực, ghi chú"></div>
+    <div class="top-actions">
+      <button class="btn btn-outline" id="bView">Dạng lưới</button>
+      <button class="btn btn-outline theme-toggle-btn" id="bTheme">Sáng/Tối</button>
+      <button class="btn btn-primary" id="bUp">Tải ảnh/video lên</button>
+    </div>
+  </div>
+
+  <div class="content-area">
+    <div class="dashboard-top-section"><div class="stats-grid-compact" id="stats"></div></div>
+    <div class="table-container">
+      <div class="table-toolbar">
+        <div class="toolbar-top">
+          <div class="toolbar-title">Sổ đăng ký dữ liệu hiện trường <span class="sub" id="cnt"></span></div>
+          <div class="toolbar-right-group"><div class="filters-wrapper">
+            <select class="select-filter" id="fSt"><option value="">Mọi trạng thái</option><option>WIP</option><option>Shared</option><option>Published</option><option>Archived</option></select>
+            <input class="select-filter" id="fFrom" type="date" title="Từ ngày">
+            <input class="select-filter" id="fTo" type="date" title="Đến ngày">
+            <button class="btn-filter-toggle active" id="bRec" title="Hiện/ẩn dữ liệu đã thu hồi">⟲</button>
+          </div></div>
+        </div>
+      </div>
+      <div class="table-wrapper" id="list"></div>
+    </div>
+  </div>
+</div>
+
+<nav class="bottom-nav">
+  <button class="bottom-nav-item active" id="nList">Danh sách</button>
+  <button class="bottom-nav-item" id="nUp">Tải lên</button>
+</nav>
+
+<!-- Upload -->
+<div class="modal" id="mUp"><div class="modal-content" style="width:760px">
+  <div class="modal-header"><div class="modal-title">Tải ảnh/video lên</div><span class="close-btn" data-close>✕</span></div>
+  <div style="display:flex;gap:6px;flex-wrap:wrap">
+    <button class="btn btn-primary" id="bPick">Chọn từ thư viện</button>
+    <button class="btn btn-outline" id="bCam">Chụp ngay</button>
+    <input id="iPick" type="file" accept="image/*,video/*" multiple hidden>
+    <input id="iCam" type="file" accept="image/*" capture="environment" hidden>
+  </div>
+  <div class="sub" style="margin-top:6px">Thông tin chung áp dụng cho cả lô. Ngày giờ và GPS được đọc từ ảnh.</div>
+  <div class="f" id="common"></div>
+  <div id="items"></div>
+  <div style="display:flex;gap:8px;justify-content:space-between;align-items:center;margin-top:10px">
+    <span class="sub" id="sum"></span><button class="btn btn-primary" id="bGo" disabled>Tải lên</button></div>
+</div></div>
+
+<!-- Chi tiết -->
+<div class="modal" id="mDt"><div class="modal-content" style="width:880px" id="dtBox"></div></div>
+<div class="toast-container" id="toasts"></div>
+
+<script>
+// ---------- Cấu hình ----------
+// Địa chỉ server API: mở bằng Live Server (cổng 5500) thì gọi sang server Node cổng 3000; chỉnh nếu khác.
+const API_BASE=window.CDE_API_BASE||(location.port==='5500'?'http://127.0.0.1:3000':'');
+const API=API_BASE+'/api/construction';
+const PROJECTS=[{code:'P01',name:'Project 01'},{code:'P02',name:'Project 02'}]; // chỉnh theo dự án thật
+// Token JWT sau khi đăng nhập. Đổi tên khoá cho đúng nơi trang đăng nhập đang lưu token.
+const TOKEN=()=>['token','authToken','cde_token','jwt'].map(k=>localStorage.getItem(k)||sessionStorage.getItem(k)).find(Boolean)||'';
+const AUTH=()=>TOKEN()?{Authorization:'Bearer '+TOKEN()}:{};
+const furl=u=>u?API_BASE+u+(u.includes('?')?'&':'?')+'token='+encodeURIComponent(TOKEN()):''; // <img>/<video> không gửi được header
+let exifrP;const loadExifr=()=>exifrP||(exifrP=new Promise(ok=>{if(window.exifr)return ok(true);const s=document.createElement('script');s.src=API_BASE+'/vendor/exifr/dist/lite.umd.js';s.onload=()=>ok(true);s.onerror=()=>{console.warn('Chưa nạp được exifr: dùng ngày sửa file');ok(false)};document.head.appendChild(s)}));
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmt=d=>d?new Date(d).toLocaleString('vi-VN'):'—';
+const toast=m=>{const t=document.createElement('div');t.className='toast';t.textContent=m;$('#toasts').appendChild(t);setTimeout(()=>t.remove(),3000)};
+async function api(p,o={}){const r=await fetch(API+p,{...o,headers:{...AUTH(),...(o.body&&typeof o.body==='string'?{'Content-Type':'application/json'}:{}),...o.headers}});
+  const j=await r.json().catch(()=>({}));if(!r.ok)throw new Error(j.error||r.status);return j}
+
+// ---------- Giao diện chung (sáng/tối, menu mobile) ----------
+document.documentElement.dataset.theme=localStorage.getItem('theme')||'dark';
+$('#bTheme').onclick=()=>{const t=document.documentElement.dataset.theme==='dark'?'light':'dark';document.documentElement.dataset.theme=t;localStorage.setItem('theme',t)};
+const menu=o=>{$('#sb').classList.toggle('mobile-open',o);$('#ov').classList.toggle('active',o)};
+$('#bMenu').onclick=()=>menu(true);$('#bCloseSb').onclick=$('#ov').onclick=()=>menu(false);
+document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>b.closest('.modal').classList.remove('active'));
+
+// ---------- Danh sách ----------
+let items=[],view='table',curLevel='',showRec=true;
+$('#fPrj').innerHTML=PROJECTS.map(p=>`<option value="${p.code}">${p.name}</option>`).join('');
+async function refresh(){
+  const q=new URLSearchParams({project:$('#fPrj').value,q:$('#fQ').value,status:$('#fSt').value,from:$('#fFrom').value,to:$('#fTo').value});
+  [...q.keys()].forEach(k=>!q.get(k)&&q.delete(k));
+  try{items=await api('/items?'+q)}catch(e){items=[];toast('Không tải được dữ liệu: '+e.message)}
+  draw()}
+const BC={WIP:'badge-wip',Shared:'badge-shared',Published:'badge-published',Archived:'badge-archive'};
+const badges=i=>`<span class="badge ${BC[i.status]||''}">${i.status}</span> ${i.recalled?'<span class="badge-recalled">Đã thu hồi</span>':''} ${i.outOfSite?'<span class="badge badge-issue" title="GPS nằm ngoài vùng công trường">Ngoài công trường</span>':''}`;
+function draw(){
+  const lv=[...new Set(items.map(i=>i.level).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'vi',{numeric:true}));
+  if(curLevel&&!lv.includes(curLevel))lv.push(curLevel);
+  $('#lvTree').innerHTML=[['','Tất cả tầng',items.length],...lv.map(l=>[l,'Tầng '+l,items.filter(i=>i.level===l).length])]
+    .map(([v,t,n])=>`<li><div class="tree-node-item ${v===curLevel?'active':''}" data-lv="${esc(v)}"><span class="node-title">${esc(t)}</span><span class="folder-file-count">${n}</span></div></li>`).join('');
+  const act=items.filter(i=>!i.recalled),last=items.reduce((a,i)=>i.uploadedAt>a?i.uploadedAt:a,'');
+  const S=(t,v,d)=>`<div class="stat-card"><div class="stat-title">${t}</div><div class="stat-value">${v}</div><div class="stat-desc">${d}</div></div>`;
+  $('#stats').innerHTML=S('Tổng dữ liệu',act.length,`${items.length-act.length} đã thu hồi`)+S('Ảnh',act.filter(i=>i.type==='Ảnh').length,'ảnh hiện trường')+S('Video',act.filter(i=>i.type==='Video').length,'video hiện trường')+S('Cập nhật gần nhất',last?new Date(last).toLocaleDateString('vi-VN'):'—','ngày tải lên mới nhất');
+  const L=items.filter(i=>(!curLevel||i.level===curLevel)&&(showRec||!i.recalled));
+  $('#cnt').textContent=`· ${L.length} mục`;
+  if(!L.length){$('#list').innerHTML='<div class="empty">Chưa có dữ liệu phù hợp. Chọn "Tải ảnh/video lên" để thêm ảnh hiện trường.</div>';return}
+  const th=i=>i.thumb?`<img class="mini" src="${esc(furl(i.thumb))}" alt="">`:`<div class="mini ph">${i.type}</div>`;
+  $('#list').innerHTML=view==='grid'
+   ?`<div class="cons-grid">${L.map(i=>`<div class="cons-card ${i.recalled?'is-recalled':''}" data-id="${i.id}"><div class="im" style="${i.thumb?`background-image:url('${esc(furl(i.thumb))}')`:''}">${i.thumb?'':i.type}</div><div class="bd"><span class="file-code">${esc(i.code)}</span><span class="sub">Tầng ${esc(i.level||'—')} · ${esc(i.zone||'—')} · ${fmt(i.capturedAt)}</span><div>${badges(i)}</div></div></div>`).join('')}</div>`
+   :`<table class="cde-table"><thead><tr><th></th><th>Mã container</th><th>Loại</th><th>Khu vực</th><th>Tầng</th><th>Ngày chụp</th><th>Nhà thầu</th><th>Rev</th><th>Trạng thái</th><th>Thao tác</th></tr></thead><tbody>${L.map(i=>`<tr class="${i.recalled?'is-recalled':''}" data-id="${i.id}" style="cursor:pointer"><td>${th(i)}</td><td class="file-code">${esc(i.code)}</td><td>${i.type}</td><td>${esc(i.zone)}</td><td>${esc(i.level)}</td><td>${fmt(i.capturedAt)}</td><td>${esc(i.contractor)}</td><td><span class="rev-tag">${esc(i.rev)}</span></td><td>${badges(i)}</td><td class="action-btns"><button class="btn-open-file" data-url="${esc(i.url)}">Mở</button><button class="btn-icon" data-id="${i.id}">Chi tiết</button></td></tr>`).join('')}</tbody></table>`}
+$('#list').onclick=e=>{const o=e.target.closest('[data-url]');if(o){e.stopPropagation();window.open(furl(o.dataset.url),'_blank','noopener');return}
+  const c=e.target.closest('[data-id]');c&&openDetail(c.dataset.id)};
+$('#lvTree').onclick=e=>{const n=e.target.closest('[data-lv]');if(n){curLevel=n.dataset.lv;draw();menu(false)}};
+$('#bView').onclick=()=>{view=view==='grid'?'table':'grid';$('#bView').textContent=view==='grid'?'Dạng bảng':'Dạng lưới';draw()};
+$('#bRec').onclick=()=>{showRec=!showRec;$('#bRec').classList.toggle('active',showRec);draw()};
+['fPrj','fSt','fFrom','fTo'].forEach(id=>$('#'+id).onchange=()=>{if(id==='fPrj')curLevel='';refresh()});
+$('#fQ').oninput=(()=>{let t;return()=>{clearTimeout(t);t=setTimeout(refresh,300)}})();
+$('#nList').onclick=()=>$('.content-area').scrollTo({top:0,behavior:'smooth'});
+
+// ---------- Chi tiết ----------
+async function openDetail(id){
+  let i;try{i=await api('/items/'+id)}catch(e){return toast(e.message)}
+  const K=(a,b)=>`<dt>${a}</dt><dd>${b||'—'}</dd>`,next={WIP:'Shared',Shared:'Published',Published:'Archived'}[i.status];
+  $('#dtBox').innerHTML=`<div class="modal-header"><div class="modal-title file-code">${esc(i.code)}</div><span class="close-btn" id="xDt">✕</span></div><div class="dt">
+  <div>${i.type==='Video'?`<video src="${esc(furl(i.url))}" controls></video>`:`<img src="${esc(furl(i.web||i.url))}" alt="">`}
+   <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px"><a class="btn btn-outline" href="${esc(furl(i.url))}" target="_blank" rel="noopener">Mở bản gốc</a>
+   ${next&&!i.recalled?`<button class="btn btn-primary" id="bNext">Chuyển sang ${next}</button>`:''}${i.recalled?'':'<button class="btn btn-outline btn-warn" id="bRecall">Thu hồi</button>'}</div></div>
+  <dl class="kv">${K('Trạng thái',badges(i))}${K('Revision',esc(i.rev))}${K('Khu vực / Tầng',esc(i.zone)+' / '+esc(i.level))}${K('Trục / WBS',esc(i.grid)+' / '+esc(i.wbs))}${K('Nhà thầu',esc(i.contractor))}${K('Ngày chụp',fmt(i.capturedAt))}${K('Ngày tải lên',fmt(i.uploadedAt))}${K('Người tải lên',esc(i.uploader))}
+  ${K('GPS',i.gps?`${i.gps.lat.toFixed(6)}, ${i.gps.lng.toFixed(6)} (${i.gps.source==='exif'?'từ ảnh':'vị trí lúc upload'}) <a href="https://maps.google.com/?q=${i.gps.lat},${i.gps.lng}" target="_blank" rel="noopener" style="color:var(--primary)">Bản đồ</a>`:'Không có')}${K('Thiết bị',esc(i.exif&&[i.exif.make,i.exif.model].filter(Boolean).join(' ')))}${K('Ghi chú',esc(i.note))}${i.recall?K('Thu hồi',esc(i.recall.reason)+' — '+esc(i.recall.by)):''}</dl></div>
+  <div class="nav-section-title" style="margin-top:12px">Nhật ký thao tác</div>${i.audit.map(a=>`<div class="log">${fmt(a.at)} · ${esc(a.by)} · ${esc(a.action)}${a.from!=null?` (${esc(a.from)} → ${esc(a.to)})`:''}${a.reason?' · '+esc(a.reason):''}</div>`).join('')}`;
+  $('#mDt').classList.add('active');$('#xDt').onclick=()=>$('#mDt').classList.remove('active');
+  const act=async(p,b,ok)=>{try{await api(`/items/${id}/${p}`,{method:'POST',body:JSON.stringify(b)});$('#mDt').classList.remove('active');toast(ok);refresh()}catch(e){toast(e.message)}};
+  const n=$('#bNext');n&&(n.onclick=()=>act('status',{status:next},'Đã chuyển sang '+next));
+  const r=$('#bRecall');r&&(r.onclick=()=>{const reason=prompt('Lý do thu hồi:');reason&&act('recall',{reason},'Đã thu hồi')})}
+
+// ---------- Upload nhiều file ----------
+let queue=[],fallbackGps=null;
+const FIELDS=[['org','Đơn vị tạo (mã)'],['zone','Khu vực'],['level','Tầng'],['grid','Trục'],['wbs','Hạng mục/WBS'],['contractor','Nhà thầu/tổ đội'],['discipline','Bộ môn (mã)'],['note','Ghi chú']];
+$('#common').innerHTML=FIELDS.map(([k,l])=>`<label>${l}<input class="inp" data-k="${k}"></label>`).join('');
+const common=()=>Object.fromEntries([...document.querySelectorAll('#common input')].map(i=>[i.dataset.k,i.value.trim()]));
+$('#bUp').onclick=$('#nUp').onclick=()=>$('#mUp').classList.add('active');
+$('#bPick').onclick=()=>$('#iPick').click();$('#bCam').onclick=()=>$('#iCam').click();
+$('#iPick').onchange=$('#iCam').onchange=async e=>{await addFiles([...e.target.files]);e.target.value=''};
+async function addFiles(files){
+  for(const f of files){
+    const q={f,url:URL.createObjectURL(f),vid:/^video\//.test(f.type),level:'',gps:null,capturedAt:null,exif:null,state:'wait'};
+    try{if(!q.vid&&await loadExifr()){const x=await exifr.parse(f,{gps:true,pick:['DateTimeOriginal','Make','Model']});
+      if(x){q.capturedAt=x.DateTimeOriginal?new Date(x.DateTimeOriginal).toISOString():null;
+        if(x.latitude!=null)q.gps={lat:x.latitude,lng:x.longitude,source:'exif'};q.exif={make:x.Make,model:x.Model}}}}catch{}
+    queue.push(q)}
+  if(queue.some(q=>!q.gps)&&!fallbackGps&&navigator.geolocation)
+    navigator.geolocation.getCurrentPosition(p=>{fallbackGps={lat:p.coords.latitude,lng:p.coords.longitude,source:'upload'};drawQ()},()=>{},{timeout:8000});
+  drawQ()}
+function drawQ(){
+  $('#items').innerHTML=queue.map((q,n)=>`<div class="it"><div>${q.vid?'<div class="ph">Video</div>':`<img src="${q.url}" alt="">`}</div><div>
+   <div class="file-code">${esc(q.f.name)}</div>
+   <span class="badge ${q.capturedAt?'badge-published':'badge-shared'}">${q.capturedAt?'Có giờ chụp':'Thiếu giờ chụp: dùng ngày sửa file'}</span>
+   <span class="badge ${q.gps?'badge-published':fallbackGps?'badge-shared':'badge-issue'}">${q.gps?'Có GPS':fallbackGps?'Dùng vị trí lúc upload':'Thiếu GPS'}</span>
+   <input class="inp" data-n="${n}" placeholder="Tầng (nếu khác chung)" value="${esc(q.level)}" size="18" ${q.state!=='wait'?'disabled':''}>
+   <span class="sub" data-s="${n}">${{wait:'',up:'Đang tải…',ok:'✓ Xong',err:''}[q.state]}</span><div class="pg"><i data-p="${n}"></i></div></div></div>`).join('');
+  $('#items').querySelectorAll('input[data-n]').forEach(i=>i.oninput=()=>queue[i.dataset.n].level=i.value);
+  const w=queue.filter(q=>q.state==='wait'||q.state==='err').length;$('#bGo').disabled=!w;$('#sum').textContent=queue.length?`${queue.length} file, ${w} chờ tải lên`:''}
+function send(q,n,meta){return new Promise(ok=>{
+  const fd=new FormData();fd.append('file',q.f);fd.append('meta',JSON.stringify(meta));
+  const x=new XMLHttpRequest();x.open('POST',API+'/upload');Object.entries(AUTH()).forEach(([k,v])=>x.setRequestHeader(k,v));
+  x.upload.onprogress=e=>{const b=document.querySelector(`[data-p="${n}"]`);b&&e.lengthComputable&&(b.style.width=e.loaded/e.total*100+'%')};
+  x.onload=()=>{if(x.status<300){q.state='ok';ok(true)}else{q.state='err';let m='';try{m=JSON.parse(x.responseText).error}catch{}q.msg=m||x.status;ok(false)}};
+  x.onerror=()=>{q.state='err';q.msg='Mất kết nối';ok(false)};x.send(fd)})}
+async function upload1(q,n){
+  const c=common(),meta={...c,project:$('#fPrj').value,level:q.level||c.level,lastModified:q.f.lastModified,capturedAt:q.capturedAt,gps:q.gps||fallbackGps,exif:q.exif};
+  for(let t=0;t<3;t++){q.state='up';drawStatus(n);const okk=await send(q,n,meta);if(okk||/trùng|quyền|Thiếu/.test(q.msg||''))break;await new Promise(r=>setTimeout(r,1500*(t+1)))}
+  drawStatus(n)}
+function drawStatus(n){const s=document.querySelector(`[data-s="${n}"]`),q=queue[n];if(!s)return;
+  s.textContent={wait:'',up:'Đang tải…',ok:'✓ Xong',err:'✗ '+(q.msg||'Lỗi')}[q.state];s.style.color=q.state==='err'?'#ef4444':''}
+$('#bGo').onclick=async()=>{
+  $('#bGo').disabled=true;const todo=queue.map((q,n)=>[q,n]).filter(([q])=>q.state==='wait'||q.state==='err');
+  let k=0;await Promise.all([0,1,2].map(async()=>{while(k<todo.length){const[q,n]=todo[k++];await upload1(q,n)}})); // 3 file song song
+  const fail=queue.filter(q=>q.state==='err').length;$('#sum').textContent=fail?`${fail} file lỗi, bấm "Tải lên" để thử lại`:'Đã tải lên xong';
+  if(!fail)toast('Đã tải lên xong');$('#bGo').disabled=!fail;refresh()};
+refresh();
+</script></body></html>

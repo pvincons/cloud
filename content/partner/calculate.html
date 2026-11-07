@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bảng Tính Chỉ Số Đầu Tư & Tài Chính</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen pb-12">
+
+    <!-- Header -->
+    <header class="bg-indigo-700 text-white py-6 shadow-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h1 class="text-2xl sm:text-3xl font-bold">Bảng Tính Chỉ Số Đầu Tư & Tài Chính</h1>
+            <p class="text-indigo-200 text-sm sm:text-base mt-1">Công cụ tự động định dạng hàng ngàn và tính toán chỉ số tài chính theo thời gian thực</p>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
+
+        <!-- CỘT 1: CHỈ SỐ ĐẦU TƯ -->
+        <section class="space-y-6">
+            <div class="border-b border-indigo-200 pb-2">
+                <h2 class="text-xl font-bold text-indigo-900 flex items-center gap-2">
+                    <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+                    Chỉ Số Hiệu Quả Đầu Tư
+                </h2>
+            </div>
+
+            <!-- 1. ROI -->
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+                <div class="flex justify-between items-start mb-3">
+                    <h3 class="font-semibold text-slate-800">1. Tỷ suất lợi nhuận đầu tư (ROI)</h3>
+                    <span class="text-xs bg-indigo-50 text-indigo-700 px-2 py-1 rounded font-medium">Return on Investment</span>
+                </div>
+                <div class="grid grid-cols-2 gap-3 mb-4">
+                    <div>
+                        <label class="block text-xs text-slate-500 mb-1">Vốn đầu tư ban đầu (VNĐ)</label>
+                        <input type="text" inputmode="numeric" id="roi-cost" value="100.000.000" class="currency-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-slate-500 mb-1">Giá trị hiện tại/Thu về (VNĐ)</label>
+                        <input type="text" inputmode="numeric" id="roi-gain" value="135.000.000" class="currency-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                    </div>
+                </div>
+                <div class="bg-slate-50 p-3 rounded-lg flex justify-between items-center">
+                    <span class="text-xs text-slate-600 font-medium">Kết quả ROI:</span>
+                    <span id="roi-result" class="text-lg font-bold text-emerald-600">35,00%</span>
+                </div>
+            </div>
+
+            <!-- 2. CAGR -->
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+                <div class="flex justify-between items-start mb-3">
+                    <h3 class="font-semibold text-slate-800">2. Tốc độ tăng trưởng kép hàng năm (CAGR)</h3>
+                    <span class="text-xs bg-indigo-50 text-indigo-700 px-2 py-1 rounded font-medium">Compound Annual Growth Rate</span>
+                </div>
+                <div class="grid grid-cols-3 gap-3 mb-4">
+                    <div>
+                        <label class="block text-xs text-slate-500 mb-1">Giá trị đầu (VNĐ)</label>
+                        <input type="text" inputmode="numeric" id="cagr-start" value="50.000.000" class="currency-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-slate-500 mb-1">Giá trị cuối (VNĐ)</label>
+                        <input type="text" inputmode="numeric" id="cagr-end" value="120.000.000" class="currency-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-slate-500 mb-1">Số năm (n)</label>
+                        <input type="text" inputmode="numeric" id="cagr-years" value="5" class="currency-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                    </div>
+                </div>
+                <div class="bg-slate-50 p-3 rounded-lg flex justify-between items-center">
+                    <span class="text-xs text-slate-600 font-medium">Kết quả CAGR:</span>
+                    <span id="cagr-result" class="text-lg font-bold text-emerald-600">19,13%/năm</span>
+                </div>
+            </div>
+
+            <!-- 3. P/E -->
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+                <div class="flex justify-between items-start mb-3">
+                    <h3 class="font-semibold text-slate-800">3. Hệ số Giá trên Thu nhập (P/E)</h3>
+                    <span class="text-xs bg-indigo-50 text-indigo-700 px-2 py-1 rounded font-medium">Price to Earnings</span>
+                </div>
+                <div class="grid grid-cols-2 gap-3 mb-4">
+                    <div>
+                        <label class="block text-xs text-slate-500 mb-1">Giá thị trường cổ phiếu (VNĐ)</label>
+                        <input type="text" inputmode="numeric" id="pe-price" value="45.000" class="currency-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-slate-500 mb-1">Thu nhập trên mỗi cổ phiếu - EPS (VNĐ)</label>
+                        <input type="text" inputmode="numeric" id="pe-eps" value="3.000" class="currency-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                    </div>
+                </div>
+                <div class="bg-slate-50 p-3 rounded-lg flex justify-between items-center">
+                    <span class="text-xs text-slate-600 font-medium">Kết quả P/E:</span>
+                    <span id="pe-result" class="text-lg font-bold text-indigo-600">15,00 lần</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- CỘT 2: CHỈ SỐ TÀI CHÍNH DOANH NGHIỆP -->
+        <section class="space-y-6">
+            <div class="border-b border-emerald-200 pb-2">
+                <h2 class="text-xl font-bold text-emerald-900 flex items-center gap-2">
+                    <svg class="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                    Chỉ Số Tài Chính Doanh Nghiệp
+                </h2>
+            </div>
+
+            <!-- 4. Biên lợi nhuận ròng -->
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+                <div class="flex justify-between items-start mb-3">
+                    <h3 class="font-semibold text-slate-800">4. Biên Lợi Nhuận Ròng</h3>
+                    <span class="text-xs bg-emerald-50 text-emerald-700 px-2 py-1 rounded font-medium">Net Profit Margin</span>
+                </div>
+                <div class="grid grid-cols-2 gap-3 mb-4">
+                    <div>
+                        <label class="block text-xs text-slate-500 mb-1">Lợi nhuận sau thuế (VNĐ)</label>
+                        <input type="text" inputmode="numeric" id="npm-net" value="250.000.000" class="currency-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-slate-500 mb-1">Tổng doanh thu thuần (VNĐ)</label>
+                        <input type="text" inputmode="numeric" id="npm-revenue" value="1.500.000.000" class="currency-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                    </div>
+                </div>
+                <div class="bg-slate-50 p-3 rounded-lg flex justify-between items-center">
+                    <span class="text-xs text-slate-600 font-medium">Biên Lợi Nhuận:</span>
+                    <span id="npm-result" class="text-lg font-bold text-emerald-600">16,67%</span>
+                </div>
+            </div>
+
+            <!-- 5. ROE -->
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+                <div class="flex justify-between items-start mb-3">
+                    <h3 class="font-semibold text-slate-800">5. Lợi nhuận trên vốn chủ sở hữu (ROE)</h3>
+                    <span class="text-xs bg-emerald-50 text-emerald-700 px-2 py-1 rounded font-medium">Return on Equity</span>
+                </div>
+                <div class="grid grid-cols-2 gap-3 mb-4">
+                    <div>
+                        <label class="block text-xs text-slate-500 mb-1">Lợi nhuận sau thuế (VNĐ)</label>
+                        <input type="text" inputmode="numeric" id="roe-income" value="250.000.000" class="currency-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-slate-500 mb-1">Vốn chủ sở hữu bình quân (VNĐ)</label>
+                        <input type="text" inputmode="numeric" id="roe-equity" value="1.200.000.000" class="currency-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                    </div>
+                </div>
+                <div class="bg-slate-50 p-3 rounded-lg flex justify-between items-center">
+                    <span class="text-xs text-slate-600 font-medium">Kết quả ROE:</span>
+                    <span id="roe-result" class="text-lg font-bold text-emerald-600">20,83%</span>
+                </div>
+            </div>
+
+            <!-- 6. Debt to Equity (D/E) -->
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+                <div class="flex justify-between items-start mb-3">
+                    <h3 class="font-semibold text-slate-800">6. Hệ số Nợ trên Vốn chủ sở hữu (D/E)</h3>
+                    <span class="text-xs bg-emerald-50 text-emerald-700 px-2 py-1 rounded font-medium">Debt-to-Equity</span>
+                </div>
+                <div class="grid grid-cols-2 gap-3 mb-4">
+                    <div>
+                        <label class="block text-xs text-slate-500 mb-1">Tổng nợ phải trả (VNĐ)</label>
+                        <input type="text" inputmode="numeric" id="de-debt" value="800.000.000" class="currency-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-slate-500 mb-1">Vốn chủ sở hữu (VNĐ)</label>
+                        <input type="text" inputmode="numeric" id="de-equity" value="1.200.000.000" class="currency-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                    </div>
+                </div>
+                <div class="bg-slate-50 p-3 rounded-lg flex justify-between items-center">
+                    <span class="text-xs text-slate-600 font-medium">Kết quả D/E:</span>
+                    <span id="de-result" class="text-lg font-bold text-slate-700">0,67 lần</span>
+                </div>
+            </div>
+
+            <!-- 7. Current Ratio -->
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+                <div class="flex justify-between items-start mb-3">
+                    <h3 class="font-semibold text-slate-800">7. Tỷ số Thanh toán hiện hành</h3>
+                    <span class="text-xs bg-emerald-50 text-emerald-700 px-2 py-1 rounded font-medium">Current Ratio</span>
+                </div>
+                <div class="grid grid-cols-2 gap-3 mb-4">
+                    <div>
+                        <label class="block text-xs text-slate-500 mb-1">Tài sản ngắn hạn (VNĐ)</label>
+                        <input type="text" inputmode="numeric" id="cr-assets" value="600.000.000" class="currency-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-slate-500 mb-1">Nợ ngắn hạn (VNĐ)</label>
+                        <input type="text" inputmode="numeric" id="cr-liabilities" value="350.000.000" class="currency-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                    </div>
+                </div>
+                <div class="bg-slate-50 p-3 rounded-lg flex justify-between items-center">
+                    <span class="text-xs text-slate-600 font-medium">Khả năng thanh toán:</span>
+                    <span id="cr-result" class="text-lg font-bold text-emerald-600">1,71 lần</span>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        // Hàm chuyển đổi chuỗi có dấu chấm phân cách thành số thực để tính toán
+        function parseFormattedNumber(valStr) {
+            if (!valStr) return 0;
+            // Xóa tất cả dấu chấm (hàng ngàn) và thay dấu phẩy bằng dấu chấm thập phân
+            const cleaned = valStr.toString().replace(/\./g, '').replace(',', '.');
+            return parseFloat(cleaned) || 0;
+        }
+
+        // Tự động thêm dấu chấm phân cách hàng ngàn khi người dùng nhập dữ liệu
+        function formatInputValue(input) {
+            let cursorPosition = input.selectionStart;
+            let originalLength = input.value.length;
+
+            // Lấy chuỗi chỉ gồm chữ số và 1 dấu phẩy thập phân nếu có
+            let rawValue = input.value.replace(/[^\d,]/g, '');
+            let parts = rawValue.split(',');
+            
+            let integerPart = parts[0].replace(/\D/g, '');
+            if (integerPart) {
+                integerPart = parseInt(integerPart, 10).toLocaleString('vi-VN');
+            }
+            
+            let formatted = integerPart;
+            if (parts.length > 1) {
+                formatted += ',' + parts[1].slice(0, 2); // Giới hạn tối đa 2 chữ số thập phân
+            }
+
+            input.value = formatted;
+
+            // Giữ vị trí con trỏ không bị giật khi gõ
+            let newLength = input.value.length;
+            cursorPosition = cursorPosition + (newLength - originalLength);
+            input.setSelectionRange(cursorPosition, cursorPosition);
+        }
+
+        // Định dạng kết quả hiển thị (chuẩn Việt Nam: . phân cách hàng ngàn, , phân cách thập phân)
+        const formatVNPercent = (val) => isNaN(val) || !isFinite(val) ? '0,00%' : val.toLocaleString('vi-VN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '%';
+        const formatVNNumber = (val, unit = '') => isNaN(val) || !isFinite(val) ? '0,00 ' + unit : val.toLocaleString('vi-VN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + (unit ? ' ' + unit : '');
+
+        function calculateAll() {
+            // 1. ROI
+            const roiCost = parseFormattedNumber(document.getElementById('roi-cost').value);
+            const roiGain = parseFormattedNumber(document.getElementById('roi-gain').value);
+            const roi = roiCost !== 0 ? ((roiGain - roiCost) / roiCost) * 100 : 0;
+            document.getElementById('roi-result').innerText = formatVNPercent(roi);
+
+            // 2. CAGR
+            const cagrStart = parseFormattedNumber(document.getElementById('cagr-start').value);
+            const cagrEnd = parseFormattedNumber(document.getElementById('cagr-end').value);
+            const cagrYears = parseFormattedNumber(document.getElementById('cagr-years').value) || 1;
+            const cagr = (cagrStart > 0 && cagrEnd > 0 && cagrYears > 0) ? (Math.pow(cagrEnd / cagrStart, 1 / cagrYears) - 1) * 100 : 0;
+            document.getElementById('cagr-result').innerText = formatVNPercent(cagr) + '/năm';
+
+            // 3. P/E
+            const pePrice = parseFormattedNumber(document.getElementById('pe-price').value);
+            const peEps = parseFormattedNumber(document.getElementById('pe-eps').value);
+            const pe = peEps !== 0 ? pePrice / peEps : 0;
+            document.getElementById('pe-result').innerText = formatVNNumber(pe, 'lần');
+
+            // 4. Net Profit Margin
+            const npmNet = parseFormattedNumber(document.getElementById('npm-net').value);
+            const npmRevenue = parseFormattedNumber(document.getElementById('npm-revenue').value);
+            const npm = npmRevenue !== 0 ? (npmNet / npmRevenue) * 100 : 0;
+            document.getElementById('npm-result').innerText = formatVNPercent(npm);
+
+            // 5. ROE
+            const roeIncome = parseFormattedNumber(document.getElementById('roe-income').value);
+            const roeEquity = parseFormattedNumber(document.getElementById('roe-equity').value);
+            const roe = roeEquity !== 0 ? (roeIncome / roeEquity) * 100 : 0;
+            document.getElementById('roe-result').innerText = formatVNPercent(roe);
+
+            // 6. D/E
+            const deDebt = parseFormattedNumber(document.getElementById('de-debt').value);
+            const deEquity = parseFormattedNumber(document.getElementById('de-equity').value);
+            const de = deEquity !== 0 ? deDebt / deEquity : 0;
+            document.getElementById('de-result').innerText = formatVNNumber(de, 'lần');
+
+            // 7. Current Ratio
+            const crAssets = parseFormattedNumber(document.getElementById('cr-assets').value);
+            const crLiabilities = parseFormattedNumber(document.getElementById('cr-liabilities').value);
+            const cr = crLiabilities !== 0 ? crAssets / crLiabilities : 0;
+            document.getElementById('cr-result').innerText = formatVNNumber(cr, 'lần');
+        }
+
+        // Đính kèm sự kiện tự động format & tính toán lại khi gõ dữ liệu
+        document.querySelectorAll('.currency-input').forEach(input => {
+            input.addEventListener('input', function() {
+                formatInputValue(this);
+                calculateAll();
+            });
+        });
+
+        // Tính toán ban đầu khi tải trang
+        calculateAll();
+    </script>
+</body>
+</html>

@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Trình duyệt dữ liệu CDE - PV INCONS</title>
+    <!-- AUTH GUARD ANTI-FOUC -->
+    <script src="/assets/js/roles.js?v=20261105-2"></script>
+    <script src="/assets/js/auth-guard.js"></script>
+    <script src="/assets/js/config.js"></script>
+    <script>
+        window.dataRouteAllowed = typeof protectRoute === 'function'
+            && protectRoute(
+                ['ADMIN', 'MASTER', 'MANAGEMENT'],
+                ['DESIGNER', 'CONTRACTOR']
+            );
+    </script>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/assets/css/data.css?v=20261104-1">
+    <style>
+        /* Styles website */        
+    </style>
+
+    <script>
+        // GIAO DIỆN SÁNG/TỐI ĐỒNG BỘ: dùng chung khoá 'cde_theme' với index.html (và mir.html)
+        const CDE_THEME_KEY = 'cde_theme';
+        function applyTheme(theme) {
+            theme = theme === 'light' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', theme);
+            document.documentElement.classList.toggle('dark', theme === 'dark');
+            return theme;
+        }
+        (function () {
+            // Chuyển giá trị cũ ('cde_data_theme') sang khoá chung một lần, rồi bỏ khoá cũ
+            const legacy = localStorage.getItem('cde_data_theme');
+            if (legacy && !localStorage.getItem(CDE_THEME_KEY)) localStorage.setItem(CDE_THEME_KEY, legacy);
+            localStorage.removeItem('cde_data_theme');
+            applyTheme(localStorage.getItem(CDE_THEME_KEY) || 'dark');
+        })();
+        // Khi nhấn đổi giao diện ở index/mir (tab khác), trang này tự đổi theo
+        window.addEventListener('storage', function (e) {
+            if (e.key === CDE_THEME_KEY && e.newValue) {
+                applyTheme(e.newValue);
+                if (typeof initThemeUI === 'function') initThemeUI();
+            }
+        });
+        // Quay lại trang bằng nút Back (trang lấy từ bộ nhớ đệm) vẫn cập nhật đúng giao diện
+        window.addEventListener('pageshow', function () {
+            applyTheme(localStorage.getItem(CDE_THEME_KEY) || 'dark');
+            if (typeof initThemeUI === 'function') initThemeUI();
+        });
+    </script>
+</head>
+
+<body class="min-h-screen p-3 sm:p-4 md:p-8 flex flex-col justify-between">
+
+<div id="rowMenu" class="hidden" role="menu"></div>
+
+    <!-- HEADER NAVIGATION -->
+    <header
+        class="w-full max-w-6xl mx-auto flex flex-col sm:flex-row items-start sm:items-center justify-between pb-4 mb-6 border-b border-[var(--border-color)] gap-4">
+        <div class="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-start">
+            <div class="flex items-center gap-3">
+                <a href="./index.html"
+                    class="w-9 h-9 rounded-xl bg-slate-800 hover:bg-slate-700 border border-[var(--border-color)] text-slate-300 hover:text-white flex items-center justify-center transition-colors shrink-0"
+                    title="Quay lại Dashboard">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </a>
+                <div>
+                    <h1 class="font-bold text-sm sm:text-base tracking-wide flex flex-wrap items-center gap-2">
+                        <span>Dữ liệu CDE Pro</span>
+                        <span id="currentPathDisplay"
+                            class="text-[11px] font-mono text-blue-400 bg-blue-950/80 px-2 py-0.5 rounded border border-blue-500/30 break-all">database/bim-vdc</span>
+                    </h1>
+                    <p class="text-xs text-[var(--text-muted)]">Trình duyệt tập tin & mô hình BIM chuẩn ISO 19650</p>
+                </div>
+            </div>
+
+            <button onclick="toggleTheme()"
+                class="sm:hidden p-2 rounded-lg bg-slate-800/50 border border-[var(--border-color)] text-slate-300 hover:text-white text-xs shrink-0"
+                id="mobileThemeBtn" title="Chuyển chế độ Sáng/Tối">
+                <i class="fa-solid fa-sun text-amber-400" id="mobileThemeIcon"></i>
+            </button>
+        </div>
+
+        <div class="flex items-center gap-1.5 sm:gap-2 flex-wrap w-full sm:w-auto justify-end">
+            <button onclick="createNewProject()" title="Tạo dự án mới, tự động sinh 4 thư mục chuẩn ISO 19650"
+                class="p-2 text-amber-300 hover:text-white bg-amber-600/30 hover:bg-amber-600 rounded-lg text-xs transition-colors border border-amber-500/30 flex items-center gap-1.5">
+                <i class="fa-solid fa-folder-tree"></i> <span class="hidden md:inline">Dự án mới</span>
+            </button>
+            <button onclick="createNewFolder()" title="Tạo thư mục mới"
+                class="p-2 text-blue-300 hover:text-white bg-blue-600/30 hover:bg-blue-600 rounded-lg text-xs transition-colors border border-blue-500/30 flex items-center gap-1.5">
+                <i class="fa-solid fa-folder-plus"></i> <span class="hidden md:inline">Thư mục mới</span>
+            </button>
+            <button id="btnPaste" onclick="pasteItem()" disabled title="Dán tệp/thư mục"
+                class="p-2 text-slate-500 bg-slate-800/50 rounded-lg text-xs border border-[var(--border-color)] flex items-center gap-1.5 cursor-not-allowed opacity-50 transition-all">
+                <i class="fa-solid fa-paste"></i> <span id="pasteBtnText" class="hidden md:inline">Dán</span>
+            </button>
+            <label title="Upload tệp tin"
+                class="p-2 text-emerald-300 hover:text-white bg-emerald-600/30 hover:bg-emerald-600 rounded-lg text-xs transition-colors border border-emerald-500/30 flex items-center gap-1.5 cursor-pointer">
+                <i class="fa-solid fa-cloud-arrow-up"></i> <span class="hidden md:inline">Upload</span>
+                <input type="file" id="cdeFileInput" class="hidden" onchange="uploadSelectedFile(event)">
+            </label>
+            <button onclick="toggleServerSettings()" title="Cấu hình API URL"
+                class="p-2 text-slate-400 hover:text-white bg-slate-800 hover:bg-slate-700 rounded-lg text-xs transition-colors border border-[var(--border-color)] flex items-center gap-1.5">
+                <i class="fa-solid fa-sliders"></i> <span class="hidden md:inline">URL</span>
+            </button>
+            <button onclick="loadCDEFiles(currentPath)" title="Tải lại"
+                class="p-2 text-slate-400 hover:text-white bg-slate-800 hover:bg-slate-700 rounded-lg text-xs transition-colors border border-[var(--border-color)]">
+                <i class="fa-solid fa-arrows-rotate"></i>
+            </button>
+            <button onclick="toggleTheme()"
+                class="hidden sm:flex items-center gap-1.5 px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 border border-[var(--border-color)] text-slate-300 hover:text-white text-xs transition-colors"
+                title="Chuyển chế độ Sáng/Tối">
+                <i class="fa-solid fa-sun text-amber-400" id="desktopThemeIcon"></i> <span id="desktopThemeText"
+                    class="hidden lg:inline">Light Mode</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- PANEL CẤU HÌNH SERVER URL -->
+    <div id="serverConfigPanel"
+        class="w-full max-w-6xl mx-auto hidden bg-slate-900/90 border border-[var(--border-color)] p-3 px-5 mb-4 rounded-xl flex flex-wrap items-center justify-between gap-3 text-xs shadow-xl">
+        <div class="flex items-center gap-2 grow max-w-xl">
+            <label class="text-slate-300 font-medium shrink-0">Server API URL:</label>
+            <input type="text" id="apiServerUrlInput" value="https://api.pvincons.cloud"
+                class="w-full px-3 py-1.5 bg-slate-800 border border-[var(--border-color)] rounded text-white text-xs focus:outline-none focus:border-blue-500 font-mono">
+        </div>
+        <div class="flex items-center gap-2">
+            <button onclick="saveServerUrl()"
+                class="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded font-medium transition-colors">Lưu
+                kết nối</button>
+            <button onclick="toggleServerSettings()"
+                class="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-slate-200 rounded font-medium transition-colors">Đóng</button>
+        </div>
+    </div>
+
+    <!-- MAIN EXPLORER CONTAINER -->
+    <main
+        class="w-full max-w-6xl mx-auto glass-panel rounded-2xl shadow-2xl overflow-hidden grow flex flex-col border border-blue-500/30">
+
+        <!-- BREADCRUMB & SEARCH -->
+        <div
+            class="p-3 px-4 sm:px-5 bg-slate-800/40 border-b border-[var(--border-color)] flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 text-xs">
+            <div id="cdeBreadcrumbs"
+                class="flex items-center gap-1.5 overflow-x-auto text-slate-300 font-mono py-1 custom-scrollbar">
+                <button onclick="navigateTo('database/bim-vdc')"
+                    class="hover:text-blue-400 flex items-center gap-1 font-bold shrink-0">
+                    <i class="fa-solid fa-database text-blue-400"></i> database/bim-vdc
+                </button>
+            </div>
+
+            <div class="relative w-full sm:w-64 shrink-0">
+                <input type="text" id="cdeSearchInput" onkeyup="filterCDEItems()"
+                    placeholder="Tìm kiếm file, thư mục..."
+                    class="w-full px-3 py-1.5 pr-8 bg-slate-900/80 border border-[var(--border-color)] rounded-lg text-xs text-white placeholder-slate-400 focus:outline-none focus:border-blue-500">
+                <i
+                    class="fa-solid fa-magnifying-glass absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+            </div>
+        </div>
+
+        <!-- BẢNG DANH SÁCH FILE & FOLDER -->
+        <div class="grow overflow-y-auto p-3 sm:p-5 custom-scrollbar min-h-[400px] relative">
+            <div id="cdeLoading"
+                class="absolute inset-0 bg-slate-900/80 backdrop-blur-sm flex flex-col items-center justify-center gap-3 z-10 hidden">
+                <i class="fa-solid fa-circle-notch fa-spin text-3xl text-blue-500"></i>
+                <p class="text-xs text-slate-300 font-medium">Đang tải dữ liệu từ <code
+                        class="text-blue-400 font-mono">database/bim-vdc</code>...</p>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full min-w-[1050px] text-left border-collapse">
+                    <thead>
+                        <tr
+                            class="border-b border-[var(--border-color)] text-[11px] font-semibold uppercase text-[var(--text-muted)] tracking-wider">
+                            <th class="pb-3 px-3">Tên tập tin</th>
+                            <th class="pb-3 px-3">Tiêu đề & Mô tả</th>
+                            <th class="pb-3 px-3 text-right">Tác giả &amp; Thời gian</th>
+                            <th class="pb-3 px-3 text-center">Trạng thái duyệt</th>
+                            <th class="pb-3 px-3 text-right">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody id="cdeFileList" class="divide-y divide-white/5 text-xs">
+                    </tbody>
+                </table>
+            </div>
+
+            <div id="cdeErrorState" class="hidden py-16 text-center space-y-3">
+                <div
+                    class="w-12 h-12 rounded-full bg-rose-500/20 text-rose-400 flex items-center justify-center mx-auto text-xl border border-rose-500/30">
+                    <i class="fa-solid fa-plug-circle-xmark"></i>
+                </div>
+                <h4 class="text-sm font-bold text-white">Chưa kết nối tới Backend CDE Server</h4>
+                <p class="text-xs text-[var(--text-muted)] max-w-md mx-auto leading-relaxed">
+                    Không thể kết nối đến <code class="text-rose-300 font-mono"
+                        id="currentApiDisplay">https://api.pvincons.cloud</code>. Vui lòng kiểm tra server.
+                </p>
+                <div class="pt-2">
+                    <button onclick="loadCDEFiles(currentPath)"
+                        class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-lg text-xs transition-colors shadow-lg">
+                        <i class="fa-solid fa-rotate-right mr-1.5"></i> Thử lại kết nối
+                    </button>
+                </div>
+            </div>
+
+            <div id="cdeEmptyState" class="hidden py-16 text-center space-y-2">
+                <i class="fa-regular fa-folder-open text-4xl text-slate-500 mb-2"></i>
+                <p class="text-xs text-[var(--text-muted)]">Thư mục này hiện tại không có dữ liệu.</p>
+            </div>
+        </div>
+
+        <div
+            class="p-3 px-5 border-t border-[var(--border-color)] bg-slate-900/60 flex items-center justify-between text-xs text-[var(--text-muted)]">
+            <div id="cdeSummaryText">Đã tải 0 mục dữ liệu</div>
+            <div class="flex items-center gap-2">
+                <span class="inline-block w-2 h-2 rounded-full bg-emerald-500"></span> Trạng thái CDE: Sẵn sàng
+                (Real-time Sync Active)
+            </div>
+        </div>
+    </main>
+
+    <footer
+        class="w-full max-w-6xl mx-auto pt-4 mt-4 border-t border-[var(--border-color)] flex flex-col sm:flex-row justify-between items-center gap-2 text-xs text-[var(--text-muted)] text-center sm:text-left">
+        <div>&copy; 2026 PV INCONS Enterprise Workspace. CDE Data Engine Pro.</div>
+        <div>BIM/VDC Standard v2.6.0 Pro</div>
+    </footer>
+
+    <div id="fileMetadataModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/80 p-3 sm:p-6"
+        role="dialog" aria-modal="true" aria-labelledby="fileMetadataTitle"
+        onclick="if (event.target === this) closeFileMetadataModal()">
+        <section class="w-full max-w-xl rounded-2xl border border-slate-700 bg-slate-900 p-5 shadow-2xl">
+            <div class="mb-5 flex items-start justify-between gap-4">
+                <div class="min-w-0">
+                    <h2 id="fileMetadataTitle" class="text-base font-bold text-white">Thông tin tài liệu</h2>
+                    <p id="fileMetadataName" class="mt-1 break-all text-xs text-slate-400"></p>
+                </div>
+                <button type="button" onclick="closeFileMetadataModal()" aria-label="Đóng"
+                    class="shrink-0 rounded-lg border border-slate-700 px-3 py-2 text-slate-300 hover:bg-slate-800">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <form id="fileMetadataForm" class="space-y-4">
+                <label class="block space-y-1.5">
+                    <span class="text-xs font-semibold text-slate-300">Tên tài liệu / Mô tả</span>
+                    <textarea id="fileMetadataDescription" rows="3" maxlength="2000"
+                        class="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-white placeholder-slate-500 focus:border-blue-500 focus:outline-none"
+                        placeholder="Mô tả nội dung hoặc mục đích của tài liệu"></textarea>
+                </label>
+                <label class="block space-y-1.5">
+                    <span class="text-xs font-semibold text-slate-300">Trạng thái duyệt</span>
+                    <select id="fileMetadataStatus"
+                        class="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-white focus:border-blue-500 focus:outline-none">
+                        <option value="PENDING">Đang chờ</option>
+                        <option value="APPROVED">Phê duyệt</option>
+                        <option value="REJECTED">Từ chối</option>
+                    </select>
+                </label>
+                <p id="fileMetadataError" class="hidden text-xs text-rose-400" role="alert"></p>
+                <div class="flex justify-end gap-2 pt-1">
+                    <button type="button" onclick="closeFileMetadataModal()"
+                        class="rounded-lg border border-slate-700 px-4 py-2 text-xs font-semibold text-slate-300 hover:bg-slate-800">Hủy</button>
+                    <button id="fileMetadataSubmit" type="submit"
+                        class="rounded-lg bg-blue-600 px-4 py-2 text-xs font-semibold text-white hover:bg-blue-500 disabled:cursor-wait disabled:opacity-60">Lưu thông tin</button>
+                </div>
+            </form>
+        </section>
+    </div>
+
+    <div id="xmlViewerModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/80 p-3 sm:p-6"
+        role="dialog" aria-modal="true" aria-labelledby="xmlViewerTitle" onclick="if (event.target === this) closeXmlViewer()">
+        <section class="w-full max-w-5xl max-h-[90vh] flex flex-col rounded-2xl border border-slate-700 bg-slate-900 shadow-2xl">
+            <header class="flex items-start justify-between gap-4 border-b border-slate-700 px-4 py-3 sm:px-5">
+                <div class="min-w-0">
+                    <h2 id="xmlViewerTitle" class="break-all text-sm font-bold text-white">Trình xem XML</h2>
+                    <p id="xmlViewerStatus" class="mt-1 text-xs text-slate-400" aria-live="polite">Đang tải...</p>
+                </div>
+                <button type="button" onclick="closeXmlViewer()" aria-label="Đóng trình xem XML"
+                    class="shrink-0 rounded-lg border border-slate-700 px-3 py-2 text-slate-300 hover:bg-slate-800 hover:text-white">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </header>
+            <pre id="xmlViewerContent" class="min-h-0 overflow-auto p-4 text-xs leading-6 text-slate-200 sm:p-5"><code></code></pre>
+        </section>
+    </div>
+
+    <!-- JAVASCRIPT XỬ LÝ DATA -->
+    <script src="/assets/js/data.js?v=20261105-6"></script>
+</body>
+
+</html>
