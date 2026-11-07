@@ -25,6 +25,10 @@ let vnptSessionReady = false;
 let fileTypeChartInstance = null;
 let storageChartInstance = null;
 let issueChartInstance = null;
+let currentProjectDeadline = null;
+let editingProjectDeadlineCompleted = false;
+let projectDeadlineLoadedFor = '';
+let projectDeadlineRequestId = 0;
 
 function getCdeAuthHeaders(headers = {}) {
     const token = localStorage.getItem('access_token') || '';
@@ -65,7 +69,7 @@ function closeAllModals() {
     if (accountModal && !accountModal.classList.contains('hidden')) {
         toggleAccountModal(false);
     }
-    ['issuesModal', 'isoRenameModal', 'metadataModal', 'viewModal', 'documentPreviewModal', 'otpSignModal', 'gateModal', 'namingModal', 'uploadModal'].forEach(id => {
+    ['issuesModal', 'isoRenameModal', 'metadataModal', 'viewModal', 'documentPreviewModal', 'otpSignModal', 'gateModal', 'namingModal', 'uploadModal', 'projectDeadlineModal'].forEach(id => {
         closeModal(id);
     });
 }
@@ -383,7 +387,196 @@ function onProjectSelectChange() {
     selectedFolderPathFilter = "";
     renderTreeUI();
     applyFilters();
+    loadProjectDeadline();
     if (window.innerWidth <= 768) closeMobileSidebar();
+}
+
+function canEditProjectDeadline() {
+    return ['ADMIN', 'MASTER'].includes(currentUserRole) ||
+        ['ADMIN', 'MASTER'].includes(currentUserPermission);
+}
+
+function renderProjectDeadline() {
+    const projectSelect = document.getElementById('projectSelect');
+    const projectName = projectSelect ? projectSelect.value : 'ALL';
+    const editButton = document.getElementById('deadlineEditButton');
+    const startLabel = document.getElementById('deadlineStartLabel');
+    const endLabel = document.getElementById('deadlineEndLabel');
+    const status = document.getElementById('deadlineStatus');
+    const progressTrack = document.getElementById('deadlineProgressTrack');
+    const progressFill = document.getElementById('deadlineProgressFill');
+    const progressPercentLabel = document.getElementById('deadlineProgressPercent');
+    const canEdit = canEditProjectDeadline() &&
+        projectName && projectName !== 'ALL' &&
+        projectDeadlineLoadedFor === projectName;
+    if (editButton) editButton.style.display = canEdit ? 'inline-flex' : 'none';
+
+    if (startLabel) startLabel.textContent = currentProjectDeadline ? formatDeadlineDate(currentProjectDeadline.startDate) : '—';
+    if (endLabel) endLabel.textContent = currentProjectDeadline ? formatDeadlineDate(currentProjectDeadline.endDate) : '—';
+
+    const setProgress = (percent, color, label, statusColor) => {
+        if (progressFill) {
+            progressFill.style.width = `${percent}%`;
+            progressFill.style.backgroundColor = color;
+        }
+        if (progressTrack) progressTrack.setAttribute('aria-valuenow', String(percent));
+        if (progressPercentLabel) progressPercentLabel.textContent = label || `${percent}%`;
+        if (status) status.style.color = statusColor || '';
+    };
+
+    if (!projectName || projectName === 'ALL') {
+        if (status) status.textContent = 'Chọn một dự án';
+        setProgress(0, '#334155', '—');
+        return;
+    }
+
+    if (!currentProjectDeadline) {
+        if (status) status.textContent = projectDeadlineLoadedFor === projectName ? 'Chưa nhập ngày' : 'Đang tải...';
+        setProgress(0, '#334155', '—');
+        return;
+    }
+
+    const startTime = Date.parse(`${currentProjectDeadline.startDate}T00:00:00`);
+    const endDateStart = Date.parse(`${currentProjectDeadline.endDate}T00:00:00`);
+    const dayMs = 24 * 60 * 60 * 1000;
+    const endTime = endDateStart + dayMs;
+    const now = Date.now();
+    if (!Number.isFinite(startTime) || !Number.isFinite(endDateStart) || endDateStart < startTime) {
+        if (status) status.textContent = 'Ngày deadline không hợp lệ';
+        setProgress(0, '#334155', '—');
+        return;
+    }
+
+    if (currentProjectDeadline.completed === true) {
+        if (status) status.textContent = 'Hoàn thành';
+        setProgress(100, '#3b82f6', '100%', '#3b82f6');
+        return;
+    }
+
+    const progress = Math.max(0, Math.min(1, (now - startTime) / (endTime - startTime)));
+    const progressPercent = Math.round(progress * 100);
+    let deadlineStatus;
+    if (now < startTime) {
+        deadlineStatus = `Bắt đầu sau ${Math.ceil((startTime - now) / dayMs)} ngày`;
+    } else if (now >= endTime) {
+        deadlineStatus = `Quá hạn ${Math.ceil((now - endTime) / dayMs)} ngày`;
+    } else if (now >= endDateStart) {
+        deadlineStatus = 'Hạn hôm nay';
+    } else {
+        deadlineStatus = `Còn ${Math.ceil((endDateStart - now) / dayMs)} ngày`;
+    }
+    if (status) status.textContent = deadlineStatus;
+    const progressColor = progressPercent >= 85
+        ? '#ef4444'
+        : progressPercent >= 70
+            ? '#fbbf24'
+            : '#22c55e';
+    setProgress(progressPercent, progressColor, undefined, progressColor);
+}
+
+function formatDeadlineDate(value) {
+    if (!value) return '—';
+    const date = new Date(`${value}T00:00:00`);
+    return Number.isNaN(date.getTime()) ? '—' : date.toLocaleDateString('vi-VN');
+}
+
+async function loadProjectDeadline() {
+    const projectSelect = document.getElementById('projectSelect');
+    const projectName = projectSelect ? projectSelect.value : 'ALL';
+    const requestId = ++projectDeadlineRequestId;
+    currentProjectDeadline = null;
+    projectDeadlineLoadedFor = '';
+    renderProjectDeadline();
+    if (!projectName || projectName === 'ALL') return;
+
+    try {
+        const response = await fetch(
+            `${DATA_SERVER_API}/api/project-deadline?projectName=${encodeURIComponent(projectName)}`,
+            { headers: getCdeAuthHeaders() }
+        );
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.error || `Lỗi tải deadline (${response.status})`);
+        if (requestId !== projectDeadlineRequestId) return;
+        currentProjectDeadline = result.deadline || null;
+        projectDeadlineLoadedFor = projectName;
+        renderProjectDeadline();
+    } catch (error) {
+        if (requestId !== projectDeadlineRequestId) return;
+        renderProjectDeadline();
+        showToast(`Không thể tải deadline dự án: ${error.message}`);
+    }
+}
+
+function openProjectDeadlineModal() {
+    const projectSelect = document.getElementById('projectSelect');
+    const projectName = projectSelect ? projectSelect.value : 'ALL';
+    if (!canEditProjectDeadline()) {
+        showToast('Chỉ Admin hoặc Master mới được nhập ngày deadline.');
+        return;
+    }
+    if (!projectName || projectName === 'ALL' || projectDeadlineLoadedFor !== projectName) {
+        showToast('Hãy chọn một dự án cụ thể và đợi tải dữ liệu deadline.');
+        return;
+    }
+
+    document.getElementById('deadlineModalProjectName').textContent = projectName;
+    document.getElementById('projectDeadlineStartInput').value = currentProjectDeadline ? currentProjectDeadline.startDate : '';
+    document.getElementById('projectDeadlineEndInput').value = currentProjectDeadline ? currentProjectDeadline.endDate : '';
+    editingProjectDeadlineCompleted = !!(currentProjectDeadline && currentProjectDeadline.completed === true);
+    renderProjectDeadlineCompletionToggle();
+    openModal('projectDeadlineModal');
+}
+
+function toggleProjectDeadlineCompletion() {
+    editingProjectDeadlineCompleted = !editingProjectDeadlineCompleted;
+    renderProjectDeadlineCompletionToggle();
+}
+
+function renderProjectDeadlineCompletionToggle() {
+    const button = document.getElementById('projectDeadlineCompleteToggle');
+    if (!button) return;
+    button.classList.toggle('is-completed', editingProjectDeadlineCompleted);
+    button.setAttribute('aria-pressed', String(editingProjectDeadlineCompleted));
+    button.innerHTML = editingProjectDeadlineCompleted
+        ? '<i class="fa-solid fa-rotate-left" aria-hidden="true"></i> Hủy hoàn thành'
+        : '<i class="fa-solid fa-check" aria-hidden="true"></i> Đánh dấu hoàn thành';
+}
+
+async function saveProjectDeadline(event) {
+    event.preventDefault();
+    const projectSelect = document.getElementById('projectSelect');
+    const projectName = projectSelect ? projectSelect.value : 'ALL';
+    const startDate = document.getElementById('projectDeadlineStartInput').value;
+    const endDate = document.getElementById('projectDeadlineEndInput').value;
+    const saveButton = document.getElementById('saveProjectDeadlineButton');
+    if (!canEditProjectDeadline() || !projectName || projectName === 'ALL') {
+        showToast('Chỉ Admin hoặc Master mới được nhập ngày cho một dự án cụ thể.');
+        return;
+    }
+    if (endDate < startDate) {
+        showToast('Ngày kết thúc phải bằng hoặc sau ngày bắt đầu.');
+        return;
+    }
+
+    saveButton.disabled = true;
+    try {
+        const response = await fetch(`${DATA_SERVER_API}/api/project-deadline`, {
+            method: 'PUT',
+            headers: getCdeAuthHeaders({ 'Content-Type': 'application/json' }),
+            body: JSON.stringify({ projectName, startDate, endDate, completed: editingProjectDeadlineCompleted })
+        });
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.error || `Lỗi lưu deadline (${response.status})`);
+        currentProjectDeadline = result.deadline;
+        projectDeadlineLoadedFor = projectName;
+        renderProjectDeadline();
+        closeModal('projectDeadlineModal');
+        showToast('Đã lưu deadline và trạng thái dự án.');
+    } catch (error) {
+        showToast(`Không thể lưu deadline dự án: ${error.message}`);
+    } finally {
+        saveButton.disabled = false;
+    }
 }
 
 function open3DViewer(itemPath) {
@@ -2736,6 +2929,9 @@ window.addEventListener('pageshow', () => {
     window.setTimeout(resetSearchInput, 0);
 });
 window.addEventListener('load', resetSearchInput);
+window.setInterval(() => {
+    if (currentProjectDeadline) renderProjectDeadline();
+}, 60_000);
 
 document.addEventListener('DOMContentLoaded', () => {
     const searchInput = document.getElementById('searchInput');
