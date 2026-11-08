@@ -34,6 +34,23 @@
     <!-- Custom Style Sheet -->
     <link rel="stylesheet" href="/assets/css/mir.css?v=20261105-1">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Ô "Lưu trữ": đơn vị dung lượng ở góc dưới bên trái */
+        .analytics-card-storage { position: relative; }
+        .analytics-card-storage .chart-unit-corner {
+            position: absolute;
+            left: 12px;
+            bottom: 8px;
+            font-family: "Plus Jakarta Sans", sans-serif;
+            font-size: 10px;
+            font-weight: 700;
+            line-height: 1;
+            letter-spacing: .04em;
+            color: var(--text-heading, #f1f5f9);
+            opacity: .75;
+            pointer-events: none;
+        }
+    </style>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
@@ -206,17 +223,18 @@
                             <p class="deadline-status" id="deadlineStatus">Chọn một dự án</p>
                         </div>
                     </article>
-                    <article class="analytics-card">
+                    <article class="analytics-card analytics-card-storage">
                         <div class="chart-header">
                             <span class="chart-title">
                                 <i class="fa-solid fa-hard-drive chart-icon-storage"></i>lưu trữ
-                                <span class="chart-title-total" id="storageChartTotal">0 KB</span>
                             </span>
                             <span class="chart-badge">CDE</span>
                         </div>
                         <div class="analytics-body">
                             <div class="chart-wrapper"><canvas id="storageChart" aria-label="Dung lượng theo CDE State"></canvas></div>
                         </div>
+                        <!-- Đơn vị dung lượng (KB / MB / GB) nằm góc dưới bên trái của ô -->
+                        <span class="chart-unit-corner" id="storageChartUnit">KB</span>
                     </article>
                     <article class="analytics-card">
                         <div class="chart-header">
@@ -983,7 +1001,7 @@
     <!-- JAVASCRIPT XỬ LÝ MIR -->
     <script src="/assets/vendor/xlsx.full.min.js"></script>
     <script src="/assets/vendor/mammoth.browser.min.js"></script>
-    <script src="/assets/js/mir.js?v=20261105-4"></script>
+    <script src="/assets/js/mir.js?v=20261108-1"></script>
 </body>
 
 </html>
