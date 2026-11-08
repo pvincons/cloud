@@ -131,6 +131,7 @@ td{word-break:break-word;padding:2px 0}
  @media(prefers-reduced-motion:reduce){#L,#R,#scrim,.fab{transition-duration:.01s!important}}
  body.tr #bar,body.pr #bar{opacity:0.2;pointer-events:none}
  .cl{display:block;margin:6px 8px 0 auto}
+ #R .cl{margin:6px auto 0 8px}
  #bar{left:8px;right:8px;width:auto;max-width:none;bottom:calc(10px + env(safe-area-inset-bottom));padding:5px;flex-direction:row;align-items:center;flex-wrap:nowrap;justify-content:flex-start;overflow-x:auto;white-space:nowrap;scrollbar-width:none;-ms-overflow-style:none}
  #bar .row{display:contents}
  #bar::-webkit-scrollbar{display:none}
@@ -615,7 +616,8 @@ function select(ids,add){
   const m=new THREE.Mesh(g,hlMat);m.renderOrder=5;m.frustumCulled=false;scene.add(m);ov.push(m);const m2=new THREE.Mesh(g,hlGhost);m2.renderOrder=6;m2.frustumCulled=false;scene.add(m2);ov.push(m2)}
  dirty=true;stat();
  const last=[...sel].pop();
- if(narrow()){document.body.classList.remove('tr');document.body.classList.toggle('pr',last!==undefined)}
+ /* Mobile: chọn cấu kiện KHÔNG tự mở bảng Thuộc tính nữa (tránh che mô hình). Người dùng tự mở bằng nút "Thuộc tính"/FAB. */
+ if(narrow()){document.body.classList.remove('tr');if(last===undefined)document.body.classList.remove('pr')}
  if(last!==undefined)try{props(last)}catch(e){console.error(e);$('#props').innerHTML='<p class="mu">Không đọc được thuộc tính.</p>'}
  else $('#props').innerHTML='<p class="mu">Bấm vào đối tượng trong mô hình để xem thuộc tính.</p>';
 }
