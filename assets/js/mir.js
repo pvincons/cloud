@@ -1532,7 +1532,7 @@ function getActionButtons(state, relativePath) {
         if (canIssue) {
             dropdownItemsHtml += `<button onclick="createIssuePrompt('${safePath}')">Tạo Issue / QA-QC</button>`;
         }
-        if (canRecall && state !== '04_ARCHIVE') {
+        if (canRecall) {
             dropdownItemsHtml += `<button class="recall-item" onclick="recallFile(this)">Thu hồi</button>`;
         }
         if (canDelete) {
@@ -2523,27 +2523,36 @@ function updateDoughnutChart(instance, canvasId, labels, values, colors, centerM
     });
 }
 
-function formatCompactStorage(bytes) {
-    if (!bytes) return '0 KB';
+function formatCompactStorageParts(bytes) {
+    if (!bytes) return { value: '0', unit: 'KB' };
     const units = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
     const index = Math.min(Math.floor(Math.log(bytes) / Math.log(1024)), units.length - 1);
     const value = bytes / Math.pow(1024, index);
-    return `${parseFloat(value.toFixed(index >= 2 ? 1 : 0))} ${units[index]}`;
+    return {
+        value: String(parseFloat(value.toFixed(index >= 2 ? 1 : 0))),
+        unit: units[index]
+    };
+}
+
+function formatCompactStorage(bytes) {
+    const parts = formatCompactStorageParts(bytes);
+    return `${parts.value} ${parts.unit}`;
 }
 
 function updateStorageChart(storageByState, totalBytes) {
     const states = ['01_WIP', '02_SHARED', '03_PUBLISHED', '04_ARCHIVE'];
     const values = states.map(state => storageByState[state] || 0);
     const colors = ['#38bdf8', '#fbbf24', '#34d399', '#94a3b8'];
-    const total = document.getElementById('storageChartTotal');
-    if (total) total.textContent = formatCompactStorage(totalBytes);
+    const parts = formatCompactStorageParts(totalBytes);
+    const unitEl = document.getElementById('storageChartUnit');
+    if (unitEl) unitEl.textContent = parts.unit;
     storageChartInstance = updateDoughnutChart(
         storageChartInstance,
         'storageChart',
         states,
         values,
         colors,
-        '',
+        parts.value,
         context => ` ${context.label}: ${formatFileSize(context.raw)}`,
         true
     );
