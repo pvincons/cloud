@@ -114,8 +114,6 @@ function navBottomAction(action, btn) {
     }
 
     if (window.CdeChat) CdeChat.close();
-    document.querySelectorAll('.bottom-nav-item').forEach(el => el.classList.remove('active'));
-    if (btn) btn.classList.add('active');
 
     if (action === 'tree') {
         openMobileSidebar();
@@ -125,7 +123,51 @@ function navBottomAction(action, btn) {
         closeAllModals();
         toggleAccountModal(true);
     }
+    syncBottomNavActive();
 }
+
+/* Trạng thái "active" của bottom bar luôn bám theo panel đang MỞ THẬT:
+   - Thư mục   -> sidebar có class mobile-open
+   - Tải lên   -> uploadModal có class active
+   - Tài khoản -> accountModal đang hiển thị
+   Không có panel nào mở thì không nút nào sáng (không còn tự chọn "Tài khoản"). */
+function syncBottomNavActive() {
+    const isShown = (id) => {
+        const el = document.getElementById(id);
+        return !!el && !el.classList.contains('hidden') && getComputedStyle(el).display !== 'none';
+    };
+    const sidebar = document.getElementById('sidebar');
+    const uploadModal = document.getElementById('uploadModal');
+    const openState = {
+        tree: !!(sidebar && sidebar.classList.contains('mobile-open')),
+        upload: !!(uploadModal && uploadModal.classList.contains('active')),
+        profile: isShown('accountModal')
+    };
+    document.querySelectorAll('.bottom-nav-item[data-nav]').forEach(el => {
+        el.classList.toggle('active', !!openState[el.dataset.nav]);
+    });
+}
+
+let bottomNavSyncQueued = false;
+function queueBottomNavSync() {
+    if (bottomNavSyncQueued) return;
+    bottomNavSyncQueued = true;
+    requestAnimationFrame(() => {
+        bottomNavSyncQueued = false;
+        syncBottomNavActive();
+    });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    syncBottomNavActive();
+    // Mở/đóng sidebar, modal (kể cả accountModal do account-modal.js tạo) -> tự cập nhật lại bottom bar
+    new MutationObserver(queueBottomNavSync).observe(document.body, {
+        attributes: true,
+        attributeFilter: ['class'],
+        childList: true,
+        subtree: true
+    });
+});
 
 function showToast(message) {
     const container = document.getElementById('toastContainer');
@@ -2371,10 +2413,10 @@ function appendFileToTable(fileName, relativePath, fileSize = 0, metadata = {}) 
     let disc = 'ARC';
     if (fileName.includes('STR') || fileName.includes('KETCAU')) disc = 'STR';
     else if (fileName.includes('MEP') || fileName.includes('CODIEN')) disc = 'MEP';
-    else if (fileName.includes('HVAC') || fileName.includes('THONGGIO')) disc = 'HVAC';
+    else if (fileName.includes('N/A') || fileName.includes('KHAC')) disc = 'N/A';
 
     const validSuitabilities = ['S0', 'S1', 'S2', 'S3', 'S4', 'A1', 'A2'];
-    const validDisciplines = ['ARC', 'STR', 'MEP', 'HVAC'];
+    const validDisciplines = ['ARC', 'STR', 'MEP', 'N/A'];
     if (validSuitabilities.includes(metadata.suitability)) suit = metadata.suitability;
     if (typeof metadata.discipline === 'string' && metadata.discipline.trim()) {
         disc = metadata.discipline.trim().slice(0, 100);
