@@ -396,13 +396,13 @@
             </svg>
             <span>Trang chủ</span>
         </a>
-        <button class="bottom-nav-item" onclick="navBottomAction('tree', this)">
+        <button class="bottom-nav-item" data-nav="tree" onclick="navBottomAction('tree', this)">
             <svg viewBox="0 0 24 24">
                 <path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z" />
             </svg>
             <span>Thư mục</span>
         </button>
-        <button class="bottom-nav-item" onclick="navBottomAction('upload', this)">
+        <button class="bottom-nav-item" data-nav="upload" onclick="navBottomAction('upload', this)">
             <svg viewBox="0 0 24 24">
                 <path d="M9 16h6v-6h4l-7-7-7 7h4zm-4 2h14v2H5z" />
             </svg>
@@ -415,7 +415,7 @@
             </svg>
             <span>Chat</span>
         </button>
-        <button class="bottom-nav-item active" onclick="navBottomAction('profile', this)">
+        <button class="bottom-nav-item" data-nav="profile" onclick="navBottomAction('profile', this)">
             <svg viewBox="0 0 24 24">
                 <path
                     d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
@@ -624,7 +624,7 @@
                         <option value="ARC">ARC - Kiến trúc</option>
                         <option value="STR">STR - Kết cấu</option>
                         <option value="MEP">MEP - Cơ điện</option>
-                        <option value="HVAC">HVAC - Thông gió</option>
+                        <option value="N/A">N/A - Khác</option>
                         <option value="CUSTOM">Tự nhập</option>
                     </select>
                     <input id="metaCustomDiscipline" class="hidden" type="text" maxlength="100"
@@ -936,7 +936,7 @@
                             <option value="ARC">ARC - Kiến trúc</option>
                             <option value="STR">STR - Kết cấu</option>
                             <option value="MEP">MEP - Cơ điện</option>
-                            <option value="HVAC">HVAC - Thông gió</option>
+                            <option value="N/A">N/A - Khác</option>
                         </select>
                     </div>
                     <small class="upload-metadata-note">Thông tin này sẽ áp dụng cho tất cả tệp được chọn. Tác giả lấy theo tài khoản tải lên.</small>
