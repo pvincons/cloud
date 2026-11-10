@@ -334,8 +334,7 @@
                                 </button>
                                 <button type="button" id="btn-export-users-json" onclick="exportUsersJson()"
                                     class="w-full sm:w-auto justify-center px-2 sm:px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-amber-400 border border-slate-700 font-bold text-[11px] sm:text-xs rounded-xl transition-all flex items-center gap-1 shadow truncate">
-                                    <i class="fa-solid fa-file-arrow-down shrink-0"></i> <span class="truncate">Xuất
-                                        users.json</span>
+                                    <i class="fa-solid fa-file-arrow-down shrink-0"></i> <span class="truncate">Export</span>
                                 </button>
                                 <button id="btn-publish-github"
                                     class="w-full sm:w-auto justify-center px-2 sm:px-3.5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-[11px] sm:text-xs rounded-xl shadow-lg transition-all flex items-center gap-1 shadow truncate">
@@ -426,7 +425,7 @@
                                 <i class="fa-solid fa-bullhorn text-amber-400"></i> Quản lý thông báo
                             </h2>
                             <p class="text-xs text-slate-400 mt-1">GitHub: <span id="notifications-path-label"
-                                    class="font-mono text-purple-300">https://raw.githubusercontent.com/pvincons/cloud/main/assets/data/notifications.json</span>
+                                    class="font-mono text-purple-300">assets/data/notifications.json</span>
                             </p>
                         </div>
                         <div class="grid grid-cols-3 gap-2 sm:flex">
@@ -436,11 +435,11 @@
                             </button>
                             <button type="button" id="btn-export-notifications" onclick="exportNotificationsJson()"
                                 class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-amber-400 border border-slate-700 font-bold text-xs rounded-xl">
-                                <i class="fa-solid fa-file-arrow-down"></i> Tải xuống
+                                <i class="fa-solid fa-file-arrow-down"></i> Export
                             </button>
                             <button type="button" id="btn-publish-notifications"
                                 class="px-3 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl">
-                                <i class="fa-solid fa-cloud-arrow-up"></i> Tải xuống
+                                <i class="fa-solid fa-cloud-arrow-up"></i> Xuất bản
                             </button>
                         </div>
                     </div>
@@ -782,10 +781,10 @@
                 "role": "ADMIN",
                 "permission": "ADMIN",
                 "avatarLink": "",
-                "fullName": "TRẦN HOÀNG PHƯỚC",
+                "fullName": "Administrator",
                 "phone": "0939751194",
-                "position": "Giám đốc",
-                "discipline": "Kỹ sư",
+                "position": "IT Manager",
+                "discipline": "Kỹ sư tin học",
                 "projects": "Tất cả dự án",
                 "company": "PV INCONS CO.LTD",
                 "status": "Active"
@@ -1030,7 +1029,7 @@
             if (b) b.textContent = text;
             const notificationsPath = document.getElementById('notifications-path-label');
             if (notificationsPath) {
-                notificationsPath.textContent = `https://raw.githubusercontent.com/${authConfig.owner}/${authConfig.repo}/${GITHUB_BRANCH}/${NOTIFICATIONS_FILE_PATH}`;
+                notificationsPath.textContent = `${authConfig.owner}/${authConfig.repo}/${GITHUB_BRANCH}/${NOTIFICATIONS_FILE_PATH}`;
             }
         }
 
