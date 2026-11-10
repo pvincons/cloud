@@ -200,6 +200,96 @@
         .glow-effect {
             animation: pulseGlow 4s infinite ease-in-out;
         }
+
+        /* ===== Chấm tín hiệu "thở" cho badge trạng thái server ===== */
+        .status-dot {
+            --dot: #fbbf24;
+            position: relative;
+            display: inline-block;
+            flex-shrink: 0;
+            width: 8px;
+            height: 8px;
+            border-radius: 9999px;
+            background: var(--dot);
+            box-shadow: 0 0 6px var(--dot);
+            animation: dotBreathe 2s ease-in-out infinite;
+        }
+
+        /* 2 vòng sóng lan tỏa, lệch pha nhau nửa chu kỳ */
+        .status-dot::before,
+        .status-dot::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            background: var(--dot);
+            opacity: 0;
+            pointer-events: none;
+            animation: dotRipple 2s ease-out infinite;
+        }
+
+        .status-dot::after {
+            animation-delay: 1s;
+        }
+
+        .status-online {
+            --dot: #34d399;
+        }
+
+        .status-unknown {
+            --dot: #fbbf24;
+        }
+
+        .status-offline {
+            --dot: #fb7185;
+            animation-duration: 1.2s;
+        }
+
+        .status-offline::before,
+        .status-offline::after {
+            animation-duration: 1.2s;
+        }
+
+        .status-offline::after {
+            animation-delay: 0.6s;
+        }
+
+        @keyframes dotBreathe {
+
+            0%,
+            100% {
+                transform: scale(0.8);
+                opacity: 0.75;
+                box-shadow: 0 0 3px var(--dot);
+            }
+
+            50% {
+                transform: scale(1.15);
+                opacity: 1;
+                box-shadow: 0 0 10px 2px var(--dot);
+            }
+        }
+
+        @keyframes dotRipple {
+            0% {
+                transform: scale(1);
+                opacity: 0.55;
+            }
+
+            100% {
+                transform: scale(3);
+                opacity: 0;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+
+            .status-dot,
+            .status-dot::before,
+            .status-dot::after {
+                animation: none;
+            }
+        }
     </style>
 </head>
 
@@ -425,7 +515,7 @@
                             </div>
                             <span id="cdeServerBadge"
                                 class="text-[10px] px-2.5 py-1 rounded-full bg-slate-200/80 dark:bg-slate-800/80 text-slate-700 dark:text-slate-300 border border-slate-300/80 dark:border-slate-700/80 flex items-center gap-1.5 font-medium">
-                                <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span> database/bim-vdc
+                                <span class="status-dot status-unknown"></span> database/bim-vdc
                             </span>
                         </div>
                         <h2 id="titleDataDoc"
@@ -842,14 +932,14 @@
                 }
 
                 if (isHealthy) {
-                    badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-400"></span> database/bim-vdc (Online)`;
+                    badge.innerHTML = `<span class="status-dot status-online"></span> database/bim-vdc (Online)`;
                     badge.className = "text-[10px] px-2.5 py-1 rounded-full bg-emerald-950/80 text-emerald-300 border border-emerald-500/30 flex items-center gap-1.5 font-medium";
                 } else {
-                    badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-amber-400"></span> database/bim-vdc (Unknown)`;
+                    badge.innerHTML = `<span class="status-dot status-unknown"></span> database/bim-vdc (Unknown)`;
                     badge.className = "text-[10px] px-2.5 py-1 rounded-full bg-amber-950/80 text-amber-300 border border-amber-500/30 flex items-center gap-1.5 font-medium";
                 }
             } catch (e) {
-                badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-rose-400"></span> database/bim-vdc (Offline)`;
+                badge.innerHTML = `<span class="status-dot status-offline"></span> database/bim-vdc (Offline)`;
                 badge.className = "text-[10px] px-2.5 py-1 rounded-full bg-rose-950/80 text-rose-300 border border-rose-500/30 flex items-center gap-1.5 font-medium";
             }
         }
