@@ -58,7 +58,7 @@ async function loadDataProjectAccess() {
         .some(value => String(value || '').toUpperCase() === 'ADMIN');
     let projects = typeof user.projects === 'string' ? user.projects : '';
     try {
-        const response = await fetch(`${CONFIG.CDE_API}/auth/me`, {
+        const response = await fetch(`${DATA_SERVER_API}/api/auth/me`, {
             headers: { Authorization: `Bearer ${localStorage.getItem('access_token') || ''}` }
         });
         if (!response.ok) throw new Error(`Lỗi tải hồ sơ (${response.status})`);
@@ -101,6 +101,7 @@ const cdeSyncChannel = new BroadcastChannel('pvincons_cde_sync_channel');
 
 cdeSyncChannel.onmessage = (event) => {
     if (event.data && event.data.type === 'REFRESH_CDE_DATA') {
+        childItemsMap.clear();
         loadCDEFiles(currentPath);
     }
 };
@@ -109,8 +110,10 @@ document.addEventListener('DOMContentLoaded', function () {
     if (window.dataRouteAllowed !== true) return;
     loadDataProjectAccess().then(() => {
         if (!canManageData()) return;
-        document.getElementById('apiServerUrlInput').value = DATA_SERVER_API;
-        document.getElementById('fileMetadataForm').addEventListener('submit', saveFileMetadata);
+        const serverInput = document.getElementById('apiServerUrlInput');
+        if (serverInput) serverInput.value = DATA_SERVER_API;
+        const metadataForm = document.getElementById('fileMetadataForm');
+        if (metadataForm) metadataForm.addEventListener('submit', saveFileMetadata);
         initThemeUI();
         loadCDEFiles(currentPath);
     });
@@ -142,7 +145,8 @@ function initThemeUI() {
 }
 
 function toggleServerSettings() {
-    document.getElementById('serverConfigPanel').classList.toggle('hidden');
+    const panel = document.getElementById('serverConfigPanel');
+    if (panel) panel.classList.toggle('hidden');
 }
 
 function saveServerUrl() {
@@ -150,6 +154,7 @@ function saveServerUrl() {
     if (newUrl) {
         DATA_SERVER_API = newUrl.replace(/\/$/, "");
         localStorage.setItem('cde_api_url', DATA_SERVER_API);
+        childItemsMap.clear();
         alert('Đã cập nhật URL CDE Server: ' + DATA_SERVER_API);
         toggleServerSettings();
         loadCDEFiles(currentPath);
@@ -281,8 +286,7 @@ async function saveFileMetadata(event) {
         const response = await fetchCdeMutation(`${DATA_SERVER_API}/api/file-metadata`, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('access_token') || ''}`
+                'Content-Type': 'application/json'
             },
             body: JSON.stringify({
                 filePath: editingMetadataPath,
@@ -295,12 +299,60 @@ async function saveFileMetadata(event) {
             throw new Error(result.error || 'Không thể lưu thông tin tài liệu.');
         }
         closeFileMetadataModal();
+        childItemsMap.clear();
         await loadCDEFiles(currentPath);
     } catch (saveError) {
         error.textContent = saveError.message || 'Không thể lưu thông tin tài liệu.';
         error.classList.remove('hidden');
     } finally {
         submit.disabled = false;
+    }
+}
+
+async function updateDiskSpaceUI(force = false) {
+    const usedEl = document.getElementById('diskUsed');
+    const freeEl = document.getElementById('diskFree');
+    const fillEl = document.getElementById('diskBarFill');
+    const trackEl = document.getElementById('diskBarTrack');
+    const percentEl = document.getElementById('diskPercent');
+    const widgetEl = document.getElementById('diskSpaceWidget');
+    if (!usedEl || !freeEl || !fillEl) return;
+
+    try {
+        const response = await fetch(`${DATA_SERVER_API}/api/disk-space${force ? '?refresh=1' : ''}`, {
+            headers: getCdeAuthHeaders()
+        });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const data = await response.json();
+        if (!data.success) throw new Error(data.error || 'Phản hồi không hợp lệ');
+
+        const percent = data.totalBytes > 0
+            ? Math.min(100, (data.usedBytes / data.totalBytes) * 100)
+            : 0;
+        // Có dữ liệu nhưng rất nhỏ vẫn hiện một vệt tối thiểu để nhìn thấy thanh
+        const visualPercent = data.usedBytes > 0 ? Math.max(percent, 1.5) : 0;
+        const label = percent >= 10 ? Math.round(percent) : percent.toFixed(1);
+
+        usedEl.textContent = data.usedFormatted;
+        freeEl.textContent = data.freeFormatted;
+        freeEl.classList.remove('is-error');
+        if (percentEl) percentEl.textContent = `${label}%`;
+        if (trackEl) trackEl.setAttribute('aria-valuenow', String(Math.round(percent)));
+
+        fillEl.classList.toggle('danger', percent >= 95);
+        fillEl.classList.toggle('warn', percent >= 85 && percent < 95);
+        // requestAnimationFrame để lần tải đầu thanh "trượt" từ 0 tới giá trị thật
+        requestAnimationFrame(() => { fillEl.style.width = `${visualPercent}%`; });
+
+        if (widgetEl) {
+            let tip = `Đã ghi: ${data.usedFormatted}\nCòn trống: ${data.freeFormatted}\nTổng khả dụng: ${data.totalFormatted}`;
+            if (data.diskTotalFormatted) tip += `\nỔ đĩa máy chủ: ${data.diskTotalFormatted}`;
+            widgetEl.title = tip;
+        }
+    } catch (error) {
+        console.warn('Không thể cập nhật thông tin dung lượng đĩa:', error);
+        freeEl.textContent = 'Không đọc được';
+        freeEl.classList.add('is-error');
     }
 }
 
@@ -343,9 +395,22 @@ async function loadCDEFiles(path = 'database/bim-vdc') {
     fileList.innerHTML = '';
 
     renderBreadcrumbs(currentPath);
+    updateDiskSpaceUI();
 
     try {
         fetchedItems = await fetchFolderContent(currentPath);
+        // Làm mới dữ liệu các thư mục con đang mở trong cây
+        for (const expandedPath of expandedFolders) {
+            if (expandedPath.startsWith(currentPath + '/')) {
+                try {
+                    const children = await fetchFolderContent(expandedPath);
+                    childItemsMap.set(expandedPath, children);
+                } catch (e) {
+                    expandedFolders.delete(expandedPath);
+                    childItemsMap.delete(expandedPath);
+                }
+            }
+        }
     } catch (error) {
         console.error('Không thể tải dữ liệu CDE:', error);
         errorState.classList.remove('hidden');
@@ -514,7 +579,7 @@ function renderTreeItems(items, container, depth = 0) {
                 // Thư mục trống bên trong cây
                 const emptyTr = document.createElement('tr');
                 emptyTr.innerHTML = `
-                            <td colspan="6" class="py-1.5 text-xs text-slate-500 italic" style="padding-left: ${(depth + 1) * 24 + 40}px">
+                            <td colspan="5" class="py-1.5 text-xs text-slate-500 italic" style="padding-left: ${(depth + 1) * 24 + 40}px">
                                 (Thư mục trống)
                             </td>
                         `;
@@ -614,16 +679,22 @@ function copyToClipboard(sourcePath, name, action) {
 function updatePasteButtonState() {
     const btn = document.getElementById('btnPaste');
     const textEl = document.getElementById('pasteBtnText');
+    const hintEl = document.getElementById('pasteBtnHint');
     if (!btn) return;
 
     if (clipboard) {
+        const actionLabel = clipboard.action === 'copy' ? 'Sao chép' : 'Chuyển';
         btn.disabled = false;
-        btn.className = "p-2 text-cyan-300 hover:text-white bg-cyan-600/40 hover:bg-cyan-600 rounded-lg text-xs transition-all border border-cyan-500/40 flex items-center gap-1.5 cursor-pointer shadow-lg animate-pulse";
-        textEl.innerText = `Dán (${clipboard.action === 'copy' ? 'Sao chép' : 'Chuyển'}: ${clipboard.name})`;
+        btn.classList.add('is-ready');
+        btn.title = `Dán (${actionLabel}: ${clipboard.name})`;
+        if (textEl) textEl.innerText = 'Dán';
+        if (hintEl) hintEl.textContent = `· ${actionLabel}: ${clipboard.name}`;
     } else {
         btn.disabled = true;
-        btn.className = "p-2 text-slate-500 bg-slate-800/50 rounded-lg text-xs border border-[var(--border-color)] flex items-center gap-1.5 cursor-not-allowed opacity-50";
-        textEl.innerText = "Dán";
+        btn.classList.remove('is-ready');
+        btn.title = 'Dán tệp/thư mục';
+        if (textEl) textEl.innerText = 'Dán';
+        if (hintEl) hintEl.textContent = '';
     }
 }
 
@@ -648,6 +719,7 @@ async function pasteItem() {
                 clipboard = null;
                 updatePasteButtonState();
             }
+            childItemsMap.clear();
             cdeSyncChannel.postMessage({ type: 'REFRESH_CDE_DATA' });
             await loadCDEFiles(targetPath);
         } else {
@@ -671,13 +743,13 @@ async function createNewFolder() {
         const res = await fetchCdeMutation(`${DATA_SERVER_API}/api/create-folder`, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('access_token') || ''}`
+                'Content-Type': 'application/json'
             },
             body: JSON.stringify({ parentPath: targetPath, folderName: folderName.trim() })
         });
         const data = await res.json();
         if (data.success) {
+            childItemsMap.clear();
             cdeSyncChannel.postMessage({ type: 'REFRESH_CDE_DATA' });
             await loadCDEFiles(targetPath);
         } else alert("Lỗi: " + (data.error || "Không thể tạo thư mục"));
@@ -703,12 +775,12 @@ async function uploadSelectedFile(event) {
     try {
         const res = await fetchCdeMutation(`${DATA_SERVER_API}/api/upload`, {
             method: 'POST',
-            headers: { 'Authorization': `Bearer ${localStorage.getItem('access_token') || ''}` },
             body: formData
         });
         const data = await res.json();
         if (data.success) {
             event.target.value = '';
+            childItemsMap.clear();
             cdeSyncChannel.postMessage({ type: 'REFRESH_CDE_DATA' });
             await loadCDEFiles(targetPath);
         } else alert("Lỗi upload: " + (data.error || "Thất bại"));
@@ -743,6 +815,8 @@ async function renameItem(itemPath, currentName) {
                         : project
                 );
             }
+            expandedFolders.delete(cleanItemPath);
+            childItemsMap.clear();
             cdeSyncChannel.postMessage({ type: 'REFRESH_CDE_DATA' });
             await loadCDEFiles(targetPath);
         } else alert("Lỗi: " + (data.error || "Không thể đổi tên"));
@@ -768,6 +842,8 @@ async function deleteItem(itemPath, itemName) {
         });
         const data = await res.json();
         if (data.success) {
+            expandedFolders.delete(cleanItemPath);
+            childItemsMap.clear();
             cdeSyncChannel.postMessage({ type: 'REFRESH_CDE_DATA' });
             await loadCDEFiles(targetPath);
         } else alert("Lỗi: " + (data.error || "Không thể xóa"));
@@ -794,6 +870,7 @@ async function createNewProject() {
         const data = await res.json();
 
         if (data.success) {
+            childItemsMap.clear();
             cdeSyncChannel.postMessage({ type: 'REFRESH_CDE_DATA' });
             await loadCDEFiles(targetPath);
         } else {
