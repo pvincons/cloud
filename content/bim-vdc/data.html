@@ -21,7 +21,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="/assets/css/data.css">
     <style>
-        /* Styles website */        
+        /* Styles website */
     </style>
 
     <script>
@@ -57,67 +57,80 @@
 
 <body class="min-h-screen p-3 sm:p-4 md:p-8 flex flex-col justify-between">
 
-<div id="rowMenu" class="hidden" role="menu"></div>
+    <div id="rowMenu" class="hidden" role="menu"></div>
 
-    <!-- HEADER NAVIGATION -->
-    <header
-        class="w-full max-w-6xl mx-auto flex flex-col sm:flex-row items-start sm:items-center justify-between pb-4 mb-6 border-b border-[var(--border-color)] gap-4">
-        <div class="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-start">
-            <div class="flex items-center gap-3">
-                <a href="./index.html"
-                    class="w-9 h-9 rounded-xl bg-slate-800 hover:bg-slate-700 border border-[var(--border-color)] text-slate-300 hover:text-white flex items-center justify-center transition-colors shrink-0"
-                    title="Quay lại Dashboard">
-                    <i class="fa-solid fa-arrow-left"></i>
-                </a>
-                <div>
-                    <h1 class="font-bold text-sm sm:text-base tracking-wide flex flex-wrap items-center gap-2">
-                        <span>Dữ liệu CDE Pro</span>
-                        <span id="currentPathDisplay"
-                            class="text-[11px] font-mono text-blue-400 bg-blue-950/80 px-2 py-0.5 rounded border border-blue-500/30 break-all">database/bim-vdc</span>
-                    </h1>
-                    <p class="text-xs text-[var(--text-muted)]">Trình duyệt tập tin & mô hình BIM chuẩn ISO 19650</p>
+    <!-- HEADER: tiêu đề + công cụ (hàng 1) | dung lượng + thao tác (hàng 2) -->
+    <header class="cde-header w-full max-w-6xl mx-auto">
+
+        <!-- Hàng 1 -->
+        <div class="cde-header__top">
+            <a href="./index.html" class="hdr-icon-btn" title="Quay lại Dashboard" aria-label="Quay lại Dashboard">
+                <i class="fa-solid fa-arrow-left"></i>
+            </a>
+
+            <div class="cde-header__title">
+                <h1>
+                    <span class="cde-title-text">Dữ liệu CDE Pro</span>
+                    <span id="currentPathDisplay" class="path-chip">database/bim-vdc</span>
+                </h1>
+                <p class="cde-subtitle">Trình duyệt tập tin & mô hình BIM chuẩn ISO 19650</p>
+            </div>
+
+            <div class="hdr-pill" role="group" aria-label="Công cụ">
+                <button onclick="loadCDEFiles(currentPath)" title="Tải lại" aria-label="Tải lại">
+                    <i class="fa-solid fa-arrows-rotate"></i>
+                </button>
+                <button onclick="toggleServerSettings()" title="Cấu hình API URL" aria-label="Cấu hình API URL">
+                    <i class="fa-solid fa-sliders"></i>
+                </button>
+                <button onclick="toggleTheme()" title="Chuyển chế độ Sáng/Tối" aria-label="Chuyển chế độ Sáng/Tối">
+                    <i class="fa-solid fa-sun text-amber-400" id="desktopThemeIcon"></i>
+                    <span id="desktopThemeText" class="sr-only">Light Mode</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Hàng 2 -->
+        <div class="cde-toolbar">
+
+            <!-- Dung lượng database -->
+            <div id="diskSpaceWidget" class="disk-card" title="Đang tính dung lượng...">
+                <div class="disk-card__icon"><i class="fa-solid fa-hard-drive"></i></div>
+                <div class="disk-card__body">
+                    <div class="disk-card__head">
+                        <span>Dung lượng database</span>
+                        <span id="diskPercent" class="disk-percent">0%</span>
+                    </div>
+                    <div id="diskBarTrack" class="disk-bar" role="progressbar"
+                        aria-label="Dung lượng database đã sử dụng" aria-valuemin="0" aria-valuemax="100"
+                        aria-valuenow="0">
+                        <div id="diskBarFill" class="disk-bar-fill"></div>
+                    </div>
+                    <div class="disk-card__stats">
+                        <span class="disk-stat">Đã ghi<strong id="diskUsed">0 MB</strong></span>
+                        <span class="disk-stat">Còn trống<strong id="diskFree" class="disk-free">Đang tính...</strong></span>
+                    </div>
                 </div>
             </div>
 
-            <button onclick="toggleTheme()"
-                class="sm:hidden p-2 rounded-lg bg-slate-800/50 border border-[var(--border-color)] text-slate-300 hover:text-white text-xs shrink-0"
-                id="mobileThemeBtn" title="Chuyển chế độ Sáng/Tối">
-                <i class="fa-solid fa-sun text-amber-400" id="mobileThemeIcon"></i>
-            </button>
-        </div>
-
-        <div class="flex items-center gap-1.5 sm:gap-2 flex-wrap w-full sm:w-auto justify-end">
-            <button onclick="createNewProject()" title="Tạo dự án mới, tự động sinh 4 thư mục chuẩn ISO 19650"
-                class="p-2 text-amber-300 hover:text-white bg-amber-600/30 hover:bg-amber-600 rounded-lg text-xs transition-colors border border-amber-500/30 flex items-center gap-1.5">
-                <i class="fa-solid fa-folder-tree"></i> <span class="hidden md:inline">Dự án mới</span>
-            </button>
-            <button onclick="createNewFolder()" title="Tạo thư mục mới"
-                class="p-2 text-blue-300 hover:text-white bg-blue-600/30 hover:bg-blue-600 rounded-lg text-xs transition-colors border border-blue-500/30 flex items-center gap-1.5">
-                <i class="fa-solid fa-folder-plus"></i> <span class="hidden md:inline">Thư mục mới</span>
-            </button>
-            <button id="btnPaste" onclick="pasteItem()" disabled title="Dán tệp/thư mục"
-                class="p-2 text-slate-500 bg-slate-800/50 rounded-lg text-xs border border-[var(--border-color)] flex items-center gap-1.5 cursor-not-allowed opacity-50 transition-all">
-                <i class="fa-solid fa-paste"></i> <span id="pasteBtnText" class="hidden md:inline">Dán</span>
-            </button>
-            <label title="Upload tệp tin"
-                class="p-2 text-emerald-300 hover:text-white bg-emerald-600/30 hover:bg-emerald-600 rounded-lg text-xs transition-colors border border-emerald-500/30 flex items-center gap-1.5 cursor-pointer">
-                <i class="fa-solid fa-cloud-arrow-up"></i> <span class="hidden md:inline">Upload</span>
-                <input type="file" id="cdeFileInput" class="hidden" onchange="uploadSelectedFile(event)">
-            </label>
-            <button onclick="toggleServerSettings()" title="Cấu hình API URL"
-                class="p-2 text-slate-400 hover:text-white bg-slate-800 hover:bg-slate-700 rounded-lg text-xs transition-colors border border-[var(--border-color)] flex items-center gap-1.5">
-                <i class="fa-solid fa-sliders"></i> <span class="hidden md:inline">URL</span>
-            </button>
-            <button onclick="loadCDEFiles(currentPath)" title="Tải lại"
-                class="p-2 text-slate-400 hover:text-white bg-slate-800 hover:bg-slate-700 rounded-lg text-xs transition-colors border border-[var(--border-color)]">
-                <i class="fa-solid fa-arrows-rotate"></i>
-            </button>
-            <button onclick="toggleTheme()"
-                class="hidden sm:flex items-center gap-1.5 px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 border border-[var(--border-color)] text-slate-300 hover:text-white text-xs transition-colors"
-                title="Chuyển chế độ Sáng/Tối">
-                <i class="fa-solid fa-sun text-amber-400" id="desktopThemeIcon"></i> <span id="desktopThemeText"
-                    class="hidden lg:inline">Light Mode</span>
-            </button>
+            <!-- Thao tác -->
+            <div class="cde-actions">
+                <button onclick="createNewProject()" class="act-btn act-amber"
+                    title="Tạo dự án mới, tự động sinh 4 thư mục chuẩn ISO 19650">
+                    <i class="fa-solid fa-folder-tree"></i><span>Dự án mới</span>
+                </button>
+                <button onclick="createNewFolder()" class="act-btn act-blue" title="Tạo thư mục mới">
+                    <i class="fa-solid fa-folder-plus"></i><span>Thư mục mới</span>
+                </button>
+                <button id="btnPaste" onclick="pasteItem()" disabled class="act-btn act-cyan" title="Dán tệp/thư mục">
+                    <i class="fa-solid fa-paste"></i><span id="pasteBtnText">Dán</span><span id="pasteBtnHint"
+                        class="act-hint"></span>
+                </button>
+                <label title="Upload tệp tin" class="act-btn act-primary">
+                    <i class="fa-solid fa-cloud-arrow-up"></i><span>Upload</span>
+                    <input type="file" id="cdeFileInput" class="hidden" onchange="uploadSelectedFile(event)">
+                </label>
+            </div>
         </div>
     </header>
 
@@ -263,15 +276,18 @@
                     <button type="button" onclick="closeFileMetadataModal()"
                         class="rounded-lg border border-slate-700 px-4 py-2 text-xs font-semibold text-slate-300 hover:bg-slate-800">Hủy</button>
                     <button id="fileMetadataSubmit" type="submit"
-                        class="rounded-lg bg-blue-600 px-4 py-2 text-xs font-semibold text-white hover:bg-blue-500 disabled:cursor-wait disabled:opacity-60">Lưu thông tin</button>
+                        class="rounded-lg bg-blue-600 px-4 py-2 text-xs font-semibold text-white hover:bg-blue-500 disabled:cursor-wait disabled:opacity-60">Lưu
+                        thông tin</button>
                 </div>
             </form>
         </section>
     </div>
 
     <div id="xmlViewerModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/80 p-3 sm:p-6"
-        role="dialog" aria-modal="true" aria-labelledby="xmlViewerTitle" onclick="if (event.target === this) closeXmlViewer()">
-        <section class="w-full max-w-5xl max-h-[90vh] flex flex-col rounded-2xl border border-slate-700 bg-slate-900 shadow-2xl">
+        role="dialog" aria-modal="true" aria-labelledby="xmlViewerTitle"
+        onclick="if (event.target === this) closeXmlViewer()">
+        <section
+            class="w-full max-w-5xl max-h-[90vh] flex flex-col rounded-2xl border border-slate-700 bg-slate-900 shadow-2xl">
             <header class="flex items-start justify-between gap-4 border-b border-slate-700 px-4 py-3 sm:px-5">
                 <div class="min-w-0">
                     <h2 id="xmlViewerTitle" class="break-all text-sm font-bold text-white">Trình xem XML</h2>
@@ -282,7 +298,8 @@
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </header>
-            <pre id="xmlViewerContent" class="min-h-0 overflow-auto p-4 text-xs leading-6 text-slate-200 sm:p-5"><code></code></pre>
+            <pre id="xmlViewerContent"
+                class="min-h-0 overflow-auto p-4 text-xs leading-6 text-slate-200 sm:p-5"><code></code></pre>
         </section>
     </div>
 
