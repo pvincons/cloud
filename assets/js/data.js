@@ -1,19 +1,14 @@
 //----------------------------------------------
 // *** Script quản lý file dữ liệu CDE/data ***
 //----------------------------------------------
+const configuredServerUrl = (typeof CONFIG !== 'undefined' && CONFIG.SERVER_URL) 
+    ? CONFIG.SERVER_URL 
+    : (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
+        ? 'http://localhost:3000' 
+        : 'https://api.pvincons.cloud');
 
-const configuredCdeApi = typeof CONFIG !== 'undefined' && CONFIG.CDE_API
-    ? CONFIG.CDE_API.replace(/\/api\/?$/, '')
-    : 'https://api.pvincons.cloud';
-const savedCdeApi = localStorage.getItem('cde_api_url') || '';
-const isLocalAuthServer = typeof isLocal !== 'undefined' && isLocal;
-let DATA_SERVER_API = isLocalAuthServer &&
-    savedCdeApi.replace(/\/+$/, '') === 'https://api.pvincons.cloud'
-    ? configuredCdeApi
-    : savedCdeApi || configuredCdeApi;
-if (isLocalAuthServer && DATA_SERVER_API === configuredCdeApi) {
-    localStorage.setItem('cde_api_url', configuredCdeApi);
-}
+let DATA_SERVER_API = localStorage.getItem('cde_api_url') || configuredServerUrl;
+
 let currentPath = 'database/bim-vdc';
 let fetchedItems = [];
 let clipboard = null;

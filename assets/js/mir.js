@@ -1,8 +1,4 @@
-let DATA_SERVER_API = localStorage.getItem('cde_api_url') || (
-    window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-        ? 'http://localhost:3000'
-        : 'https://api.pvincons.cloud'
-);
+let DATA_SERVER_API = localStorage.getItem('cde_api_url') || CONFIG.SERVER_URL;
 
 let currentRowElement = null;
 let selectedFolderPathFilter = "";
