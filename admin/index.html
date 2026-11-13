@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Super Admin - Quản lý Phân quyền Portal</title>
+    <title>Super Admin - Quản lý Phân quyền Portal (SQLite)</title>
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bcryptjs/2.4.3/bcrypt.min.js"></script>
@@ -74,7 +74,7 @@
         class="fixed top-4 right-4 left-4 lg:left-auto z-50 flex flex-col gap-2 pointer-events-none lg:max-w-sm w-auto">
     </div>
 
-    <!-- 1. MÀN HÌNH ĐĂNG NHẬP GITHUB PAT -->
+    <!-- 1. MÀN HÌNH ĐĂNG NHẬP BACKEND SERVER (ADMIN) -->
     <div id="login-modal"
         class="fixed inset-0 bg-[#090a0f]/95 backdrop-blur-md z-50 flex items-center justify-center p-4">
         <div class="bg-[#14171f] border border-[#262a36] rounded-2xl p-6 w-full max-w-md shadow-2xl space-y-5">
@@ -84,39 +84,39 @@
                     <i class="fa-solid fa-user-shield"></i>
                 </div>
                 <h2 class="text-lg font-bold text-gray-100">Super Admin Portal</h2>
-                <p class="text-xs text-gray-400">Xác thực GitHub để quản lý phân quyền users.json</p>
+                <p class="text-xs text-gray-400">Đăng nhập tài khoản ADMIN để quản lý SQLite qua Backend Server</p>
             </div>
 
-            <div class="space-y-3">
+            <form id="login-form" class="space-y-3">
                 <div class="space-y-1">
-                    <label class="text-[11px] font-semibold text-gray-400 uppercase">GitHub Owner / User</label>
-                    <input type="text" id="auth-owner" placeholder="VD: pvincons"
+                    <label class="text-[11px] font-semibold text-gray-400 uppercase">Backend Server URL</label>
+                    <input type="text" id="auth-server" placeholder="VD: https://api.pvincons.cloud"
                         class="w-full bg-[#0f1117] border border-[#2a2e3d] rounded-xl px-3 py-2.5 text-xs text-gray-200 outline-none focus:border-purple-500 font-mono">
                 </div>
                 <div class="space-y-1">
-                    <label class="text-[11px] font-semibold text-gray-400 uppercase">Repository Name</label>
-                    <input type="text" id="auth-repo" placeholder="VD: backend"
+                    <label class="text-[11px] font-semibold text-gray-400 uppercase">Tài khoản Admin (Username)</label>
+                    <input type="text" id="auth-username" placeholder="VD: admin" autocomplete="username" required
                         class="w-full bg-[#0f1117] border border-[#2a2e3d] rounded-xl px-3 py-2.5 text-xs text-gray-200 outline-none focus:border-purple-500 font-mono">
                 </div>
                 <div class="space-y-1">
-                    <label class="text-[11px] font-semibold text-gray-400 uppercase">Personal Access Token (PAT)</label>
-                    <input type="password" id="auth-token" placeholder="ghp_......"
+                    <label class="text-[11px] font-semibold text-gray-400 uppercase">Mật khẩu (Password)</label>
+                    <input type="password" id="auth-password" placeholder="••••••••" autocomplete="current-password" required
                         class="w-full bg-[#0f1117] border border-[#2a2e3d] rounded-xl px-3 py-2.5 text-xs text-gray-200 outline-none focus:border-purple-500 font-mono">
                 </div>
-            </div>
 
-            <!-- KHUNG HIỂN THỊ THÔNG BÁO LỖI TRỰC TIẾP TRÊN TAB ĐĂNG NHẬP -->
-            <div id="login-error-box"
-                class="hidden bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs p-3 rounded-xl flex items-center gap-2">
-                <i class="fa-solid fa-circle-exclamation shrink-0 text-sm"></i>
-                <span id="login-error-text">Nội dung lỗi...</span>
-            </div>
+                <!-- KHUNG HIỂN THỊ THÔNG BÁO LỖI TRỰC TIẾP TRÊN TAB ĐĂNG NHẬP -->
+                <div id="login-error-box"
+                    class="hidden bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs p-3 rounded-xl flex items-center gap-2">
+                    <i class="fa-solid fa-circle-exclamation shrink-0 text-sm"></i>
+                    <span id="login-error-text">Nội dung lỗi...</span>
+                </div>
 
-            <button id="btn-login"
-                class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold py-2.5 rounded-xl text-xs transition shadow-lg shadow-purple-900/30 flex items-center justify-center gap-2">
-                <i class="fa-solid fa-key text-xs"></i>
-                <span>Xác nhận & Vào Super Admin</span>
-            </button>
+                <button type="submit" id="btn-login"
+                    class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold py-2.5 rounded-xl text-xs transition shadow-lg shadow-purple-900/30 flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-key text-xs"></i>
+                    <span>Đăng nhập & Vào Super Admin</span>
+                </button>
+            </form>
         </div>
     </div>
 
@@ -134,18 +134,17 @@
                         <h1
                             class="font-extrabold text-white text-base sm:text-lg tracking-wider flex items-center gap-2">
                             SUPER ADMIN PORTAL <span
-                                class="text-[10px] bg-purple-500/20 text-purple-300 px-2 py-0.5 rounded border border-purple-500/30">ROOT</span>
+                                class="text-[10px] bg-purple-500/20 text-purple-300 px-2 py-0.5 rounded border border-purple-500/30">SQLITE</span>
                         </h1>
-                        <p class="text-[11px] sm:text-xs text-slate-400">Quản lý tài khoản, thông báo & đồng bộ JSON lên
-                            GitHub</p>
+                        <p class="text-[11px] sm:text-xs text-slate-400">Quản lý tài khoản, thông báo & đồng bộ trực tiếp với SQLite Backend</p>
                     </div>
                 </div>
 
                 <div class="flex items-center gap-2 sm:gap-3 w-full sm:w-auto justify-between sm:justify-end">
                     <span
-                        class="text-[10px] sm:text-xs text-slate-400 font-mono flex items-center gap-1 shrink-0 bg-slate-900 px-2.5 py-1.5 rounded-xl border border-slate-800">
-                        <i class="fa-brands fa-github text-xs text-slate-300"></i>
-                        <span id="display-repo-info" class="text-purple-300 font-semibold">pvincons/cloud</span>
+                        class="text-[10px] sm:text-xs text-slate-400 font-mono flex items-center gap-1.5 shrink-0 bg-slate-900 px-2.5 py-1.5 rounded-xl border border-slate-800">
+                        <i class="fa-solid fa-database text-xs text-emerald-400"></i>
+                        <span id="display-admin-info" class="text-purple-300 font-semibold">admin</span>
                     </span>
                     <button id="btn-logout"
                         class="px-3 py-2 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 text-xs font-bold transition-all flex items-center gap-1.5">
@@ -207,24 +206,24 @@
                             class="fa-solid fa-user-slash"></i></div>
                 </div>
 
-                <!-- 4. Hệ thống GitHub -->
+                <!-- 4. Hệ thống SQLite Server -->
                 <div class="glass-card p-3 sm:p-5 rounded-2xl flex items-center justify-between">
                     <div class="flex lg:hidden items-center justify-between w-full">
-                        <span class="text-xs font-semibold text-slate-400 uppercase">HỆ THỐNG GITHUB</span>
+                        <span class="text-xs font-semibold text-slate-400 uppercase">SQLITE BACKEND</span>
                         <div class="flex items-center gap-2">
-                            <span class="text-[11px] font-bold text-emerald-400 flex items-center gap-1">
-                                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> API CONNECTED
+                            <span id="server-status-mob" class="text-[11px] font-bold text-emerald-400 flex items-center gap-1">
+                                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> CONNECTED
                             </span>
-                            <div class="text-emerald-400 text-xl"><i class="fa-solid fa-cloud"></i></div>
+                            <div class="text-emerald-400 text-xl"><i class="fa-solid fa-server"></i></div>
                         </div>
                     </div>
                     <div class="hidden lg:block">
-                        <p class="text-[10px] sm:text-xs font-semibold text-slate-400 uppercase">HỆ THỐNG GITHUB</p>
-                        <p class="text-[11px] sm:text-xs font-bold text-emerald-400 mt-2 flex items-center gap-1.5">
-                            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> API CONNECTED
+                        <p class="text-[10px] sm:text-xs font-semibold text-slate-400 uppercase">SQLITE BACKEND</p>
+                        <p id="server-status-desk" class="text-[11px] sm:text-xs font-bold text-emerald-400 mt-2 flex items-center gap-1.5">
+                            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> CONNECTED
                         </p>
                     </div>
-                    <div class="hidden lg:block text-emerald-400 text-xl sm:text-2xl"><i class="fa-solid fa-cloud"></i>
+                    <div class="hidden lg:block text-emerald-400 text-xl sm:text-2xl"><i class="fa-solid fa-server"></i>
                     </div>
                 </div>
 
@@ -309,7 +308,7 @@
             </div>
 
             <div id="tab-panel-users" role="tabpanel" aria-labelledby="tab-btn-users">
-                <!-- THƯ MỤC 2: QUẢN LÝ TÀI KHOẢN USERS.JSON & BỘ LỌC -->
+                <!-- THƯ MỤC 2: QUẢN LÝ TÀI KHOẢN SQLITE USERS & BỘ LỌC -->
                 <div class="glass-card p-4 sm:p-6 rounded-3xl">
                     <div class="flex flex-col gap-4 mb-6">
                         <div class="flex flex-wrap items-center justify-between gap-4">
@@ -317,17 +316,15 @@
                                 <h2 class="text-sm font-bold text-white flex items-center gap-2">
                                     <i class="fa-solid fa-database text-yellow-400"></i> Danh Sách Tài Khoản <span
                                         id="users-path-label"
-                                        class="font-mono text-xs text-purple-300 hidden sm:inline">( chưa đồng bộ
-                                        )</span>
+                                        class="font-mono text-xs text-purple-300 hidden sm:inline">( database/sqlite.db → users )</span>
                                 </h2>
                                 <p class="text-xs text-slate-400 mt-1 hidden sm:block">Hệ thống lọc nâng cao theo Chức
-                                    vụ,
-                                    Vai trò, Công ty, Trạng thái & Sắp xếp</p>
+                                    vụ, Vai trò, Công ty, Trạng thái & Đồng bộ trực tiếp với SQLite</p>
                             </div>
 
                             <div
                                 class="grid grid-cols-2 gap-1.5 sm:flex sm:items-center sm:gap-2 w-full sm:w-auto justify-end">
-                                <button id="btn-sync-github"
+                                <button id="btn-sync-users"
                                     class="w-full sm:w-auto justify-center px-2 sm:px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-blue-400 border border-slate-700 font-bold text-[11px] sm:text-xs rounded-xl transition-all flex items-center gap-1 shadow truncate">
                                     <i class="fa-solid fa-arrows-rotate shrink-0"></i> <span class="truncate">Tải dữ
                                         liệu</span>
@@ -336,7 +333,7 @@
                                     class="w-full sm:w-auto justify-center px-2 sm:px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-amber-400 border border-slate-700 font-bold text-[11px] sm:text-xs rounded-xl transition-all flex items-center gap-1 shadow truncate">
                                     <i class="fa-solid fa-file-arrow-down shrink-0"></i> <span class="truncate">Export</span>
                                 </button>
-                                <button id="btn-publish-github"
+                                <button id="btn-publish-users"
                                     class="w-full sm:w-auto justify-center px-2 sm:px-3.5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-[11px] sm:text-xs rounded-xl shadow-lg transition-all flex items-center gap-1 shadow truncate">
                                     <i class="fa-solid fa-cloud-arrow-up shrink-0"></i> <span class="truncate">Xuất
                                         bản</span>
@@ -424,8 +421,8 @@
                             <h2 class="text-sm font-bold text-white flex items-center gap-2">
                                 <i class="fa-solid fa-bullhorn text-amber-400"></i> Quản lý thông báo
                             </h2>
-                            <p class="text-xs text-slate-400 mt-1">GitHub: <span id="notifications-path-label"
-                                    class="font-mono text-purple-300">assets/data/notifications.json</span>
+                            <p class="text-xs text-slate-400 mt-1">SQLite Table: <span id="notifications-path-label"
+                                    class="font-mono text-purple-300">database/sqlite.db → notifications</span>
                             </p>
                         </div>
                         <div class="grid grid-cols-3 gap-2 sm:flex">
@@ -594,15 +591,15 @@
                     </form>
 
                     <div id="notification-admin-list" class="space-y-3" aria-live="polite">
-                        <p class="text-xs text-slate-500">Đăng nhập GitHub và tải JSON để quản lý thông báo.</p>
+                        <p class="text-xs text-slate-500">Đăng nhập Admin và tải dữ liệu để quản lý thông báo.</p>
                     </div>
                 </div>
             </section>
         </div>
 
         <footer class="mt-8 text-center text-xs text-slate-500">
-            &copy; 2026 PV INCONS Enterprise Workspace. GitHub Path: <span id="users-path-footer"
-                class="font-mono text-purple-400">chưa đồng bộ</span>
+            &copy; 2026 PV INCONS Enterprise Workspace. Backend API: <span id="users-path-footer"
+                class="font-mono text-purple-400">SQLite Edition</span>
         </footer>
     </div>
 
@@ -632,7 +629,7 @@
                     <label class="block text-slate-400 mb-1 font-semibold">Mật Khẩu Ban Đầu (Gốc)</label>
                     <input type="text" id="formRawPassword" placeholder="Nhập mật khẩu mới (nếu muốn đổi)"
                         class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-purple-400 placeholder:text-slate-600">
-                    <p class="text-[10px] text-slate-500 mt-1">* Hệ thống tự mã hóa Hash khi lưu vào JSON</p>
+                    <p class="text-[10px] text-slate-500 mt-1">* Hệ thống tự mã hóa Hash bcrypt khi lưu</p>
                 </div>
 
                 <div>
@@ -704,7 +701,7 @@
                 <div class="sm:col-span-2">
                     <label class="block text-slate-400 mb-1 font-semibold">Dự án tham gia (projects - phân tách bằng dấu
                         phẩy)</label>
-                    <input type="text" id="formProjects" placeholder="VD: Project_01, Project_02"
+                    <input type="text" id="formProjects" placeholder="VD: @Sample Project, Project_01"
                         class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-purple-400">
                 </div>
 
@@ -736,9 +733,17 @@
             }, 0);
         });
 
-        // ===== CẤU HÌNH ĐƯỜNG DẪN USERS.JSON (DÙNG CHUNG CHO LOCAL VÀ VPS) =====
-        const USERS_FILE_PATH = 'database/users.json';
-        const NOTIFICATIONS_FILE_PATH = 'database/notifications.json';
+        // ===== CẤU HÌNH KẾT NỐI BACKEND SERVER (SQLITE) =====
+        const AUTH_STORAGE_KEY = 'pv_admin_session';
+        const SERVER_URL_STORAGE_KEY = 'pv_backend_server_url';
+        const DEFAULT_SERVER_URL = (window.location.origin && window.location.origin.startsWith('http'))
+            ? window.location.origin
+            : 'http://localhost:3000';
+
+        // Dọn dẹp khóa GitHub cũ nếu còn tồn tại
+        localStorage.removeItem('pv_github_auth');
+        localStorage.removeItem('pv_users_json_path');
+
         const NOTIFICATION_ICONS = {
             'fa-circle-info': 'Thông tin',
             'fa-bell': 'Chuông',
@@ -758,60 +763,59 @@
             purple: { label: 'Tím', swatch: 'bg-purple-400' },
             rose: { label: 'Đỏ', swatch: 'bg-rose-400' }
         };
-        const GITHUB_BRANCH = 'main';
-        const USERS_PATH_KEY = 'pv_users_json_path';
-        localStorage.removeItem(USERS_PATH_KEY);
 
         const USER_FIELDS = ['id', 'username', 'passwordHash', 'role', 'permission', 'avatarLink', 'fullName', 'phone', 'position', 'discipline', 'projects', 'company', 'status'];
 
-        let usersFilePath = USERS_FILE_PATH;
-        let usersFileExists = null;
-        let usersLoadedFromGitHub = false;
+        let usersLoadedFromServer = false;
         let isLoadingUsers = false;
         let notificationsData = [];
-        let notificationsLoadedFromGitHub = false;
+        let notificationsLoadedFromServer = false;
         let isLoadingNotifications = false;
         let editingNotificationId = null;
 
-        const SAMPLE_USERS = [
-            {
-                "id": 1,
-                "username": "admin",
-                "passwordHash": "$2b$10$Mhg7uk2abtNcK8/yqU1ZFOzT7mPAdzbjK9zPJMX18cF/yalhrIpSa",
-                "role": "ADMIN",
-                "permission": "ADMIN",
-                "avatarLink": "",
-                "fullName": "Administrator",
-                "phone": "0939751194",
-                "position": "IT Manager",
-                "discipline": "Kỹ sư tin học",
-                "projects": "Tất cả dự án",
-                "company": "PV INCONS CO.LTD",
-                "status": "Active"
-            }
-        ];
+        function normalizeServerUrl(raw) {
+            const trimmed = String(raw || '').trim().replace(/\/+$/, '');
+            return trimmed || DEFAULT_SERVER_URL;
+        }
 
-        function loadAuth() {
+        function loadAuthSession() {
             try {
-                const val = localStorage.getItem('pv_github_auth');
-                if (!val) return null;
-                const parsed = val.trim().startsWith('{') ? JSON.parse(val) : JSON.parse(atob(val));
-                if (!parsed || typeof parsed.owner !== 'string' || typeof parsed.repo !== 'string' ||
-                    typeof parsed.token !== 'string' || !parsed.owner.trim() || !parsed.repo.trim() || !parsed.token.trim()) {
-                    return null;
-                }
-                const normalized = {
-                    owner: parsed.owner.trim(),
-                    repo: parsed.repo.trim(),
-                    token: parsed.token.trim()
+                const raw = localStorage.getItem(AUTH_STORAGE_KEY);
+                if (!raw) return null;
+                const parsed = JSON.parse(raw);
+                if (!parsed || typeof parsed.token !== 'string' || !parsed.token.trim()) return null;
+                return {
+                    serverUrl: normalizeServerUrl(parsed.serverUrl || localStorage.getItem(SERVER_URL_STORAGE_KEY)),
+                    token: parsed.token.trim(),
+                    user: parsed.user || null
                 };
-                localStorage.setItem('pv_github_auth', btoa(JSON.stringify(normalized)));
-                return normalized;
             } catch (e) {
                 return null;
             }
         }
-        let authConfig = loadAuth();
+
+        let authSession = loadAuthSession();
+
+        // Điền sẵn URL server vào ô đăng nhập
+        const authServerInput = document.getElementById('auth-server');
+        if (authServerInput) {
+            authServerInput.value = (authSession && authSession.serverUrl)
+                || localStorage.getItem(SERVER_URL_STORAGE_KEY)
+                || DEFAULT_SERVER_URL;
+        }
+
+        function apiUrl(endpoint) {
+            const base = authSession ? authSession.serverUrl : normalizeServerUrl(document.getElementById('auth-server')?.value);
+            return `${base}${endpoint.startsWith('/') ? endpoint : '/' + endpoint}`;
+        }
+
+        function apiHeaders(extra = {}) {
+            const headers = { 'Content-Type': 'application/json', ...extra };
+            if (authSession && authSession.token) {
+                headers['Authorization'] = `Bearer ${authSession.token}`;
+            }
+            return headers;
+        }
 
         function showToast(message, type = 'success') {
             const container = document.getElementById('toast-container');
@@ -851,121 +855,143 @@
 
         function hideLoginError() {
             const errorBox = document.getElementById('login-error-box');
-            if (errorBox) {
-                errorBox.classList.add('hidden');
-            }
+            if (errorBox) errorBox.classList.add('hidden');
         }
 
-        // Lắng nghe thay đổi input để ẩn lỗi cũ
-        ['auth-owner', 'auth-repo', 'auth-token'].forEach(id => {
+        ['auth-server', 'auth-username', 'auth-password'].forEach(id => {
             document.getElementById(id)?.addEventListener('input', hideLoginError);
         });
 
-        function utf8_to_b64(str) {
-            return btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, (match, p1) => String.fromCharCode('0x' + p1)));
+        function updateConnectionLabels() {
+            if (!authSession) return;
+            const userLabel = authSession.user
+                ? `${authSession.user.fullName || authSession.user.username} (${authSession.user.role})`
+                : 'ADMIN';
+            const displayAdmin = document.getElementById('display-admin-info');
+            if (displayAdmin) displayAdmin.textContent = userLabel;
+
+            const pathLabel = document.getElementById('users-path-label');
+            if (pathLabel) pathLabel.textContent = `( ${authSession.serverUrl} → sqlite.db/users )`;
+
+            const notifPathLabel = document.getElementById('notifications-path-label');
+            if (notifPathLabel) notifPathLabel.textContent = `${authSession.serverUrl} → sqlite.db/notifications`;
+
+            const footerLabel = document.getElementById('users-path-footer');
+            if (footerLabel) footerLabel.textContent = `${authSession.serverUrl} (SQLite Edition)`;
         }
 
-        function b64_to_utf8(str) {
-            return decodeURIComponent(Array.prototype.map.call(atob(str.replace(/\s/g, '')), c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
+        function handleUnauthorizedSession(msg) {
+            localStorage.removeItem(AUTH_STORAGE_KEY);
+            authSession = null;
+            usersLoadedFromServer = false;
+            notificationsLoadedFromServer = false;
+            document.getElementById('admin-workspace').classList.add('hidden');
+            document.getElementById('login-modal').classList.remove('hidden');
+            showLoginError(msg || 'Phiên đăng nhập đã hết hạn hoặc không đủ quyền ADMIN. Vui lòng đăng nhập lại.');
         }
 
-        if (authConfig) {
+        async function apiFetch(endpoint, options = {}) {
+            const response = await fetch(apiUrl(endpoint), {
+                ...options,
+                cache: 'no-store',
+                headers: apiHeaders(options.headers || {})
+            });
+            const data = await response.json().catch(() => ({}));
+            if (response.status === 401 || response.status === 403) {
+                handleUnauthorizedSession(data.error || `Không có quyền truy cập (HTTP ${response.status}).`);
+                throw new Error(data.error || `HTTP ${response.status}`);
+            }
+            if (!response.ok || data.success === false) {
+                throw new Error(data.error || `Server trả về lỗi HTTP ${response.status}`);
+            }
+            return data;
+        }
+
+        function enterAdminWorkspace() {
             document.getElementById('login-modal').classList.add('hidden');
             document.getElementById('admin-workspace').classList.remove('hidden');
-            document.getElementById('display-repo-info').innerText = `${authConfig.owner}/${authConfig.repo}`;
-            loadUsersFromGitHub();
+            updateConnectionLabels();
+            loadUsersFromServer();
         }
 
-        document.getElementById('btn-login').addEventListener('click', async () => {
+        if (authSession) {
+            enterAdminWorkspace();
+        }
+
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
             hideLoginError();
 
-            const owner = document.getElementById('auth-owner').value.trim();
-            const repo = document.getElementById('auth-repo').value.trim();
-            const token = document.getElementById('auth-token').value.trim();
+            const serverUrl = normalizeServerUrl(document.getElementById('auth-server').value);
+            const username = document.getElementById('auth-username').value.trim();
+            const password = document.getElementById('auth-password').value;
 
-            if (!owner || !repo || !token) {
-                showLoginError('Vui lòng điền đầy đủ thông tin xác thực GitHub!');
+            if (!username || !password) {
+                showLoginError('Vui lòng nhập đầy đủ tài khoản và mật khẩu!');
                 return;
             }
 
             const btnLogin = document.getElementById('btn-login');
             btnLogin.disabled = true;
-            btnLogin.innerHTML = `<i class="fa-solid fa-arrows-rotate fa-spin text-xs"></i> <span>Đang xác thực với GitHub...</span>`;
+            btnLogin.innerHTML = `<i class="fa-solid fa-arrows-rotate fa-spin text-xs"></i> <span>Đang xác thực với Server...</span>`;
 
             try {
-                const testUrl = `https://api.github.com/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}`;
-                const response = await fetch(testUrl, {
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Accept': 'application/vnd.github.v3+json'
-                    }
+                const loginRes = await fetch(`${serverUrl}/api/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
                 });
+                const loginData = await loginRes.json().catch(() => ({}));
 
-                if (!response.ok) {
-                    if (response.status === 401) {
-                        throw new Error('Token PAT không hợp lệ hoặc đã hết hạn!');
-                    } else if (response.status === 404) {
-                        throw new Error('Không tìm thấy Repository hoặc Owner không đúng!');
-                    } else {
-                        throw new Error(`Xác thực thất bại (HTTP ${response.status})`);
-                    }
+                if (!loginRes.ok || !loginData.success || !loginData.token) {
+                    throw new Error(loginData.error || `Đăng nhập thất bại (HTTP ${loginRes.status})`);
                 }
 
-                authConfig = { owner, repo, token };
-                localStorage.setItem('pv_github_auth', btoa(JSON.stringify(authConfig)));
+                // Kiểm tra thông tin chi tiết & quyền ADMIN qua /api/auth/me
+                const meRes = await fetch(`${serverUrl}/api/auth/me`, {
+                    headers: { 'Authorization': `Bearer ${loginData.token}` }
+                });
+                const meData = await meRes.json().catch(() => ({}));
+                const userProfile = (meData && meData.user) || loginData.user || {};
+                const role = String(userProfile.role || '').toUpperCase();
+                const permission = String(userProfile.permission || '').toUpperCase();
 
-                document.getElementById('login-modal').classList.add('hidden');
-                document.getElementById('admin-workspace').classList.remove('hidden');
-                document.getElementById('display-repo-info').innerText = `${owner}/${repo}`;
+                if (role !== 'ADMIN' && permission !== 'ADMIN') {
+                    throw new Error('Tài khoản này không có quyền ADMIN để truy cập Super Admin Portal!');
+                }
 
-                showToast('Xác thực GitHub thành công!');
-                loadUsersFromGitHub();
+                authSession = {
+                    serverUrl,
+                    token: loginData.token,
+                    user: userProfile
+                };
+                localStorage.setItem(SERVER_URL_STORAGE_KEY, serverUrl);
+                localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(authSession));
+
+                document.getElementById('auth-password').value = '';
+                showToast(`Đăng nhập thành công! Xin chào ${userProfile.fullName || userProfile.username}.`);
+                enterAdminWorkspace();
             } catch (err) {
                 console.error('Lỗi đăng nhập:', err);
                 let errorMsg = err.message;
                 if (errorMsg === 'Failed to fetch') {
-                    errorMsg = 'Lỗi kết nối mạng hoặc bị chặn CORS. Hãy kiểm tra lại kết nối!';
+                    errorMsg = `Không thể kết nối tới Backend Server (${serverUrl}). Kiểm tra lại server hoặc CORS!`;
                 }
-                showLoginError(errorMsg || 'Xác thực thất bại!');
+                showLoginError(errorMsg || 'Đăng nhập thất bại!');
             } finally {
                 btnLogin.disabled = false;
-                btnLogin.innerHTML = `<i class="fa-solid fa-key text-xs"></i><span>Xác nhận & Vào Super Admin</span>`;
+                btnLogin.innerHTML = `<i class="fa-solid fa-key text-xs"></i><span>Đăng nhập & Vào Super Admin</span>`;
             }
         });
 
         document.getElementById('btn-logout').addEventListener('click', () => {
-            localStorage.removeItem('pv_github_auth');
-            localStorage.removeItem('pv_users_json_path');
+            localStorage.removeItem(AUTH_STORAGE_KEY);
             location.reload();
         });
-
-        function ghHeaders(accept) {
-            return { 'Authorization': `Bearer ${authConfig.token}`, 'Accept': accept || 'application/vnd.github.v3+json' };
-        }
-
-        function ghContentsUrl(filePath, withRef = true) {
-            const enc = filePath.split('/').map(encodeURIComponent).join('/');
-            const base = `https://api.github.com/repos/${encodeURIComponent(authConfig.owner)}/${encodeURIComponent(authConfig.repo)}/contents/${enc}`;
-            return withRef ? `${base}?ref=${encodeURIComponent(GITHUB_BRANCH)}` : base;
-        }
-
-        async function describeGitHubError(res) {
-            let detail = '';
-            try { detail = (await res.json()).message || ''; } catch (e) { }
-            if (res.status === 401) return 'Token PAT không hợp lệ hoặc đã hết hạn (401).';
-            if (res.status === 403) {
-                if (res.headers.get('x-ratelimit-remaining') === '0') return 'Vượt giới hạn số lần gọi GitHub API (403).';
-                return 'Token không đủ quyền với repo này (403).' + (detail ? ` [${detail}]` : '');
-            }
-            if (res.status === 404) return 'Không tìm thấy repo hoặc token không truy cập được (404).';
-            return `GitHub trả về lỗi HTTP ${res.status}` + (detail ? `: ${detail}` : '');
-        }
 
         function normalizeStatus(st) {
             return (st === 'Active' || st === 'Đang triển khai') ? 'Active' : 'Inactive';
         }
-
-        const BCRYPT_RE = /^\$2[aby]\$\d{2}\$[./A-Za-z0-9]{53}$/;
 
         function getBcrypt() {
             return (window.dcodeIO && window.dcodeIO.bcrypt) || window.bcrypt || null;
@@ -992,118 +1018,61 @@
                     else if (k === 'status') o.status = normalizeStatus(u.status);
                     else o[k] = (u[k] === undefined || u[k] === null) ? '' : u[k];
                 });
+                if (Array.isArray(u.groups)) o.groups = u.groups;
                 Object.keys(u).forEach(k => { if (!(k in o) && !k.startsWith('_')) o[k] = u[k]; });
                 return o;
             });
         }
 
         function exportUsersJson() {
-            if (!usersData.length || (!usersLoadedFromGitHub && usersFileExists !== false)) {
-                showToast('Chưa có dữ liệu users.json từ GitHub để xuất.', 'error');
+            if (!usersData.length || !usersLoadedFromServer) {
+                showToast('Chưa có dữ liệu từ SQLite để xuất.', 'error');
                 return;
             }
             const blob = new Blob([JSON.stringify(serializeUsers(), null, 2)], { type: 'application/json;charset=utf-8' });
             const a = document.createElement('a');
             a.href = URL.createObjectURL(blob);
-            a.download = 'users.json';
+            a.download = 'users-sqlite-backup.json';
             document.body.appendChild(a);
             a.click();
             a.remove();
             setTimeout(() => URL.revokeObjectURL(a.href), 1000);
-            showToast(`Đã xuất users.json (${usersData.length} tài khoản).`);
+            showToast(`Đã xuất backup ${usersData.length} tài khoản.`);
         }
 
         function switchTab(name) {
             document.querySelectorAll('[data-tab]').forEach(b => b.setAttribute('aria-selected', b.dataset.tab === name ? 'true' : 'false'));
             document.querySelectorAll('[role="tabpanel"]').forEach(p => p.classList.toggle('hidden', p.id !== `tab-panel-${name}`));
-            if (name === 'notifications' && !notificationsLoadedFromGitHub) {
-                loadNotificationsFromGitHub();
+            if (name === 'notifications' && !notificationsLoadedFromServer) {
+                loadNotificationsFromServer();
             }
         }
 
-        function updatePathLabels() {
-            const text = `${authConfig.owner}/${authConfig.repo}/${GITHUB_BRANCH}/${USERS_FILE_PATH}`;
-            const a = document.getElementById('users-path-label');
-            const b = document.getElementById('users-path-footer');
-            if (a) a.textContent = `( ${text} )`;
-            if (b) b.textContent = text;
-            const notificationsPath = document.getElementById('notifications-path-label');
-            if (notificationsPath) {
-                notificationsPath.textContent = `${authConfig.owner}/${authConfig.repo}/${GITHUB_BRANCH}/${NOTIFICATIONS_FILE_PATH}`;
-            }
-        }
-
-        async function findUsersFile() {
-            const res = await fetch(ghContentsUrl(USERS_FILE_PATH), { headers: ghHeaders(), cache: 'no-store' });
-            if (res.ok) return { path: USERS_FILE_PATH, data: await res.json() };
-            if (res.status !== 404) throw new Error(await describeGitHubError(res));
-            return null;
-        }
-
-        async function readFileContent(found) {
-            if (found.data.content && found.data.encoding === 'base64') return b64_to_utf8(found.data.content);
-            const res = await fetch(ghContentsUrl(found.path), { headers: ghHeaders('application/vnd.github.raw+json'), cache: 'no-store' });
-            if (!res.ok) throw new Error(await describeGitHubError(res));
-            return await res.text();
-        }
-
-        async function publishJsonFile(filePath, data, message) {
-            const checkRes = await fetch(ghContentsUrl(filePath), { headers: ghHeaders(), cache: 'no-store' });
-            let sha = null;
-            if (checkRes.ok) {
-                sha = (await checkRes.json()).sha;
-            } else if (checkRes.status !== 404) {
-                throw new Error(await describeGitHubError(checkRes));
-            }
-
-            const putRes = await fetch(ghContentsUrl(filePath, false), {
-                method: 'PUT',
-                headers: { ...ghHeaders(), 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    message,
-                    content: utf8_to_b64(JSON.stringify(data, null, 2)),
-                    branch: GITHUB_BRANCH,
-                    sha: sha || undefined
-                })
-            });
-            if (!putRes.ok) throw new Error(await describeGitHubError(putRes));
-        }
-
-        async function loadUsersFromGitHub() {
-            if (!authConfig || isLoadingUsers) return;
+        // ===== 1. ĐỒNG BỘ USERS VỚI SQLITE BACKEND =====
+        async function loadUsersFromServer() {
+            if (!authSession || isLoadingUsers) return;
             isLoadingUsers = true;
-            const btn = document.getElementById('btn-sync-github');
+            const btn = document.getElementById('btn-sync-users');
             const oldHtml = btn ? btn.innerHTML : '';
             if (btn) { btn.disabled = true; btn.innerHTML = `<i class="fa-solid fa-arrows-rotate fa-spin text-xs"></i> Đang tải...`; }
 
             try {
-                const found = await findUsersFile();
-                if (!found) {
-                    usersFileExists = false;
-                    usersLoadedFromGitHub = false;
-                    if (!usersData.length) usersData = JSON.parse(JSON.stringify(SAMPLE_USERS));
-                    updatePathLabels();
-                    showToast(`Repo chưa có file ${USERS_FILE_PATH}. Đang hiển thị dữ liệu mẫu.`, 'info');
-                } else {
-                    let content;
-                    try { content = JSON.parse(await readFileContent(found)); }
-                    catch (e) { throw new Error(`File ${found.path} không đọc được (${e.message}).`); }
-                    if (!Array.isArray(content)) throw new Error(`File ${found.path} sai định dạng mảng.`);
-
-                    usersFileExists = true;
-                    usersLoadedFromGitHub = true;
-                    usersData = content.map(u => ({
-                        ...u,
-                        status: normalizeStatus(u.status)
-                    }));
-                    updatePathLabels();
-                    showToast(`Đã tải ${usersData.length} tài khoản từ GitHub (${USERS_FILE_PATH}).`);
+                const data = await apiFetch('/api/admin/users');
+                if (!Array.isArray(data.users)) {
+                    throw new Error('Dữ liệu users trả về từ server không hợp lệ.');
                 }
+
+                usersLoadedFromServer = true;
+                usersData = data.users.map(u => ({
+                    ...u,
+                    status: normalizeStatus(u.status)
+                }));
+                updateConnectionLabels();
+                showToast(`Đã tải ${usersData.length} tài khoản từ SQLite.`);
             } catch (err) {
                 console.error(err);
-                usersLoadedFromGitHub = false;
-                showToast(`Không tải được users.json: ${err.message}`, 'error');
-                if (!usersData.length) usersData = JSON.parse(JSON.stringify(SAMPLE_USERS));
+                usersLoadedFromServer = false;
+                showToast(`Không tải được danh sách users: ${err.message}`, 'error');
             } finally {
                 isLoadingUsers = false;
                 if (btn) { btn.disabled = false; btn.innerHTML = oldHtml; }
@@ -1112,79 +1081,61 @@
             }
         }
 
-        document.getElementById('btn-sync-github').addEventListener('click', loadUsersFromGitHub);
+        document.getElementById('btn-sync-users').addEventListener('click', loadUsersFromServer);
 
-        document.getElementById('btn-publish-github').addEventListener('click', async () => {
-            if (!authConfig) return;
+        document.getElementById('btn-publish-users').addEventListener('click', async () => {
+            if (!authSession) return;
 
-            if (!usersLoadedFromGitHub && usersFileExists !== false) {
-                showToast('Chưa đồng bộ được users.json từ GitHub nên không thể xuất bản.', 'error');
+            if (!usersLoadedFromServer) {
+                showToast('Chưa đồng bộ được dữ liệu từ SQLite nên không thể xuất bản.', 'error');
                 return;
             }
 
-            const url = ghContentsUrl(USERS_FILE_PATH);
-            const putUrl = ghContentsUrl(USERS_FILE_PATH, false);
-
-            const btnPub = document.getElementById('btn-publish-github');
+            const btnPub = document.getElementById('btn-publish-users');
+            const oldHtml = btnPub.innerHTML;
             btnPub.disabled = true;
-            btnPub.innerHTML = `<i class="fa-solid fa-arrows-rotate fa-spin text-xs"></i> Đang đẩy...`;
+            btnPub.innerHTML = `<i class="fa-solid fa-arrows-rotate fa-spin text-xs"></i> Đang lưu...`;
 
             try {
-                let sha = null;
-                const checkRes = await fetch(url, { headers: ghHeaders(), cache: 'no-store' });
-                if (checkRes.ok) {
-                    sha = (await checkRes.json()).sha;
-                } else if (checkRes.status !== 404) {
-                    throw new Error(await describeGitHubError(checkRes));
-                }
-
-                const jsonString = JSON.stringify(serializeUsers(), null, 2);
-                const contentBase64 = utf8_to_b64(jsonString);
-
-                const putRes = await fetch(putUrl, {
+                const data = await apiFetch('/api/admin/users', {
                     method: 'PUT',
-                    headers: { ...ghHeaders(), 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        message: `Update ${USERS_FILE_PATH} via Super Admin Portal`,
-                        content: contentBase64,
-                        branch: GITHUB_BRANCH,
-                        sha: sha || undefined
-                    })
+                    body: JSON.stringify({ users: serializeUsers() })
                 });
 
-                if (!putRes.ok) throw new Error(await describeGitHubError(putRes));
+                if (Array.isArray(data.users)) {
+                    usersData = data.users.map(u => ({
+                        ...u,
+                        status: normalizeStatus(u.status)
+                    }));
+                    populateFilterDropdowns();
+                    applyFiltersAndSort();
+                }
 
-                usersFileExists = true;
-                usersLoadedFromGitHub = true;
-                updatePathLabels();
-                showToast(`Đã xuất bản ${usersData.length} tài khoản lên GitHub (${USERS_FILE_PATH}).`);
+                showToast(`Đã cập nhật ${data.count ?? usersData.length} tài khoản vào SQLite thành công!`);
             } catch (err) {
-                showToast(`Lỗi xuất bản: ${err.message}`, 'error');
+                showToast(`Lỗi lưu vào SQLite: ${err.message}`, 'error');
             } finally {
                 btnPub.disabled = false;
-                btnPub.innerHTML = `<i class="fa-solid fa-cloud-arrow-up"></i> Xuất bản`;
+                btnPub.innerHTML = oldHtml;
             }
         });
 
+        // ===== 2. ĐỒNG BỘ NOTIFICATIONS VỚI SQLITE BACKEND =====
         function serializeNotifications() {
-            return {
-                version: 1,
-                updatedAt: new Date().toISOString(),
-                notifications: notificationsData.map(notification => ({
-                    id: notification.id,
-                    title: notification.title,
-                    message: notification.message,
-                    icon: notification.icon,
-                    color: notification.color,
-                    active: notification.active,
-                    createdAt: notification.createdAt,
-                    updatedAt: notification.updatedAt
-                }))
-            };
+            return notificationsData.map(notification => ({
+                id: notification.id,
+                title: notification.title,
+                message: notification.message,
+                icon: notification.icon,
+                color: notification.color,
+                active: notification.active,
+                createdAt: notification.createdAt,
+                updatedAt: notification.updatedAt || ''
+            }));
         }
 
-        async function loadNotificationsFromGitHub(force = false) {
-            if (!authConfig || isLoadingNotifications || (!force && notificationsLoadedFromGitHub)) return;
+        async function loadNotificationsFromServer(force = false) {
+            if (!authSession || isLoadingNotifications || (!force && notificationsLoadedFromServer)) return;
             isLoadingNotifications = true;
             const button = document.getElementById('btn-sync-notifications');
             const oldHtml = button.innerHTML;
@@ -1192,40 +1143,27 @@
             button.innerHTML = '<i class="fa-solid fa-arrows-rotate fa-spin"></i> Đang tải...';
 
             try {
-                const response = await fetch(ghContentsUrl(NOTIFICATIONS_FILE_PATH), {
-                    headers: ghHeaders(),
-                    cache: 'no-store'
-                });
-                if (response.status === 404) {
-                    notificationsData = [];
-                    notificationsLoadedFromGitHub = true;
-                    showToast(`Repo chưa có ${NOTIFICATIONS_FILE_PATH}. Có thể tạo và xuất bản file mới.`, 'info');
-                } else {
-                    if (!response.ok) throw new Error(await describeGitHubError(response));
-                    const metadata = await response.json();
-                    const raw = await readFileContent({ path: NOTIFICATIONS_FILE_PATH, data: metadata });
-                    const parsed = JSON.parse(raw);
-                    if (!parsed || !Array.isArray(parsed.notifications)) {
-                        throw new Error('notifications.json phải có thuộc tính notifications dạng mảng.');
-                    }
-
-                    notificationsData = parsed.notifications.map((item, index) => ({
-                        id: String(item.id || `notification-${index + 1}`),
-                        title: String(item.title || ''),
-                        message: String(item.message || ''),
-                        icon: String(item.icon || 'fa-circle-info'),
-                        color: ['blue', 'emerald', 'amber', 'purple', 'rose'].includes(item.color) ? item.color : 'blue',
-                        active: item.active !== false,
-                        createdAt: item.createdAt || new Date().toISOString(),
-                        updatedAt: item.updatedAt || ''
-                    }));
-                    notificationsLoadedFromGitHub = true;
-                    showToast(`Đã tải ${notificationsData.length} thông báo từ GitHub.`);
+                const data = await apiFetch('/api/admin/notifications');
+                if (!Array.isArray(data.notifications)) {
+                    throw new Error('Dữ liệu thông báo từ server không hợp lệ.');
                 }
+
+                notificationsData = data.notifications.map((item, index) => ({
+                    id: String(item.id || `notification-${index + 1}`),
+                    title: String(item.title || ''),
+                    message: String(item.message || ''),
+                    icon: String(item.icon || 'fa-circle-info'),
+                    color: ['blue', 'emerald', 'amber', 'purple', 'rose'].includes(item.color) ? item.color : 'blue',
+                    active: item.active !== false,
+                    createdAt: item.createdAt || new Date().toISOString(),
+                    updatedAt: item.updatedAt || ''
+                }));
+                notificationsLoadedFromServer = true;
+                showToast(`Đã tải ${notificationsData.length} thông báo từ SQLite.`);
                 renderNotificationsAdmin();
             } catch (error) {
-                notificationsLoadedFromGitHub = false;
-                showToast(`Không tải được notifications.json: ${error.message}`, 'error');
+                notificationsLoadedFromServer = false;
+                showToast(`Không tải được thông báo: ${error.message}`, 'error');
                 renderNotificationsAdmin(error.message);
             } finally {
                 isLoadingNotifications = false;
@@ -1244,17 +1182,17 @@
                 container.appendChild(error);
                 return;
             }
-            if (!notificationsLoadedFromGitHub) {
+            if (!notificationsLoadedFromServer) {
                 const hint = document.createElement('p');
                 hint.className = 'text-xs text-slate-500';
-                hint.textContent = 'Đăng nhập GitHub và tải JSON để quản lý thông báo.';
+                hint.textContent = 'Nhấn "Tải dữ liệu" để đồng bộ thông báo từ SQLite.';
                 container.appendChild(hint);
                 return;
             }
             if (!notificationsData.length) {
                 const empty = document.createElement('p');
                 empty.className = 'text-xs text-slate-400';
-                empty.textContent = 'Chưa có thông báo. Thêm thông báo rồi xuất bản lên GitHub.';
+                empty.textContent = 'Chưa có thông báo trong SQLite. Hãy thêm thông báo rồi nhấn "Xuất bản".';
                 container.appendChild(empty);
                 return;
             }
@@ -1265,8 +1203,13 @@
                 const content = document.createElement('div');
                 content.className = 'min-w-0 flex-1';
                 const title = document.createElement('h3');
-                title.className = 'text-sm font-bold text-white';
-                title.textContent = notification.title;
+                title.className = 'text-sm font-bold text-white flex items-center gap-2';
+                const titleIcon = document.createElement('i');
+                titleIcon.className = `fa-solid ${notification.icon} text-purple-400`;
+                const titleText = document.createElement('span');
+                titleText.textContent = notification.title;
+                title.append(titleIcon, titleText);
+
                 const message = document.createElement('p');
                 message.className = 'text-xs text-slate-400 mt-1 whitespace-pre-wrap break-words';
                 message.textContent = notification.message;
@@ -1276,7 +1219,7 @@
                 status.className = notification.active
                     ? 'text-[10px] text-emerald-300 shrink-0'
                     : 'text-[10px] text-slate-500 shrink-0';
-                status.textContent = notification.active ? 'Đang hiển thị' : 'Đã ẩn';
+                status.textContent = notification.active ? '● Đang hiển thị' : '● Đã ẩn';
                 const timestamp = Date.parse(notification.updatedAt || notification.createdAt || '');
                 const timestampLabel = document.createElement('span');
                 timestampLabel.className = 'text-[10px] text-slate-500 whitespace-nowrap';
@@ -1376,13 +1319,13 @@
             notificationsData = notificationsData.filter(item => item.id !== id);
             if (editingNotificationId === id) resetNotificationForm();
             renderNotificationsAdmin();
-            showToast('Đã xóa thông báo khỏi bản nháp. Hãy xuất bản để cập nhật GitHub.');
+            showToast('Đã xóa thông báo khỏi bản nháp. Nhấn "Xuất bản" để lưu vào SQLite.');
         }
 
         document.getElementById('notification-form').addEventListener('submit', event => {
             event.preventDefault();
-            if (!notificationsLoadedFromGitHub) {
-                showToast('Hãy tải notifications.json từ GitHub trước khi chỉnh sửa.', 'error');
+            if (!notificationsLoadedFromServer) {
+                showToast('Hãy tải dữ liệu thông báo từ SQLite trước khi chỉnh sửa.', 'error');
                 return;
             }
 
@@ -1421,11 +1364,11 @@
             }
             resetNotificationForm();
             renderNotificationsAdmin();
-            showToast('Đã lưu thông báo vào bản nháp. Nhấn “Xuất bản” để cập nhật.');
+            showToast('Đã lưu thông báo vào bản nháp. Nhấn “Xuất bản” để đẩy vào SQLite.');
         });
 
         document.getElementById('btn-cancel-notification-edit').addEventListener('click', resetNotificationForm);
-        document.getElementById('btn-sync-notifications').addEventListener('click', () => loadNotificationsFromGitHub(true));
+        document.getElementById('btn-sync-notifications').addEventListener('click', () => loadNotificationsFromServer(true));
 
         const notificationIconPicker = document.getElementById('notification-icon-picker');
         const notificationIconButton = document.getElementById('notification-icon-button');
@@ -1482,46 +1425,52 @@
         setNotificationColor(document.getElementById('notification-color').value);
 
         function exportNotificationsJson() {
-            if (!notificationsLoadedFromGitHub) {
-                showToast('Hãy tải notifications.json từ GitHub trước khi xuất.', 'error');
+            if (!notificationsLoadedFromServer) {
+                showToast('Hãy tải dữ liệu thông báo từ SQLite trước khi xuất.', 'error');
                 return;
             }
-            const blob = new Blob([JSON.stringify(serializeNotifications(), null, 2)], {
+            const payload = {
+                version: 1,
+                updatedAt: new Date().toISOString(),
+                notifications: serializeNotifications()
+            };
+            const blob = new Blob([JSON.stringify(payload, null, 2)], {
                 type: 'application/json;charset=utf-8'
             });
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
-            link.download = 'notifications.json';
+            link.download = 'notifications-sqlite-backup.json';
             document.body.appendChild(link);
             link.click();
             link.remove();
             setTimeout(() => URL.revokeObjectURL(link.href), 1000);
-            showToast('Đã tải xuống notifications.json.');
+            showToast('Đã tải xuống bản sao lưu notifications.');
         }
 
         document.getElementById('btn-publish-notifications').addEventListener('click', async () => {
-            if (!authConfig || !notificationsLoadedFromGitHub) {
-                showToast('Hãy tải notifications.json từ GitHub trước khi xuất bản.', 'error');
+            if (!authSession || !notificationsLoadedFromServer) {
+                showToast('Hãy tải thông báo từ SQLite trước khi xuất bản.', 'error');
                 return;
             }
             const button = document.getElementById('btn-publish-notifications');
+            const oldHtml = button.innerHTML;
             button.disabled = true;
-            button.innerHTML = '<i class="fa-solid fa-arrows-rotate fa-spin"></i> Đang đẩy...';
+            button.innerHTML = '<i class="fa-solid fa-arrows-rotate fa-spin"></i> Đang lưu...';
             try {
-                await publishJsonFile(
-                    NOTIFICATIONS_FILE_PATH,
-                    serializeNotifications(),
-                    `Update ${NOTIFICATIONS_FILE_PATH} via Super Admin Portal`
-                );
-                showToast(`Đã xuất bản ${notificationsData.length} thông báo lên GitHub (${NOTIFICATIONS_FILE_PATH}).`);
+                const data = await apiFetch('/api/admin/notifications', {
+                    method: 'PUT',
+                    body: JSON.stringify({ notifications: serializeNotifications() })
+                });
+                showToast(`Đã cập nhật ${data.count ?? notificationsData.length} thông báo vào SQLite thành công!`);
             } catch (error) {
-                showToast(`Lỗi xuất bản thông báo: ${error.message}`, 'error');
+                showToast(`Lỗi lưu thông báo vào SQLite: ${error.message}`, 'error');
             } finally {
                 button.disabled = false;
-                button.innerHTML = '<i class="fa-solid fa-cloud-arrow-up"></i> Xuất bản';
+                button.innerHTML = oldHtml;
             }
         });
 
+        // ===== 3. BỘ LỌC, SẮP XẾP & HIỂN THỊ USERS =====
         function populateFilterDropdowns() {
             const positions = [...new Set(usersData.map(u => u.position).filter(Boolean))];
             const roles = [...new Set(usersData.map(u => u.role).filter(Boolean))];
@@ -1622,7 +1571,7 @@
                     <td class="py-3.5 px-3 font-bold text-slate-200">${user.company || 'PV INCONS'}</td>
                     <td class="py-3.5 px-3 max-w-[180px]">
                         <div class="flex flex-wrap gap-1">
-                            ${(user.projects || '').split(',').map(p => `<span class="px-1.5 py-0.5 bg-slate-800 text-slate-300 text-[10px] rounded border border-slate-700">${p.trim()}</span>`).join('')}
+                            ${(user.projects || '').split(',').filter(Boolean).map(p => `<span class="px-1.5 py-0.5 bg-slate-800 text-slate-300 text-[10px] rounded border border-slate-700">${p.trim()}</span>`).join('')}
                         </div>
                     </td>
                     <td class="py-3.5 px-3">
@@ -1689,7 +1638,7 @@
                     <div class="bg-slate-900/60 p-2.5 rounded-xl text-[11px]">
                         <div class="text-slate-400 font-bold mb-1"><i class="fa-solid fa-building text-xs mr-1"></i> ${user.company || 'PV INCONS'}</div>
                         <div class="flex flex-wrap gap-1 mt-1">
-                            ${(user.projects || '').split(',').map(p => `<span class="px-1.5 py-0.5 bg-slate-800 text-slate-300 text-[9px] rounded border border-slate-700">${p.trim()}</span>`).join('')}
+                            ${(user.projects || '').split(',').filter(Boolean).map(p => `<span class="px-1.5 py-0.5 bg-slate-800 text-slate-300 text-[9px] rounded border border-slate-700">${p.trim()}</span>`).join('')}
                         </div>
                     </div>
 
@@ -1703,6 +1652,10 @@
         }
 
         function openAddModal() {
+            if (!usersLoadedFromServer) {
+                showToast('Vui lòng tải dữ liệu từ SQLite trước khi thêm tài khoản.', 'error');
+                return;
+            }
             document.getElementById('modalTitle').innerHTML = '<i class="fa-solid fa-user-plus text-purple-400"></i> Thêm Người Dùng Mới';
             document.getElementById('userForm').reset();
             document.getElementById('userId').value = '';
@@ -1790,7 +1743,8 @@
                     discipline: document.getElementById('formDiscipline').value.trim(),
                     projects: document.getElementById('formProjects').value.trim(),
                     company: document.getElementById('formCompany').value.trim(),
-                    status: document.getElementById('formStatus').value
+                    status: document.getElementById('formStatus').value,
+                    groups: existingUser && Array.isArray(existingUser.groups) ? existingUser.groups : []
                 };
 
                 if (existingUser) {
@@ -1804,7 +1758,7 @@
                 populateFilterDropdowns();
                 applyFiltersAndSort();
                 closeModal();
-                showToast('Đã lưu thay đổi vào bộ nhớ tạm. Hãy nhấn "Xuất bản GitHub" để đồng bộ lên repo!');
+                showToast('Đã lưu thay đổi vào bản nháp. Nhấn "Xuất bản" để ghi vào SQLite!');
             } catch (err) {
                 console.error(err);
                 showToast(`Lưu thất bại: ${err && err.message ? err.message : err}`, 'error');
@@ -1820,7 +1774,7 @@
                 usersData = usersData.filter(u => u.id !== id);
                 populateFilterDropdowns();
                 applyFiltersAndSort();
-                showToast('Đã xóa tài khoản.');
+                showToast('Đã xóa tài khoản khỏi bản nháp. Nhấn "Xuất bản" để cập nhật SQLite.');
             }
         }
     </script>
