@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Super Admin - Quản lý Phân quyền Portal (SQLite)</title>
+    <title>Super Admin - Quản lý Phân quyền Portal (PostgreSQL)</title>
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bcryptjs/2.4.3/bcrypt.min.js"></script>
@@ -84,7 +84,7 @@
                     <i class="fa-solid fa-user-shield"></i>
                 </div>
                 <h2 class="text-lg font-bold text-gray-100">Super Admin Portal</h2>
-                <p class="text-xs text-gray-400">Đăng nhập tài khoản ADMIN để quản lý SQLite qua Backend Server</p>
+                <p class="text-xs text-gray-400">Đăng nhập tài khoản ADMIN để quản lý PostgreSQL qua Backend Server</p>
             </div>
 
             <form id="login-form" class="space-y-3">
@@ -134,9 +134,9 @@
                         <h1
                             class="font-extrabold text-white text-base sm:text-lg tracking-wider flex items-center gap-2">
                             SUPER ADMIN PORTAL <span
-                                class="text-[10px] bg-purple-500/20 text-purple-300 px-2 py-0.5 rounded border border-purple-500/30">SQLITE</span>
+                                class="text-[10px] bg-purple-500/20 text-purple-300 px-2 py-0.5 rounded border border-purple-500/30">POSTGRESQL</span>
                         </h1>
-                        <p class="text-[11px] sm:text-xs text-slate-400">Quản lý tài khoản, thông báo & đồng bộ trực tiếp với SQLite Backend</p>
+                        <p class="text-[11px] sm:text-xs text-slate-400">Quản lý tài khoản, thông báo & đồng bộ trực tiếp với PostgreSQL qua Backend Server</p>
                     </div>
                 </div>
 
@@ -206,21 +206,21 @@
                             class="fa-solid fa-user-slash"></i></div>
                 </div>
 
-                <!-- 4. Hệ thống SQLite Server -->
+                <!-- 4. Hệ thống PostgreSQL Server -->
                 <div class="glass-card p-3 sm:p-5 rounded-2xl flex items-center justify-between">
                     <div class="flex lg:hidden items-center justify-between w-full">
-                        <span class="text-xs font-semibold text-slate-400 uppercase">SQLITE BACKEND</span>
+                        <span class="text-xs font-semibold text-slate-400 uppercase">POSTGRESQL BACKEND</span>
                         <div class="flex items-center gap-2">
-                            <span id="server-status-mob" class="text-[11px] font-bold text-emerald-400 flex items-center gap-1">
-                                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> CONNECTED
+                            <span id="server-status-mob" class="text-[11px] font-bold text-slate-400 flex items-center gap-1">
+                                <span class="w-2 h-2 rounded-full bg-slate-400"></span> ĐANG KIỂM TRA
                             </span>
                             <div class="text-emerald-400 text-xl"><i class="fa-solid fa-server"></i></div>
                         </div>
                     </div>
                     <div class="hidden lg:block">
-                        <p class="text-[10px] sm:text-xs font-semibold text-slate-400 uppercase">SQLITE BACKEND</p>
-                        <p id="server-status-desk" class="text-[11px] sm:text-xs font-bold text-emerald-400 mt-2 flex items-center gap-1.5">
-                            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> CONNECTED
+                        <p class="text-[10px] sm:text-xs font-semibold text-slate-400 uppercase">POSTGRESQL BACKEND</p>
+                        <p id="server-status-desk" class="text-[11px] sm:text-xs font-bold text-slate-400 mt-2 flex items-center gap-1.5">
+                            <span class="w-2 h-2 rounded-full bg-slate-400"></span> ĐANG KIỂM TRA
                         </p>
                     </div>
                     <div class="hidden lg:block text-emerald-400 text-xl sm:text-2xl"><i class="fa-solid fa-server"></i>
@@ -308,7 +308,7 @@
             </div>
 
             <div id="tab-panel-users" role="tabpanel" aria-labelledby="tab-btn-users">
-                <!-- THƯ MỤC 2: QUẢN LÝ TÀI KHOẢN SQLITE USERS & BỘ LỌC -->
+                <!-- THƯ MỤC 2: QUẢN LÝ TÀI KHOẢN POSTGRESQL USERS & BỘ LỌC -->
                 <div class="glass-card p-4 sm:p-6 rounded-3xl">
                     <div class="flex flex-col gap-4 mb-6">
                         <div class="flex flex-wrap items-center justify-between gap-4">
@@ -316,10 +316,10 @@
                                 <h2 class="text-sm font-bold text-white flex items-center gap-2">
                                     <i class="fa-solid fa-database text-yellow-400"></i> Danh Sách Tài Khoản <span
                                         id="users-path-label"
-                                        class="font-mono text-xs text-purple-300 hidden sm:inline">( database/sqlite.db → users )</span>
+                                        class="font-mono text-xs text-purple-300 hidden sm:inline">( PostgreSQL → bảng users )</span>
                                 </h2>
                                 <p class="text-xs text-slate-400 mt-1 hidden sm:block">Hệ thống lọc nâng cao theo Chức
-                                    vụ, Vai trò, Công ty, Trạng thái & Đồng bộ trực tiếp với SQLite</p>
+                                    vụ, Vai trò, Công ty, Trạng thái & Đồng bộ trực tiếp với PostgreSQL</p>
                             </div>
 
                             <div
@@ -421,8 +421,8 @@
                             <h2 class="text-sm font-bold text-white flex items-center gap-2">
                                 <i class="fa-solid fa-bullhorn text-amber-400"></i> Quản lý thông báo
                             </h2>
-                            <p class="text-xs text-slate-400 mt-1">SQLite Table: <span id="notifications-path-label"
-                                    class="font-mono text-purple-300">database/sqlite.db → notifications</span>
+                            <p class="text-xs text-slate-400 mt-1">Bảng PostgreSQL: <span id="notifications-path-label"
+                                    class="font-mono text-purple-300">PostgreSQL → bảng notifications</span>
                             </p>
                         </div>
                         <div class="grid grid-cols-3 gap-2 sm:flex">
@@ -599,7 +599,7 @@
 
         <footer class="mt-8 text-center text-xs text-slate-500">
             &copy; 2026 PV INCONS Enterprise Workspace. Backend API: <span id="users-path-footer"
-                class="font-mono text-purple-400">SQLite Edition</span>
+                class="font-mono text-purple-400">PostgreSQL Edition</span>
         </footer>
     </div>
 
@@ -733,12 +733,16 @@
             }, 0);
         });
 
-        // ===== CẤU HÌNH KẾT NỐI BACKEND SERVER (SQLITE) =====
+        // ===== CẤU HÌNH KẾT NỐI BACKEND SERVER (POSTGRESQL) =====
         const AUTH_STORAGE_KEY = 'pv_admin_session';
         const SERVER_URL_STORAGE_KEY = 'pv_backend_server_url';
-        const DEFAULT_SERVER_URL = (window.location.origin && window.location.origin.startsWith('http'))
-            ? window.location.origin
-            : 'http://localhost:3000';
+        // Địa chỉ Backend mặc định: nếu trang đang mở bằng Live Server / static server (không có API) thì trỏ tới server.js ở cổng 3000
+        function guessDefaultServerUrl(loc) {
+            if (!loc.origin || !loc.origin.startsWith('http')) return 'http://localhost:3000';
+            if (/^(55\d\d|5173|8000|8080)$/.test(loc.port)) return `${loc.protocol}//${loc.hostname}:3000`;
+            return loc.origin;
+        }
+        const DEFAULT_SERVER_URL = guessDefaultServerUrl(window.location);
 
         // Dọn dẹp khóa GitHub cũ nếu còn tồn tại
         localStorage.removeItem('pv_github_auth');
@@ -767,6 +771,9 @@
         const USER_FIELDS = ['id', 'username', 'passwordHash', 'role', 'permission', 'avatarLink', 'fullName', 'phone', 'position', 'discipline', 'projects', 'company', 'status'];
 
         let usersLoadedFromServer = false;
+        let usersRevision = '';                 // mã phiên bản users lúc tải (chống ghi đè khi nhiều admin cùng sửa)
+        let notificationsBaseUpdatedAt = null;  // mốc updatedAt của notifications lúc tải (null = chưa tải)
+        let backendDbName = '';                 // tên database PostgreSQL do server báo về
         let isLoadingUsers = false;
         let notificationsData = [];
         let notificationsLoadedFromServer = false;
@@ -871,13 +878,14 @@
             if (displayAdmin) displayAdmin.textContent = userLabel;
 
             const pathLabel = document.getElementById('users-path-label');
-            if (pathLabel) pathLabel.textContent = `( ${authSession.serverUrl} → sqlite.db/users )`;
+            const dbLabel = backendDbName ? `PostgreSQL ${backendDbName}` : 'PostgreSQL';
+            if (pathLabel) pathLabel.textContent = `( ${authSession.serverUrl} → ${dbLabel} › users )`;
 
             const notifPathLabel = document.getElementById('notifications-path-label');
-            if (notifPathLabel) notifPathLabel.textContent = `${authSession.serverUrl} → sqlite.db/notifications`;
+            if (notifPathLabel) notifPathLabel.textContent = `${authSession.serverUrl} → ${dbLabel} › notifications`;
 
             const footerLabel = document.getElementById('users-path-footer');
-            if (footerLabel) footerLabel.textContent = `${authSession.serverUrl} (SQLite Edition)`;
+            if (footerLabel) footerLabel.textContent = `${authSession.serverUrl} (PostgreSQL Edition)`;
         }
 
         function handleUnauthorizedSession(msg) {
@@ -890,27 +898,102 @@
             showLoginError(msg || 'Phiên đăng nhập đã hết hạn hoặc không đủ quyền ADMIN. Vui lòng đăng nhập lại.');
         }
 
-        async function apiFetch(endpoint, options = {}) {
-            const response = await fetch(apiUrl(endpoint), {
-                ...options,
-                cache: 'no-store',
-                headers: apiHeaders(options.headers || {})
+        // ===== TRẠNG THÁI KẾT NỐI BACKEND SERVER / POSTGRESQL =====
+        const SERVER_STATUS_STYLES = {
+            checking:  { text: 'text-slate-400',   dot: 'bg-slate-400',                label: 'ĐANG KIỂM TRA' },
+            connected: { text: 'text-emerald-400', dot: 'bg-emerald-400 animate-pulse', label: 'CONNECTED' },
+            dberror:   { text: 'text-amber-400',   dot: 'bg-amber-400',                label: 'DB ERROR' },
+            offline:   { text: 'text-rose-400',    dot: 'bg-rose-400',                 label: 'OFFLINE' }
+        };
+        const ALL_STATUS_TEXT = Object.values(SERVER_STATUS_STYLES).map(s => s.text);
+
+        function setServerStatus(state, detail = '') {
+            const style = SERVER_STATUS_STYLES[state] || SERVER_STATUS_STYLES.checking;
+            ['server-status-mob', 'server-status-desk'].forEach(id => {
+                const el = document.getElementById(id);
+                if (!el) return;
+                el.classList.remove(...ALL_STATUS_TEXT);
+                el.classList.add(style.text);
+                const dot = document.createElement('span');
+                dot.className = `w-2 h-2 rounded-full ${style.dot}`;
+                el.replaceChildren(dot, document.createTextNode(` ${style.label}`));
+                el.title = detail;
             });
+        }
+
+        let statusPollTimer = null;
+        async function checkBackendStatus() {
+            if (!authSession) return;
+            try {
+                const response = await fetch(apiUrl('/api/health'), { cache: 'no-store' });
+                const data = await response.json().catch(() => ({}));
+                if (data && data.dbName) {
+                    if (backendDbName !== data.dbName) { backendDbName = data.dbName; updateConnectionLabels(); }
+                }
+                if (response.ok && data.dbOk !== false) {
+                    const latency = typeof data.dbLatencyMs === 'number' ? ` • ${data.dbLatencyMs} ms` : '';
+                    setServerStatus('connected', `PostgreSQL${data.dbName ? ' • ' + data.dbName : ''}${latency}`);
+                } else {
+                    setServerStatus('dberror', (data && data.message) || `Backend phản hồi HTTP ${response.status}`);
+                }
+            } catch (_) {
+                setServerStatus('offline', `Không kết nối được Backend Server (${authSession.serverUrl}).`);
+            }
+        }
+
+        function startStatusPolling() {
+            checkBackendStatus();
+            if (statusPollTimer) clearInterval(statusPollTimer);
+            statusPollTimer = setInterval(() => { if (!document.hidden) checkBackendStatus(); }, 30000);
+        }
+        document.addEventListener('visibilitychange', () => { if (!document.hidden && authSession) checkBackendStatus(); });
+
+        async function apiFetch(endpoint, options = {}) {
+            let response;
+            try {
+                response = await fetch(apiUrl(endpoint), {
+                    ...options,
+                    cache: 'no-store',
+                    headers: apiHeaders(options.headers || {})
+                });
+            } catch (networkError) {
+                setServerStatus('offline', 'Không kết nối được Backend Server.');
+                throw new Error(`Không thể kết nối tới Backend Server (${authSession ? authSession.serverUrl : ''}). Kiểm tra server, mạng hoặc CORS.`);
+            }
             const data = await response.json().catch(() => ({}));
             if (response.status === 401 || response.status === 403) {
                 handleUnauthorizedSession(data.error || `Không có quyền truy cập (HTTP ${response.status}).`);
                 throw new Error(data.error || `HTTP ${response.status}`);
             }
             if (!response.ok || data.success === false) {
-                throw new Error(data.error || `Server trả về lỗi HTTP ${response.status}`);
+                if (response.status >= 500) checkBackendStatus(); // cập nhật nhãn trạng thái khi server/PostgreSQL gặp sự cố
+                const error = new Error(data.error || `Server trả về lỗi HTTP ${response.status}`);
+                error.code = data.code;
+                error.status = response.status;
+                throw error;
             }
             return data;
+        }
+
+        // Dữ liệu trên PostgreSQL đã bị quản trị viên khác thay đổi sau khi tải về (HTTP 409)
+        function handleStaleData(kind) {
+            const label = kind === 'users' ? 'tài khoản' : 'thông báo';
+            const reload = window.confirm(
+                `Danh sách ${label} đã được quản trị viên khác thay đổi sau khi bạn tải.\n\n` +
+                `Nhấn OK để tải lại dữ liệu mới nhất từ PostgreSQL (bản nháp hiện tại sẽ bị bỏ).\n` +
+                `Nhấn Hủy để giữ bản nháp (nên xuất file sao lưu trước khi tải lại).`);
+            if (reload) {
+                if (kind === 'users') loadUsersFromServer(); else loadNotificationsFromServer(true);
+            } else {
+                showToast(`Chưa lưu: dữ liệu ${label} trên PostgreSQL đã thay đổi. Hãy sao lưu bản nháp rồi tải lại.`, 'error');
+            }
         }
 
         function enterAdminWorkspace() {
             document.getElementById('login-modal').classList.add('hidden');
             document.getElementById('admin-workspace').classList.remove('hidden');
             updateConnectionLabels();
+            startStatusPolling();
             loadUsersFromServer();
         }
 
@@ -944,6 +1027,9 @@
                 const loginData = await loginRes.json().catch(() => ({}));
 
                 if (!loginRes.ok || !loginData.success || !loginData.token) {
+                    if ([404, 405].includes(loginRes.status) && !loginData.error) {
+                        throw new Error(`Địa chỉ ${serverUrl} không phải Backend Server (HTTP ${loginRes.status}). Hãy nhập địa chỉ đang chạy server.js, ví dụ http://localhost:3000 (không dùng cổng Live Server 5500).`);
+                    }
                     throw new Error(loginData.error || `Đăng nhập thất bại (HTTP ${loginRes.status})`);
                 }
 
@@ -1026,13 +1112,13 @@
 
         function exportUsersJson() {
             if (!usersData.length || !usersLoadedFromServer) {
-                showToast('Chưa có dữ liệu từ SQLite để xuất.', 'error');
+                showToast('Chưa có dữ liệu từ PostgreSQL để xuất.', 'error');
                 return;
             }
             const blob = new Blob([JSON.stringify(serializeUsers(), null, 2)], { type: 'application/json;charset=utf-8' });
             const a = document.createElement('a');
             a.href = URL.createObjectURL(blob);
-            a.download = 'users-sqlite-backup.json';
+            a.download = 'users-postgresql-backup.json';
             document.body.appendChild(a);
             a.click();
             a.remove();
@@ -1048,7 +1134,7 @@
             }
         }
 
-        // ===== 1. ĐỒNG BỘ USERS VỚI SQLITE BACKEND =====
+        // ===== 1. ĐỒNG BỘ USERS VỚI POSTGRESQL BACKEND =====
         async function loadUsersFromServer() {
             if (!authSession || isLoadingUsers) return;
             isLoadingUsers = true;
@@ -1063,12 +1149,13 @@
                 }
 
                 usersLoadedFromServer = true;
+                usersRevision = typeof data.revision === 'string' ? data.revision : '';
                 usersData = data.users.map(u => ({
                     ...u,
                     status: normalizeStatus(u.status)
                 }));
                 updateConnectionLabels();
-                showToast(`Đã tải ${usersData.length} tài khoản từ SQLite.`);
+                showToast(`Đã tải ${usersData.length} tài khoản từ PostgreSQL.`);
             } catch (err) {
                 console.error(err);
                 usersLoadedFromServer = false;
@@ -1087,7 +1174,7 @@
             if (!authSession) return;
 
             if (!usersLoadedFromServer) {
-                showToast('Chưa đồng bộ được dữ liệu từ SQLite nên không thể xuất bản.', 'error');
+                showToast('Chưa đồng bộ được dữ liệu từ PostgreSQL nên không thể xuất bản.', 'error');
                 return;
             }
 
@@ -1099,9 +1186,10 @@
             try {
                 const data = await apiFetch('/api/admin/users', {
                     method: 'PUT',
-                    body: JSON.stringify({ users: serializeUsers() })
+                    body: JSON.stringify({ users: serializeUsers(), baseRevision: usersRevision })
                 });
 
+                if (typeof data.revision === 'string') usersRevision = data.revision;
                 if (Array.isArray(data.users)) {
                     usersData = data.users.map(u => ({
                         ...u,
@@ -1111,16 +1199,20 @@
                     applyFiltersAndSort();
                 }
 
-                showToast(`Đã cập nhật ${data.count ?? usersData.length} tài khoản vào SQLite thành công!`);
+                showToast(`Đã lưu ${data.count ?? usersData.length} tài khoản vào PostgreSQL và xác nhận lại từ cơ sở dữ liệu.`);
             } catch (err) {
-                showToast(`Lỗi lưu vào SQLite: ${err.message}`, 'error');
+                if (err.code === 'STALE_REVISION') {
+                    handleStaleData('users');
+                } else {
+                    showToast(`Lỗi lưu vào PostgreSQL: ${err.message}`, 'error');
+                }
             } finally {
                 btnPub.disabled = false;
                 btnPub.innerHTML = oldHtml;
             }
         });
 
-        // ===== 2. ĐỒNG BỘ NOTIFICATIONS VỚI SQLITE BACKEND =====
+        // ===== 2. ĐỒNG BỘ NOTIFICATIONS VỚI POSTGRESQL BACKEND =====
         function serializeNotifications() {
             return notificationsData.map(notification => ({
                 id: notification.id,
@@ -1131,6 +1223,19 @@
                 active: notification.active,
                 createdAt: notification.createdAt,
                 updatedAt: notification.updatedAt || ''
+            }));
+        }
+
+        function normalizeNotificationList(list) {
+            return list.map((item, index) => ({
+                id: String(item.id || `notification-${index + 1}`),
+                title: String(item.title || ''),
+                message: String(item.message || ''),
+                icon: String(item.icon || 'fa-circle-info'),
+                color: ['blue', 'emerald', 'amber', 'purple', 'rose'].includes(item.color) ? item.color : 'blue',
+                active: item.active !== false,
+                createdAt: item.createdAt || new Date().toISOString(),
+                updatedAt: item.updatedAt || ''
             }));
         }
 
@@ -1148,18 +1253,10 @@
                     throw new Error('Dữ liệu thông báo từ server không hợp lệ.');
                 }
 
-                notificationsData = data.notifications.map((item, index) => ({
-                    id: String(item.id || `notification-${index + 1}`),
-                    title: String(item.title || ''),
-                    message: String(item.message || ''),
-                    icon: String(item.icon || 'fa-circle-info'),
-                    color: ['blue', 'emerald', 'amber', 'purple', 'rose'].includes(item.color) ? item.color : 'blue',
-                    active: item.active !== false,
-                    createdAt: item.createdAt || new Date().toISOString(),
-                    updatedAt: item.updatedAt || ''
-                }));
+                notificationsData = normalizeNotificationList(data.notifications);
+                notificationsBaseUpdatedAt = typeof data.updatedAt === 'string' ? data.updatedAt : '';
                 notificationsLoadedFromServer = true;
-                showToast(`Đã tải ${notificationsData.length} thông báo từ SQLite.`);
+                showToast(`Đã tải ${notificationsData.length} thông báo từ PostgreSQL.`);
                 renderNotificationsAdmin();
             } catch (error) {
                 notificationsLoadedFromServer = false;
@@ -1185,14 +1282,14 @@
             if (!notificationsLoadedFromServer) {
                 const hint = document.createElement('p');
                 hint.className = 'text-xs text-slate-500';
-                hint.textContent = 'Nhấn "Tải dữ liệu" để đồng bộ thông báo từ SQLite.';
+                hint.textContent = 'Nhấn "Tải dữ liệu" để đồng bộ thông báo từ PostgreSQL.';
                 container.appendChild(hint);
                 return;
             }
             if (!notificationsData.length) {
                 const empty = document.createElement('p');
                 empty.className = 'text-xs text-slate-400';
-                empty.textContent = 'Chưa có thông báo trong SQLite. Hãy thêm thông báo rồi nhấn "Xuất bản".';
+                empty.textContent = 'Chưa có thông báo trong PostgreSQL. Hãy thêm thông báo rồi nhấn "Xuất bản".';
                 container.appendChild(empty);
                 return;
             }
@@ -1319,13 +1416,13 @@
             notificationsData = notificationsData.filter(item => item.id !== id);
             if (editingNotificationId === id) resetNotificationForm();
             renderNotificationsAdmin();
-            showToast('Đã xóa thông báo khỏi bản nháp. Nhấn "Xuất bản" để lưu vào SQLite.');
+            showToast('Đã xóa thông báo khỏi bản nháp. Nhấn "Xuất bản" để lưu vào PostgreSQL.');
         }
 
         document.getElementById('notification-form').addEventListener('submit', event => {
             event.preventDefault();
             if (!notificationsLoadedFromServer) {
-                showToast('Hãy tải dữ liệu thông báo từ SQLite trước khi chỉnh sửa.', 'error');
+                showToast('Hãy tải dữ liệu thông báo từ PostgreSQL trước khi chỉnh sửa.', 'error');
                 return;
             }
 
@@ -1364,7 +1461,7 @@
             }
             resetNotificationForm();
             renderNotificationsAdmin();
-            showToast('Đã lưu thông báo vào bản nháp. Nhấn “Xuất bản” để đẩy vào SQLite.');
+            showToast('Đã lưu thông báo vào bản nháp. Nhấn “Xuất bản” để đẩy vào PostgreSQL.');
         });
 
         document.getElementById('btn-cancel-notification-edit').addEventListener('click', resetNotificationForm);
@@ -1426,7 +1523,7 @@
 
         function exportNotificationsJson() {
             if (!notificationsLoadedFromServer) {
-                showToast('Hãy tải dữ liệu thông báo từ SQLite trước khi xuất.', 'error');
+                showToast('Hãy tải dữ liệu thông báo từ PostgreSQL trước khi xuất.', 'error');
                 return;
             }
             const payload = {
@@ -1439,7 +1536,7 @@
             });
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
-            link.download = 'notifications-sqlite-backup.json';
+            link.download = 'notifications-postgresql-backup.json';
             document.body.appendChild(link);
             link.click();
             link.remove();
@@ -1449,7 +1546,7 @@
 
         document.getElementById('btn-publish-notifications').addEventListener('click', async () => {
             if (!authSession || !notificationsLoadedFromServer) {
-                showToast('Hãy tải thông báo từ SQLite trước khi xuất bản.', 'error');
+                showToast('Hãy tải thông báo từ PostgreSQL trước khi xuất bản.', 'error');
                 return;
             }
             const button = document.getElementById('btn-publish-notifications');
@@ -1459,11 +1556,20 @@
             try {
                 const data = await apiFetch('/api/admin/notifications', {
                     method: 'PUT',
-                    body: JSON.stringify({ notifications: serializeNotifications() })
+                    body: JSON.stringify({ notifications: serializeNotifications(), baseUpdatedAt: notificationsBaseUpdatedAt })
                 });
-                showToast(`Đã cập nhật ${data.count ?? notificationsData.length} thông báo vào SQLite thành công!`);
+                if (typeof data.updatedAt === 'string') notificationsBaseUpdatedAt = data.updatedAt;
+                if (Array.isArray(data.notifications)) {
+                    notificationsData = normalizeNotificationList(data.notifications); // dữ liệu server đọc lại từ PostgreSQL
+                    renderNotificationsAdmin();
+                }
+                showToast(`Đã lưu ${data.count ?? notificationsData.length} thông báo vào PostgreSQL và xác nhận lại từ cơ sở dữ liệu.`);
             } catch (error) {
-                showToast(`Lỗi lưu thông báo vào SQLite: ${error.message}`, 'error');
+                if (error.code === 'STALE_REVISION') {
+                    handleStaleData('notifications');
+                } else {
+                    showToast(`Lỗi lưu thông báo vào PostgreSQL: ${error.message}`, 'error');
+                }
             } finally {
                 button.disabled = false;
                 button.innerHTML = oldHtml;
@@ -1653,7 +1759,7 @@
 
         function openAddModal() {
             if (!usersLoadedFromServer) {
-                showToast('Vui lòng tải dữ liệu từ SQLite trước khi thêm tài khoản.', 'error');
+                showToast('Vui lòng tải dữ liệu từ PostgreSQL trước khi thêm tài khoản.', 'error');
                 return;
             }
             document.getElementById('modalTitle').innerHTML = '<i class="fa-solid fa-user-plus text-purple-400"></i> Thêm Người Dùng Mới';
@@ -1758,7 +1864,7 @@
                 populateFilterDropdowns();
                 applyFiltersAndSort();
                 closeModal();
-                showToast('Đã lưu thay đổi vào bản nháp. Nhấn "Xuất bản" để ghi vào SQLite!');
+                showToast('Đã lưu thay đổi vào bản nháp. Nhấn "Xuất bản" để ghi vào PostgreSQL!');
             } catch (err) {
                 console.error(err);
                 showToast(`Lưu thất bại: ${err && err.message ? err.message : err}`, 'error');
@@ -1774,7 +1880,7 @@
                 usersData = usersData.filter(u => u.id !== id);
                 populateFilterDropdowns();
                 applyFiltersAndSort();
-                showToast('Đã xóa tài khoản khỏi bản nháp. Nhấn "Xuất bản" để cập nhật SQLite.');
+                showToast('Đã xóa tài khoản khỏi bản nháp. Nhấn "Xuất bản" để cập nhật PostgreSQL.');
             }
         }
     </script>

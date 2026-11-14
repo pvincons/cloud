@@ -1036,19 +1036,19 @@ $('#pgDel').onclick=()=>{for(const id of sel){const g=gidOf(id);if(g&&PROG.delet
 function queueSave(){clearTimeout(sq);if(!CANW||!DIRTY.size)return;$('#pgSave').textContent='Chưa lưu…';sq=setTimeout(saveProgress,1500)}
 async function saveProgress(){
  if(!DIRTY.size||!CANW)return;if(!CUR_REL){const ok=saveLocal();DIRTY.clear();$('#pgSave').textContent=ok?'Đã lưu trong trình duyệt này '+new Date().toLocaleTimeString('vi-VN'):'Bộ nhớ trình duyệt đầy — hãy bấm Xuất CSV để sao lưu';return}const keys=[...DIRTY];
- try{for(let i=0;i<keys.length;i+=2000){const items={};
+ let skp=0,drp=0;try{for(let i=0;i<keys.length;i+=2000){const items={};
    for(const g of keys.slice(i,i+2000)){const d=PROG.get(g);items[g]=d?{st:d.st,start:iso(d.start),end:iso(d.end),note:d.note,photos:d.photos}:null}
    const r=await fetch(window.API+'/api/progress/save',{method:'POST',headers:{'Content-Type':'application/json',...authH(window.API)},body:JSON.stringify({filePath:CUR_REL,items})}),j=await r.json();
-   if(!r.ok||!j.success)throw new Error(j.error||r.status)}
-  keys.forEach(k=>DIRTY.delete(k));$('#pgSave').textContent='Đã lưu lên server '+new Date().toLocaleTimeString('vi-VN')}
+   if(!r.ok||!j.success)throw new Error(j.error||r.status);skp+=j.skipped||0;drp+=j.photosDropped||0}
+  keys.forEach(k=>DIRTY.delete(k));$('#pgSave').textContent='Đã lưu lên server '+new Date().toLocaleTimeString('vi-VN')+(skp||drp?` · server bỏ qua ${skp?skp+' dòng sai GlobalId/định dạng':''}${skp&&drp?', ':''}${drp?drp+' ảnh không phải URL https hoặc đường dẫn /':''}`:'')}
  catch(e){$('#pgSave').textContent='Lỗi lưu: '+(e.message||e)}}
 async function loadProgress(){
- CANW=false;DIRTY.clear();PROG.clear();$('#pgEdit').style.display='none';
+ CANW=false;DIRTY.clear();PROG.clear();$('#pgEdit').style.display='none';logBtn(false);
  if(!CUR_REL){CANW=true;$('#pgEdit').style.display='block';$('#pgSave').textContent='Mô hình mở từ máy: dữ liệu lưu trong trình duyệt này (Xuất CSV để sao lưu, ảnh chỉ tải được với mô hình từ CDE)';try{for(const [g,d] of JSON.parse(localStorage.getItem(LK)||'[]'))PROG.set(g,{st:d.st||'',start:+d.start||0,end:+d.end||0,photos:Array.isArray(d.photos)?d.photos.map(String):[],note:String(d.note||'')})}catch(e){}for(const el of els.values())progColor(el);pgUi();if(progMode){applyColorsToBuffer();dirty=true}return}
  $('#pgSave').textContent='';
  try{const r=await fetch(window.API+'/api/progress?file='+encodeURIComponent(CUR_REL),{headers:authH(window.API)});if(!r.ok)return;const j=await r.json();if(!j.success)return;
   for(const [g,d] of Object.entries(j.items||{}))PROG.set(g,{st:ST[d.st]&&d.st!=='NONE'?d.st:'',start:pd(d.start),end:pd(d.end),photos:Array.isArray(d.photos)?d.photos.map(String):[],note:String(d.note||'')});
-  CANW=!!j.canWrite;$('#pgEdit').style.display=CANW?'block':'none';loadRelated();
+  CANW=!!j.canWrite;$('#pgEdit').style.display=CANW?'block':'none';logBtn(CANW);loadRelated();
   for(const el of els.values())progColor(el);pgUi();if(progMode){applyColorsToBuffer();dirty=true}}catch(e){}}
 
 /* ---------- Revision · Ảnh hiện trường · Lưu cục bộ · Xuất CSV ---------- */
@@ -1079,6 +1079,33 @@ $('#pgExp').onclick=()=>{if(!PROG.size){toast('Chưa có dữ liệu để xuấ
  const q=v=>{let s=String(v??'');if(/^[=+\-@\t\r]/.test(s))s="'"+s;return '"'+s.replace(/"/g,'""')+'"'},fd=t=>t?new Date(t).toISOString().slice(0,10):'';
  const rows=[['GlobalId','Status','Start','Finish','Photo','Note'].join(','),...[...PROG].map(([g,d])=>[g,d.st?ST[d.st].n:'',fd(d.start),fd(d.end),d.photos.join('|'),d.note].map(q).join(','))];
  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\ufeff'+rows.join('\r\n')],{type:'text/csv;charset=utf-8'}));a.download=((document.title||'BIM').replace(/ – .*$/,'').replace(/[\\/:*?"<>|]+/g,'_'))+'-thi-cong.csv';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),4000)};
+
+/* ---------- Nhật ký thi công (GET /api/progress/audit) ---------- */
+$('#pgExp').insertAdjacentHTML('afterend',`<button id="pgLogBtn" style="display:none;width:100%;margin-top:6px;${SS}" title="Ai đã lưu / chuyển dữ liệu / tải ảnh lên cho mô hình này, vào lúc nào">Nhật ký thi công</button>`);
+function logBtn(v){const b=$('#pgLogBtn');if(b)b.style.display=v&&CUR_REL?'block':'none'}
+const LOGACT={save:'Lưu dữ liệu',copy:'Chuyển từ revision khác',photo:'Tải ảnh lên'};
+function progLogKey(e){if(e.key==='Escape')closeProgLog()}
+function closeProgLog(){const o=$('#pgLog');if(o)o.remove();document.removeEventListener('keydown',progLogKey)}
+function logRow(x){
+ const a=x.action||(x.copiedFrom?'copy':'save'),t=x.at?new Date(x.at).toLocaleString('vi-VN'):'';let d;
+ if(a==='copy')d=`Chuyển ${x.saved||0} cấu kiện từ ${String(x.copiedFrom||'').split('/').pop()}`+(x.skipped?` · bỏ qua ${x.skipped} đã có`:'');
+ else if(a==='photo')d=`Tải lên ${x.count||1} ảnh`;
+ else d=`Lưu ${x.saved||0} · xóa ${x.deleted||0} cấu kiện`+(x.skipped?` · bỏ qua ${x.skipped} dòng không hợp lệ`:'')+(x.photosDropped?` · loại ${x.photosDropped} ảnh sai định dạng`:'');
+ const who=esc(x.name||x.user||'')+(x.user&&x.name&&x.name!==x.user?` <span style="opacity:.6">(${esc(x.user)})</span>`:'');
+ return `<div style="padding:8px 0;border-top:1px solid var(--ln,#2a3544)"><div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap"><b>${esc(LOGACT[a]||a)}</b><span style="opacity:.7">${esc(t)}</span></div><div>${who}</div><div style="opacity:.85">${esc(d)}</div></div>`}
+async function openProgLog(){
+ if(!CUR_REL||!CANW)return;closeProgLog();
+ const o=document.createElement('div');o.id='pgLog';
+ o.style.cssText='position:fixed;inset:0;z-index:60;display:flex;align-items:center;justify-content:center;padding:12px;box-sizing:border-box;background:rgba(0,0,0,.55)';
+ o.innerHTML=`<div role="dialog" aria-modal="true" aria-label="Nhật ký thi công" style="width:min(520px,100%);max-height:min(80vh,640px);display:flex;flex-direction:column;border-radius:10px;overflow:hidden;background:var(--p,#111822);color:var(--tx,#d6dee7);border:1px solid var(--ln,#2a3544);font-size:13px"><div style="display:flex;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid var(--ln,#2a3544)"><b style="flex:1">Nhật ký thi công</b><button id="pgLogClose" style="${SS}">Đóng</button></div><div id="pgLogInfo" style="padding:8px 12px;opacity:.75"></div><div id="pgLogBody" style="overflow:auto;padding:0 12px 12px;-webkit-overflow-scrolling:touch"></div></div>`;
+ document.body.appendChild(o);o.onclick=e=>{if(e.target===o)closeProgLog()};$('#pgLogClose').onclick=closeProgLog;document.addEventListener('keydown',progLogKey);
+ const info=$('#pgLogInfo'),body=$('#pgLogBody');info.textContent='Đang tải nhật ký…';
+ try{const r=await fetch(window.API+'/api/progress/audit?file='+encodeURIComponent(CUR_REL),{headers:authH(window.API)}),j=await r.json().catch(()=>({}));
+  if(!r.ok||!j.success)throw new Error(j.error||('HTTP '+r.status));if(!$('#pgLog'))return;
+  const log=j.log||[];info.textContent=log.length?`${CUR_REL.split('/').pop()} · hiển thị ${log.length}/${j.total??log.length} lần thay đổi gần nhất`:'Chưa có nhật ký cho mô hình này.';
+  body.innerHTML=log.map(logRow).join('')}
+ catch(x){if($('#pgLog'))info.textContent='Không tải được nhật ký: '+(x.message||x)}}
+$('#pgLogBtn').onclick=openProgLog;
 
 /* ---------- Camera & Controls ---------- */
 function bbox(ids){const b=new THREE.Box3();
