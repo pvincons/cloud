@@ -1,9 +1,6 @@
-// assets/js/config.js
-const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-
 const CONFIG = {
     // Cả Auth và CDE đều chạy chung một cổng duy nhất sau khi gộp file server.js[cite: 1]
-    AUTH_API: isLocal ? 'http://localhost:3000/api/auth' : 'https://api.pvincons.cloud/api/auth',
-    CDE_API: isLocal ? 'http://localhost:3000/api' : 'https://api.pvincons.cloud/api',
-    SERVER_URL: isLocal ? 'http://localhost:3000' : 'https://api.pvincons.cloud'
+    AUTH_API: 'https://api.pvincons.cloud/api/auth',
+    CDE_API: 'https://api.pvincons.cloud/api',
+    SERVER_URL: 'https://api.pvincons.cloud'
 };
